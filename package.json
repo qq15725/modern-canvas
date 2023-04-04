@@ -1,23 +1,24 @@
 {
-  "name": "starter-ts",
+  "name": "modern-canvas",
   "type": "module",
-  "version": "0.0.3",
+  "version": "0.0.0",
   "packageManager": "pnpm@7.26.2",
-  "description": "Starter template for TypeScript library",
+  "description": "A data driven modern canvas library",
   "author": "wxm",
   "license": "MIT",
-  "homepage": "https://github.com/qq15725/starter-ts",
+  "homepage": "https://github.com/qq15725/modern-canvas",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/qq15725/starter-ts.git"
+    "url": "git+https://github.com/qq15725/modern-canvas.git"
   },
   "bugs": {
-    "url": "https://github.com/qq15725/starter-ts/issues"
+    "url": "https://github.com/qq15725/modern-canvas/issues"
   },
   "keywords": [
-    "starter",
-    "template",
-    "typescript"
+    "modern",
+    "canvas",
+    "webgl",
+    "webgl2"
   ],
   "sideEffects": false,
   "exports": {
