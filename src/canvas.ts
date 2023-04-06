@@ -1,6 +1,6 @@
 import { render } from './render'
 import { createContainer } from './container'
-import { bufferPlugin, fadePlugin, imagePlugin, positionTransformPlugin } from './plugins'
+import { bufferPlugin, fadePlugin, imagePlugin, transformPlugin } from './plugins'
 import { registerProgram, useProgram } from './program'
 import { registerTexture } from './texture'
 import { draw } from './draw'
@@ -16,8 +16,9 @@ import type { Container } from './container'
 import type { Buffer, RegisterBufferOptions } from './buffer'
 
 export interface CanvasOptions {
-  view?: HTMLCanvasElement
   glOptions?: WebGLContextAttributes
+  view?: HTMLCanvasElement
+  children?: Node[]
 }
 
 export interface Canvas extends Container {
@@ -54,13 +55,14 @@ const presetPlugins = [
   bufferPlugin,
   imagePlugin,
   fadePlugin,
-  positionTransformPlugin,
+  transformPlugin,
 ]
 
 export function createCanvas(options: CanvasOptions = {}): Canvas {
   const {
-    view = document.createElement('canvas'),
     glOptions,
+    view = document.createElement('canvas'),
+    children = [],
   } = options
 
   const canvas = createContainer() as Canvas
@@ -72,7 +74,7 @@ export function createCanvas(options: CanvasOptions = {}): Canvas {
   canvas.set('programs', new Map())
   canvas.set('buffers', new Map())
   canvas.set('textures', new Map())
-  canvas.set('children', [])
+  canvas.set('children', children)
   canvas.set('registerPlugin', (options: any) => registerPlugin(canvas, options))
   canvas.set('registerBuffer', (options: any) => registerBuffer(canvas, options))
   canvas.set('registerTexture', (options: any) => registerTexture(canvas, options))

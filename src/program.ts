@@ -179,6 +179,15 @@ export function useProgramUniforms(canvas: Canvas, program: Program, uniforms?: 
       case 'vec4':
         gl.uniform4fv(location, value)
         break
+      case 'mat2':
+        gl.uniformMatrix2fv(location, false, value)
+        break
+      case 'mat3':
+        gl.uniformMatrix3fv(location, false, value)
+        break
+      case 'mat4':
+        gl.uniformMatrix4fv(location, false, value)
+        break
     }
   }
 }
