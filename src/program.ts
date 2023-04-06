@@ -1,35 +1,44 @@
+import type { GlSlType } from './gl'
 import type { Canvas } from './canvas'
 
 export interface RegisterProgramOptions {
   name: string
-  mode: 'point' | 'line' | 'triangle'
-  vertices: Float32Array | number[]
-  indexes?: Uint16Array | number[]
   vert: string
   frag: string
   uniforms?: Record<string, any>
-  texture?: string
+  textureName?: string
+  vertexBufferName: string
+  indexBufferName?: string
+  drawMode?: keyof Canvas['glDrawModes']
 }
 
 export interface UseProgramOptions {
   name: string
   uniforms?: Record<string, any>
-  texture?: string
+  textureName?: string
+}
+
+export interface GlActivatedUniform {
+  type: GlSlType
+  isArray: boolean
+  location: WebGLUniformLocation | null
 }
 
 export type Program = RegisterProgramOptions & {
   glProgram: WebGLProgram
+  glActivatedUniforms: Record<string, GlActivatedUniform>
   glDrawCount: number
 }
 
 export function registerProgram(canvas: Canvas, options: RegisterProgramOptions) {
-  const { gl, programs } = canvas
+  const { gl, programs, buffers, glSlTypes } = canvas
 
   const {
     name,
-    vertices,
     vert,
     frag,
+    vertexBufferName,
+    uniforms,
   } = options
 
   if (programs.has(name)) return
@@ -61,78 +70,106 @@ export function registerProgram(canvas: Canvas, options: RegisterProgramOptions)
     throw new Error(`failed to initing program: ${ gl.getProgramInfoLog(glProgram) }`)
   }
 
-  // create webgl vertex buffer
-  const glBuffer = gl.createBuffer()
-  gl.bindBuffer(gl.ARRAY_BUFFER, glBuffer)
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW)
-  gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0)
-  gl.enableVertexAttribArray(0)
-
   gl.useProgram(glProgram)
 
-  // bind attrib
-  gl.bindAttribLocation(glProgram, 0, 'aPosition')
+  // bind webgl vertex buffer
+  const vertexBuffer = buffers.get(vertexBufferName)
+  if (!vertexBuffer) return
+  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer.glBuffer)
+  const location = gl.getAttribLocation(glProgram, 'aPosition')
+  gl.vertexAttribPointer(location, 2, gl.FLOAT, false, 0, 0)
+  gl.enableVertexAttribArray(location)
 
   // resovle actived uniforms info
-  gl.uniform1i(gl.getUniformLocation(glProgram, 'uSampler'), 0)
+  const glActivatedUniforms: Record<string, GlActivatedUniform> = {}
+  for (let len = gl.getProgramParameter(glProgram, gl.ACTIVE_UNIFORMS), i = 0; i < len; i++) {
+    const gLActiveInfo = gl.getActiveUniform(glProgram, i)
+    if (!gLActiveInfo) continue
+    const { name, type } = gLActiveInfo
+    const varName = name.replace(/\[.*?]$/, '')
+    glActivatedUniforms[varName] = {
+      type: glSlTypes[type],
+      isArray: !!(name.match(/\[.*?]$/)),
+      location: gl.getUniformLocation(glProgram, varName),
+    }
+  }
 
-  // calc draw count
-  const glDrawCount = vertices.length / 2
+  if (glActivatedUniforms.uSampler) {
+    gl.uniform1i(glActivatedUniforms.uSampler.location, 0)
+  }
 
-  programs.set(name, {
+  const program = {
     ...options,
     glProgram,
-    glDrawCount,
-  })
+    glActivatedUniforms,
+    glDrawCount: vertexBuffer.numberPoints / 2,
+  }
+
+  programs.set(name, program)
+
+  useProgramUniforms(canvas, program, uniforms)
 }
 
 export function useProgram(canvas: Canvas, options: UseProgramOptions) {
-  const { gl, programs, textures } = canvas
-  const { name, texture: textureName, uniforms } = options
+  const { gl, programs } = canvas
+  const { name, textureName, uniforms } = options
 
   const program = programs.get(name)
   if (!program) return
 
-  const { mode, glProgram, glDrawCount } = program
+  const {
+    drawMode = 'triangles',
+    glProgram,
+    glDrawCount,
+  } = program
 
   // use texture
   if (textureName) {
-    const texture = textures.get(textureName)
-    if (texture) {
-      gl.bindTexture(gl.TEXTURE_2D, texture.glTexture)
-    }
+    gl.bindTexture(
+      gl.TEXTURE_2D,
+      canvas.textures.get(textureName)?.glTexture
+      ?? canvas.glDefaultTexture,
+    )
   }
 
   // use program
   gl.useProgram(glProgram)
+  useProgramUniforms(canvas, program, uniforms)
+  gl.drawArrays(canvas.glDrawModes[drawMode], 0, glDrawCount)
+}
 
-  if (uniforms) {
-    for (const [key, value] of Object.entries(uniforms)) {
-      // TODO
-      gl.uniform4fv(gl.getUniformLocation(glProgram, key), value)
+export function useProgramUniforms(canvas: Canvas, program: Program, uniforms?: Record<string, any>) {
+  if (!uniforms) return
+  const { gl } = canvas
+  const { glActivatedUniforms } = program
+  for (const [key, value] of Object.entries(uniforms)) {
+    if (!(key in glActivatedUniforms)) continue
+    const { type, isArray, location } = glActivatedUniforms[key]
+    switch (type) {
+      case 'float':
+        if (isArray) {
+          gl.uniform1fv(location, value)
+        } else {
+          gl.uniform1f(location, value)
+        }
+        break
+      case 'bool':
+      case 'int':
+        if (isArray) {
+          gl.uniform1iv(location, value)
+        } else {
+          gl.uniform1i(location, value)
+        }
+        break
+      case 'vec2':
+        gl.uniform2fv(location, value)
+        break
+      case 'vec3':
+        gl.uniform3fv(location, value)
+        break
+      case 'vec4':
+        gl.uniform4fv(location, value)
+        break
     }
   }
-
-  // const isLast = index === programs.size - 1
-  // const textureBuffer = textureBuffers[index++ % 2]
-  // gl.useProgram(program)
-  // uniforms.uTime?.location && gl.uniform1f(uniforms.uTime.location, time)
-  // if (isLast) {
-  //   gl.bindFramebuffer(gl.FRAMEBUFFER, null)
-  // } else {
-  //   gl.bindFramebuffer(gl.FRAMEBUFFER, textureBuffer.buffer)
-  // }
-  gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)
-  gl.clearColor(1, 1, 1, 1)
-  gl.clearDepth(1)
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-  gl.enable(gl.DEPTH_TEST)
-
-  switch (mode) {
-    case 'triangle':
-      gl.drawArrays(gl.TRIANGLES, 0, glDrawCount)
-      break
-  }
-
-  // !isLast && gl.bindTexture(gl.TEXTURE_2D, textureBuffer.texture)
 }

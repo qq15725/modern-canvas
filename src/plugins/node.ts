@@ -5,32 +5,35 @@ export const nodePlugin = definePlugin(() => {
     name: 'canvas:node',
     type: 'unknown',
     register(canvas) {
-      canvas.registerProgram({
-        name: 'canvas:node-render',
-        mode: 'triangle',
-        vertices: [
+      canvas.registerBuffer({
+        name: 'canvas:rectangle',
+        target: 'arrayBuffer',
+        value: new Float32Array([
           -1, 1, -1, -1, 1, -1,
           1, -1, 1, 1, -1, 1,
-        ],
+        ]),
+      })
+
+      canvas.registerProgram({
+        name: 'canvas:node-render',
+        drawMode: 'triangles',
+        vertexBufferName: 'canvas:rectangle',
         vert: `attribute vec2 aPosition;
+varying vec2 vTextureCoord;
 uniform vec4 uTransform;
 void main() {
+  vTextureCoord = step(0.0, aPosition);
   vec2 position = aPosition;
-  position += uTransform.xy;
   position *= uTransform.zw;
+  position.y += (1.0 - uTransform.w) - (2.0 * uTransform.y);
+  position.x += (2.0 * uTransform.x) - (1.0 - uTransform.z);
   gl_Position = vec4(position, 0, 1);
 }`,
-        frag: `void main() {
-  gl_FragColor = vec4(1, 1, 1, 1);
+        frag: `uniform sampler2D uSampler;
+varying vec2 vTextureCoord;
+void main() {
+  gl_FragColor = texture2D(uSampler, vTextureCoord);
 }`,
-      })
-    },
-    render(canvas, node) {
-      canvas.useProgram({
-        name: 'canvas:node-render',
-        uniforms: {
-          uTransform: [node.x, node.y, node.w, node.h],
-        },
       })
     },
   }

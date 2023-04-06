@@ -5,14 +5,12 @@ export interface RegisterPluginOptions {
   name: string
   type: string | string[]
   register?(canvas: Canvas): void
-  boot?(canvas: Canvas, node: Node): void
-  render?(canvas: Canvas, node: Node, time: number): void
+  draw?(canvas: Canvas, node: Node, time: number): void
 }
 
 export interface Plugin {
   name: string
-  boot?(canvas: Canvas, node: Node): void | Promise<void>
-  render?(canvas: Canvas, node: Node, time: number): void
+  draw?(canvas: Canvas, node: Node, time: number): void
 }
 
 export function definePlugin(plugin: RegisterPluginOptions | (() => RegisterPluginOptions)): RegisterPluginOptions {

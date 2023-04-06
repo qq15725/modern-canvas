@@ -7,20 +7,13 @@ export const imagePlugin = definePlugin(() => {
     register(canvas) {
       canvas.registerProgram({
         name: 'canvas:image-render',
-        mode: 'triangle',
-        vertices: [
-          -1, 1, -1, -1, 1, -1,
-          1, -1, 1, 1, -1, 1,
-        ],
+        drawMode: 'triangles',
+        vertexBufferName: 'canvas:rectangle',
         vert: `attribute vec2 aPosition;
-uniform vec4 uTransform;
 varying vec2 vTextureCoord;
 void main() {
   vTextureCoord = step(0.0, aPosition);
-  vec2 position = aPosition;
-  position += uTransform.xy;
-  // position *= uTransform.zw;
-  gl_Position = vec4(position, 0, 1);
+  gl_Position = vec4(aPosition, 0, 1);
 }`,
         frag: `uniform sampler2D uSampler;
 varying vec2 vTextureCoord;
@@ -29,24 +22,21 @@ void main() {
 }`,
       })
     },
-    async boot(canvas, node) {
-      const source = await new Promise<HTMLImageElement>(resolve => {
-        const img = new Image()
-        img.src = node.url
-        img.onload = () => resolve(img)
-      })
-      canvas.registerTexture({
-        name: node.url,
-        source,
-      })
-    },
-    render(canvas, node) {
+    draw(canvas, node) {
+      const { textures } = canvas
+
+      if (!textures.has(node.url)) {
+        const source = new Image()
+        source.src = node.url
+        canvas.registerTexture({
+          name: node.url,
+          source,
+        })
+      }
+
       canvas.useProgram({
         name: 'canvas:image-render',
-        texture: node.url,
-        uniforms: {
-          uTransform: [node.x, node.y, node.w, node.h],
-        },
+        textureName: node.url,
       })
     },
   }

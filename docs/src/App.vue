@@ -9,24 +9,20 @@
       view: canvasEl.value,
     })
 
-    canvas.children.push({
-      type: 'image',
-      x: 0.2,
-      y: 0.2,
-      w: 1 / 4,
-      h: 1 / 4,
-      url: '/example.jpg',
-    })
+    canvas.children = [
+      { type: 'image', x: 0, y: 0, w: 100, h: 100, url: '/example.jpg' },
+      { type: 'image', x: 30, y: 30, w: 100, h: 100, url: '/example.jpg' },
+      { type: 'image', x: 60, y: 60, w: 100, h: 100, url: '/example.jpg' },
+      { type: 'image', x: 200, y: 200, w: 100, h: 100, url: '/example.jpg' },
+    ]
 
-    await canvas.boot()
-
-    canvas.draw(0)
+    canvas.render()
   })
 </script>
 
 <template>
   <div style="text-align: center;">
-    <canvas ref="canvasEl" style="width: 200px" width="400" height="400" />
+    <canvas ref="canvasEl" style="width: 400px; border: 1px solid grey;" width="400" height="400" />
   </div>
 </template>
 

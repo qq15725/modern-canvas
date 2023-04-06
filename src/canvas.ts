@@ -1,14 +1,19 @@
+import { render } from './render'
 import { createContainer } from './container'
 import { imagePlugin, nodePlugin } from './plugins'
 import { registerProgram, useProgram } from './program'
 import { registerTexture } from './texture'
 import { draw } from './draw'
 import { registerPlugin } from './plugin'
+import { registerBuffer } from './buffer'
+import { provideGl } from './gl'
+import type { GlBufferTargets, GlDrawModes, GlExtensions, GlSlTypes } from './gl'
 import type { Node } from './types'
 import type { Program, RegisterProgramOptions, UseProgramOptions } from './program'
 import type { Plugin, RegisterPluginOptions } from './plugin'
 import type { RegisterTextureOptions, Texture } from './texture'
 import type { Container } from './container'
+import type { Buffer, RegisterBufferOptions } from './buffer'
 
 export interface CanvasOptions {
   view?: HTMLCanvasElement
@@ -17,15 +22,24 @@ export interface CanvasOptions {
 
 export interface Canvas extends Container {
   view: HTMLCanvasElement
+  width: number
+  height: number
+
   gl: WebGLRenderingContext
-  glExtensions: {
-    loseContext: WEBGL_lose_context | null
-  }
+  glDefaultTexture: WebGLTexture
+  glDefaultFramebuffers: { glFramebuffer: WebGLFramebuffer; glTexture: WebGLTexture }[]
+  glBufferTargets: GlBufferTargets
+  glDrawModes: GlDrawModes
+  glSlTypes: GlSlTypes
+  glExtensions: GlExtensions
+
   plugins: Map<string, Plugin[]>
   programs: Map<string, Program>
+  buffers: Map<string, Buffer>
   textures: Map<string, Texture>
   children: Node[]
   registerPlugin(options: RegisterPluginOptions): void
+  registerBuffer(options: RegisterBufferOptions): void
   registerTexture(options: RegisterTextureOptions): void
   registerProgram(options: RegisterProgramOptions): void
   getProgram(name: string): Program
@@ -49,59 +63,21 @@ export function createCanvas(options: CanvasOptions = {}): Canvas {
 
   const canvas = createContainer() as Canvas
   canvas.set('view', view)
-  canvas.singleton('gl', () => {
-    // init webgl context TODO support webgl2
-    const gl = (
-      view.getContext('webgl', glOptions)
-      || view.getContext('experimental-webgl', glOptions)
-    ) as WebGLRenderingContext
-    if (!gl) throw new Error('failed to getContext for webgl')
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
-    return gl
-  })
-  canvas.singleton('glExtensions', () => ({
-    loseContext: canvas.gl.getExtension('WEBGL_lose_context'),
-  }))
+  provideGl(canvas, glOptions)
+  canvas.bind('width', () => canvas.gl.drawingBufferWidth)
+  canvas.bind('height', () => canvas.gl.drawingBufferHeight)
   canvas.set('plugins', new Map())
   canvas.set('programs', new Map())
+  canvas.set('buffers', new Map())
   canvas.set('textures', new Map())
   canvas.set('children', [])
   canvas.set('registerPlugin', (options: any) => registerPlugin(canvas, options))
+  canvas.set('registerBuffer', (options: any) => registerBuffer(canvas, options))
   canvas.set('registerTexture', (options: any) => registerTexture(canvas, options))
   canvas.set('registerProgram', (options: any) => registerProgram(canvas, options))
   canvas.set('useProgram', (options: any) => useProgram(canvas, options))
-  canvas.set('boot', async () => {
-    const { children, plugins } = canvas
-    async function boot(node: Node) {
-      const usePlugins = plugins.get(node.type)
-      if (usePlugins) {
-        for (let len = usePlugins.length, i = 0; i < len; i++) {
-          await usePlugins[i].boot?.(canvas, node)
-        }
-      }
-      const { children } = node
-      if (!children) return
-      for (let len = children.length, i = 0; i < len; i++) {
-        await boot(children[i])
-      }
-    }
-    for (let len = children.length, i = 0; i < len; i++) {
-      await boot(children[i])
-    }
-  })
   canvas.set('draw', (time: any) => draw(canvas, time))
-  canvas.set('render', () => {
-    let then = 0
-    let time = 0
-    function mainLoop(now: number) {
-      canvas.draw(time)
-      now *= 0.001
-      time += now - then
-      then = now
-      requestAnimationFrame(mainLoop)
-    }
-    requestAnimationFrame(mainLoop)
-  })
+  canvas.set('render', () => render(canvas))
   function onLost(event: WebGLContextEvent) {
     event.preventDefault()
     setTimeout(() => {
