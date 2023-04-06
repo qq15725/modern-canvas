@@ -3,13 +3,16 @@ import type { Node } from './types'
 
 export interface RegisterPluginOptions {
   name: string
-  type: string | string[]
+  include?: (node: Node) => boolean
+  exclude?: (node: Node) => boolean
   register?(canvas: Canvas): void
   draw?(canvas: Canvas, node: Node, time: number): void
 }
 
 export interface Plugin {
   name: string
+  include?: (node: Node) => boolean
+  exclude?: (node: Node) => boolean
   draw?(canvas: Canvas, node: Node, time: number): void
 }
 
@@ -19,18 +22,9 @@ export function definePlugin(plugin: RegisterPluginOptions | (() => RegisterPlug
 
 export function registerPlugin(canvas: Canvas, options: RegisterPluginOptions) {
   const { plugins } = canvas
-  const { type, register, ...plugin } = options
+  const { register, ...plugin } = options
 
   register?.(canvas)
 
-  const types = typeof type === 'string' ? [type] : type
-
-  types.forEach(type => {
-    let usePlugins = plugins.get(type)
-    if (!usePlugins) {
-      usePlugins = []
-      plugins.set(type, usePlugins)
-    }
-    usePlugins.push(plugin)
-  })
+  plugins.push(plugin)
 }

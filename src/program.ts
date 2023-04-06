@@ -3,8 +3,8 @@ import type { Canvas } from './canvas'
 
 export interface RegisterProgramOptions {
   name: string
-  vert: string
-  frag: string
+  vert?: string
+  frag?: string
   uniforms?: Record<string, any>
   textureName?: string
   vertexBufferName: string
@@ -35,8 +35,17 @@ export function registerProgram(canvas: Canvas, options: RegisterProgramOptions)
 
   const {
     name,
-    vert,
-    frag,
+    vert = `attribute vec2 aPosition;
+varying vec2 vTextureCoord;
+void main() {
+  vTextureCoord = step(0.0, aPosition);
+  gl_Position = vec4(aPosition, 0, 1);
+}`,
+    frag = `uniform sampler2D uSampler;
+varying vec2 vTextureCoord;
+void main() {
+  gl_FragColor = texture2D(uSampler, vTextureCoord);
+}`,
     vertexBufferName,
     uniforms,
   } = options

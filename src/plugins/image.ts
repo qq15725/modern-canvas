@@ -3,18 +3,11 @@ import { definePlugin } from '../plugin'
 export const imagePlugin = definePlugin(() => {
   return {
     name: 'canvas:image',
-    type: 'image',
+    include: node => node.type === 'image',
     register(canvas) {
       canvas.registerProgram({
-        name: 'canvas:image-render',
-        drawMode: 'triangles',
+        name: 'canvas:image',
         vertexBufferName: 'canvas:rectangle',
-        vert: `attribute vec2 aPosition;
-varying vec2 vTextureCoord;
-void main() {
-  vTextureCoord = step(0.0, aPosition);
-  gl_Position = vec4(aPosition, 0, 1);
-}`,
         frag: `uniform sampler2D uSampler;
 varying vec2 vTextureCoord;
 void main() {
@@ -35,7 +28,7 @@ void main() {
       }
 
       canvas.useProgram({
-        name: 'canvas:image-render',
+        name: 'canvas:image',
         textureName: node.url,
       })
     },

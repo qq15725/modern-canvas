@@ -4,6 +4,8 @@ import type { Node } from './types'
 export function draw(canvas: Canvas, time: number) {
   const { gl, width, height, children, plugins } = canvas
 
+  const drawablePlugins = plugins.filter(plugin => plugin.draw)
+
   gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
   gl.viewport(0, 0, width, height)
   gl.clearColor(1, 1, 1, 1)
@@ -11,42 +13,39 @@ export function draw(canvas: Canvas, time: number) {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
   // gl.enable(gl.DEPTH_TEST)
 
-  function render(node: Node) {
-    const usePlugins = plugins.get(node.type)
+  function drawNode(node: Node) {
+    const used = drawablePlugins.filter(plugin => {
+      return (
+        (!plugin.include && !plugin.exclude)
+        || (plugin.include && plugin.include(node))
+        || (plugin.exclude && !plugin.exclude(node))
+      )
+    })
 
-    if (usePlugins) {
-      for (let len = usePlugins.length, i = 0; i < len; i++) {
-        const buffer = canvas.glDefaultFramebuffers[i % 2]
+    for (let len = used.length, i = 0; i < len; i++) {
+      const last = i === len - 1
+      const buffer = canvas.glDefaultFramebuffers[i % 2]
+      if (last) {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null)
+      } else {
         gl.bindFramebuffer(gl.FRAMEBUFFER, buffer.glFramebuffer)
-        usePlugins[i].draw?.(canvas, node, time)
+      }
+      used[i].draw?.(canvas, node, time)
+      if (!last) {
         gl.bindTexture(gl.TEXTURE_2D, buffer.glTexture)
       }
     }
 
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null)
-    canvas.useProgram({
-      name: 'canvas:node-render',
-      uniforms: {
-        uTransform: [
-          (node.x ?? 0) / width,
-          (node.y ?? 0) / height,
-          node.w / width,
-          node.h / height,
-        ],
-      },
-    })
-
     const { children } = node
-
-    if (!children) return
-
-    for (let len = children.length, i = 0; i < len; i++) {
-      render(children[i])
+    if (children) {
+      for (let len = children.length, i = 0; i < len; i++) {
+        drawNode(children[i])
+      }
     }
   }
 
   for (let len = children.length, i = 0; i < len; i++) {
-    render(children[i])
+    drawNode(children[i])
   }
 
   gl.flush()

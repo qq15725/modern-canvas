@@ -1,6 +1,6 @@
 import { render } from './render'
 import { createContainer } from './container'
-import { imagePlugin, nodePlugin } from './plugins'
+import { bufferPlugin, fadePlugin, imagePlugin, positionTransformPlugin } from './plugins'
 import { registerProgram, useProgram } from './program'
 import { registerTexture } from './texture'
 import { draw } from './draw'
@@ -33,7 +33,7 @@ export interface Canvas extends Container {
   glSlTypes: GlSlTypes
   glExtensions: GlExtensions
 
-  plugins: Map<string, Plugin[]>
+  plugins: Plugin[]
   programs: Map<string, Program>
   buffers: Map<string, Buffer>
   textures: Map<string, Texture>
@@ -51,8 +51,10 @@ export interface Canvas extends Container {
 }
 
 const presetPlugins = [
-  nodePlugin,
+  bufferPlugin,
   imagePlugin,
+  fadePlugin,
+  positionTransformPlugin,
 ]
 
 export function createCanvas(options: CanvasOptions = {}): Canvas {
@@ -66,7 +68,7 @@ export function createCanvas(options: CanvasOptions = {}): Canvas {
   provideGl(canvas, glOptions)
   canvas.bind('width', () => canvas.gl.drawingBufferWidth)
   canvas.bind('height', () => canvas.gl.drawingBufferHeight)
-  canvas.set('plugins', new Map())
+  canvas.set('plugins', [])
   canvas.set('programs', new Map())
   canvas.set('buffers', new Map())
   canvas.set('textures', new Map())

@@ -1,22 +1,11 @@
 import { definePlugin } from '../plugin'
 
-export const nodePlugin = definePlugin(() => {
+export const positionTransformPlugin = definePlugin(() => {
   return {
-    name: 'canvas:node',
-    type: 'unknown',
+    name: 'canvas:position-transform',
     register(canvas) {
-      canvas.registerBuffer({
-        name: 'canvas:rectangle',
-        target: 'arrayBuffer',
-        value: new Float32Array([
-          -1, 1, -1, -1, 1, -1,
-          1, -1, 1, 1, -1, 1,
-        ]),
-      })
-
       canvas.registerProgram({
-        name: 'canvas:node-render',
-        drawMode: 'triangles',
+        name: 'canvas:position-transform',
         vertexBufferName: 'canvas:rectangle',
         vert: `attribute vec2 aPosition;
 varying vec2 vTextureCoord;
@@ -29,11 +18,21 @@ void main() {
   position.x += (2.0 * uTransform.x) - (1.0 - uTransform.z);
   gl_Position = vec4(position, 0, 1);
 }`,
-        frag: `uniform sampler2D uSampler;
-varying vec2 vTextureCoord;
-void main() {
-  gl_FragColor = texture2D(uSampler, vTextureCoord);
-}`,
+      })
+    },
+    draw(canvas, node) {
+      const { width, height } = canvas
+
+      canvas.useProgram({
+        name: 'canvas:position-transform',
+        uniforms: {
+          uTransform: [
+            (node.x ?? 0) / width,
+            (node.y ?? 0) / height,
+            node.w / width,
+            node.h / height,
+          ],
+        },
       })
     },
   }
