@@ -3,19 +3,19 @@ import type { Canvas } from './canvas'
 
 export interface RegisterProgramOptions {
   name: string
-  vert?: string
-  frag?: string
+  vertexShader?: string
+  fragmentShader?: string
   uniforms?: Record<string, any>
-  textureName?: string
-  vertexBufferName: string
-  indexBufferName?: string
+  texture?: string
+  vertexBuffer: string
+  indexBuffer?: string
   drawMode?: keyof Canvas['glDrawModes']
 }
 
 export interface UseProgramOptions {
   name: string
   uniforms?: Record<string, any>
-  textureName?: string
+  texture?: string
 }
 
 export interface GlActivatedUniform {
@@ -35,26 +35,26 @@ export function registerProgram(canvas: Canvas, options: RegisterProgramOptions)
 
   const {
     name,
-    vert = `attribute vec2 aPosition;
+    vertexShader = `attribute vec2 aPosition;
 varying vec2 vTextureCoord;
 void main() {
   vTextureCoord = step(0.0, aPosition);
   gl_Position = vec4(aPosition, 0, 1);
 }`,
-    frag = `uniform sampler2D uSampler;
+    fragmentShader = `uniform sampler2D uSampler;
 varying vec2 vTextureCoord;
 void main() {
   gl_FragColor = texture2D(uSampler, vTextureCoord);
 }`,
-    vertexBufferName,
+    vertexBuffer,
     uniforms,
   } = options
 
   if (programs.has(name)) return
 
   const glShaderSources = [
-    { type: gl.VERTEX_SHADER, source: vert },
-    { type: gl.FRAGMENT_SHADER, source: frag.includes('precision') ? frag : `precision mediump float;\n${ frag }` },
+    { type: gl.VERTEX_SHADER, source: vertexShader },
+    { type: gl.FRAGMENT_SHADER, source: fragmentShader.includes('precision') ? fragmentShader : `precision mediump float;\n${ fragmentShader }` },
   ]
 
   // create webgl shaders
@@ -82,9 +82,9 @@ void main() {
   gl.useProgram(glProgram)
 
   // bind webgl vertex buffer
-  const vertexBuffer = buffers.get(vertexBufferName)
-  if (!vertexBuffer) return
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer.glBuffer)
+  const vertex = buffers.get(vertexBuffer)
+  if (!vertex) return
+  gl.bindBuffer(gl.ARRAY_BUFFER, vertex.glBuffer)
   const location = gl.getAttribLocation(glProgram, 'aPosition')
   gl.vertexAttribPointer(location, 2, gl.FLOAT, false, 0, 0)
   gl.enableVertexAttribArray(location)
@@ -111,7 +111,7 @@ void main() {
     ...options,
     glProgram,
     glActivatedUniforms,
-    glDrawCount: vertexBuffer.numberPoints / 2,
+    glDrawCount: vertex.numberPoints / 2,
   }
 
   programs.set(name, program)
@@ -121,7 +121,7 @@ void main() {
 
 export function useProgram(canvas: Canvas, options: UseProgramOptions) {
   const { gl, programs } = canvas
-  const { name, textureName, uniforms } = options
+  const { name, texture, uniforms } = options
 
   const program = programs.get(name)
   if (!program) return
@@ -133,10 +133,10 @@ export function useProgram(canvas: Canvas, options: UseProgramOptions) {
   } = program
 
   // use texture
-  if (textureName) {
+  if (texture) {
     gl.bindTexture(
       gl.TEXTURE_2D,
-      canvas.textures.get(textureName)?.glTexture
+      canvas.textures.get(texture)?.glTexture
       ?? canvas.glDefaultTexture,
     )
   }

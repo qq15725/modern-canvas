@@ -1,16 +1,14 @@
-import { render } from './render'
+import { render, startRenderLoop } from './render'
 import { createContainer } from './container'
-import { bufferPlugin, fadePlugin, imagePlugin, transformPlugin } from './plugins'
+import { presetPlugins } from './plugins'
 import { registerProgram, useProgram } from './program'
 import { registerTexture } from './texture'
-import { draw } from './draw'
-import { registerPlugin } from './plugin'
 import { registerBuffer } from './buffer'
 import { provideGl } from './gl'
 import type { GlBufferTargets, GlDrawModes, GlExtensions, GlSlTypes } from './gl'
 import type { Node } from './types'
 import type { Program, RegisterProgramOptions, UseProgramOptions } from './program'
-import type { Plugin, RegisterPluginOptions } from './plugin'
+import type { Plugin } from './plugin'
 import type { RegisterTextureOptions, Texture } from './texture'
 import type { Container } from './container'
 import type { Buffer, RegisterBufferOptions } from './buffer'
@@ -18,13 +16,12 @@ import type { Buffer, RegisterBufferOptions } from './buffer'
 export interface CanvasOptions {
   glOptions?: WebGLContextAttributes
   view?: HTMLCanvasElement
-  children?: Node[]
+  data?: Node[]
 }
 
 export interface Canvas extends Container {
   view: HTMLCanvasElement
-  width: number
-  height: number
+  data: Node[]
 
   gl: WebGLRenderingContext
   glDefaultTexture: WebGLTexture
@@ -34,35 +31,33 @@ export interface Canvas extends Container {
   glSlTypes: GlSlTypes
   glExtensions: GlExtensions
 
-  plugins: Plugin[]
+  width: number
+  height: number
+
+  plugins: Map<string, Plugin>
+  beforeRenderPlugins: Plugin[]
+  renderPlugins: Plugin[]
+  afterRenderPlugins: Plugin[]
+
   programs: Map<string, Program>
   buffers: Map<string, Buffer>
   textures: Map<string, Texture>
-  children: Node[]
-  registerPlugin(options: RegisterPluginOptions): void
   registerBuffer(options: RegisterBufferOptions): void
   registerTexture(options: RegisterTextureOptions): void
   registerProgram(options: RegisterProgramOptions): void
   getProgram(name: string): Program
   useProgram(options: UseProgramOptions): void
   boot(): Promise<void>
-  draw(time?: number): void
-  render(): void
+  render(time?: number): void
+  startRenderLoop(): void
   destroy(): void
 }
-
-const presetPlugins = [
-  bufferPlugin,
-  imagePlugin,
-  fadePlugin,
-  transformPlugin,
-]
 
 export function createCanvas(options: CanvasOptions = {}): Canvas {
   const {
     glOptions,
     view = document.createElement('canvas'),
-    children = [],
+    data = [],
   } = options
 
   const canvas = createContainer() as Canvas
@@ -70,18 +65,27 @@ export function createCanvas(options: CanvasOptions = {}): Canvas {
   provideGl(canvas, glOptions)
   canvas.bind('width', () => canvas.gl.drawingBufferWidth)
   canvas.bind('height', () => canvas.gl.drawingBufferHeight)
-  canvas.set('plugins', [])
+  canvas.singleton('plugins', () => {
+    const plugins = new Map()
+    presetPlugins.forEach(plugin => {
+      plugin.register?.(canvas)
+      plugins.set(plugin.name, plugin)
+    })
+    return plugins
+  })
+  canvas.singleton('beforeRenderPlugins', () => Array.from(canvas.plugins.values()).filter(plugin => 'beforeRender' in plugin))
+  canvas.singleton('renderPlugins', () => Array.from(canvas.plugins.values()).filter(plugin => 'render' in plugin))
+  canvas.singleton('afterRenderPlugins', () => Array.from(canvas.plugins.values()).filter(plugin => 'afterRender' in plugin))
   canvas.set('programs', new Map())
   canvas.set('buffers', new Map())
   canvas.set('textures', new Map())
-  canvas.set('children', children)
-  canvas.set('registerPlugin', (options: any) => registerPlugin(canvas, options))
+  canvas.set('data', data)
   canvas.set('registerBuffer', (options: any) => registerBuffer(canvas, options))
   canvas.set('registerTexture', (options: any) => registerTexture(canvas, options))
   canvas.set('registerProgram', (options: any) => registerProgram(canvas, options))
   canvas.set('useProgram', (options: any) => useProgram(canvas, options))
-  canvas.set('draw', (time: any) => draw(canvas, time))
-  canvas.set('render', () => render(canvas))
+  canvas.set('render', (time: any) => render(canvas, time))
+  canvas.set('startRenderLoop', () => startRenderLoop(canvas))
   function onLost(event: WebGLContextEvent) {
     event.preventDefault()
     setTimeout(() => {
@@ -97,8 +101,6 @@ export function createCanvas(options: CanvasOptions = {}): Canvas {
     canvas.gl.useProgram(null)
     canvas.glExtensions.loseContext?.loseContext()
   })
-
-  presetPlugins.forEach(plugin => canvas.registerPlugin(plugin))
 
   return canvas
 }

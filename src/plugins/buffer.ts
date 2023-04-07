@@ -5,7 +5,7 @@ export const bufferPlugin = definePlugin(() => {
     name: 'canvas:buffer',
     register(canvas) {
       canvas.registerBuffer({
-        name: 'canvas:rectangle',
+        name: 'rectangle',
         target: 'arrayBuffer',
         value: new Float32Array([
           -1, 1, -1, -1, 1, -1,

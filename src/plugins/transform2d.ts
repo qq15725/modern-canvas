@@ -1,14 +1,14 @@
 import { definePlugin } from '../plugin'
 import { Matrix3 } from '../matrix3'
 
-export const transformPlugin = definePlugin(() => {
+export const transform2dPlugin = definePlugin(() => {
   return {
-    name: 'canvas:transform',
+    name: 'canvas:transform2d',
     register(canvas) {
       canvas.registerProgram({
-        name: 'canvas:transform',
-        vertexBufferName: 'canvas:rectangle',
-        vert: `attribute vec2 aPosition;
+        name: 'transform2d',
+        vertexBuffer: 'rectangle',
+        vertexShader: `attribute vec2 aPosition;
 varying vec2 vTextureCoord;
 uniform mat3 uLocalMatrix;
 void main() {
@@ -18,7 +18,7 @@ void main() {
 }`,
       })
     },
-    draw(canvas, node) {
+    render(canvas, node) {
       const { width, height } = canvas
 
       const x = node.x / width
@@ -28,7 +28,7 @@ void main() {
       const radians = (node.rotation ?? 0) / 180 * Math.PI
 
       canvas.useProgram({
-        name: 'canvas:transform',
+        name: 'transform2d',
         uniforms: {
           uLocalMatrix: Matrix3.identity()
             .multiply(Matrix3.translation((2 * x) - (1 - w), (1 - h) - (2 * y)))

@@ -51,6 +51,13 @@ export function provideGl(canvas: Canvas, glOptions?: WebGLContextAttributes) {
       || view.getContext('experimental-webgl', glOptions)
     ) as WebGLRenderingContext
     if (!gl) throw new Error('failed to getContext for webgl')
+
+    // init
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
+    gl.clearColor(1, 1, 1, 1)
+    gl.enable(gl.CULL_FACE)
+    gl.enable(gl.DEPTH_TEST)
+
     return gl
   })
 

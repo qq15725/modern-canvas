@@ -1,21 +1,21 @@
 import { definePlugin } from '../plugin'
 
-export const imagePlugin = definePlugin(() => {
+export const node2dImagePlugin = definePlugin(() => {
   return {
-    name: 'canvas:image',
+    name: 'canvas:node2d-image',
     include: node => node.type === 'image',
     register(canvas) {
       canvas.registerProgram({
-        name: 'canvas:image',
-        vertexBufferName: 'canvas:rectangle',
-        frag: `uniform sampler2D uSampler;
+        name: 'image',
+        vertexBuffer: 'rectangle',
+        fragmentShader: `uniform sampler2D uSampler;
 varying vec2 vTextureCoord;
 void main() {
   gl_FragColor = texture2D(uSampler, vTextureCoord);
 }`,
       })
     },
-    draw(canvas, node) {
+    render(canvas, node) {
       const { textures } = canvas
 
       if (!textures.has(node.url)) {
@@ -28,8 +28,8 @@ void main() {
       }
 
       canvas.useProgram({
-        name: 'canvas:image',
-        textureName: node.url,
+        name: 'image',
+        texture: node.url,
       })
     },
   }

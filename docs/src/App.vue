@@ -7,7 +7,7 @@
   onMounted(async () => {
     const canvas = createCanvas({
       view: canvasEl.value,
-      children: [
+      data: [
         { type: 'image', x: 0, y: 0, w: 100, h: 100, rotation: 30, url: '/example.jpg' },
         { type: 'image', x: 30, y: 30, w: 100, h: 100, url: '/example.jpg' },
         { type: 'image', x: 60, y: 60, w: 100, h: 100, rotation: 50, url: '/example.jpg', fade: true },
@@ -15,7 +15,7 @@
       ]
     })
 
-    canvas.render()
+    canvas.startRenderLoop()
   })
 </script>
 
