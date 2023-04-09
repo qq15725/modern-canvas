@@ -1,17 +1,19 @@
 import { render, startRenderLoop } from './render'
 import { createContainer } from './container'
 import { presetPlugins } from './plugins'
-import { registerProgram, useProgram } from './program'
+import { registerMaterial } from './material'
 import { registerTexture } from './texture'
-import { registerBuffer } from './buffer'
 import { provideGl } from './gl'
-import type { GlBufferTargets, GlDrawModes, GlExtensions, GlSlTypes } from './gl'
+import { registerShape } from './shape'
+import { renderNode } from './render-node'
+import type { RenderNodeOptions } from './render-node'
+import type { InternalShape, Shape } from './shape'
+import type { GlDrawModes, GlExtensions, GlSlTypes } from './gl'
 import type { Node } from './types'
-import type { Program, RegisterProgramOptions, UseProgramOptions } from './program'
+import type { InternalMaterial, Material } from './material'
 import type { Plugin } from './plugin'
-import type { RegisterTextureOptions, Texture } from './texture'
+import type { InternalTexture, Texture } from './texture'
 import type { Container } from './container'
-import type { Buffer, RegisterBufferOptions } from './buffer'
 
 export interface CanvasOptions {
   glOptions?: WebGLContextAttributes
@@ -26,7 +28,6 @@ export interface Canvas extends Container {
   gl: WebGLRenderingContext
   glDefaultTexture: WebGLTexture
   glDefaultFramebuffers: { glFramebuffer: WebGLFramebuffer; glTexture: WebGLTexture }[]
-  glBufferTargets: GlBufferTargets
   glDrawModes: GlDrawModes
   glSlTypes: GlSlTypes
   glExtensions: GlExtensions
@@ -39,15 +40,16 @@ export interface Canvas extends Container {
   renderPlugins: Plugin[]
   afterRenderPlugins: Plugin[]
 
-  programs: Map<string, Program>
-  buffers: Map<string, Buffer>
-  textures: Map<string, Texture>
-  registerBuffer(options: RegisterBufferOptions): void
-  registerTexture(options: RegisterTextureOptions): void
-  registerProgram(options: RegisterProgramOptions): void
-  getProgram(name: string): Program
-  useProgram(options: UseProgramOptions): void
-  boot(): Promise<void>
+  shapes: Map<string, InternalShape>
+  registerShape(shape: Shape): void
+
+  materials: Map<string, InternalMaterial>
+  registerMaterial(options: Material): void
+
+  textures: Map<string, InternalTexture>
+  registerTexture(options: Texture): void
+
+  renderNode(options: RenderNodeOptions): void
   render(time?: number): void
   startRenderLoop(): void
   destroy(): void
@@ -76,14 +78,14 @@ export function createCanvas(options: CanvasOptions = {}): Canvas {
   canvas.singleton('beforeRenderPlugins', () => Array.from(canvas.plugins.values()).filter(plugin => 'beforeRender' in plugin))
   canvas.singleton('renderPlugins', () => Array.from(canvas.plugins.values()).filter(plugin => 'render' in plugin))
   canvas.singleton('afterRenderPlugins', () => Array.from(canvas.plugins.values()).filter(plugin => 'afterRender' in plugin))
-  canvas.set('programs', new Map())
-  canvas.set('buffers', new Map())
+  canvas.set('shapes', new Map())
+  canvas.set('materials', new Map())
   canvas.set('textures', new Map())
   canvas.set('data', data)
-  canvas.set('registerBuffer', (options: any) => registerBuffer(canvas, options))
+  canvas.set('registerShape', (shape: any) => registerShape(canvas, shape))
+  canvas.set('registerMaterial', (options: any) => registerMaterial(canvas, options))
   canvas.set('registerTexture', (options: any) => registerTexture(canvas, options))
-  canvas.set('registerProgram', (options: any) => registerProgram(canvas, options))
-  canvas.set('useProgram', (options: any) => useProgram(canvas, options))
+  canvas.set('renderNode', (options: any) => renderNode(canvas, options))
   canvas.set('render', (time: any) => render(canvas, time))
   canvas.set('startRenderLoop', () => startRenderLoop(canvas))
   function onLost(event: WebGLContextEvent) {

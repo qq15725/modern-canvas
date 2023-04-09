@@ -1,11 +1,11 @@
-import { bufferPlugin } from './buffer'
-import { node2dImagePlugin } from './node2d-image'
 import { fadePlugin } from './fade'
+import { node2dImagePlugin } from './node2d-image'
+import { presetShapesPlugin } from './preset-shapes'
 import { transform2dPlugin } from './transform2d'
 import { selector2dPlugin } from './selector2d'
 
 export const presetPlugins = [
-  bufferPlugin,
+  presetShapesPlugin,
   node2dImagePlugin,
   fadePlugin,
   transform2dPlugin,

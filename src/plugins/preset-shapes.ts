@@ -1,13 +1,12 @@
 import { definePlugin } from '../plugin'
 
-export const bufferPlugin = definePlugin(() => {
+export const presetShapesPlugin = definePlugin(() => {
   return {
-    name: 'canvas:buffer',
+    name: 'canvas:preset-shapes',
     register(canvas) {
-      canvas.registerBuffer({
+      canvas.registerShape({
         name: 'rectangle',
-        target: 'arrayBuffer',
-        value: new Float32Array([
+        data: new Float32Array([
           -1, 1, -1, -1, 1, -1,
           1, -1, 1, 1, -1, 1,
         ]),

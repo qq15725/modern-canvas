@@ -1,13 +1,12 @@
 import { definePlugin } from '../plugin'
-import { Matrix3 } from '../matrix3'
+import { Matrix3 } from '../utils'
 
 export const transform2dPlugin = definePlugin(() => {
   return {
     name: 'canvas:transform2d',
     register(canvas) {
-      canvas.registerProgram({
+      canvas.registerMaterial({
         name: 'transform2d',
-        vertexBuffer: 'rectangle',
         vertexShader: `attribute vec2 aPosition;
 varying vec2 vTextureCoord;
 uniform mat3 uLocalMatrix;
@@ -27,8 +26,9 @@ void main() {
       const h = node.h / height
       const radians = (node.rotation ?? 0) / 180 * Math.PI
 
-      canvas.useProgram({
-        name: 'transform2d',
+      canvas.renderNode({
+        material: 'transform2d',
+        shape: 'rectangle',
         uniforms: {
           uLocalMatrix: Matrix3.identity()
             .multiply(Matrix3.translation((2 * x) - (1 - w), (1 - h) - (2 * y)))

@@ -5,9 +5,8 @@ export const fadePlugin = definePlugin(() => {
     name: 'canvas:fade',
     include: node => node.fade,
     register(canvas) {
-      canvas.registerProgram({
+      canvas.registerMaterial({
         name: 'fade',
-        vertexBuffer: 'rectangle',
         fragmentShader: `uniform sampler2D uSampler;
 varying vec2 vTextureCoord;
 uniform float uTime;
@@ -21,8 +20,9 @@ void main(void) {
       })
     },
     render(canvas, node, time) {
-      canvas.useProgram({
-        name: 'fade',
+      canvas.renderNode({
+        material: 'fade',
+        shape: 'rectangle',
         uniforms: {
           uTime: time,
         },

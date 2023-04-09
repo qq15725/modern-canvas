@@ -1,10 +1,5 @@
 import type { Canvas } from './canvas'
 
-export interface GlBufferTargets {
-  arrayBuffer: GLenum
-  elementArrayBuffer: GLenum
-}
-
 export interface GlDrawModes {
   points: GLenum
   linear: GLenum
@@ -92,11 +87,6 @@ export function provideGl(canvas: Canvas, glOptions?: WebGLContextAttributes) {
       }
     })
   })
-
-  canvas.singleton('glBufferTargets', () => ({
-    arrayBuffer: canvas.gl.ARRAY_BUFFER,
-    elementArrayBuffer: canvas.gl.ELEMENT_ARRAY_BUFFER,
-  }))
 
   canvas.singleton('glDrawModes', () => ({
     points: canvas.gl.POINTS,

@@ -1,20 +1,20 @@
 import type { Canvas } from './canvas'
 
-export interface RegisterTextureOptions {
+export interface Texture {
   name: string
   source: TexImageSource
 }
 
-export type Texture = {
+export type InternalTexture = {
   loading: boolean
   glTexture: WebGLTexture | null
 }
 
-export function registerTexture(canvas: Canvas, options: RegisterTextureOptions) {
+export function registerTexture(canvas: Canvas, options: Texture) {
   const { gl, textures } = canvas
   const { name, source } = options
 
-  const texture: Texture = {
+  const texture: InternalTexture = {
     loading: true,
     glTexture: null,
   }

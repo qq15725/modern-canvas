@@ -5,9 +5,8 @@ export const node2dImagePlugin = definePlugin(() => {
     name: 'canvas:node2d-image',
     include: node => node.type === 'image',
     register(canvas) {
-      canvas.registerProgram({
-        name: 'image',
-        vertexBuffer: 'rectangle',
+      canvas.registerMaterial({
+        name: 'node2d:image',
         fragmentShader: `uniform sampler2D uSampler;
 varying vec2 vTextureCoord;
 void main() {
@@ -27,9 +26,12 @@ void main() {
         })
       }
 
-      canvas.useProgram({
-        name: 'image',
-        texture: node.url,
+      canvas.renderNode({
+        shape: 'rectangle',
+        material: 'node2d:image',
+        uniforms: {
+          uSampler: node.url,
+        },
       })
     },
   }

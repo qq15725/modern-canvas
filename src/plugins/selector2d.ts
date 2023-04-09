@@ -1,12 +1,12 @@
 import { definePlugin } from '../plugin'
-import { Matrix3 } from '../matrix3'
+import { Matrix3 } from '../utils'
 import type { Node } from '../types'
 
 export const selector2dPlugin = definePlugin(() => {
   const mouse = { x: 0, y: 0 }
   let path: number[] | undefined
   return {
-    name: 'canvas:selector',
+    name: 'canvas:selector2d',
     register(canvas) {
       const { view } = canvas
       view.addEventListener('mousemove', (e) => {
@@ -14,9 +14,8 @@ export const selector2dPlugin = definePlugin(() => {
         mouse.x = e.clientX - rect.left
         mouse.y = e.clientY - rect.top
       })
-      canvas.registerProgram({
-        name: 'selector',
-        vertexBuffer: 'rectangle',
+      canvas.registerMaterial({
+        name: 'selector2d',
         vertexShader: `attribute vec2 aPosition;
 varying vec2 vTextureCoord;
 uniform mat3 uLocalMatrix;
@@ -57,8 +56,9 @@ void main() {
         const w = node.w / width
         const h = node.h / height
         const radians = (node.rotation ?? 0) / 180 * Math.PI
-        canvas?.useProgram({
-          name: 'selector',
+        canvas?.renderNode({
+          shape: 'rectangle',
+          material: 'selector2d',
           uniforms: {
             uLocalMatrix: Matrix3.identity()
               .multiply(Matrix3.translation((2 * x) - (1 - w), (1 - h) - (2 * y)))
