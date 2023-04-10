@@ -18,7 +18,12 @@ export const selector2dPlugin = definePlugin(() => {
 
       view.addEventListener('click', () => {
         const hovered = canvas.get('hovered')
-        hovered && canvas.get('onSelect')?.(hovered)
+        if (hovered) {
+          canvas.set('selected', hovered)
+          canvas.get('onSelect')?.(hovered)
+        } else {
+          canvas.set('selected', undefined)
+        }
       })
 
       canvas.registerNodeRenderer({

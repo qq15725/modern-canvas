@@ -17,12 +17,12 @@ export const nodeTextPlugin = definePlugin(() => {
             height = 20,
             text,
             color = 'black',
-            fontSize = '14px',
+            fontSize = '14',
           } = node
           if (!canvas.resources.has(text)) {
             context2d.canvas.width = width
             context2d.canvas.height = height
-            context2d.font = `${ fontSize } monospace`
+            context2d.font = `${ fontSize }px monospace`
             context2d.textAlign = 'center'
             context2d.textBaseline = 'middle'
             context2d.fillStyle = color
