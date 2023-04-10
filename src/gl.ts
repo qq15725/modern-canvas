@@ -33,17 +33,24 @@ export type GlSlType = 'float'
 
 export type GlSlTypes = Record<number, GlSlType>
 
+export interface GlFramebuffer {
+  buffer: WebGLFramebuffer | null
+  depthBuffer: WebGLRenderbuffer | null
+  texture: WebGLTexture | null
+  resize(): void
+}
+
 export interface GlExtensions {
   loseContext: WEBGL_lose_context | null
 }
 
-export function provideGl(canvas: Canvas, glOptions?: WebGLContextAttributes) {
+export function provideGl(canvas: Canvas, options?: WebGLContextAttributes) {
   canvas.singleton('gl', () => {
     const { view } = canvas
     // TODO support webgl2
     const gl = (
-      view.getContext('webgl', glOptions)
-      || view.getContext('experimental-webgl', glOptions)
+      view.getContext('webgl', options)
+      || view.getContext('experimental-webgl', options)
     ) as WebGLRenderingContext
     if (!gl) throw new Error('failed to getContext for webgl')
 
@@ -58,43 +65,58 @@ export function provideGl(canvas: Canvas, glOptions?: WebGLContextAttributes) {
 
   canvas.singleton('glDefaultTexture', () => {
     const { gl, width, height } = canvas
-    const glTexture = gl.createTexture()
-    gl.bindTexture(gl.TEXTURE_2D, glTexture)
+    const texture = gl.createTexture()
+    gl.bindTexture(gl.TEXTURE_2D, texture)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null)
-    return glTexture
+    return texture
   })
 
-  canvas.singleton('glDefaultFramebuffers', () => {
-    const { gl, width, height } = canvas
+  canvas.singleton<GlFramebuffer[]>('glFramebuffers', () => {
+    const { gl } = canvas
     return Array.from({ length: 2 }, () => {
-      const glTexture = gl.createTexture()
-      gl.bindTexture(gl.TEXTURE_2D, glTexture)
+      const texture = gl.createTexture()
+      const buffer = gl.createFramebuffer()
+      const depthBuffer = gl.createRenderbuffer()
+      function resize() {
+        const { width, height } = canvas
+        gl.bindTexture(gl.TEXTURE_2D, texture)
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null)
+        gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer)
+        gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height)
+      }
+      resize()
+      gl.bindTexture(gl.TEXTURE_2D, texture)
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null)
-      const glFramebuffer = gl.createFramebuffer()
-      gl.bindFramebuffer(gl.FRAMEBUFFER, glFramebuffer)
-      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glTexture, 0)
+      gl.bindFramebuffer(gl.FRAMEBUFFER, buffer)
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0)
+      gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer)
+      gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, depthBuffer)
       return {
-        glFramebuffer,
-        glTexture,
+        buffer,
+        depthBuffer,
+        texture,
+        resize,
       }
     })
   })
 
-  canvas.singleton('glDrawModes', () => ({
-    points: canvas.gl.POINTS,
-    linear: canvas.gl.LINEAR,
-    triangles: canvas.gl.TRIANGLES,
-    triangleStrip: canvas.gl.TRIANGLE_STRIP,
-    triangleFan: canvas.gl.TRIANGLE_FAN,
-  }))
+  canvas.singleton('glDrawModes', () => {
+    const { gl } = canvas
+    return {
+      points: gl.POINTS,
+      linear: gl.LINEAR,
+      triangles: gl.TRIANGLES,
+      triangleStrip: gl.TRIANGLE_STRIP,
+      triangleFan: gl.TRIANGLE_FAN,
+    }
+  })
 
   canvas.singleton('glSlTypes', () => {
     const gl = canvas.gl as any

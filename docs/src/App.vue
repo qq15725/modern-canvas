@@ -1,19 +1,22 @@
 <script setup lang="ts">
   import { onMounted, ref } from 'vue'
-  import { createCanvas } from '../../src'
+  import { createCanvas, plugins } from '../../src'
 
   const canvasEl = ref()
 
   onMounted(async () => {
     const canvas = createCanvas({
       view: canvasEl.value,
-      data: [
-        { type: 'image', x: 0, y: 0, w: 100, h: 100, rotation: 30, url: '/example.jpg' },
-        { type: 'image', x: 30, y: 30, w: 100, h: 100, url: '/example.jpg' },
-        { type: 'image', x: 60, y: 60, w: 100, h: 100, rotation: 50, url: '/example.jpg', fade: true },
-        { type: 'image', x: 200, y: 200, w: 100, h: 100, url: '/example.jpg' },
-      ]
+      children: [
+        { x: 0, y: 0, width: 100, height: 100, rotation: 30, image: '/example.jpg' },
+        { x: 30, y: 30, width: 100, height: 100, image: '/example.png' },
+        { x: 60, y: 60, width: 100, height: 100, rotation: 50, image: '/example.jpg', fade: true },
+        { x: 200, y: 200, width: 100, height: 100, image: '/example.png' },
+      ],
+      plugins,
     })
+
+    await canvas.load()
 
     canvas.startRenderLoop()
   })
