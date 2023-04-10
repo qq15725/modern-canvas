@@ -56,9 +56,12 @@ export function provideGl(canvas: Canvas, options?: WebGLContextAttributes) {
 
     // init
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
-    gl.clearColor(1, 1, 1, 1)
-    gl.enable(gl.CULL_FACE)
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true)
+    gl.clearColor(0, 0, 0, 0)
     gl.enable(gl.DEPTH_TEST)
+    gl.enable(gl.CULL_FACE)
+    gl.enable(gl.BLEND)
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 
     return gl
   })

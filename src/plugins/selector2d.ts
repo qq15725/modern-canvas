@@ -3,7 +3,7 @@ import { Matrix3 } from '../utils'
 
 export const selector2dPlugin = definePlugin(() => {
   const mouse = { x: 0, y: 0 }
-  let path: number[] | undefined
+
   return {
     name: 'canvas:selector2d',
     register(canvas) {
@@ -13,6 +13,11 @@ export const selector2dPlugin = definePlugin(() => {
         const rect = view.getBoundingClientRect()
         mouse.x = e.clientX - rect.left
         mouse.y = e.clientY - rect.top
+      })
+
+      view.addEventListener('click', () => {
+        const hovered = canvas.get('hovered')
+        hovered && canvas.get('onSelect')?.(hovered)
       })
 
       canvas.registerNodeRenderer({
@@ -60,8 +65,7 @@ void main() {
       })
     },
     beforeRender(canvas) {
-      // TODO
-      const { width, height, gl, nodeRenderers } = canvas
+      const { width, height, gl, children, nodeRenderers } = canvas
       let uid = 0
       const map: Record<number, number[]> = {}
       gl.bindFramebuffer(gl.FRAMEBUFFER, canvas.glFramebuffers[0].buffer)
@@ -75,17 +79,16 @@ void main() {
       })
       const color = new Uint8Array(4)
       gl.readPixels(mouse.x, height - mouse.y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, color)
-      const id = (color[0] << 16) + (color[1] << 8) + color[2]
-      path = map[id]
-    },
-    afterRender(canvas) {
-      // TODO
-      const { children } = canvas
-      if (!path) return
-      let node: any = { children }
-      path.forEach(val => {
-        node = node.children?.[val]
-      })
+      const path = map[(color[0] << 16) + (color[1] << 8) + color[2]]
+      if (canvas.get('hoveredPath')?.join('') === path?.join('')) return
+      let node: any
+      if (path) {
+        node = { children }
+        path.forEach(val => node = node.children?.[val])
+      }
+      canvas.set('hovered', node)
+      canvas.set('hoveredPath', path)
+      node && canvas.get('onHover')?.(node, path)
     },
   }
 })

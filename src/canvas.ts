@@ -95,12 +95,12 @@ export function createCanvas(options: CanvasOptions = {}): Canvas {
     // TODO to be optimized
     canvas.get('plugins')
     const allRenderers = Array.from(canvas.nodeRenderers.values())
-    canvas.forEachNode(node => {
+    canvas.forEachNode((node, path) => {
       const renderers = allRenderers.filter(renderer => {
         return (
           (!renderer.include && !renderer.exclude)
-          || (renderer.include && renderer.include(node))
-          || (renderer.exclude && !renderer.exclude(node))
+          || (renderer.include && renderer.include(node, path))
+          || (renderer.exclude && !renderer.exclude(node, path))
         )
       })
       renderers.forEach(renderer => renderer.update?.(node, 0))

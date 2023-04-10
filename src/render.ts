@@ -19,15 +19,15 @@ export function render(canvas: Canvas, time = 0) {
   gl.viewport(0, 0, width, height)
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-  forEachNode(node => {
+  forEachNode((node, path) => {
     gl.bindFramebuffer(gl.FRAMEBUFFER, null)
     gl.bindTexture(gl.TEXTURE_2D, null)
 
     const renderers = allRenderers.filter(renderer => {
       return (
         (!renderer.include && !renderer.exclude)
-        || (renderer.include && renderer.include(node))
-        || (renderer.exclude && !renderer.exclude(node))
+        || (renderer.include && renderer.include(node, path))
+        || (renderer.exclude && !renderer.exclude(node, path))
       )
     })
 

@@ -5,8 +5,8 @@ import type { Node } from './node'
 
 export interface NodeRenderer {
   name: string
-  include?: (node: Node) => boolean
-  exclude?: (node: Node) => boolean
+  include?: (node: Node, path: number[]) => boolean
+  exclude?: (node: Node, path: number[]) => boolean
   shape: string | Omit<Shape, 'name'>
   material: string | Omit<Material, 'name'>
   update?(node: Node, time: number): undefined | Record<string, any>
