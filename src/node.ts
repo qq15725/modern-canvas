@@ -13,7 +13,8 @@ export function forEachNode(canvas: Canvas, callbackFn: (node: Node, path: numbe
   const { children } = canvas
 
   function forEachNodes(children: Node[], parentPath: number[] = []) {
-    for (let i = children.length - 1; i >= 0; i--) {
+    // for (let i = children.length - 1; i >= 0; i--) {
+    for (let len = children.length, i = 0; i < len; i++) {
       const path = [...parentPath, i]
       const node = children[i]
       forEachNodes(node.children ?? [], path)

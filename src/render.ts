@@ -4,8 +4,6 @@ import type { Canvas } from './canvas'
 export function render(canvas: Canvas, time = 0) {
   const {
     gl,
-    width,
-    height,
     beforeRenderPlugins,
     afterRenderPlugins,
     nodeRenderers,
@@ -16,13 +14,9 @@ export function render(canvas: Canvas, time = 0) {
 
   beforeRenderPlugins.forEach(plugin => plugin.beforeRender?.(canvas))
 
-  gl.viewport(0, 0, width, height)
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
   forEachNode((node, path) => {
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null)
-    gl.bindTexture(gl.TEXTURE_2D, null)
-
     const renderers = allRenderers.filter(renderer => {
       return (
         (!renderer.include && !renderer.exclude)

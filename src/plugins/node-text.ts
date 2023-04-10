@@ -12,14 +12,20 @@ export const nodeTextPlugin = definePlugin(() => {
         shape: 'rectangle',
         material: 'baseMaterial',
         update(node) {
-          const { width = 100, height = 100, text } = node
+          const {
+            width = 100,
+            height = 20,
+            text,
+            color = 'black',
+            fontSize = '14px',
+          } = node
           if (!canvas.resources.has(text)) {
             context2d.canvas.width = width
             context2d.canvas.height = height
-            context2d.font = '20px monospace'
+            context2d.font = `${ fontSize } monospace`
             context2d.textAlign = 'center'
             context2d.textBaseline = 'middle'
-            context2d.fillStyle = 'black'
+            context2d.fillStyle = color
             context2d.clearRect(0, 0, context2d.canvas.width, context2d.canvas.height)
             context2d.fillText(text, width / 2, height / 2)
             canvas.registerResource({

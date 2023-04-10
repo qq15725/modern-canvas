@@ -55,13 +55,18 @@ export function provideGl(canvas: Canvas, options?: WebGLContextAttributes) {
     if (!gl) throw new Error('failed to getContext for webgl')
 
     // init
+    const width = gl.drawingBufferWidth
+    const height = gl.drawingBufferHeight
+    gl.viewport(0, 0, width, height)
+
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
     gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true)
     gl.clearColor(0, 0, 0, 0)
     gl.enable(gl.DEPTH_TEST)
     gl.enable(gl.CULL_FACE)
     gl.enable(gl.BLEND)
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
+    gl.depthMask(false)
 
     return gl
   })

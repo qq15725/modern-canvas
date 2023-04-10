@@ -12,7 +12,7 @@
         { x: 30, y: 30, width: 200, height: 200, image: '/example.png' },
         { x: 60, y: 60, width: 120, height: 120, rotation: 50, image: '/example.jpg', fade: true },
         { x: 200, y: 200, width: 100, height: 100, image: '/example.png' },
-        { x: 30, y: 30, width: 100, height: 100, rotation: 40, text: 'example' },
+        { x: 30, y: 30, width: 100, height: 100, rotation: 40, text: 'example', color: 'red' },
       ],
       plugins,
     })
@@ -25,7 +25,7 @@
 
 <template>
   <div style="text-align: center;">
-    <canvas ref="canvasEl" style="width: 400px; border: 1px solid grey;" width="400" height="400" />
+    <canvas ref="canvasEl" style="width: 200px; border: 1px solid grey;" width="400" height="400" />
   </div>
 </template>
 

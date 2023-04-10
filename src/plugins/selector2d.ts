@@ -3,6 +3,7 @@ import { Matrix3 } from '../utils'
 
 export const selector2dPlugin = definePlugin(() => {
   const mouse = { x: 0, y: 0 }
+  const prevMouse = { x: 0, y: 0 }
 
   return {
     name: 'canvas:selector2d',
@@ -65,6 +66,9 @@ void main() {
       })
     },
     beforeRender(canvas) {
+      if (prevMouse.x === mouse.x && prevMouse.y === mouse.y) return
+      prevMouse.x = mouse.x
+      prevMouse.y = mouse.y
       const { width, height, gl, children, nodeRenderers } = canvas
       let uid = 0
       const map: Record<number, number[]> = {}
