@@ -10,7 +10,7 @@ export const nodeTextPlugin = definePlugin(() => {
         name: 'text',
         include: node => Boolean(node.text),
         shape: 'rectangle',
-        material: 'baseMaterial',
+        material: 'textureMaterial',
         update(node) {
           const {
             width = 100,
@@ -26,7 +26,7 @@ export const nodeTextPlugin = definePlugin(() => {
             context2d.textAlign = 'center'
             context2d.textBaseline = 'middle'
             context2d.fillStyle = color
-            context2d.clearRect(0, 0, context2d.canvas.width, context2d.canvas.height)
+            context2d.clearRect(0, 0, width, height)
             context2d.fillText(text, width / 2, height / 2)
             canvas.registerResource({
               name: text,

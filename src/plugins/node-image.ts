@@ -8,7 +8,7 @@ export const nodeImagePlugin = definePlugin(() => {
         name: 'image',
         include: node => Boolean(node.image),
         shape: 'rectangle',
-        material: 'baseMaterial',
+        material: 'textureMaterial',
         update(node) {
           if (!canvas.resources.has(node.image)) {
             const img = new Image()

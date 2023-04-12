@@ -15,7 +15,7 @@ export const basePlugin = definePlugin(() => {
       })
 
       canvas.registerMaterial({
-        name: 'baseMaterial',
+        name: 'textureMaterial',
         vertexShader: `attribute vec2 aPosition;
 varying vec2 vTextureCoord;
 void main() {

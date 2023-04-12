@@ -34,6 +34,17 @@ export function registerResource(canvas: Canvas, resource: Resource) {
 
   if (data instanceof HTMLImageElement) {
     data.addEventListener('load', loadTexture, { once: true })
+  } else if (data instanceof HTMLVideoElement) {
+    let playing = false
+    let timeupdate = false
+    data.addEventListener('playing', () => {
+      playing = true
+      playing && timeupdate && loadTexture()
+    }, true)
+    data.addEventListener('timeupdate', () => {
+      timeupdate = true
+      playing && timeupdate && loadTexture()
+    }, true)
   } else {
     loadTexture()
   }
