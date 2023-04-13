@@ -15,7 +15,7 @@ export const nodeImagePlugin = definePlugin(() => {
             img.src = node.image
             canvas.registerResource({
               name: node.image,
-              data: img,
+              source: img,
             })
           }
           return {

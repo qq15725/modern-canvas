@@ -30,7 +30,7 @@ export const nodeTextPlugin = definePlugin(() => {
             context2d.fillText(text, width / 2, height / 2)
             canvas.registerResource({
               name: text,
-              data: context2d.canvas,
+              source: context2d.canvas,
             })
           }
           return {

@@ -2,21 +2,23 @@ import type { Canvas } from './canvas'
 
 export interface Resource {
   name: string
-  data: TexImageSource
+  source: TexImageSource
 }
 
 export type InternalResource = {
   loading: boolean
   texture: WebGLTexture | null
+  source: TexImageSource
 }
 
 export function registerResource(canvas: Canvas, resource: Resource) {
   const { gl, resources } = canvas
-  const { name, data } = resource
+  const { name, source } = resource
 
   const internalResource: InternalResource = {
     loading: true,
     texture: null,
+    source,
   }
 
   function loadTexture() {
@@ -27,24 +29,22 @@ export function registerResource(canvas: Canvas, resource: Resource) {
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, data)
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source)
     }
     internalResource.loading = false
   }
 
-  if (data instanceof HTMLImageElement) {
-    data.addEventListener('load', loadTexture, { once: true })
-  } else if (data instanceof HTMLVideoElement) {
-    let playing = false
-    let timeupdate = false
-    data.addEventListener('playing', () => {
-      playing = true
-      playing && timeupdate && loadTexture()
-    }, true)
-    data.addEventListener('timeupdate', () => {
-      timeupdate = true
-      playing && timeupdate && loadTexture()
-    }, true)
+  if (source instanceof HTMLImageElement) {
+    source.addEventListener('load', loadTexture, { once: true })
+  } else if (source instanceof HTMLVideoElement) {
+    source.addEventListener('canplay', () => {
+      loadTexture()
+      source.currentTime = 0.01
+    }, { once: true })
+    source.addEventListener('timeupdate', () => {
+      gl.bindTexture(gl.TEXTURE_2D, internalResource.texture)
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source)
+    })
   } else {
     loadTexture()
   }
