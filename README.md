@@ -28,21 +28,51 @@ npm i modern-canvas
 ## 🦄 Usage
 
 ```ts
-import { createCanvas, plugins } from 'modern-canvas'
+import { createApp, plugins } from 'modern-canvas'
 
-const canvas = createCanvas({
+const app = createApp({
   view: document.querySelector('canvas'),
   children: [
-    { x: 0, y: 0, width: 30, height: 30, rotation: 30, image: '/example.jpg' },
-    { x: 30, y: 30, width: 200, height: 200, image: '/example.png' },
-    { x: 60, y: 60, width: 120, height: 120, rotation: 50, image: '/example.jpg' },
-    { x: 200, y: 200, width: 100, height: 100, image: '/example.png' },
-    { x: 30, y: 30, width: 100, height: 100, rotation: 40, text: 'example' },
+    {
+      type: 'image',
+      style: {
+        left: 0,
+        top: 0,
+        width: 130,
+        height: 130,
+        rotation: 30,
+      },
+      src: '/example.jpg',
+    },
+    {
+      type: 'text',
+      style: {
+        left: 60,
+        top: 60,
+        width: 240,
+        height: 240,
+        rotation: 0,
+        fontSize: 40,
+        color: 'red',
+      },
+      content: 'TEXT',
+    },
+    {
+      type: 'video',
+      style: {
+        left: 60,
+        top: 60,
+        width: 30,
+        height: 30,
+        rotation: 30,
+      },
+      src: 'example.mp4',
+    },
   ],
   plugins,
 })
 
-await canvas.load()
+await app.load()
 
-canvas.startRenderLoop()
+app.start()
 ```

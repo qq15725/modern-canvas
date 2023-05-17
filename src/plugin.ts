@@ -1,10 +1,8 @@
-import type { Canvas } from './canvas'
+import type { App } from './app'
 
 export interface Plugin {
   name: string
-  register?(canvas: Canvas): void
-  beforeRender?(canvas: Canvas): void
-  afterRender?(canvas: Canvas): void
+  register?(app: App): void
 }
 
 export function definePlugin(plugin: Plugin | (() => Plugin)): Plugin {

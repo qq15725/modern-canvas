@@ -1,3 +1,4 @@
 export * from './plugins'
-export * from './canvas'
+export * from './app'
+export * from './create-app'
 export type { Node } from './node'

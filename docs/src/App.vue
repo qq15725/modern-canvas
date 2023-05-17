@@ -1,28 +1,62 @@
 <script setup lang="ts">
   import { onMounted, reactive, ref } from 'vue'
-  import { createCanvas, plugins } from '../../src'
-  import type { Canvas, Node } from '../../src'
+  import { Renderer2d, createApp } from '../../src'
+  import type { App, Node } from '../../src'
 
   const viewEl = ref()
-  const canvas = ref<Canvas>()
+  const app = ref<App>()
   const activeElement = ref<Node>()
   const children = reactive([
-    { x: 0, y: 0, width: 130, height: 130, rotation: 30, image: '/example.jpg' },
-    { x: 30, y: 30, width: 200, height: 200, image: '/example.png' },
-    { x: 60, y: 60, width: 240, height: 240, rotation: 50, image: '/example.jpg', fade: true },
-    { x: 30, y: 30, width: 200, height: 200, rotation: 40, fontSize: 40, text: 'example', color: 'red' },
-    { x: 200, y: 200, width: 100, height: 100, image: '/example.png' },
-    { x: 100, y: 200, width: 100, height: 100, video: '/example.mp4' },
+    {
+      type: 'image',
+      style: {
+        left: 0,
+        top: 0,
+        width: 130,
+        height: 130,
+        rotation: 30,
+      },
+      filters: [
+        { type: 'fade' },
+      ],
+      src: '/example.jpg',
+    },
+    {
+      type: 'text',
+      style: {
+        left: 60,
+        top: 60,
+        width: 240,
+        height: 240,
+        rotation: 0,
+        fontSize: 40,
+        color: 'red',
+      },
+      content: 'TEXT',
+    },
+    {
+      type: 'video',
+      style: {
+        left: 60,
+        top: 60,
+        width: 30,
+        height: 30,
+        rotation: 30,
+      },
+      src: 'example.mp4',
+    },
   ])
 
   onMounted(async () => {
-    canvas.value = createCanvas({
+    app.value = createApp({
       view: viewEl.value,
       children,
-      plugins,
+      plugins: [
+        Renderer2d,
+      ],
     })
-    await canvas.value.load()
-    canvas.value.render()
+    await app.value.load()
+    app.value.render()
   })
 
   function throttle<T extends (...args: any[]) => any>(fn: T, limit: number) {
@@ -36,7 +70,7 @@
     }
   }
 
-  const render = throttle(() => canvas.value?.render(), 20)
+  const render = throttle(() => app.value?.render(), 20)
 
   const pointer = {
     startX: 0,
@@ -53,11 +87,11 @@
     currentKey = key
     pointer.startX = event.clientX
     pointer.startY = event.clientY
-    pointer.elX = activeElement.value.x ?? 0
-    pointer.elY = activeElement.value.y ?? 0
-    pointer.elW = activeElement.value.width ?? 0
-    pointer.elH = activeElement.value.height ?? 0
-    pointer.elR = activeElement.value.rotation ?? 0
+    pointer.elX = activeElement.value.style.left ?? 0
+    pointer.elY = activeElement.value.style.top ?? 0
+    pointer.elW = activeElement.value.style.width ?? 0
+    pointer.elH = activeElement.value.style.height ?? 0
+    pointer.elR = activeElement.value.style.rotation ?? 0
     document.addEventListener('mousemove', onMove)
     document.addEventListener('mouseup', onMoveEnd, true)
   }
@@ -65,48 +99,48 @@
     if (!activeElement.value) return
     switch (currentKey) {
       case 't':
-        activeElement.value.y = pointer.elY + (event.clientY - pointer.startY)
-        activeElement.value.height = pointer.elH - (event.clientY - pointer.startY)
+        activeElement.value.style.top = pointer.elY + (event.clientY - pointer.startY)
+        activeElement.value.style.height = pointer.elH - (event.clientY - pointer.startY)
         break
       case 'b':
-        activeElement.value.height = pointer.elH + (event.clientY - pointer.startY)
+        activeElement.value.style.height = pointer.elH + (event.clientY - pointer.startY)
         break
       case 'l':
-        activeElement.value.x = pointer.elX + (event.clientX - pointer.startX)
-        activeElement.value.width = pointer.elW - (event.clientX - pointer.startX)
+        activeElement.value.style.left = pointer.elX + (event.clientX - pointer.startX)
+        activeElement.value.style.width = pointer.elW - (event.clientX - pointer.startX)
         break
       case 'r':
-        activeElement.value.width = pointer.elW + (event.clientX - pointer.startX)
+        activeElement.value.style.width = pointer.elW + (event.clientX - pointer.startX)
         break
       case 'lt':
-        activeElement.value.y = pointer.elY + (event.clientY - pointer.startY)
-        activeElement.value.height = pointer.elH - (event.clientY - pointer.startY)
-        activeElement.value.x = pointer.elX + (event.clientX - pointer.startX)
-        activeElement.value.width = pointer.elW - (event.clientX - pointer.startX)
+        activeElement.value.style.top = pointer.elY + (event.clientY - pointer.startY)
+        activeElement.value.style.height = pointer.elH - (event.clientY - pointer.startY)
+        activeElement.value.style.left = pointer.elX + (event.clientX - pointer.startX)
+        activeElement.value.style.width = pointer.elW - (event.clientX - pointer.startX)
         break
       case 'lb':
-        activeElement.value.x = pointer.elX + (event.clientX - pointer.startX)
-        activeElement.value.width = pointer.elW - (event.clientX - pointer.startX)
-        activeElement.value.height = pointer.elH + (event.clientY - pointer.startY)
+        activeElement.value.style.left = pointer.elX + (event.clientX - pointer.startX)
+        activeElement.value.style.width = pointer.elW - (event.clientX - pointer.startX)
+        activeElement.value.style.height = pointer.elH + (event.clientY - pointer.startY)
         break
       case 'rt':
-        activeElement.value.width = pointer.elW + (event.clientX - pointer.startX)
-        activeElement.value.y = pointer.elY + (event.clientY - pointer.startY)
-        activeElement.value.height = pointer.elH - (event.clientY - pointer.startY)
+        activeElement.value.style.width = pointer.elW + (event.clientX - pointer.startX)
+        activeElement.value.style.top = pointer.elY + (event.clientY - pointer.startY)
+        activeElement.value.style.height = pointer.elH - (event.clientY - pointer.startY)
         break
       case 'rb':
-        activeElement.value.width = pointer.elW + (event.clientX - pointer.startX)
-        activeElement.value.height = pointer.elH + (event.clientY - pointer.startY)
+        activeElement.value.style.width = pointer.elW + (event.clientX - pointer.startX)
+        activeElement.value.style.height = pointer.elH + (event.clientY - pointer.startY)
         break
       case 'lt-r':
       case 'lb-r':
       case 'rt-r':
       case 'rb-r':
-        activeElement.value.rotation = pointer.elR + (event.clientX - pointer.startX) + (event.clientY - pointer.startY)
+        activeElement.value.style.rotation = pointer.elR + (event.clientX - pointer.startX) + (event.clientY - pointer.startY)
         break
       default:
-        activeElement.value.x = event.clientX - pointer.startX + pointer.elX
-        activeElement.value.y = event.clientY - pointer.startY + pointer.elY
+        activeElement.value.style.left = event.clientX - pointer.startX + pointer.elX
+        activeElement.value.style.top = event.clientY - pointer.startY + pointer.elY
         break
     }
     render()
@@ -132,9 +166,9 @@
       :key="key"
       class="placeholder"
       :style="{
-        width: `${node.width}px`,
-        height: `${node.height}px`,
-        transform: `translate(${node.x}px, ${node.y}px) rotate(${node.rotation ?? 0}deg)`,
+        width: `${node.style.width}px`,
+        height: `${node.style.height}px`,
+        transform: `translate(${node.style.left}px, ${node.style.top}px) rotate(${node.style.rotation ?? 0}deg)`,
       }"
       @mousedown.stop.prevent="(event) => {
         activeElement = node
@@ -146,9 +180,9 @@
       v-if="activeElement"
       class="transformer"
       :style="{
-        width: `${activeElement.width}px`,
-        height: `${activeElement.height}px`,
-        transform: `translate(${activeElement.x}px, ${activeElement.y}px) rotate(${activeElement.rotation ?? 0}deg)`,
+        width: `${activeElement.style.width}px`,
+        height: `${activeElement.style.height}px`,
+        transform: `translate(${activeElement.style.left}px, ${activeElement.style.top}px) rotate(${activeElement.style.rotation ?? 0}deg)`,
       }"
       @mousedown.stop.prevent="onMoveStart"
     >

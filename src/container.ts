@@ -6,7 +6,6 @@ export interface Container {
   set<T = any>(key: string, value: T): void
   bind<T = any>(key: string, value: () => T, shared?: boolean): void
   singleton<T = any>(key: string, value: () => T): void
-  [key: string]: any
 }
 
 export function createContainer(): Container {

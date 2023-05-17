@@ -1,142 +1,139 @@
-import type { GlSlType } from './gl'
-import type { Canvas } from './canvas'
+import type { App } from './app'
 
-export interface Material {
-  name: string
+export interface UserMaterial {
   vertexShader: string
   fragmentShader: string
   uniforms?: Record<string, any>
 }
 
-export type InternalMaterial = Material & {
+export type Material = UserMaterial & {
   program: WebGLProgram
   attributes: Record<string, MaterialAttribute>
   uniforms: Record<string, MaterialUniform>
-  setAttributes(attributes: Record<string, any>): void
-  setUniforms(uniforms: Record<string, any>): void
+  setupAttributes(attributes: Record<string, any>): void
+  setupUniforms(uniforms: Record<string, any>): void
 }
 
 export interface MaterialAttribute {
-  type: GlSlType
+  type: App['slTypes'][keyof App['slTypes']]
   isArray: boolean
   location: GLint
 }
 
 export interface MaterialUniform {
-  type: GlSlType
+  type: App['slTypes'][keyof App['slTypes']]
   isArray: boolean
   location: WebGLUniformLocation | null
 }
 
-export function registerMaterial(canvas: Canvas, material: Material) {
-  const { gl, materials, glSlTypes } = canvas
+export function registerMaterial(app: App, name: string, userMaterial: UserMaterial) {
+  const { context, materials, slTypes } = app
 
   const {
-    name,
     vertexShader,
     fragmentShader,
     uniforms: userUniforms,
-  } = material
+  } = userMaterial
 
   if (materials.has(name)) return
 
   // create shaders
   const shaders = ([
-    { type: gl.VERTEX_SHADER, source: vertexShader },
-    { type: gl.FRAGMENT_SHADER, source: fragmentShader.includes('precision') ? fragmentShader : `precision mediump float;\n${ fragmentShader }` },
+    { type: context.VERTEX_SHADER, source: vertexShader },
+    { type: context.FRAGMENT_SHADER, source: fragmentShader.includes('precision') ? fragmentShader : `precision mediump float;\n${ fragmentShader }` },
   ]).map(({ type, source }) => {
-    const shader = gl.createShader(type)
+    const shader = context.createShader(type)
     if (!shader) throw new Error('failed to create shader')
-    gl.shaderSource(shader, source)
-    gl.compileShader(shader)
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-      throw new Error(`failed to compiling shader:\n${ source }\n${ gl.getShaderInfoLog(shader) }`)
+    context.shaderSource(shader, source)
+    context.compileShader(shader)
+    if (!context.getShaderParameter(shader, context.COMPILE_STATUS)) {
+      throw new Error(`failed to compiling shader:\n${ source }\n${ context.getShaderInfoLog(shader) }`)
     }
     return shader
   })
 
   // create program
-  const program = gl.createProgram()
+  const program = context.createProgram()
   if (!program) throw new Error('failed to create program')
-  shaders.forEach(shader => gl.attachShader(program, shader))
-  gl.linkProgram(program)
-  shaders.forEach(shader => gl.deleteShader(shader))
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    throw new Error(`failed to initing program: ${ gl.getProgramInfoLog(program) }`)
+  shaders.forEach(shader => context.attachShader(program, shader))
+  context.linkProgram(program)
+  shaders.forEach(shader => context.deleteShader(shader))
+  if (!context.getProgramParameter(program, context.LINK_STATUS)) {
+    throw new Error(`failed to initing program: ${ context.getProgramInfoLog(program) }`)
   }
 
   // resovle attributes
   const attributes: Record<string, MaterialAttribute> = {}
-  for (let len = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES), i = 0; i < len; i++) {
-    const activeAttrib = gl.getActiveAttrib(program, i)
+  for (let len = context.getProgramParameter(program, context.ACTIVE_ATTRIBUTES), i = 0; i < len; i++) {
+    const activeAttrib = context.getActiveAttrib(program, i)
     if (!activeAttrib) continue
     const name = activeAttrib.name.replace(/\[.*?]$/, '')
     attributes[name] = {
-      type: glSlTypes[activeAttrib.type],
+      type: slTypes[activeAttrib.type],
       isArray: name !== activeAttrib.name,
-      location: gl.getAttribLocation(program, name),
+      location: context.getAttribLocation(program, name),
     }
   }
 
   // resovle uniforms
   const uniforms: Record<string, MaterialUniform> = {}
-  for (let len = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS), i = 0; i < len; i++) {
-    const activeUniform = gl.getActiveUniform(program, i)
+  for (let len = context.getProgramParameter(program, context.ACTIVE_UNIFORMS), i = 0; i < len; i++) {
+    const activeUniform = context.getActiveUniform(program, i)
     if (!activeUniform) continue
     const name = activeUniform.name.replace(/\[.*?]$/, '')
     uniforms[name] = {
-      type: glSlTypes[activeUniform.type],
+      type: slTypes[activeUniform.type],
       isArray: name !== activeUniform.name,
-      location: gl.getUniformLocation(program, name),
+      location: context.getUniformLocation(program, name),
     }
   }
 
-  const internalMaterial: InternalMaterial = {
-    ...material,
+  const material: Material = {
+    ...userMaterial,
     program,
     attributes,
     uniforms,
-    setAttributes(userAttributes) {
+    setupAttributes(userAttributes) {
       for (const [key, value] of Object.entries(userAttributes)) {
         const attribute = attributes[key]
         if (!attribute) continue
         const { type, isArray, location } = attribute
         if (value instanceof WebGLBuffer) {
-          gl.bindBuffer(gl.ARRAY_BUFFER, value)
-          const location = gl.getAttribLocation(program, key)
+          context.bindBuffer(context.ARRAY_BUFFER, value)
+          const location = context.getAttribLocation(program, key)
           switch (type) {
             case 'vec2':
-              gl.vertexAttribPointer(location, 2, gl.FLOAT, false, 0, 0)
-              gl.enableVertexAttribArray(location)
+              context.vertexAttribPointer(location, 2, context.FLOAT, false, 0, 0)
+              context.enableVertexAttribArray(location)
               break
             case 'vec3':
-              gl.vertexAttribPointer(location, 3, gl.FLOAT, false, 0, 0)
-              gl.enableVertexAttribArray(location)
+              context.vertexAttribPointer(location, 3, context.FLOAT, false, 0, 0)
+              context.enableVertexAttribArray(location)
               break
           }
         } else {
           switch (type) {
             case 'float':
               if (isArray) {
-                gl.vertexAttrib1fv(location, value)
+                context.vertexAttrib1fv(location, value)
               } else {
-                gl.vertexAttrib1f(location, value)
+                context.vertexAttrib1f(location, value)
               }
               break
             case 'vec2':
-              gl.vertexAttrib2fv(location, value)
+              context.vertexAttrib2fv(location, value)
               break
             case 'vec3':
-              gl.vertexAttrib3fv(location, value)
+              context.vertexAttrib3fv(location, value)
               break
             case 'vec4':
-              gl.vertexAttrib4fv(location, value)
+              context.vertexAttrib4fv(location, value)
               break
           }
         }
       }
     },
-    setUniforms(userUniforms) {
+    setupUniforms(userUniforms) {
       for (const [key, value] of Object.entries(userUniforms)) {
         const uniform = uniforms[key]
         if (!uniform) continue
@@ -144,51 +141,50 @@ export function registerMaterial(canvas: Canvas, material: Material) {
         switch (type) {
           case 'float':
             if (isArray) {
-              gl.uniform1fv(location, value)
+              context.uniform1fv(location, value)
             } else {
-              gl.uniform1f(location, value)
+              context.uniform1f(location, value)
             }
             break
           case 'bool':
           case 'int':
             if (isArray) {
-              gl.uniform1iv(location, value)
+              context.uniform1iv(location, value)
             } else {
-              gl.uniform1i(location, value)
+              context.uniform1i(location, value)
             }
             break
           case 'vec2':
-            gl.uniform2fv(location, value)
+            context.uniform2fv(location, value)
             break
           case 'vec3':
-            gl.uniform3fv(location, value)
+            context.uniform3fv(location, value)
             break
           case 'vec4':
-            gl.uniform4fv(location, value)
+            context.uniform4fv(location, value)
             break
           case 'mat2':
-            gl.uniformMatrix2fv(location, false, value)
+            context.uniformMatrix2fv(location, false, value)
             break
           case 'mat3':
-            gl.uniformMatrix3fv(location, false, value)
+            context.uniformMatrix3fv(location, false, value)
             break
           case 'mat4':
-            gl.uniformMatrix4fv(location, false, value)
+            context.uniformMatrix4fv(location, false, value)
             break
           case 'sampler2D':
-            gl.bindTexture(
-              gl.TEXTURE_2D,
-              canvas.resources.get(value)?.texture
-              ?? canvas.glDefaultTexture,
+            context.bindTexture(
+              context.TEXTURE_2D,
+              value ?? app.defaultTexture,
             )
-            gl.uniform1i(location, 0)
+            context.uniform1i(location, 0)
             break
         }
       }
     },
   }
 
-  userUniforms && internalMaterial.setUniforms(userUniforms)
+  userUniforms && material.setupUniforms(userUniforms)
 
-  materials.set(name, internalMaterial)
+  materials.set(name, material)
 }

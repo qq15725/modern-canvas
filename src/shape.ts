@@ -1,11 +1,9 @@
-import type { GlDrawModes } from './gl'
-import type { Canvas } from './canvas'
+import type { App } from './app'
 
-export interface Shape {
-  name: string
+export interface UserShape {
   type?: '2d' | '3d'
-  mode?: keyof GlDrawModes
-  data?: Uint8Array
+  mode?: keyof App['drawModes']
+  buffer?: Uint8Array
   | Uint8ClampedArray
   | Uint16Array
   | Uint32Array
@@ -18,28 +16,27 @@ export interface Shape {
   | Float64Array
 }
 
-export interface InternalShape {
+export interface Shape {
   mode: GLenum
   count: number
   buffer: WebGLBuffer | null
 }
 
-export function registerShape(canvas: Canvas, shape: Shape) {
-  const { gl, shapes, glDrawModes } = canvas
+export function registerShape(app: App, name: string, userShape: UserShape) {
+  const { context, shapes, drawModes } = app
   const {
-    name,
     type = '2d',
     mode = 'triangles',
-    data = new Float32Array([]),
-  } = shape
+    buffer = new Float32Array([]),
+  } = userShape
 
-  const buffer = gl.createBuffer()
-  gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
-  gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW)
+  const glBuffer = context.createBuffer()
+  context.bindBuffer(context.ARRAY_BUFFER, glBuffer)
+  context.bufferData(context.ARRAY_BUFFER, buffer, context.STATIC_DRAW)
 
   shapes.set(name, {
-    mode: glDrawModes[mode],
-    count: (data.byteLength / data.BYTES_PER_ELEMENT) / (type === '2d' ? 2 : 3),
-    buffer,
+    mode: drawModes[mode],
+    count: (buffer.byteLength / buffer.BYTES_PER_ELEMENT) / (type === '2d' ? 2 : 3),
+    buffer: glBuffer,
   })
 }

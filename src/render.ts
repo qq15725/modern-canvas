@@ -1,41 +1,66 @@
-import type { InternalNodeRenderer } from './node-renderer'
-import type { Canvas } from './canvas'
+import type { App } from './app'
 
-export function render(canvas: Canvas, time = 0) {
-  const {
-    gl,
-    beforeRenderPlugins,
-    afterRenderPlugins,
-    nodeRenderers,
-    forEachNode,
-  } = canvas
+export interface RenderNodeOptions {
+  shape: string
+  material: string
+  uniforms?: Record<string, any>
+  extraRenderers?: {
+    shape: string
+    material: string
+    uniforms?: Record<string, any>
+  }[]
+}
 
-  const allRenderers = Array.from(nodeRenderers.values()) as InternalNodeRenderer[]
+export function renderNode(app: App, options: RenderNodeOptions) {
+  const { context, shapes, materials, framebuffers, lastState } = app
+  const { extraRenderers = [] } = options
 
-  beforeRenderPlugins.forEach(plugin => plugin.beforeRender?.(canvas))
+  const renderers = [
+    options,
+    ...extraRenderers,
+  ].filter(renderer => shapes.has(renderer.shape) && materials.has(renderer.material))
 
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+  for (let len = renderers.length, i = 0; i < len; i++) {
+    const render = renderers[i]
+    const {
+      shape: shapeName,
+      material: materialName,
+      uniforms,
+    } = render
+    const shape = shapes.get(shapeName)!
+    const material = materials.get(materialName)!
 
-  forEachNode((node, path) => {
-    const renderers = allRenderers.filter(renderer => {
-      return (
-        (!renderer.include && !renderer.exclude)
-        || (renderer.include && renderer.include(node, path))
-        || (renderer.exclude && !renderer.exclude(node, path))
-      )
-    })
-
-    for (let len = renderers.length, i = 0; i < len; i++) {
-      let framebuffer: any = null
-      if (i < len - 1) framebuffer = canvas.glFramebuffers[i % 2]
-      gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer?.buffer ?? null)
-      framebuffer && gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-      renderers[i].render(node, time)
-      framebuffer && gl.bindTexture(gl.TEXTURE_2D, framebuffer.texture)
+    if (lastState?.material !== materialName && lastState?.shape !== shapeName) {
+      material.setupAttributes({ aPosition: shape.buffer })
     }
-  })
 
-  afterRenderPlugins.forEach(plugin => plugin.afterRender?.(canvas))
+    const framebuffer = i < len - 1 ? framebuffers[i % 2] : null
+    context.bindFramebuffer(context.FRAMEBUFFER, framebuffer?.buffer ?? null)
+    framebuffer && context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT)
 
-  gl.flush()
+    if (lastState?.material !== materialName) {
+      context.useProgram(material.program)
+    }
+
+    uniforms && material.setupUniforms(uniforms)
+    context.drawArrays(shape.mode, 0, shape.count)
+    framebuffer && context.bindTexture(context.TEXTURE_2D, framebuffer.texture)
+
+    app.lastState = {
+      material: materialName,
+      shape: shapeName,
+    }
+  }
+}
+
+export function render(app: App, time = 0) {
+  const { context, systems } = app
+
+  context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT)
+
+  for (let len = systems.length, i = 0; i < len; i++) {
+    systems[i].update?.(time)
+  }
+
+  context.flush()
 }
