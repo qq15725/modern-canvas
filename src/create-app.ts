@@ -18,8 +18,6 @@ export function createApp(options: Options = {}): App {
 
   const app = createContainer() as App
   app.view = view
-  app.nodeLastId = 0
-  app.nodeIdPathMap = new Map()
 
   app.singleton('context', () => {
     const { view } = app
@@ -149,11 +147,16 @@ export function createApp(options: Options = {}): App {
   app.materials = new Map()
   app.registerMaterial = (name, material) => registerMaterial(app, name, material)
   app.textures = new Map()
-  app.components = new Map()
   app.registerTexture = (name, source) => registerTexture(app, name, source)
+
+  // ECS
+  app.entities = new Map()
+  app.components = new Map()
+  app.archetypes = new Map()
   app.systems = []
   app.registerSystem = system => registerSystem(app, system)
-  app.query = (...componentNames) => query(app, ...componentNames)
+  app.query = options => query(app, options)
+
   app.setup = () => setup(app)
   app.load = async () => {
     const { systems, textures } = app

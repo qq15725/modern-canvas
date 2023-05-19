@@ -12,7 +12,7 @@ export interface RenderNodeOptions {
 }
 
 export function renderNode(app: App, options: RenderNodeOptions) {
-  const { context, shapes, materials, framebuffers, lastState } = app
+  const { width, height, context, shapes, materials, framebuffers, lastState } = app
   const { extraRenderers = [] } = options
 
   const renderers = [
@@ -36,6 +36,7 @@ export function renderNode(app: App, options: RenderNodeOptions) {
 
     const framebuffer = i < len - 1 ? framebuffers[i % 2] : null
     context.bindFramebuffer(context.FRAMEBUFFER, framebuffer?.buffer ?? null)
+    context.viewport(0, 0, width, height)
     framebuffer && context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT)
 
     if (lastState?.material !== materialName) {
@@ -54,7 +55,9 @@ export function renderNode(app: App, options: RenderNodeOptions) {
 }
 
 export function render(app: App, time = 0) {
-  const { context, systems } = app
+  const { context, systems, framebuffers } = app
+
+  framebuffers.forEach(framebuffer => framebuffer.resize())
 
   context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT)
 

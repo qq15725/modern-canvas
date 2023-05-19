@@ -64,3 +64,111 @@ export class Matrix3 extends Float32Array {
     return this
   }
 }
+
+export function getArchetypeIdCodePoints(componentIds: number[]): number[] {
+  const codePoints = []
+  for (let len = componentIds.length, i = 0; i < len; i++) {
+    const componentId = componentIds[i]
+    const index = ~~(componentId / 16)
+    for (let ix = 0; ix <= index; ix++) {
+      if (!(ix in codePoints)) codePoints[ix] = 0
+    }
+    codePoints[index] |= 1 << (componentId % 16)
+  }
+  return codePoints
+}
+
+export function createVideo(url: string): HTMLVideoElement {
+  const video = document.createElement('video')
+  video.playsInline = true
+  video.muted = true
+  video.loop = true
+  video.src = url
+  return video
+}
+
+export function createImage(url: string): HTMLImageElement {
+  const img = new Image()
+  img.decoding = 'sync'
+  img.loading = 'eager'
+  img.crossOrigin = 'anonymous'
+  img.src = url
+  return img
+}
+
+// TODO 需要释放
+let sandbox: HTMLIFrameElement | undefined
+const colors = new Map<string, [number, number, number, number]>()
+function getCurrentSandbox() {
+  if (!sandbox) {
+    sandbox = document.createElement('iframe')
+    sandbox.id = `__SANDBOX__${ Math.random() }`
+    sandbox.width = '0'
+    sandbox.height = '0'
+    sandbox.style.visibility = 'hidden'
+    sandbox.style.position = 'fixed'
+    document.body.appendChild(sandbox)
+    sandbox.contentWindow?.document.write('<!DOCTYPE html><meta charset="UTF-8"><title></title><body>')
+  }
+  return sandbox
+}
+
+function decodeColor(color: string): number[] | void {
+  switch (true) {
+    case color.startsWith('#') && color.length === 7:
+      color = color.substring(1)
+      return [
+        parseInt(`${ color[0] }${ color[1] }`, 16) / 255,
+        parseInt(`${ color[2] }${ color[3] }`, 16) / 255,
+        parseInt(`${ color[4] }${ color[5] }`, 16) / 255,
+        1,
+      ]
+    case color.startsWith('#') && color.length === 9:
+      color = color.substring(1)
+      return [
+        parseInt(`${ color[0] }${ color[1] }`, 16) / 255,
+        parseInt(`${ color[2] }${ color[3] }`, 16) / 255,
+        parseInt(`${ color[4] }${ color[5] }`, 16) / 255,
+        parseInt(`${ color[6] }${ color[7] }`, 16) / 255,
+      ]
+    case color.startsWith('rgb('):
+      return [
+        ...color.replace(/rgb\((.+?)\)/, '$1')
+          .split(',')
+          .slice(0, 3)
+          .map(val => Number(val.trim()) / 255),
+        1,
+      ]
+    case color.startsWith('rgba('):
+      return color.replace(/rgba\((.+?)\)/, '$1')
+        .split(',')
+        .slice(0, 4)
+        .map(val => Number(val.trim()) / 255)
+  }
+}
+
+export function resolveColor(value: string, defaultValue = [0, 0, 0, 0]): [number, number, number, number] {
+  if (colors.has(value)) return colors.get(value)!
+
+  let color = decodeColor(value)
+
+  if (!color) {
+    const sandbox = getCurrentSandbox()
+    if (sandbox) {
+      const sandboxWindow = sandbox.contentWindow
+      if (sandboxWindow) {
+        const sandboxDocument = sandboxWindow.document
+        const el = sandboxDocument.createElement('div')
+        sandboxDocument.body.appendChild(el)
+        el.textContent = ' '
+        el.style.color = value
+        color = decodeColor(sandboxWindow.getComputedStyle(el).color)
+        sandboxDocument.body.removeChild(el)
+      }
+    }
+  }
+
+  if (color) colors.set(value, color as any)
+
+  return (color ?? defaultValue) as any
+}

@@ -24,15 +24,13 @@
     {
       type: 'text',
       style: {
-        left: 60,
-        top: 60,
-        width: 240,
-        height: 240,
+        left: 120,
+        top: 120,
         rotation: 0,
-        fontSize: 40,
+        fontSize: 22,
         color: 'red',
       },
-      content: 'TEXT',
+      content: 'test',
     },
     {
       type: 'video',
@@ -199,6 +197,7 @@
 <style>
   html body {
     margin: 0;
+    background-color: #ccc;
   }
 
   .editor {

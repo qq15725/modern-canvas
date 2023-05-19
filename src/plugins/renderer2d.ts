@@ -1,5 +1,5 @@
 import { definePlugin } from '../plugin'
-import { Matrix3 } from '../utils'
+import { Matrix3, createImage, createVideo, resolveColor } from '../utils'
 
 export const Renderer2d = definePlugin({
   name: 'renderer2d',
@@ -26,8 +26,10 @@ void main() {
 }`,
       fragmentShader: `uniform sampler2D uSampler;
 varying vec2 vTextureCoord;
+uniform vec4 uBackgroundColor;
 void main() {
-  gl_FragColor = texture2D(uSampler, vTextureCoord);
+  vec4 color = texture2D(uSampler, vTextureCoord);
+  gl_FragColor = mix(uBackgroundColor, color, color.a);
 }`,
     })
 
@@ -45,18 +47,11 @@ void main() {
 
           if (type === 'image' && node.src) {
             if (!textures.has(node.id)) {
-              const img = new Image()
-              img.src = node.src
-              app.registerTexture(node.id, img)
+              app.registerTexture(node.id, createImage(node.src))
             }
           } else if (type === 'video') {
             if (!textures.has(node.id)) {
-              const video = document.createElement('video')
-              video.playsInline = true
-              video.muted = true
-              video.loop = true
-              video.src = node.src
-              app.registerTexture(node.id, video)
+              app.registerTexture(node.id, createVideo(node.src))
             } else {
               const video = textures.get(node.id)?.source as HTMLVideoElement
               if (video.duration) {
@@ -65,11 +60,11 @@ void main() {
             }
           } else if (type === 'text') {
             const {
-              width = 100,
-              height = 20,
+              width: userWidth,
+              height: userHeight,
               color = 'black',
               fontSize = 14,
-              fontWeight = 900,
+              fontWeight = 400,
               direction = 'inherit',
               fontFamily = 'monospace',
               fontKerning = 'normal',
@@ -78,11 +73,18 @@ void main() {
             } = node.style ?? {}
 
             if (!textures.has(node.id)) {
+              const font = `${ fontWeight } ${ fontSize }px ${ fontFamily }`
+              context2d.font = font
+              const result = context2d.measureText(node.content)
+              const height = userHeight ?? result.actualBoundingBoxAscent + result.actualBoundingBoxDescent
+              const width = userWidth ?? result.width
+              node.style.width = width
+              node.style.height = height
               context2d.canvas.width = width
               context2d.canvas.height = height
               context2d.fillStyle = color
               context2d.direction = direction
-              context2d.font = `${ fontWeight } ${ fontSize }px ${ fontFamily }`
+              context2d.font = font
               context2d.fontKerning = fontKerning
               context2d.textAlign = textAlign
               context2d.textBaseline = textBaseline
@@ -120,6 +122,7 @@ void main() {
             width = 0,
             height = 0,
             rotation = 0,
+            background,
           } = node.style ?? {}
 
           const x = left / appWidth
@@ -128,11 +131,16 @@ void main() {
           const h = height / appHeight
           const r = rotation / 180 * Math.PI
 
+          const backgroundColor = background?.color
+            ? resolveColor(background.color)
+            : [0, 0, 0, 0]
+
           app.renderNode({
             shape,
             material,
             uniforms: {
               uSampler: textures.get(node.id)?.value,
+              uBackgroundColor: backgroundColor,
               uModelMatrix: Matrix3.identity()
                 .multiply(Matrix3.translation((2 * x) - (1 - w), (1 - h) - (2 * y)))
                 .multiply(Matrix3.scaling(w, h))

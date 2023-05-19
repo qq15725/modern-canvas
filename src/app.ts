@@ -11,14 +11,6 @@ import type { Container } from './container'
 export interface App extends Container {
   view: HTMLCanvasElement
   children: Node[]
-
-  nodeLastId: number
-  nodeIdPathMap: Map<number, number[]>
-  lastState?: {
-    material: string
-    shape: string
-  }
-
   context: WebGLRenderingContext
   defaultTexture: WebGLTexture
   framebuffers: {
@@ -38,29 +30,38 @@ export interface App extends Container {
   extensions: {
     loseContext: WEBGL_lose_context | null
   }
-
   width: number
   height: number
-
   plugins: Map<string, Plugin>
-
   shapes: Map<string, Shape>
   registerShape(name: string, shape: UserShape): void
-
   materials: Map<string, Material>
   registerMaterial(name: string, material: UserMaterial): void
-
   textures: Map<number, Texture>
   registerTexture(id: number, source: TexImageSource): Promise<void>
+  lastState?: {
+    material: string
+    shape: string
+  }
 
-  components: Map<string, number[]>
-
+  // ECS
+  // Map<entity-id, node-path>
+  entities: Map<number, {
+    path: number[]
+    archetypeId: string
+  }>
+  // Map<component-name, component-id>
+  components: Map<string, number>
+  // Map<archetype-id, entity-id[]>
+  archetypes: Map<string, {
+    entityIds: Set<number>
+    codePoints: number[]
+  }>
   systems: System[]
   registerSystem(system: System): void
-
   query(where?: QueryOptions): Node
-  setup(): void
 
+  setup(): void
   load(): Promise<void>
   renderNode(options: RenderNodeOptions): void
   render(time?: number): void
