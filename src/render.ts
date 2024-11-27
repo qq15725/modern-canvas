@@ -1,69 +1,55 @@
-import type { App } from './app'
+import { Node } from './core'
+import { Engine } from './Engine'
 
-export interface RenderNodeOptions {
-  shape: string
-  material: string
-  uniforms?: Record<string, any>
-  extraRenderers?: {
-    shape: string
-    material: string
-    uniforms?: Record<string, any>
-  }[]
+let engine: Engine | undefined
+let renderLoop: Promise<void> | undefined
+const queue: (() => Promise<void>)[] = []
+
+export interface RenderOptions {
+  data: Record<string, any> | Node | (Node | Record<string, any>)[]
+  width: number
+  height: number
 }
 
-export function renderNode(app: App, options: RenderNodeOptions) {
-  const { width, height, context, shapes, materials, framebuffers, lastState } = app
-  const { extraRenderers = [] } = options
-
-  const renderers = [
-    options,
-    ...extraRenderers,
-  ].filter(renderer => shapes.has(renderer.shape) && materials.has(renderer.material))
-
-  for (let len = renderers.length, i = 0; i < len; i++) {
-    const render = renderers[i]
-    const {
-      shape: shapeName,
-      material: materialName,
-      uniforms,
-    } = render
-    const shape = shapes.get(shapeName)!
-    const material = materials.get(materialName)!
-
-    if (lastState?.material !== materialName && lastState?.shape !== shapeName) {
-      material.setupAttributes({ aPosition: shape.buffer })
+async function startRenderLoop(sleep = 100) {
+  while (true) {
+    const cb = queue.shift()
+    if (cb) {
+      try {
+        await cb()
+      }
+      catch (e) {
+        console.error(e)
+      }
     }
-
-    const framebuffer = i < len - 1 ? framebuffers[i % 2] : null
-    context.bindFramebuffer(context.FRAMEBUFFER, framebuffer?.buffer ?? null)
-    context.viewport(0, 0, width, height)
-    framebuffer && context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT)
-
-    if (lastState?.material !== materialName) {
-      context.useProgram(material.program)
-    }
-
-    uniforms && material.setupUniforms(uniforms)
-    context.drawArrays(shape.mode, 0, shape.count)
-    framebuffer && context.bindTexture(context.TEXTURE_2D, framebuffer.texture)
-
-    app.lastState = {
-      material: materialName,
-      shape: shapeName,
+    else {
+      await new Promise(r => setTimeout(r, sleep))
     }
   }
 }
 
-export function render(app: App, time = 0) {
-  const { context, systems, framebuffers } = app
+async function performRender(options: RenderOptions): Promise<HTMLCanvasElement> {
+  engine ??= new Engine({ width: 1, height: 1 })
+  const root = engine.root
+  root.removeChildren()
 
-  framebuffers.forEach(framebuffer => framebuffer.resize())
+  const { data, width, height } = options
+  engine.resize(width, height)
+  ;(Array.isArray(data) ? data : [data]).forEach((v) => {
+    if (v instanceof Node) {
+      root.addChild(v)
+    }
+    else {
+      root.addChild(Node.parse(v) as unknown as Node)
+    }
+  })
+  await engine.waitUntilLoad()
+  return engine.toCanvas2D()
+}
 
-  context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT)
-
-  for (let len = systems.length, i = 0; i < len; i++) {
-    systems[i].update?.(time)
-  }
-
-  context.flush()
+export async function render(options: RenderOptions): Promise<HTMLCanvasElement> {
+  renderLoop ??= startRenderLoop()
+  return new Promise((r) => {
+    queue.push(async () => r(await performRender(options)))
+  })
 }

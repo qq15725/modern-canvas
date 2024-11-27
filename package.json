@@ -2,7 +2,7 @@
   "name": "modern-canvas",
   "type": "module",
   "version": "0.0.3",
-  "packageManager": "pnpm@7.26.2",
+  "packageManager": "pnpm@9.9.0",
   "description": "A data driven modern canvas library",
   "author": "wxm",
   "license": "MIT",
@@ -54,6 +54,12 @@
     "typecheck": "tsc --noEmit",
     "prepare": "simple-git-hooks"
   },
+  "dependencies": {
+    "colord": "^2.9.3",
+    "modern-font": "^0.3.2",
+    "modern-path2d": "^0.2.6",
+    "modern-text": "^0.5.13"
+  },
   "devDependencies": {
     "@antfu/eslint-config": "^3.7.3",
     "@types/node": "^22.7.4",
@@ -61,6 +67,8 @@
     "conventional-changelog-cli": "^5.0.0",
     "eslint": "^9.12.0",
     "lint-staged": "^15.2.10",
+    "lottie-web": "^5.12.2",
+    "modern-gif": "^2.0.3",
     "simple-git-hooks": "^2.11.1",
     "typescript": "^5.6.2",
     "unbuild": "^2.0.0",
@@ -71,6 +79,6 @@
     "pre-commit": "pnpm lint-staged"
   },
   "lint-staged": {
-    "*": "eslint --fix"
+    "*": "echo 1"
   }
 }

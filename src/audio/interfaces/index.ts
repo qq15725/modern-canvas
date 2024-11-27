@@ -1,0 +1,5 @@
+export * from './IAudio'
+export * from './IAudioContext'
+export * from './IAudioNode'
+export * from './IPlayOptions'
+export * from './ISound'
