@@ -1,11 +1,13 @@
 import { MouseInputEvent } from './MouseInputEvent'
 
 export class PointerInputEvent extends MouseInputEvent implements PointerEvent {
+  declare altitudeAngle: number
+  declare azimuthAngle: number
   /**
    * The unique identifier of the pointer.
    * @see https://developer.mozilla.org/en-US/docs/Web/API/PointerEvent/pointerId
    */
-  pointerId!: number
+  declare pointerId: number
 
   /**
    * The width of the pointer's contact along the x-axis, measured in CSS pixels.

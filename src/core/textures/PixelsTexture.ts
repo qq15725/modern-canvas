@@ -18,7 +18,7 @@ export class PixelsTexture extends Texture<TexturePixelsSource> {
         source.pixels = new Uint8Array(pixels.buffer)
       }
       else {
-        source.pixels = new Uint8Array(pixels)
+        source.pixels = new Uint8Array(pixels as any)
       }
     }
 

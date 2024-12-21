@@ -9,7 +9,7 @@ import { clamp, lerp, Matrix, Matrix4, Vector4 } from '../math'
  * | r3 | g3 | b3 | a3 | ta |
  */
 export class ColorMatrix extends Matrix {
-  constructor(array?: ArrayLike<number>) {
+  constructor(array?: number[]) {
     super(4, 5, array)
   }
 
@@ -233,7 +233,7 @@ export class ColorMatrix extends Matrix {
     ])
   }
 
-  override multiply(target: ArrayLike<number>): this {
+  override multiply(target: number[]): this {
     const b = target
     const a = this._array
     return this.set([

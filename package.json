@@ -56,9 +56,9 @@
   },
   "dependencies": {
     "colord": "^2.9.3",
-    "modern-font": "^0.3.2",
-    "modern-path2d": "^0.2.6",
-    "modern-text": "^0.5.13"
+    "modern-font": "^0.3.4",
+    "modern-path2d": "^0.2.8",
+    "modern-text": "^0.7.3"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^3.7.3",
@@ -74,6 +74,9 @@
     "unbuild": "^2.0.0",
     "vite": "^5.4.8",
     "vitest": "^2.1.2"
+  },
+  "peerDependencies": {
+    "lottie-web": "^5.12.2"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm lint-staged"

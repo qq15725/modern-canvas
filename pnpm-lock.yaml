@@ -7,6 +7,19 @@ settings:
 importers:
 
   .:
+    dependencies:
+      colord:
+        specifier: ^2.9.3
+        version: 2.9.3
+      modern-font:
+        specifier: ^0.3.4
+        version: 0.3.4
+      modern-path2d:
+        specifier: ^0.2.8
+        version: 0.2.8
+      modern-text:
+        specifier: ^0.7.3
+        version: 0.7.3
     devDependencies:
       '@antfu/eslint-config':
         specifier: ^3.7.3
@@ -26,6 +39,12 @@ importers:
       lint-staged:
         specifier: ^15.2.10
         version: 15.2.10
+      lottie-web:
+        specifier: ^5.12.2
+        version: 5.12.2
+      modern-gif:
+        specifier: ^2.0.3
+        version: 2.0.3
       simple-git-hooks:
         specifier: ^2.11.1
         version: 2.11.1
@@ -1726,6 +1745,9 @@ packages:
       picomatch:
         optional: true
 
+  fflate@0.8.2:
+    resolution: {integrity: sha512-cPJU47OaAoCbg0pBvzsgpTPhmhqI5eJjh/JIu8tPj5q+T7iLvW/JAYUqmE7KOB4R1ZyEhzBaIQpQpardBF5z8A==}
+
   file-entry-cache@8.0.0:
     resolution: {integrity: sha512-XXTUwCvisa5oacNGRP9SfNtYBNAMi+RPwBFmblZEF7N7swHYQS6/Zfk7SRwx4D5j3CH211YNRco1DEMNVfZCnQ==}
     engines: {node: '>=16.0.0'}
@@ -2063,6 +2085,9 @@ packages:
   longest-streak@3.1.0:
     resolution: {integrity: sha512-9Ri+o0JYgehTaVBBDoMqIl8GXtbWg711O3srftcHhZ0dqnETqLaoIK0x17fUw9rFSlK/0NlsKe0Ahhyl5pXE2g==}
 
+  lottie-web@5.12.2:
+    resolution: {integrity: sha512-uvhvYPC8kGPjXT3MyKMrL3JitEAmDMp30lVkuq/590Mw9ok6pWcFCwXJveo0t5uqYw1UREQHofD+jVpdjBv8wg==}
+
   loupe@3.1.2:
     resolution: {integrity: sha512-23I4pFZHmAemUnz8WZXbYRSKYj801VDaNv9ETuMh7IrMc7VuVVSo+Z9iLE3ni30+U48iDWfi30d3twAXBYmnCg==}
 
@@ -2276,6 +2301,21 @@ packages:
 
   mlly@1.7.3:
     resolution: {integrity: sha512-xUsx5n/mN0uQf4V548PKQ+YShA4/IW0KI1dZhrNrPCLG+xizETbHTkOa1f8/xut9JRPp8kQuMnz0oqwkTiLo/A==}
+
+  modern-font@0.3.4:
+    resolution: {integrity: sha512-fSV8CRYSgCxOTTHb6ZHgo0xI/ns3ExaUaBc3q5GG1MP6n0J+ua3Fz7LN5IDcIRhNbbJ3rus0qIKo8DPudfVGEQ==}
+
+  modern-gif@2.0.3:
+    resolution: {integrity: sha512-3QXbWnVkrD1UgNqpaKopSDWlIvVyRC3m8yQdGFsi+xNk0ndnSTwj95MqhXcXv0FltJHq/BcwglTak42pfUf4IQ==}
+
+  modern-palette@2.0.0:
+    resolution: {integrity: sha512-wKZcom2QzK6sS6h5RLYHEkd3V3maQLzgkI+ekDCimlk7dfXa63aekZcy+7KS+8JEqIDeY/yV1CAvA7l+7u6QHA==}
+
+  modern-path2d@0.2.8:
+    resolution: {integrity: sha512-tuv0pq6aBlQjWNoV+EWq/MMyHBF/2a+t8yhPAiDrY6hvWcH2dOxoNSmYvyjyczqcT+JkwFTnB3tlnsIiJBWcMw==}
+
+  modern-text@0.7.3:
+    resolution: {integrity: sha512-O718/Fwc1vXbrBC3LN89HA1XTJvmNIPZL1VSjEQa8tYms7HNeUrfy4K/iw7RXaKe18i4hpLHmgsRHEYvsDOc7g==}
 
   mri@1.2.0:
     resolution: {integrity: sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==}
@@ -4841,6 +4881,8 @@ snapshots:
     optionalDependencies:
       picomatch: 4.0.2
 
+  fflate@0.8.2: {}
+
   file-entry-cache@8.0.0:
     dependencies:
       flat-cache: 4.0.1
@@ -5149,6 +5191,8 @@ snapshots:
       wrap-ansi: 9.0.0
 
   longest-streak@3.1.0: {}
+
+  lottie-web@5.12.2: {}
 
   loupe@3.1.2: {}
 
@@ -5529,6 +5573,23 @@ snapshots:
       pathe: 1.1.2
       pkg-types: 1.2.1
       ufo: 1.5.4
+
+  modern-font@0.3.4:
+    dependencies:
+      fflate: 0.8.2
+
+  modern-gif@2.0.3:
+    dependencies:
+      modern-palette: 2.0.0
+
+  modern-palette@2.0.0: {}
+
+  modern-path2d@0.2.8: {}
+
+  modern-text@0.7.3:
+    dependencies:
+      modern-font: 0.3.4
+      modern-path2d: 0.2.8
 
   mri@1.2.0: {}
 
