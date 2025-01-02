@@ -7,7 +7,6 @@ const resolvePath = (str: string) => resolve(__dirname, str)
 export default defineConfig({
   build: {
     lib: {
-      formats: ['umd'],
       entry: resolvePath('./src/index.ts'),
     },
     rollupOptions: {

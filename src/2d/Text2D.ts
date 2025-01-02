@@ -99,11 +99,11 @@ export class Text2D extends Element2D {
 
   measure(): MeasureResult {
     const result = measureText({
-      content: this.content as any,
+      content: this.content,
       style: {
         ...this.style.toJSON(),
         height: undefined,
-      } as any,
+      },
     })
     if (!this.style.width)
       this.style.width = result.boundingBox.width
@@ -156,9 +156,9 @@ export class Text2D extends Element2D {
         renderText({
           view: this.texture.source,
           pixelRatio: this.pixelRatio,
-          content: this.content as any,
+          content: this.content,
           effects: this.effects,
-          style: this.style.toJSON() as any,
+          style: this.style.toJSON(),
         })
       }
       this.texture.requestUpload()
