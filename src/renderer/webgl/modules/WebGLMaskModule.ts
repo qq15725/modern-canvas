@@ -2,12 +2,6 @@ import type { WebGLRenderer } from '../WebGLRenderer'
 import type { Renderable } from './types'
 import { WebGLModule } from './WebGLModule'
 
-declare module '../WebGLRenderer' {
-  interface WebGLRenderer {
-    mask: WebGLMaskModule
-  }
-}
-
 export type MaskColor = number
 
 export interface MaskRect {

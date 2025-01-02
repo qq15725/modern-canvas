@@ -2,12 +2,6 @@ import type { WebGLViewport } from '../types'
 import type { WebGLRenderer } from '../WebGLRenderer'
 import { WebGLModule } from './WebGLModule'
 
-declare module '../WebGLRenderer' {
-  interface WebGLRenderer {
-    viewport: WebGLViewportModule
-  }
-}
-
 export class WebGLViewportModule extends WebGLModule {
   override install(renderer: WebGLRenderer): void {
     super.install(renderer)

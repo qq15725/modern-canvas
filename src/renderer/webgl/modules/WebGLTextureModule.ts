@@ -3,12 +3,6 @@ import type { WebGLRenderer } from '../WebGLRenderer'
 import { getChanged } from './utils'
 import { WebGLModule } from './WebGLModule'
 
-declare module '../WebGLRenderer' {
-  interface WebGLRenderer {
-    texture: WebGLTextureModule
-  }
-}
-
 export class WebGLTextureModule extends WebGLModule {
   override install(renderer: WebGLRenderer): void {
     super.install(renderer)

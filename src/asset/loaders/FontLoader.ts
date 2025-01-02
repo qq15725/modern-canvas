@@ -2,12 +2,6 @@ import type { Font } from 'modern-font'
 import type { Assets } from '../Assets'
 import { Loader } from './Loader'
 
-declare module '../Assets' {
-  interface Assets {
-    font: FontLoader
-  }
-}
-
 export class FontLoader extends Loader {
   declare load: (url: string) => Promise<Font>
 

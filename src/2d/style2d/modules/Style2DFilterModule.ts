@@ -2,11 +2,7 @@ import type { Style2D } from '../Style2D'
 import { ColorMatrix } from '../../../color'
 import { defineProperty } from '../../../core'
 import { parseCssFunctions, PI_2 } from '../../../shared'
-import { Style2DModule } from './Style2DModule'
-
-export interface Style2DFilterProperties {
-  filter: string
-}
+import { Style2DModule } from '../Style2DModule'
 
 export type Style2DFilterKey =
   | 'hue-rotate'
@@ -17,17 +13,16 @@ export type Style2DFilterKey =
   | 'sepia'
   | 'opacity'
   | 'grayscale'
+
 export type Style2DFilter = Record<Style2DFilterKey, number>
 
-declare module '../Style2D' {
-  interface Style2DOptions extends Partial<Style2DFilterProperties> {
-    //
-  }
+export interface Style2DFilterProperties {
+  filter: string
+}
 
-  interface Style2D extends Style2DFilterProperties {
-    getComputedFilter: typeof getComputedFilter
-    getComputedFilterColorMatrix: typeof getComputedFilterColorMatrix
-  }
+export interface Style2DFilterExtend extends Style2DFilterProperties {
+  getComputedFilter: typeof getComputedFilter
+  getComputedFilterColorMatrix: typeof getComputedFilterColorMatrix
 }
 
 export class Style2DFilterModule extends Style2DModule {

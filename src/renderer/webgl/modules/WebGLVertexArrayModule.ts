@@ -2,12 +2,6 @@ import type { WebGLVertexArrayObjectMeta, WebGLVertexArrayObjectOptions, WebGLVe
 import type { WebGLRenderer } from '../WebGLRenderer'
 import { WebGLModule } from './WebGLModule'
 
-declare module '../WebGLRenderer' {
-  interface WebGLRenderer {
-    vertexArray: WebGLVertexArrayModule
-  }
-}
-
 export class WebGLVertexArrayModule extends WebGLModule {
   override install(renderer: WebGLRenderer): void {
     super.install(renderer)

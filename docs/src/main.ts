@@ -1,4 +1,4 @@
-import { Engine, Image2D } from '../../src'
+import { Engine, Image2D, Text2D } from '../../src'
 
 const engine = new Engine({ width: 500, height: 500, pixelRatio: 1, antialias: true })
 engine.speed = 1
@@ -13,6 +13,15 @@ engine.root.addChild(
       height: 100,
     },
     src: '/example.png',
+  }),
+)
+engine.root.addChild(
+  new Text2D({
+    style: {
+      left: 100,
+      top: 100,
+    },
+    content: '/example.png',
   }),
 )
 

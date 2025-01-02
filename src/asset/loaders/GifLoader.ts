@@ -3,12 +3,6 @@ import { Image2DResource } from '../../2d'
 import { PixelsTexture } from '../../core'
 import { Loader } from './Loader'
 
-declare module '../Assets' {
-  interface Assets {
-    gif: GifLoader
-  }
-}
-
 export class GifLoader extends Loader {
   declare load: (url: string) => Promise<Image2DResource>
 

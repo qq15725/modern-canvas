@@ -19,6 +19,20 @@ import {
   WebGLViewportModule,
 } from './modules'
 
+export interface WebGLRenderer {
+  texture: WebGLTextureModule
+  buffer: WebGLBufferModule
+  framebuffer: WebGLFramebufferModule
+  program: WebGLProgramModule
+  vertexArray: WebGLVertexArrayModule
+  viewport: WebGLViewportModule
+  state: WebGLStateModule
+  mask: WebGLMaskModule
+  scissor: WebGLScissorModule
+  stencil: WebGLStencilModule
+  batch2D: WebGLBatch2DModule
+}
+
 export class WebGLRenderer extends Renderer {
   declare gl: WebGLRenderingContext | WebGL2RenderingContext
   declare version: 1 | 2

@@ -2,12 +2,6 @@ import type { WebGLFramebufferMeta, WebGLFramebufferOptions } from '../types'
 import type { WebGLRenderer } from '../WebGLRenderer'
 import { WebGLModule } from './WebGLModule'
 
-declare module '../WebGLRenderer' {
-  interface WebGLRenderer {
-    framebuffer: WebGLFramebufferModule
-  }
-}
-
 export class WebGLFramebufferModule extends WebGLModule {
   override install(renderer: WebGLRenderer): void {
     super.install(renderer)

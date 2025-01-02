@@ -1,9 +1,25 @@
+import type { Overflow } from 'modern-idoc'
+import type {
+  Style2DBackgroundExtend,
+  Style2DBackgroundProperties,
+  Style2DFilterExtend,
+  Style2DFilterProperties,
+  Style2DOffsetExtend,
+  Style2DOffsetProperties,
+  Style2DTextExtend,
+  Style2DTextProperties,
+  Style2DTransformExtend,
+  Style2DTransformProperties,
+} from './modules'
 import { _Object, property } from '../../core'
 import * as modules from './modules'
 
-export type Overflow = 'hidden' | 'visible'
-
-export interface Style2DOptions {
+export interface Style2DOptions extends
+  Partial<Style2DBackgroundProperties>,
+  Partial<Style2DFilterProperties>,
+  Partial<Style2DOffsetProperties>,
+  Partial<Style2DTextProperties>,
+  Partial<Style2DTransformProperties> {
   // shadow
   shadowColor?: string
   shadowOffsetX?: number
@@ -13,6 +29,15 @@ export interface Style2DOptions {
   opacity?: number
   borderRadius?: number
   overflow?: Overflow
+}
+
+export interface Style2D extends
+  Style2DBackgroundExtend,
+  Style2DFilterExtend,
+  Style2DOffsetExtend,
+  Style2DTextExtend,
+  Style2DTransformExtend {
+  //
 }
 
 export class Style2D extends _Object {

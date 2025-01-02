@@ -15,6 +15,16 @@ const SUPPORTS_WEAK_REF = 'WeakRef' in globalThis
 
 export type AssetHandler = (url: string, options?: any) => any | Promise<any>
 
+export interface Assets {
+  font: FontLoader
+  gif: GifLoader
+  json: JsonLoader
+  lottie: LottieLoader
+  text: TextLoader
+  texture: TextureLoader
+  video: VideoLoader
+}
+
 export class Assets {
   defaultHandler: AssetHandler = (url: string) => this.fetch(url)
   protected _handlers = new Map<string, AssetHandler>()

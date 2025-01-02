@@ -4,12 +4,6 @@ import { WebGLBlendMode } from './WebGLBlendMode'
 import { WebGLModule } from './WebGLModule'
 import { WebGLState } from './WebGLStateModule'
 
-declare module '../WebGLRenderer' {
-  interface WebGLRenderer {
-    batch2D: WebGLBatch2DModule
-  }
-}
-
 export interface Batchable2D {
   vertices: number[]
   indices: number[]
@@ -49,22 +43,10 @@ export class WebGLBatch2DModule extends WebGLModule {
   protected _defaultBackgroundColor = 0x00000000
   protected _defaultColorMatrixOffset = [0, 0, 0, 0]
   protected _defaultColorMatrix = [
-    1,
-    0,
-    0,
-    0,
-    0,
-    1,
-    0,
-    0,
-    0,
-    0,
-    1,
-    0,
-    0,
-    0,
-    0,
-    1,
+    1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    0, 0, 0, 1,
   ]
 
   protected _batchables: Batchable2D[] = []

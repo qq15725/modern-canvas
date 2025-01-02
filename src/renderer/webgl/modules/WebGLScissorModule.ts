@@ -2,12 +2,6 @@ import type { WebGLRenderer } from '../WebGLRenderer'
 import type { MaskData, MaskRect } from './WebGLMaskModule'
 import { WebGLModule } from './WebGLModule'
 
-declare module '../WebGLRenderer' {
-  interface WebGLRenderer {
-    scissor: WebGLScissorModule
-  }
-}
-
 export class WebGLScissorModule extends WebGLModule {
   override install(renderer: WebGLRenderer): void {
     super.install(renderer)

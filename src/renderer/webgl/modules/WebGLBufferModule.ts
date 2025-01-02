@@ -3,12 +3,6 @@ import type { WebGLRenderer } from '../WebGLRenderer'
 import { uid } from '../../../shared'
 import { WebGLModule } from './WebGLModule'
 
-declare module '../WebGLRenderer' {
-  interface WebGLRenderer {
-    buffer: WebGLBufferModule
-  }
-}
-
 export class WebGLBufferModule extends WebGLModule {
   override install(renderer: WebGLRenderer): void {
     super.install(renderer)

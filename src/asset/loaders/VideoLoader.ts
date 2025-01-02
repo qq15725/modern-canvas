@@ -2,12 +2,6 @@ import type { Assets } from '../Assets'
 import { VideoTexture } from '../../core'
 import { Loader } from './Loader'
 
-declare module '../Assets' {
-  interface Assets {
-    video: VideoLoader
-  }
-}
-
 export class VideoLoader extends Loader {
   declare load: (url: string) => Promise<VideoTexture>
 

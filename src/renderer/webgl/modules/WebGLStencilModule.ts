@@ -3,12 +3,6 @@ import type { Renderable } from './types'
 import type { MaskData } from './WebGLMaskModule'
 import { WebGLModule } from './WebGLModule'
 
-declare module '../WebGLRenderer' {
-  interface WebGLRenderer {
-    stencil: WebGLStencilModule
-  }
-}
-
 export class WebGLStencilModule extends WebGLModule {
   override install(renderer: WebGLRenderer): void {
     super.install(renderer)

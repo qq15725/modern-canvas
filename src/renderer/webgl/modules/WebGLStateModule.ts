@@ -2,12 +2,6 @@ import type { WebGLRenderer } from '../WebGLRenderer'
 import { mapWebGLBlendModes, WebGLBlendMode } from './WebGLBlendMode'
 import { WebGLModule } from './WebGLModule'
 
-declare module '../WebGLRenderer' {
-  interface WebGLRenderer {
-    state: WebGLStateModule
-  }
-}
-
 export interface WebGLState {
   blend: boolean
   offsets: boolean

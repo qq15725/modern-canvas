@@ -2,12 +2,6 @@ import type { WebGLProgramMeta, WebGLProgramOptions } from '../types'
 import type { WebGLRenderer } from '../WebGLRenderer'
 import { WebGLModule } from './WebGLModule'
 
-declare module '../WebGLRenderer' {
-  interface WebGLRenderer {
-    program: WebGLProgramModule
-  }
-}
-
 export class WebGLProgramModule extends WebGLModule {
   override install(renderer: WebGLRenderer): void {
     super.install(renderer)

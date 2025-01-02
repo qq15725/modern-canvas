@@ -2,12 +2,6 @@ import type { Assets } from '../Assets'
 import { Texture } from '../../core'
 import { Loader } from './Loader'
 
-declare module '../Assets' {
-  interface Assets {
-    texture: TextureLoader
-  }
-}
-
 export class TextureLoader extends Loader {
   declare load: (url: string) => Promise<Texture<ImageBitmap>>
 

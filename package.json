@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.0.3",
   "packageManager": "pnpm@9.15.1",
-  "description": "A data driven modern canvas library",
+  "description": "A JavaScript WebGL rendering engine.",
   "author": "wxm",
   "license": "MIT",
   "homepage": "https://github.com/qq15725/modern-canvas",

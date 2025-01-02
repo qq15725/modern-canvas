@@ -11,7 +11,7 @@ import type {
 } from 'modern-idoc'
 import type { Style2D } from '../Style2D'
 import { defineProperty } from '../../../core'
-import { Style2DModule } from './Style2DModule'
+import { Style2DModule } from '../Style2DModule'
 
 export interface Style2DTextProperties {
   color: string
@@ -33,14 +33,8 @@ export interface Style2DTextProperties {
   writingMode: WritingMode
 }
 
-declare module '../Style2D' {
-  interface Style2DOptions extends Partial<Style2DTextProperties> {
-    //
-  }
-
-  interface Style2D extends Style2DTextProperties {
-    //
-  }
+export interface Style2DTextExtend extends Style2DTextProperties {
+  //
 }
 
 export class Style2DTextModule extends Style2DModule {

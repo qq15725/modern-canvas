@@ -1,12 +1,16 @@
 import type { Style2D } from '../Style2D'
 import { defineProperty } from '../../../core'
-import { Style2DModule } from './Style2DModule'
+import { Style2DModule } from '../Style2DModule'
 
 export interface Style2DOffsetProperties {
   offsetPath?: string
   offsetAnchor?: string | number
   offsetDistance?: string | number
   offsetPosition?: string | number
+}
+
+export interface Style2DOffsetExtend extends Style2DOffsetProperties {
+  getComputedOffset: typeof getComputedOffset
 }
 
 declare module '../Style2D' {

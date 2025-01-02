@@ -1,3 +1,4 @@
+import type { IDOCStyleDeclaration, IDOCTextContent } from 'modern-idoc'
 import type { MeasureResult } from 'modern-text'
 import type { Element2DOptions } from './Element2D'
 import { measureText, renderText, textDefaultStyle } from 'modern-text'
@@ -5,13 +6,11 @@ import { customNode, InternalMode, property, Texture } from '../core'
 import { Transform2D } from '../math'
 import { Element2D } from './Element2D'
 
-export type Text2DContent = any
-
 export interface Text2DOptions extends Element2DOptions {
   pixelRatio?: number
   split?: boolean
-  content?: Text2DContent
-  effects?: any[]
+  content?: IDOCTextContent
+  effects?: Partial<IDOCStyleDeclaration>[]
 }
 
 const textStyles = new Set(Object.keys(textDefaultStyle))
@@ -20,8 +19,8 @@ const textStyles = new Set(Object.keys(textDefaultStyle))
 export class Text2D extends Element2D {
   @property({ default: 2 }) declare pixelRatio: number
   @property({ default: false }) declare split: boolean
-  @property({ default: '' }) declare content: Text2DContent
-  @property() effects?: any[]
+  @property({ default: '' }) declare content: IDOCTextContent
+  @property() effects?: Partial<IDOCStyleDeclaration>[]
 
   readonly texture = new Texture(document.createElement('canvas'))
   protected _subTextsCount = 0
@@ -100,7 +99,7 @@ export class Text2D extends Element2D {
 
   measure(): MeasureResult {
     const result = measureText({
-      content: this.content,
+      content: this.content as any,
       style: {
         ...this.style.toJSON(),
         height: undefined,
@@ -157,14 +156,14 @@ export class Text2D extends Element2D {
         renderText({
           view: this.texture.source,
           pixelRatio: this.pixelRatio,
-          content: this.content,
+          content: this.content as any,
           effects: this.effects,
           style: this.style.toJSON() as any,
         })
+        document.body.append(this.texture.source)
       }
       this.texture.requestUpload()
-      const texture = this.texture
-      this.context.fillStyle = texture
+      this.context.fillStyle = this.texture
       this.context.textureTransform = new Transform2D().scale(
         1 / this.pixelRatio,
         1 / this.pixelRatio,

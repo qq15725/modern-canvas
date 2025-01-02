@@ -2,7 +2,7 @@ import type { Style2D } from '../Style2D'
 import { defineProperty } from '../../../core'
 import { DEG_TO_RAD, Transform2D } from '../../../math'
 import { parseCssFunctions, PI_2 } from '../../../shared'
-import { Style2DModule } from './Style2DModule'
+import { Style2DModule } from '../Style2DModule'
 
 export interface Style2DTransformProperties {
   left: number
@@ -16,15 +16,9 @@ export interface Style2DTransformProperties {
   transformOrigin: string
 }
 
-declare module '../Style2D' {
-  interface Style2DOptions extends Partial<Style2DTransformProperties> {
-    //
-  }
-
-  interface Style2D extends Style2DTransformProperties {
-    getComputedTransform: typeof getComputedTransform
-    getComputedTransformOrigin: typeof getComputedTransformOrigin
-  }
+export interface Style2DTransformExtend extends Style2DTransformProperties {
+  getComputedTransform: typeof getComputedTransform
+  getComputedTransformOrigin: typeof getComputedTransformOrigin
 }
 
 export class Style2DTransformModule extends Style2DModule {

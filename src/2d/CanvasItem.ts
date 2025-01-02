@@ -2,12 +2,12 @@ import type { ColorValue } from '../color'
 import type { NodeOptions, PropertyDeclaration } from '../core'
 import type { WebGLBlendMode, WebGLRenderer } from '../renderer'
 import type { CanvasBatchable } from './CanvasContext'
-import type { Style2DOptions } from './Style2D'
+import type { Style2DOptions } from './style2d'
 import { Color } from '../color'
 import { customNode, Node, property } from '../core'
 import { clamp } from '../math'
 import { CanvasContext } from './CanvasContext'
-import { Style2D } from './Style2D'
+import { Style2D } from './style2d'
 
 export interface CanvasItemOptions extends NodeOptions {
   style?: Style2DOptions

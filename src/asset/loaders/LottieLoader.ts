@@ -2,12 +2,6 @@ import type { AnimationItem } from 'lottie-web'
 import type { Assets } from '../Assets'
 import { Loader } from './Loader'
 
-declare module '../Assets' {
-  interface Assets {
-    lottie: LottieLoader
-  }
-}
-
 export class LottieLoader extends Loader {
   declare load: (url: string, canvas: HTMLCanvasElement) => Promise<AnimationItem>
 

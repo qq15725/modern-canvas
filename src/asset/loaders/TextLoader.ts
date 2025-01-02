@@ -1,12 +1,6 @@
 import type { Assets } from '../Assets'
 import { Loader } from './Loader'
 
-declare module '../Assets' {
-  interface Assets {
-    text: TextLoader
-  }
-}
-
 export class TextLoader extends Loader {
   declare load: (url: string) => Promise<string>
 
