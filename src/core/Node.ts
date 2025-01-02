@@ -1,3 +1,4 @@
+import type { Visibility } from 'modern-idoc'
 import type { Maskable, WebGLRenderer } from '../renderer'
 import type { EventListenerOptions, EventListenerValue } from '../shared'
 import type { ReferenceEventMap } from './Reference'
@@ -39,8 +40,6 @@ export enum InternalMode {
   FRONT = 1,
   BACK = 2,
 }
-
-export type Visibility = 'visible' | 'hidden'
 
 export interface NodeOptions {
   name?: string

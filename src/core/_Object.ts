@@ -4,13 +4,6 @@ import { EventEmitter } from '../shared'
 import { getDeclarations } from './decorators'
 import { nextTick } from './global'
 
-export interface UpdatePropertyEvent {
-  key: PropertyKey
-  value: any
-  oldValue: any
-  declaration?: PropertyDeclaration
-}
-
 export interface _ObjectEventMap {
   updateProperty: (key: PropertyKey, newValue: any, oldValue: any, declaration?: PropertyDeclaration) => void
 }

@@ -27,51 +27,43 @@ npm i modern-canvas
 ## 🦄 Usage
 
 ```ts
-import { createApp, plugins } from 'modern-canvas'
+import { Engine } from 'modern-canvas'
+import { fonts } from 'modern-font'
 
-const app = createApp({
-  view: document.querySelector('canvas'),
-  children: [
-    {
-      type: 'image',
+async function loadFallbackFont(): Promise<void> {
+  fonts.fallbackFont = await fonts.load({ family: 'fallbackFont', src: '/fallback.woff' })
+}
+
+loadFallbackFont().then(() => {
+  const engine = new Engine({ width: 500, height: 500 }).start()
+
+  engine.root.addChild(
+    new Image2D({
       style: {
-        left: 0,
-        top: 0,
-        width: 130,
-        height: 130,
-        rotation: 30,
+        left: 100,
+        top: 100,
+        width: 100,
+        height: 100,
+        rotate: 30,
+        filter: 'sepia(0.5)',
       },
-      src: '/example.jpg',
-    },
-    {
-      type: 'text',
+      src: '/example.png',
+    }),
+  )
+
+  engine.root.addChild(
+    new Text2D({
       style: {
-        left: 60,
-        top: 60,
-        width: 240,
-        height: 240,
-        rotation: 0,
-        fontSize: 40,
-        color: 'red',
+        left: 100,
+        top: 100,
+        fontSize: 30,
       },
-      content: 'TEXT',
-    },
-    {
-      type: 'video',
-      style: {
-        left: 60,
-        top: 60,
-        width: 30,
-        height: 30,
-        rotation: 30,
-      },
-      src: 'example.mp4',
-    },
-  ],
-  plugins,
+      content: '/example.png',
+    }),
+  )
+
+  console.log(engine)
+
+  document.body.append(engine.view!)
 })
-
-await app.load()
-
-app.start()
 ```
