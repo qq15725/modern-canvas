@@ -26,11 +26,11 @@ npm i modern-canvas
 
 ## 🦄 Usage
 
-```ts
+```javascript
 import { Engine } from 'modern-canvas'
 import { fonts } from 'modern-font'
 
-async function loadFallbackFont(): Promise<void> {
+async function loadFallbackFont() {
   fonts.fallbackFont = await fonts.load({ family: 'fallbackFont', src: '/fallback.woff' })
 }
 
@@ -64,6 +64,6 @@ loadFallbackFont().then(() => {
 
   console.log(engine)
 
-  document.body.append(engine.view!)
+  document.body.append(engine.view)
 })
 ```
