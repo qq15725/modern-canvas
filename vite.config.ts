@@ -8,13 +8,21 @@ export default defineConfig({
   build: {
     lib: {
       formats: ['umd'],
-      fileName: (format) => {
-        if (format === 'umd')
-          return basename(browser)
-        return `${name}.${format}`
-      },
       entry: resolvePath('./src/index.ts'),
-      name: name.replace(/-(\w)/g, (_, v) => v.toUpperCase()),
+    },
+    rollupOptions: {
+      external: ['modern-gif', 'lottie-web'],
+      output: [
+        {
+          format: 'umd',
+          entryFileNames: basename(browser),
+          name: name.replace(/-(\w)/g, (_, v) => v.toUpperCase()),
+          globals: {
+            'modern-gif': 'modernGif',
+            'lottie-web': 'lottie',
+          },
+        },
+      ],
     },
   },
 })
