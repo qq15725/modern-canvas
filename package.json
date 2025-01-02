@@ -54,6 +54,18 @@
     "typecheck": "tsc --noEmit",
     "prepare": "simple-git-hooks"
   },
+  "peerDependencies": {
+    "lottie-web": "^5",
+    "modern-gif": "^2"
+  },
+  "peerDependenciesMeta": {
+    "lottie-web": {
+      "optional": true
+    },
+    "modern-gif": {
+      "optional": true
+    }
+  },
   "dependencies": {
     "colord": "^2.9.3",
     "earcut": "^3.0.1",
@@ -78,22 +90,10 @@
     "vite": "^6.0.6",
     "vitest": "^2.1.8"
   },
-  "peerDependencies": {
-    "lottie-web": "^5",
-    "modern-gif": "^2"
-  },
-  "peerDependenciesMeta": {
-    "lottie-web": {
-      "optional": true
-    },
-    "modern-gif": {
-      "optional": true
-    }
-  },
   "simple-git-hooks": {
     "pre-commit": "pnpm lint-staged"
   },
   "lint-staged": {
-    "*": "echo 1"
+    "*": "eslint src --fix"
   }
 }
