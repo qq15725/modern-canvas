@@ -27,7 +27,7 @@ npm i modern-canvas
 ## 🦄 Usage
 
 ```javascript
-import { Engine } from 'modern-canvas'
+import { Engine, Image2D, Text2D } from 'modern-canvas'
 import { fonts } from 'modern-font'
 
 async function loadFallbackFont() {
