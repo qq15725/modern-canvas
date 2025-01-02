@@ -1,10 +1,10 @@
-import type { IPlayOptions, ISound } from '../interfaces'
+import type { IPlayOptions } from '../interfaces'
 import type { AudioProcessor } from '../pipeline'
 import type { WebAudio } from './WebAudio'
 import { Ticker } from '../../core'
 import { EventEmitter } from '../../shared'
 
-export class WebSound extends EventEmitter implements ISound {
+export class WebSound extends EventEmitter {
   protected _audio: WebAudio | null = null
   protected _sourceNode: AudioBufferSourceNode | null = null
   protected _gain: GainNode | null = null

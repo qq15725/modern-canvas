@@ -126,7 +126,7 @@ export class ImageTexture extends Texture<HTMLImageElement> {
   override _glTextureOptions(renderer: WebGLRenderer): WebGLTextureOptions {
     return {
       ...super._glTextureOptions(renderer),
-      source: this.bitmap ?? this.source,
+      value: this.bitmap ?? this.source,
     }
   }
 

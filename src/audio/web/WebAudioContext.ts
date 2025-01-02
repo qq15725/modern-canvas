@@ -15,7 +15,8 @@ function createAudioContext(): AudioContext {
     return new AudioContext()
   }
   else if (SUPPORTS_WEBKIT_AUDIO_CONTEXT) {
-    return new (globalThis as any).webkitAudioContext()
+    const AudioContext = (globalThis as any).webkitAudioContext
+    return new AudioContext()
   }
   else {
     throw new Error('Failed to createAudioContext')
@@ -27,7 +28,8 @@ function createOfflineAudioContext(numberOfChannels: number, length: number, sam
     return new OfflineAudioContext(numberOfChannels, length, sampleRate)
   }
   else if (SUPPORTS_WEBKIT_OFFLINE_AUDIO_CONTEXT) {
-    return new (globalThis as any).webkitOfflineAudioContext(numberOfChannels, length, sampleRate)
+    const OfflineAudioContext = (globalThis as any).webkitOfflineAudioContext
+    return new OfflineAudioContext(numberOfChannels, length, sampleRate)
   }
   else {
     throw new Error('Failed to createOfflineAudioContext')
@@ -184,7 +186,7 @@ export class WebAudioContext extends AudioPipeline implements IAudioContext {
 
   decode(buffer: ArrayBuffer): Promise<AudioBuffer> {
     return new Promise((resolve, reject) => {
-      const handleError = (err: Error) => {
+      const handleError = (err: Error): void => {
         reject(new Error(err?.message || 'Unable to decode file'))
       }
       const result = this._offlineContext.decodeAudioData(buffer, resolve, handleError)
@@ -194,7 +196,7 @@ export class WebAudioContext extends AudioPipeline implements IAudioContext {
     })
   }
 
-  setParamValue(param: AudioParam, value: number) {
+  setParamValue(param: AudioParam, value: number): void {
     if (param.setValueAtTime) {
       param.setValueAtTime(value, this._context.currentTime)
     }

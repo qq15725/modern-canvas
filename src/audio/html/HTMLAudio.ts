@@ -1,9 +1,8 @@
 import type { Audio } from '../Audio'
-import type { IAudio } from '../interfaces'
 import { HTMLAudioContext } from './HTMLAudioContext'
 import { HTMLSound } from './HTMLSound'
 
-export class HTMLAudio implements IAudio {
+export class HTMLAudio {
   source = new globalThis.Audio()
 
   protected _src = ''

@@ -1,21 +1,26 @@
-import type { IPlayOptions, ISound } from './interfaces'
+import type { HTMLSound } from './html'
+import type { IPlayOptions } from './interfaces'
+import type { WebSound } from './web'
 import { customNode, Node } from '../core'
 import { SUPPORTS_WEB_AUDIO } from '../shared'
 import { HTMLAudio } from './html'
 import { WebAudio } from './web'
 
+export type PlatformAudio = WebAudio | HTMLAudio
+export type PlatformSound = WebSound | HTMLSound
+
 @customNode('Audio')
 export class Audio extends Node {
-  protected static _soundPool: ISound[] = []
+  protected static _soundPool: PlatformSound[] = []
 
-  protected _sounds: ISound[] = []
+  protected _sounds: PlatformSound[] = []
 
   /** PlatformAudio */
   protected _platformAudio = SUPPORTS_WEB_AUDIO
     ? new WebAudio(this)
     : new HTMLAudio(this)
 
-  get platformAudio(): WebAudio | HTMLAudio { return this._platformAudio }
+  get platformAudio(): PlatformAudio { return this._platformAudio }
 
   /** Src */
   protected _src!: string
@@ -124,7 +129,7 @@ export class Audio extends Node {
     return this
   }
 
-  play(options: IPlayOptions = {}): ISound | undefined {
+  play(options: IPlayOptions = {}): PlatformSound | undefined {
     if (!this.isLoaded)
       return
     if (!this.multiple) {
@@ -155,11 +160,11 @@ export class Audio extends Node {
     this._sounds.length = 0
   }
 
-  protected _createSound(): ISound {
+  protected _createSound(): PlatformSound {
     if (Audio._soundPool.length > 0) {
-      return Audio._soundPool.pop()!.init(this._platformAudio)
+      return Audio._soundPool.pop()!.init(this._platformAudio as any)
     }
-    return this._platformAudio.createSound().init(this._platformAudio)
+    return this._platformAudio.createSound().init(this._platformAudio as any)
   }
 
   refresh(): void {
@@ -174,7 +179,7 @@ export class Audio extends Node {
     }
   }
 
-  protected _onComplete = (sound: ISound): void => {
+  protected _onComplete = (sound: PlatformSound): void => {
     if (this._sounds) {
       const index = this._sounds.indexOf(sound)
       if (index > -1) {
@@ -185,7 +190,7 @@ export class Audio extends Node {
     this._recycleSound(sound)
   }
 
-  protected _recycleSound(sound: ISound): void {
+  protected _recycleSound(sound: PlatformSound): void {
     sound.destroy()
     if (!Audio._soundPool.includes(sound)) {
       Audio._soundPool.push(sound)

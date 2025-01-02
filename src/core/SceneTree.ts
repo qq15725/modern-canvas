@@ -36,7 +36,7 @@ export class SceneTree extends MainLoop {
   protected _render(renderer: WebGLRenderer, delta = 0): this {
     this.timeline.addTime(delta)
     this.emit('processing')
-    this.root.emit('process', { delta })
+    this.root.emit('process', delta)
     this.emit('processed')
     renderer.program.uniforms.projectionMatrix = this.root.toProjectionArray(true)
     this.renderStack.render(renderer)

@@ -1,10 +1,9 @@
 import type { Audio } from '../Audio'
-import type { IAudio, ISound } from '../interfaces'
 import { AudioPipeline } from '../pipeline'
 import { WebAudioContext } from './WebAudioContext'
 import { WebSound } from './WebSound'
 
-export class WebAudio extends AudioPipeline implements IAudio {
+export class WebAudio extends AudioPipeline {
   /** Source */
   protected _sourceBuffer?: AudioBuffer
   protected _sourceNode: AudioBufferSourceNode
@@ -78,7 +77,7 @@ export class WebAudio extends AudioPipeline implements IAudio {
     })
   }
 
-  cloneSource() {
+  cloneSource(): { source: AudioBufferSourceNode, gain: GainNode } {
     const context = this.context
     const orig = this._sourceNode
     const source = context.audioContext.createBufferSource()
@@ -91,7 +90,7 @@ export class WebAudio extends AudioPipeline implements IAudio {
     return { source, gain }
   }
 
-  createSound(): ISound {
+  createSound(): WebSound {
     return new WebSound()
   }
 }

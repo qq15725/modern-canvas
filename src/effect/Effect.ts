@@ -170,27 +170,20 @@ export class Effect extends Node {
     }
   }
 
-  override notification(what: string): void {
-    switch (what) {
-      case 'process':
-        this._renderId = 0
-        switch (this._mode) {
-          case 'before':
-            super.notification(what)
-            break
-          case 'parent':
-            this._processParent()
-            break
-          case 'children':
-            this._processChildren()
-            break
-          default:
-            // skip
-            break
-        }
+  override _onProcess(delta = 0): void {
+    this._renderId = 0
+    switch (this._mode) {
+      case 'before':
+        super._onProcess(delta)
+        break
+      case 'parent':
+        this._processParent()
+        break
+      case 'children':
+        this._processChildren()
         break
       default:
-        super.notification(what)
+        // skip
         break
     }
   }

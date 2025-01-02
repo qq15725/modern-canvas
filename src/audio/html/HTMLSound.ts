@@ -1,10 +1,10 @@
-import type { IPlayOptions, ISound } from '../interfaces'
+import type { IPlayOptions } from '../interfaces'
 import type { AudioProcessor } from '../pipeline'
 import type { HTMLAudio } from './HTMLAudio'
 import { Ticker } from '../../core'
 import { EventEmitter } from '../../shared'
 
-export class HTMLSound extends EventEmitter implements ISound {
+export class HTMLSound extends EventEmitter {
   static readonly PADDING = 0.1
   protected _source: HTMLAudioElement | null = null
   protected _audio: HTMLAudio | null = null
@@ -194,6 +194,7 @@ export class HTMLSound extends EventEmitter implements ISound {
 
     const { start = 0, end = 0 } = options
 
+    // eslint-disable-next-line no-console
     end && console.assert(end > start, 'End time is before start time')
 
     options.playbackRate !== undefined && (this._playbackRate = options.playbackRate)

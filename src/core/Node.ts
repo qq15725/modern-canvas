@@ -19,7 +19,7 @@ export interface NodeEventMap extends ReferenceEventMap {
   treeExited: () => void
   parented: () => void
   unparented: () => void
-  process: (params: Record<string, any>) => void
+  process: (delta?: number) => void
   addChild: (child: Node) => void
   removeChild: (child: Node, index: number) => void
   moveChild: (child: Node, newIndex: number, oldIndex: number) => void
@@ -238,11 +238,11 @@ export class Node extends Reference {
     this._ready()
   }
 
-  protected _onProcess(params: Record<string, any>): void {
+  protected _onProcess(delta = 0): void {
     this._updateVisibility()
     const tree = this._tree
     tree?.emit('nodeProcessing', this)
-    this._process(params.delta ?? 0)
+    this._process(delta)
 
     const isRenderable = this.isRenderable()
     let oldRenderCall
@@ -266,7 +266,7 @@ export class Node extends Reference {
     }
 
     for (let len = this._children.length, i = 0; i < len; i++) {
-      this._children[i].emit('process', params)
+      this._children[i].emit('process', delta)
     }
 
     if (tree && isRenderable) {

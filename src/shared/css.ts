@@ -66,6 +66,7 @@ export function parseCssFunctions(
   const functions = []
   let match: RegExpExecArray | null | undefined
 
+  // eslint-disable-next-line no-cond-assign
   while ((match = FUNCTIONS_RE.exec(propertyValue)) !== null) {
     const [, name, value] = match
     if (name) {
@@ -83,6 +84,7 @@ function parseArguments(name: string, value: string, context: ParseArgumentConte
   let match: RegExpExecArray | null | undefined
   let i = 0
 
+  // eslint-disable-next-line no-cond-assign
   while ((match = ARGS_RE.exec(value)) !== null) {
     values.push(
       parseArgument(name, match[0], {
