@@ -160,7 +160,6 @@ export class Text2D extends Element2D {
           effects: this.effects,
           style: this.style.toJSON() as any,
         })
-        document.body.append(this.texture.source)
       }
       this.texture.requestUpload()
       this.context.fillStyle = this.texture
