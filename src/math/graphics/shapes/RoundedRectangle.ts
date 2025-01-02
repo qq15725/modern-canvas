@@ -3,7 +3,7 @@ import { buildCircle } from '../build'
 import { Rectangle } from './Rectangle'
 
 // Check corner within stroke width
-function isCornerWithinStroke(pX: number, pY: number, cornerX: number, cornerY: number, radius: number, halfStrokeWidth: number) {
+function isCornerWithinStroke(pX: number, pY: number, cornerX: number, cornerY: number, radius: number, halfStrokeWidth: number): boolean {
   const dx = pX - cornerX
   const dy = pY - cornerY
   const distance = Math.sqrt((dx * dx) + (dy * dy))

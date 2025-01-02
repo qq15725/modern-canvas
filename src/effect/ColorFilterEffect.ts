@@ -17,10 +17,10 @@ export class ColorFilterEffect extends Effect {
 
   constructor(options?: ColorFilterEffectOptions) {
     super()
-    options && this.setProperties(options)
+    this.setProperties(options)
   }
 
-  override apply(renderer: WebGLRenderer, source: Viewport) {
+  override apply(renderer: WebGLRenderer, source: Viewport): void {
     if (!this.filter)
       return
 

@@ -187,14 +187,14 @@ export class WebGLRenderer extends Renderer {
     return this
   }
 
-  protected _onContextLost(event: WebGLContextEvent) {
+  protected _onContextLost(event: WebGLContextEvent): void {
     event.preventDefault()
     setTimeout(() => {
       this.gl.isContextLost() && this.extensions.loseContext?.restoreContext()
     }, 0)
   }
 
-  protected _onContextRestored() {}
+  protected _onContextRestored(): void {}
 
   getBindPoint(target: WebGLTarget): number {
     return (this.gl as any)[target.toUpperCase()] as number

@@ -47,7 +47,9 @@ export class Path2D {
     const polygon = this._polygon
     if (polygon && polygon.points.length > 2) {
       polygon.closed = closePath
-      this.shapes.push({ shape: polygon })
+      this.shapes.push({
+        shape: polygon,
+      })
     }
     this._polygon = undefined
     return this
@@ -205,12 +207,12 @@ export class Path2D {
     return this
   }
 
-  buildOutline(points = []) {
+  buildOutline(points: number[] = []): number[] {
     this.shapes.forEach(item => item.shape.buildOutline(points))
     return points
   }
 
-  buildGeometry(vertices = [], indices = []) {
+  buildGeometry(vertices: number[] = [], indices: number[] = []): { vertices: number[], indices: number[] } {
     this.shapes.forEach(item => item.shape.buildGeometry(vertices, indices))
     return {
       vertices,

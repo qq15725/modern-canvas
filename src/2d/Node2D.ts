@@ -15,10 +15,10 @@ export class Node2D extends CanvasItem {
 
   constructor(options?: Node2DOptions) {
     super()
-    options && this.setProperties(options)
+    this.setProperties(options)
   }
 
-  getBoundingBox() {
+  getBoundingBox(): Rectangle {
     let { left, top, width, height, rotate } = this.style
     if (rotate) {
       rotate = Math.abs(rotate % 180)

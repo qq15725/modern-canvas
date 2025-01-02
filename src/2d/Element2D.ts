@@ -19,7 +19,7 @@ export class Element2D extends Node2D {
 
   constructor(options?: Element2DOptions) {
     super()
-    options && this.setProperties(options)
+    this.setProperties(options)
   }
 
   protected override _onUpdateStyleProperty(key: PropertyKey, value: any, oldValue: any): void {

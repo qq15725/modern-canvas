@@ -3,6 +3,7 @@ import { Material } from '../core'
 // uniform float foo; // = 42.0
 // uniform vec2 foo; // = vec2(42.0, 42.0)
 // uniform vec2 foo, bar; // = vec2(1.0, 2.0); // both at the same time ! (needs a ';' if you have this second //, like usual glsl code)
+// eslint-disable-next-line regexp/no-super-linear-backtracking
 const DEFAULT_VALUE_RE = /^uniform \w+ (.+?);\s*\/\/\s*=\s*([^;]+?)[\s;]*$/gm
 
 // TODO

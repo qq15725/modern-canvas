@@ -1,6 +1,5 @@
 import type { WebGLProgramMeta, WebGLProgramOptions } from '../types'
 import type { WebGLRenderer } from '../WebGLRenderer'
-import { toRaw } from '../../../shared'
 import { WebGLModule } from './WebGLModule'
 
 declare module '../WebGLRenderer' {
@@ -189,11 +188,9 @@ export class WebGLProgramModule extends WebGLModule {
       const info = uniformsInfo.get(key)
       if (!info)
         continue
-      const { type, isArray } = info
-      const location = toRaw(info.location)
+      const { type, isArray, location } = info
       if (!location)
         continue
-
       const oldValue = boundUniforms.get(location)
       if (oldValue === value)
         continue

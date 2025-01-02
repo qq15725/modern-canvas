@@ -7,7 +7,7 @@ export function clamp(min: number, val: number, max: number): number {
   return Math.max(min, Math.min(val, max))
 }
 
-export function lerp(a: number, b: number, weight: number) {
+export function lerp(a: number, b: number, weight: number): number {
   return (1 - weight) * a + weight * b
 }
 
@@ -18,7 +18,7 @@ export const curves = {
   maxSegments: 2048,
   epsilon: 0.0001,
   _segmentsCount(length: number, defaultSegments = 20) {
-    if (!this.adaptive || !length || isNaN(length)) {
+    if (!this.adaptive || !length || Number.isNaN(length)) {
       return defaultSegments
     }
 

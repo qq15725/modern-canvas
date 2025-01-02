@@ -16,7 +16,7 @@ export class WebGLViewportModule extends WebGLModule {
 
   boundViewport: WebGLViewport = { x: 0, y: 0, width: 0, height: 0 }
 
-  bind(viewport: WebGLViewport) {
+  bind(viewport: WebGLViewport): void {
     const boundViewport = this.boundViewport
 
     const x = Math.floor(viewport.x)

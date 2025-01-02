@@ -1,4 +1,4 @@
-import type { Ttf, Woff } from 'modern-font'
+import type { Font } from 'modern-font'
 import type { Assets } from '../Assets'
 import { Loader } from './Loader'
 
@@ -9,14 +9,14 @@ declare module '../Assets' {
 }
 
 export class FontLoader extends Loader {
-  declare load: (url: string) => Promise<Ttf | Woff>
+  declare load: (url: string) => Promise<Font>
 
   install(assets: Assets): this {
-    const handler = async (url: string) => {
-      const { parse } = await import('modern-font')
+    const handler = async (url: string): Promise<Font> => {
+      const { parseFont } = await import('modern-font')
       return await assets.fetch(url)
         .then(res => res.arrayBuffer())
-        .then(buffer => parse(buffer) as any)
+        .then(buffer => parseFont(buffer))
     }
 
     this.load = (url) => {

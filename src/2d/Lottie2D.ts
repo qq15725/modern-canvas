@@ -21,7 +21,7 @@ export class Lottie2D extends Element2D {
 
   constructor(options?: LottieOptions) {
     super()
-    options && this.setProperties(options)
+    this.setProperties(options)
   }
 
   protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any): void {

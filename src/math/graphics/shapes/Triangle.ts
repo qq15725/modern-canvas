@@ -75,14 +75,7 @@ export class Triangle implements Shape {
   }
 
   clone(): Triangle {
-    return new Triangle(
-      this.x,
-      this.y,
-      this.x2,
-      this.y2,
-      this.x3,
-      this.y3,
-    )
+    return new Triangle(this.x, this.y, this.x2, this.y2, this.x3, this.y3)
   }
 
   copyFrom(triangle: Triangle): this {

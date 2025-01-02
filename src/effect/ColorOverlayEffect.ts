@@ -62,7 +62,7 @@ void main(void) {
 
   protected _color = new Color()
 
-  override apply(renderer: WebGLRenderer, source: Viewport) {
+  override apply(renderer: WebGLRenderer, source: Viewport): void {
     source.redraw(renderer, () => {
       const colors = this.colors.map((val) => {
         this._color.value = val

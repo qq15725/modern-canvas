@@ -71,19 +71,15 @@ export class Rectangle implements Shape {
     return new Rectangle(this.x, this.y, this.width, this.height)
   }
 
-  copyFrom(rectangle: Rectangle): Rectangle {
+  copyFrom(rectangle: Rectangle): void {
     this.x = rectangle.x
     this.y = rectangle.y
     this.width = rectangle.width
     this.height = rectangle.height
-
-    return this
   }
 
-  copyTo(rectangle: Rectangle): Rectangle {
+  copyTo(rectangle: Rectangle): void {
     rectangle.copyFrom(this)
-
-    return rectangle
   }
 
   intersects(other: Rectangle, transform?: Transform2D): boolean {

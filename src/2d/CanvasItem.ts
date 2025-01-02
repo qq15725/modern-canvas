@@ -1,5 +1,5 @@
 import type { ColorValue } from '../color'
-import type { NodeOptions } from '../core'
+import type { NodeOptions, PropertyDeclaration } from '../core'
 import type { WebGLBlendMode, WebGLRenderer } from '../renderer'
 import type { CanvasBatchable } from './CanvasContext'
 import type { Style2DOptions } from './Style2D'
@@ -47,36 +47,39 @@ export class CanvasItem extends Node {
 
   constructor(options?: CanvasItemOptions) {
     super()
-    options && this.setProperties(options)
     this._onUpdateStyleProperty = this._onUpdateStyleProperty.bind(this)
+    this.setProperties(options)
     this.style = new Style2D()
   }
 
-  override setProperties(properties: Record<PropertyKey, any>): this {
-    const { style, ...restProperties } = properties
-    style && this.style.setProperties(style)
-    super.setProperties(restProperties)
+  override setProperties(properties?: Record<PropertyKey, any>): this {
+    if (properties) {
+      const { style, ...restProperties } = properties
+      style && this.style.setProperties(style)
+      super.setProperties(restProperties)
+    }
     return this
   }
 
-  protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any): void {
-    super._onUpdateProperty(key, value, oldValue)
+  protected override _onUpdateProperty(key: PropertyKey, newValue: any, oldValue: any, declaration?: PropertyDeclaration): void {
+    super._onUpdateProperty(key, newValue, oldValue, declaration)
 
     switch (key) {
       case 'blendMode':
         this.requestRepaint()
         break
       case 'tint':
-        this._tint.value = value || 0xFFFFFFFF
+        this._tint.value = newValue || 0xFFFFFFFF
         this.requestRepaint()
         break
     }
   }
 
-  protected _onUpdateStyleProperty(key: PropertyKey, value: any, _oldValue: any): void {
+  // eslint-disable-next-line unused-imports/no-unused-vars
+  protected _onUpdateStyleProperty(key: PropertyKey, newValue: any, oldValue: any, declaration?: PropertyDeclaration): void {
     switch (key) {
       case 'backgroundColor':
-        this._backgroundColor.value = value || 0x00000000
+        this._backgroundColor.value = newValue || 0x00000000
         if (this._originalBatchables.length) {
           this.requestRepaint()
         }
@@ -120,9 +123,18 @@ export class CanvasItem extends Node {
     super._process(delta)
   }
 
-  protected _draw(): void { /** override */ }
-  protected _relayout(batchables: CanvasBatchable[]): CanvasBatchable[] { return this._reflow(batchables) }
-  protected _reflow(batchables: CanvasBatchable[]): CanvasBatchable[] { return this._repaint(batchables) }
+  protected _draw(): void {
+    /** override */
+  }
+
+  protected _relayout(batchables: CanvasBatchable[]): CanvasBatchable[] {
+    return this._reflow(batchables)
+  }
+
+  protected _reflow(batchables: CanvasBatchable[]): CanvasBatchable[] {
+    return this._repaint(batchables)
+  }
+
   protected _repaint(batchables: CanvasBatchable[]): CanvasBatchable[] {
     const colorMatrix = this.style.getComputedFilterColorMatrix()
     return batchables.map((batchable) => {

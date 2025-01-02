@@ -11,7 +11,7 @@ export interface RenderOptions {
   height: number
 }
 
-async function startRenderLoop(sleep = 100) {
+async function startRenderLoop(sleep = 100): Promise<void> {
   while (true) {
     const cb = queue.shift()
     if (cb) {

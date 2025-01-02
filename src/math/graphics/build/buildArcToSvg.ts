@@ -44,7 +44,7 @@ function approxUnitArc(ang1: number, ang2: number): { x: number, y: number }[] {
   ]
 }
 
-function vectorAngle(ux: number, uy: number, vx: number, vy: number) {
+function vectorAngle(ux: number, uy: number, vx: number, vy: number): number {
   const sign = ((ux * vy) - (uy * vx) < 0) ? -1 : 1
   let dot = (ux * vx) + (uy * vy)
   if (dot > 1) {
@@ -56,12 +56,26 @@ function vectorAngle(ux: number, uy: number, vx: number, vy: number) {
   return sign * Math.acos(dot)
 }
 
-function getArcCenter(px: number, py: number, cx: number, cy: number, rx: number, ry: number, largeArcFlag: number, sweepFlag: number, sinPhi: number, cosPhi: number, pxp: number, pyp: number, out: {
-  centerX: number
-  centerY: number
-  ang1: number
-  ang2: number
-}) {
+function getArcCenter(
+  px: number,
+  py: number,
+  cx: number,
+  cy: number,
+  rx: number,
+  ry: number,
+  largeArcFlag: number,
+  sweepFlag: number,
+  sinPhi: number,
+  cosPhi: number,
+  pxp: number,
+  pyp: number,
+  out: {
+    centerX: number
+    centerY: number
+    ang1: number
+    ang2: number
+  },
+): void {
   const rxSq = rx ** 2
   const rySq = ry ** 2
   const pxpSq = pxp ** 2
@@ -140,21 +154,7 @@ export function buildArcToSvg(
     ry *= Math.sqrt(lambda)
   }
 
-  getArcCenter(
-    px,
-    py,
-    cx,
-    cy,
-    rx,
-    ry,
-    largeArcFlag,
-    sweepFlag,
-    sinPhi,
-    cosPhi,
-    pxp,
-    pyp,
-    out,
-  )
+  getArcCenter(px, py, cx, cy, rx, ry, largeArcFlag, sweepFlag, sinPhi, cosPhi, pxp, pyp, out)
 
   let { ang1, ang2 } = out
   const { centerX, centerY } = out
@@ -185,17 +185,7 @@ export function buildArcToSvg(
     const { x: x2, y: y2 } = mapToEllipse(curve[1], rx, ry, cosPhi, sinPhi, centerX, centerY, outCurvePoint)
     const { x, y } = mapToEllipse(curve[2], rx, ry, cosPhi, sinPhi, centerX, centerY, outCurvePoint)
 
-    buildAdaptiveBezier(
-      points,
-      lastX,
-      lastY,
-      x1,
-      y1,
-      x2,
-      y2,
-      x,
-      y,
-    )
+    buildAdaptiveBezier(points, lastX, lastY, x1, y1, x2, y2, x, y)
 
     lastX = x
     lastY = y

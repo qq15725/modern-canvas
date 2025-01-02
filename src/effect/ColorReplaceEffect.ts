@@ -55,7 +55,7 @@ void main(void) {
 
   protected _color = new Color()
 
-  override apply(renderer: WebGLRenderer, source: Viewport) {
+  override apply(renderer: WebGLRenderer, source: Viewport): void {
     const colors = this.colors.map((val) => {
       this._color.value = val[0]
       const color0 = this._color.toArray().slice(0, 3)

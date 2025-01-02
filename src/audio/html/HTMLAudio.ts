@@ -1,5 +1,5 @@
 import type { Audio } from '../Audio'
-import type { IAudio, ISound } from '../interfaces'
+import type { IAudio } from '../interfaces'
 import { HTMLAudioContext } from './HTMLAudioContext'
 import { HTMLSound } from './HTMLSound'
 
@@ -7,7 +7,7 @@ export class HTMLAudio implements IAudio {
   source = new globalThis.Audio()
 
   protected _src = ''
-  get src() { return this._src }
+  get src(): string { return this._src }
   set src(val) {
     if (this._src !== val) {
       this._src = val
@@ -36,7 +36,7 @@ export class HTMLAudio implements IAudio {
     })
   }
 
-  createSound(): ISound {
+  createSound(): HTMLSound {
     return new HTMLSound()
   }
 }

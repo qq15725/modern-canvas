@@ -84,7 +84,7 @@ export class WebGLBatch2DModule extends WebGLModule {
     aColorMatrix: { size: 4, normalized: false, type: 'float' }, // 16
   }
 
-  protected _getShader(maxTextureUnits: number) {
+  protected _getShader(maxTextureUnits: number): Shader {
     let shader = this._shaders.get(maxTextureUnits)
     if (!shader) {
       this._shaders.set(maxTextureUnits, shader = this._createShader(maxTextureUnits))
@@ -92,7 +92,7 @@ export class WebGLBatch2DModule extends WebGLModule {
     return shader
   }
 
-  protected _createShader(maxTextureUnits: number) {
+  protected _createShader(maxTextureUnits: number): Shader {
     const renderer = this._renderer
 
     const program = renderer.program.create({

@@ -13,7 +13,7 @@ export class GifLoader extends Loader {
   declare load: (url: string) => Promise<Image2DResource>
 
   install(assets: Assets): this {
-    const handler = async (url: string) => {
+    const handler = async (url: string): Promise<Image2DResource> => {
       const { decodeFrames } = await import('modern-gif')
       return await assets.fetch(url)
         .then(res => res.arrayBuffer())

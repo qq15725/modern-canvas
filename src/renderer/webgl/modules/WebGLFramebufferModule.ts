@@ -182,7 +182,7 @@ export class WebGLFramebufferModule extends WebGLModule {
     }
   }
 
-  protected _getAttachmentAndFormat(meta: WebGLFramebufferMeta) {
+  protected _getAttachmentAndFormat(meta: WebGLFramebufferMeta): { attachment: number, format: number } {
     const gl = this.gl
     let attachment
     let format

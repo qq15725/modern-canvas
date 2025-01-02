@@ -147,7 +147,7 @@ void main(void) {
   @property() center: number[] = [0, 0]
   @property() alpha = 1
 
-  override apply(renderer: WebGLRenderer, source: Viewport) {
+  override apply(renderer: WebGLRenderer, source: Viewport): void {
     const radians = this.angle * (Math.PI / 180)
     const light = this.parallel ? [Math.cos(radians), Math.sin(radians)] : this.center
 

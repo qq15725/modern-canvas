@@ -52,7 +52,7 @@ void main(void) {
     this.size = size
   }
 
-  override apply(renderer: WebGLRenderer, source: Viewport) {
+  override apply(renderer: WebGLRenderer, source: Viewport): void {
     source.redraw(renderer, () => {
       QuadUvGeometry.draw(renderer, PixelateEffect.material, {
         sampler: 0,

@@ -1,11 +1,11 @@
+export * from './_Object'
 export * from './decorators'
 export * from './geometries'
 export * from './global'
 export * from './MainLoop'
 export * from './materials'
-
 export * from './Node'
-export * from './Reactive'
+export * from './Reference'
 export * from './RenderStack'
 export * from './Resource'
 export * from './SceneTree'

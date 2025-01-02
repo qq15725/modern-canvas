@@ -15,7 +15,7 @@ export class IndexBuffer extends Resource {
 
   constructor(options?: IndexBufferOptions) {
     super()
-    options && this.setProperties(options)
+    this.setProperties(options)
   }
 
   /** @internal */

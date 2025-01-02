@@ -5,9 +5,9 @@ export interface CustomNodeOptions {
 
 export const customNodes = new Map<string, any>()
 
-export function customNode(tag: string): any
-export function customNode(options: CustomNodeOptions): any
-export function customNode(options: string | CustomNodeOptions): any {
+export function customNode(tag: string): ClassDecorator
+export function customNode(options: CustomNodeOptions): ClassDecorator
+export function customNode(options: string | CustomNodeOptions): ClassDecorator {
   let tag: string
   let renderable: boolean | undefined
   if (typeof options === 'string') {

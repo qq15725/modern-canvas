@@ -21,7 +21,7 @@ interface ParseArgumentContext {
 }
 
 const FUNCTIONS_RE = /([\w-]+)\((.+?)\)/g
-const ARGS_RE = /([^,]+)/g
+const ARGS_RE = /[^,]+/g
 const ARG_RE = /([-e.\d]+)(.*)/
 
 export function getDefaultCssPropertyValue<T extends CssFunctionArg | CssFunction[]>(
@@ -64,7 +64,7 @@ export function parseCssFunctions(
   context: ParseArgumentContext = {},
 ): CssFunction[] {
   const functions = []
-  let match
+  let match: RegExpExecArray | null | undefined
 
   while ((match = FUNCTIONS_RE.exec(propertyValue)) !== null) {
     const [, name, value] = match
@@ -80,7 +80,7 @@ export function parseCssFunctions(
 
 function parseArguments(name: string, value: string, context: ParseArgumentContext = {}): CssFunctionArg[] {
   const values = []
-  let match
+  let match: RegExpExecArray | null | undefined
   let i = 0
 
   while ((match = ARGS_RE.exec(value)) !== null) {

@@ -50,7 +50,7 @@ void main(void) {
   @property() alpha = 1
   @property() gamma = 1
 
-  override apply(renderer: WebGLRenderer, source: Viewport) {
+  override apply(renderer: WebGLRenderer, source: Viewport): void {
     source.redraw(renderer, () => {
       QuadUvGeometry.draw(renderer, ColorAdjustEffect.material, {
         sampler: 0,

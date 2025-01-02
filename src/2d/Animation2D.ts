@@ -125,7 +125,7 @@ export class Animation2D extends Node {
 
   constructor(options?: AnimationOptions) {
     super()
-    options && this.setProperties(options)
+    this.setProperties(options)
     this._onUpdateTime = this._onUpdateTime.bind(this)
   }
 

@@ -34,7 +34,7 @@ export class SVGPath {
   protected _calls: Path2DCall[] = []
   protected _dirty = false
 
-  get path2D() {
+  get path2D(): Path2D {
     const path2D = new Path2D()
     if (this._dirty) {
       this._dirty = false
@@ -87,7 +87,7 @@ export class SVGPath {
     return defines
   }
 
-  update() {
+  update(): void {
     const subpaths: SubPath[] = []
     let currentSubPath: SubPath | null = null
     let lastX = 0

@@ -16,7 +16,7 @@ function proxy(
       get() {
         if (options?.method) {
           return (...args: any[]) => {
-            this.context[name].call(this.context, ...args)
+            (this.context as any)[name].call(this.context, ...args)
             options.redraw && this.requestRedraw()
             return target
           }

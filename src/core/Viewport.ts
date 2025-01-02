@@ -6,6 +6,11 @@ import { UvMaterial } from './materials'
 import { Node } from './Node'
 import { ViewportTexture } from './textures'
 
+export interface ViewportFramebuffer {
+  texture: ViewportTexture
+  needsUpload: boolean
+}
+
 @customNode({
   tag: 'Viewport',
   renderable: true,
@@ -18,12 +23,12 @@ export class Viewport extends Node {
 
   protected _projection = new Projection2D()
   protected _framebufferIndex = 0
-  protected _framebuffers = [
+  protected _framebuffers: ViewportFramebuffer[] = [
     { texture: new ViewportTexture(), needsUpload: false },
     { texture: new ViewportTexture(), needsUpload: false },
   ]
 
-  get framebuffer() { return this._framebuffers[this._framebufferIndex] }
+  get framebuffer(): ViewportFramebuffer { return this._framebuffers[this._framebufferIndex] }
   get texture(): ViewportTexture { return this.framebuffer.texture }
 
   constructor(

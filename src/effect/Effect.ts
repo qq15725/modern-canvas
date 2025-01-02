@@ -64,7 +64,7 @@ export class Effect extends Node {
 
   constructor(options?: EffectOptions) {
     super()
-    options && this.setProperties(options)
+    this.setProperties(options)
   }
 
   protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any): void {
@@ -103,8 +103,8 @@ export class Effect extends Node {
     const tree = this._tree!
     tree.off('processing', this._onProcessing)
     tree.off('nodeProcessed', this._onNodeProcessed)
-    this.viewport._setTree(null)
-    this.viewport2._setTree(null)
+    this.viewport._setTree(undefined)
+    this.viewport2._setTree(undefined)
   }
 
   protected _onProcessing = (): void => {
@@ -165,7 +165,7 @@ export class Effect extends Node {
 
   protected _processChildren(): void {
     if (this._children.length) {
-      super.notification('process')
+      super.emit('process')
       this._tree?.renderStack.push(this)
     }
   }

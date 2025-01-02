@@ -1,34 +1,34 @@
-import type { TextContent, TextStyle } from 'modern-text'
+import type { MeasureResult } from 'modern-text'
 import type { Element2DOptions } from './Element2D'
-import { defaultTextStyles, measureText, renderText } from 'modern-text'
+import { measureText, renderText, textDefaultStyle } from 'modern-text'
 import { customNode, InternalMode, property, Texture } from '../core'
 import { Transform2D } from '../math'
 import { Element2D } from './Element2D'
 
-export type Text2DContent = TextContent
+export type Text2DContent = any
 
 export interface Text2DOptions extends Element2DOptions {
   pixelRatio?: number
   split?: boolean
   content?: Text2DContent
-  effects?: TextStyle[]
+  effects?: any[]
 }
 
-const textStyles = new Set(Object.keys(defaultTextStyles))
+const textStyles = new Set(Object.keys(textDefaultStyle))
 
 @customNode('Text2D')
 export class Text2D extends Element2D {
   @property({ default: 2 }) declare pixelRatio: number
   @property({ default: false }) declare split: boolean
   @property({ default: '' }) declare content: Text2DContent
-  @property() effects?: TextStyle[]
+  @property() effects?: any[]
 
   readonly texture = new Texture(document.createElement('canvas'))
   protected _subTextsCount = 0
 
   constructor(options?: Text2DOptions) {
     super()
-    options && this.setProperties(options)
+    this.setProperties(options)
   }
 
   protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any): void {
@@ -98,7 +98,7 @@ export class Text2D extends Element2D {
     }
   }
 
-  measure() {
+  measure(): MeasureResult {
     const result = measureText({
       content: this.content,
       style: {
@@ -113,7 +113,7 @@ export class Text2D extends Element2D {
     return result
   }
 
-  protected _updateSplit() {
+  protected _updateSplit(): void {
     if (this._subTextsCount) {
       this.getChildren(InternalMode.FRONT).forEach(child => this.removeChild(child))
       this._subTextsCount = 0
@@ -147,7 +147,7 @@ export class Text2D extends Element2D {
     }
   }
 
-  protected override _drawContent() {
+  protected override _drawContent(): void {
     if (!this.split) {
       const onText2DRender = (this.children?.find(child => 'onText2DRender' in child) as any)?.onText2DRender
       if (onText2DRender) {
@@ -159,7 +159,7 @@ export class Text2D extends Element2D {
           pixelRatio: this.pixelRatio,
           content: this.content,
           effects: this.effects,
-          style: this.style.toJSON(),
+          style: this.style.toJSON() as any,
         })
       }
       this.texture.requestUpload()

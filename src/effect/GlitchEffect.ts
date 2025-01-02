@@ -157,7 +157,7 @@ void main(void) {
     texture.requestUpload()
   }
 
-  override apply(renderer: WebGLRenderer, source: Viewport) {
+  override apply(renderer: WebGLRenderer, source: Viewport): void {
     if (!this._redraw) {
       this._redraw = true
       this.redraw()

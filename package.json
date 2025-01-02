@@ -2,7 +2,7 @@
   "name": "modern-canvas",
   "type": "module",
   "version": "0.0.3",
-  "packageManager": "pnpm@9.9.0",
+  "packageManager": "pnpm@9.15.1",
   "description": "A data driven modern canvas library",
   "author": "wxm",
   "license": "MIT",
@@ -54,29 +54,32 @@
     "typecheck": "tsc --noEmit",
     "prepare": "simple-git-hooks"
   },
-  "dependencies": {
-    "colord": "^2.9.3",
-    "modern-font": "^0.3.4",
-    "modern-path2d": "^0.2.8",
-    "modern-text": "^0.7.3"
-  },
-  "devDependencies": {
-    "@antfu/eslint-config": "^3.7.3",
-    "@types/node": "^22.7.4",
-    "bumpp": "^9.6.1",
-    "conventional-changelog-cli": "^5.0.0",
-    "eslint": "^9.12.0",
-    "lint-staged": "^15.2.10",
-    "lottie-web": "^5.12.2",
-    "modern-gif": "^2.0.3",
-    "simple-git-hooks": "^2.11.1",
-    "typescript": "^5.7.2",
-    "unbuild": "^3.0.1",
-    "vite": "^5.4.8",
-    "vitest": "^2.1.2"
-  },
   "peerDependencies": {
     "lottie-web": "^5.12.2"
+  },
+  "dependencies": {
+    "colord": "^2.9.3",
+    "earcut": "^3.0.1",
+    "modern-font": "^0.3.5",
+    "modern-idoc": "^0.1.4",
+    "modern-path2d": "^1.0.1",
+    "modern-text": "^1.0.5"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^3.12.1",
+    "@types/earcut": "^2.1.4",
+    "@types/node": "^22.10.3",
+    "bumpp": "^9.9.2",
+    "conventional-changelog-cli": "^5.0.0",
+    "eslint": "^9.17.0",
+    "lint-staged": "^15.3.0",
+    "lottie-web": "^5.12.2",
+    "modern-gif": "^2.0.4",
+    "simple-git-hooks": "^2.11.1",
+    "typescript": "^5.7.2",
+    "unbuild": "^3.2.0",
+    "vite": "^6.0.6",
+    "vitest": "^2.1.8"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm lint-staged"

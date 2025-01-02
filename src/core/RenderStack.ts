@@ -12,7 +12,7 @@ export class RenderStack {
   currentCall?: RenderCall
   calls: RenderCall[] = []
 
-  createCall(renderable: Node) {
+  createCall(renderable: Node): RenderCall {
     return {
       renderable,
       parentCall: this.currentCall,
@@ -27,7 +27,7 @@ export class RenderStack {
     return call
   }
 
-  render(renderer: WebGLRenderer) {
+  render(renderer: WebGLRenderer): void {
     this.calls.forEach(function render(call: RenderCall) {
       call.fn(renderer, () => {
         call.calls.forEach(render)

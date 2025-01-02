@@ -27,12 +27,11 @@ export class Style2DBackgroundModule extends Style2DModule {
   }
 }
 
-async function getComputedBackground(this: Style2D) {
+async function getComputedBackground(this: Style2D): Promise<ColorTexture | undefined> {
   if (this.backgroundImage) {
     return await assets.texture.load(this.backgroundImage)
   }
   if (this.backgroundColor) {
     return new ColorTexture(this.backgroundColor)
   }
-  return undefined
 }

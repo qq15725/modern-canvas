@@ -78,11 +78,12 @@ export class Bounds {
     return this
   }
 
-  set(x0: number, y0: number, x1: number, y1: number) {
+  set(x0: number, y0: number, x1: number, y1: number): this {
     this.minX = x0
     this.minY = y0
     this.maxX = x1
     this.maxY = y1
+    return this
   }
 
   addFrame(x0: number, y0: number, x1: number, y1: number, matrix?: Transform2D): void {
@@ -138,12 +139,14 @@ export class Bounds {
     this.maxY = maxY
   }
 
-  addRect(rect: Rectangle, matrix?: Transform2D) {
+  addRect(rect: Rectangle, matrix?: Transform2D): this {
     this.addFrame(rect.x, rect.y, rect.x + rect.width, rect.y + rect.height, matrix)
+    return this
   }
 
-  addBounds(bounds: BoundsData, matrix?: Transform2D) {
+  addBounds(bounds: BoundsData, matrix?: Transform2D): this {
     this.addFrame(bounds.minX, bounds.minY, bounds.maxX, bounds.maxY, matrix)
+    return this
   }
 
   addBoundsMask(mask: Bounds): void {

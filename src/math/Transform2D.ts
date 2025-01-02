@@ -1,6 +1,16 @@
 import { PI_2 } from '../shared'
 import { Matrix3 } from './Matrix3'
 
+export interface Transform2DObject {
+  a: number
+  c: number
+  tx: number
+  b: number
+  d: number
+  ty: number
+  tz: number
+}
+
 /**
  * Transform
  *
@@ -72,27 +82,17 @@ export class Transform2D extends Matrix3 {
     const tz = this._translateZ
     const array = this._array
     this._array = [
-      a,
-      c,
-      tx,
-      b,
-      d,
-      ty,
-      array[6],
-      array[7],
-      tz,
+      a, c, tx,
+      b, d, ty,
+      array[6], array[7], tz,
     ]
     this.dirtyId++
   }
 
   protected _performUpdateFields(): void {
     const {
-      a,
-      c,
-      tx,
-      b,
-      d,
-      ty,
+      a, c, tx,
+      b, d, ty,
       tz,
     } = this.toObject()
     const skewX = -Math.atan2(-c, d)
@@ -236,7 +236,7 @@ export class Transform2D extends Matrix3 {
     return a === 1 && b === 0 && c === 0 && d === 1 && tx === 0 && ty === 0
   }
 
-  toObject() {
+  toObject(): Transform2DObject {
     const [a, c, tx, b, d, ty, ,, tz] = this._array
     return { a, c, tx, b, d, ty, tz }
   }

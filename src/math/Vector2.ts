@@ -4,7 +4,7 @@ import { Vector, type VectorLike } from './Vector'
  * Vector2
  */
 export class Vector2 extends Vector {
-  get x() { return this._array[0] }
+  get x(): number { return this._array[0] }
   set x(val) {
     const [x, y] = this._array
     if (x !== val) {
@@ -12,7 +12,7 @@ export class Vector2 extends Vector {
     }
   }
 
-  get y() { return this._array[1] }
+  get y(): number { return this._array[1] }
   set y(val) {
     const [x, y] = this._array
     if (y !== val) {
@@ -20,10 +20,10 @@ export class Vector2 extends Vector {
     }
   }
 
-  get width() { return this.x }
+  get width(): number { return this.x }
   set width(val) { this.x = val }
 
-  get height() { return this.y }
+  get height(): number { return this.y }
   set height(val) { this.y = val }
 
   constructor(x: VectorLike = 0, y?: number) {
@@ -31,11 +31,12 @@ export class Vector2 extends Vector {
     this.set(typeof x === 'number' ? [x, y ?? x] : x)
   }
 
-  update(x: number, y: number) {
+  update(x: number, y: number): this {
     const [oldX, oldY] = this._array
     if (oldX !== x || oldY !== y) {
       this.set(x, y)
     }
+    return this
   }
 
   getLength(): number {

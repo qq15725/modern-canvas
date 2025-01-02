@@ -37,16 +37,16 @@ function createOfflineAudioContext(numberOfChannels: number, length: number, sam
 export class WebAudioContext extends AudioPipeline implements IAudioContext {
   /** Singleton */
   protected static _instance?: WebAudioContext
-  static get instance() {
+  static get instance(): WebAudioContext {
     if (!this._instance) {
       this._instance = new WebAudioContext()
     }
     return this._instance
   }
 
-  static get audioContext() { return this.instance.audioContext }
-  static get offlineContext() { return this.instance.offlineContext }
-  static setParamValue(param: AudioParam, value: number) { this.instance.setParamValue(param, value) }
+  static get audioContext(): AudioContext { return this.instance.audioContext }
+  static get offlineContext(): OfflineAudioContext { return this.instance.offlineContext }
+  static setParamValue(param: AudioParam, value: number): void { this.instance.setParamValue(param, value) }
   static decode(buffer: ArrayBuffer): Promise<AudioBuffer> { return this.instance.decode(buffer) }
 
   /** Context */

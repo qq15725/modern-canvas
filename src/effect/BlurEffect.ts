@@ -90,7 +90,7 @@ export class BlurEffect extends Effect {
   @property({ default: 8 }) declare strength: number
   @property({ default: 4 }) declare quality: number
 
-  apply(renderer: WebGLRenderer, source: Viewport) {
+  apply(renderer: WebGLRenderer, source: Viewport): void {
     source.redraw(renderer, () => {
       QuadUvGeometry.draw(renderer, BlurEffect.materialX, {
         sampler: 0,

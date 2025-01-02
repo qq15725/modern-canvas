@@ -108,12 +108,12 @@ export class AudioWaveform extends Element2D {
     this.requestRedraw()
   }
 
-  protected override _process(delta: number) {
+  protected override _process(delta: number): void {
     this.syncTexture()
     super._process(delta)
   }
 
-  protected _drawSrc() {
+  protected _drawSrc(): void {
     const src = this._src
     if (src?.valid) {
       this.context.fillStyle = src

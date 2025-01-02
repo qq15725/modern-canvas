@@ -17,10 +17,10 @@ export class MaskEffect extends Effect {
 
   constructor(options?: MaskEffectOptions) {
     super()
-    options && this.setProperties(options)
+    this.setProperties(options)
   }
 
-  async load() {
+  async load(): Promise<void> {
     this.texture = undefined
     if (this.src) {
       this.texture = await assets.texture.load(this.src)
@@ -40,7 +40,7 @@ export class MaskEffect extends Effect {
     }
   }
 
-  override apply(renderer: WebGLRenderer, source: Viewport, context: EffectContext) {
+  override apply(renderer: WebGLRenderer, source: Viewport, context: EffectContext): void {
     if (this.texture && context.targetArea) {
       source.redraw(renderer, () => {
         this.texture!.activate(renderer, 1)

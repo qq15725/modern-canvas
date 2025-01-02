@@ -1,4 +1,4 @@
-import { property, Reactive } from '../../core'
+import { _Object, property } from '../../core'
 import * as modules from './modules'
 
 export type Overflow = 'hidden' | 'visible'
@@ -15,7 +15,7 @@ export interface Style2DOptions {
   overflow?: Overflow
 }
 
-export class Style2D extends Reactive {
+export class Style2D extends _Object {
   // shadow
   @property({ default: '#000000' }) declare shadowColor: string
   @property({ default: 0 }) declare shadowOffsetX: number
@@ -28,7 +28,7 @@ export class Style2D extends Reactive {
 
   constructor(options?: Style2DOptions) {
     super()
-    options && this.setProperties(options)
+    this.setProperties(options)
   }
 
   protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any): void {

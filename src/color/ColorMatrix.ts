@@ -47,52 +47,20 @@ export class ColorMatrix extends Matrix {
     const x = ((amount - 1) * 2 / 3) + 1
     const y = ((x - 1) * -0.5)
     return this.multiply([
-      x,
-      y,
-      y,
-      0,
-      0,
-      y,
-      x,
-      y,
-      0,
-      0,
-      y,
-      y,
-      x,
-      0,
-      0,
-      0,
-      0,
-      0,
-      1,
-      0,
+      x, y, y, 0, 0,
+      y, x, y, 0, 0,
+      y, y, x, 0, 0,
+      0, 0, 0, 1, 0,
     ])
   }
 
   brightness(amount = 1): this {
     const v = amount
     return this.multiply([
-      v,
-      0,
-      0,
-      0,
-      0,
-      0,
-      v,
-      0,
-      0,
-      0,
-      0,
-      0,
-      v,
-      0,
-      0,
-      0,
-      0,
-      0,
-      1,
-      0,
+      v, 0, 0, 0, 0,
+      0, v, 0, 0, 0,
+      0, 0, v, 0, 0,
+      0, 0, 0, 1, 0,
     ])
   }
 
@@ -100,26 +68,10 @@ export class ColorMatrix extends Matrix {
     const v = amount
     const o = -128 * (v - 1)
     return this.multiply([
-      v,
-      0,
-      0,
-      0,
-      o,
-      0,
-      v,
-      0,
-      0,
-      o,
-      0,
-      0,
-      v,
-      0,
-      o,
-      0,
-      0,
-      0,
-      1,
-      0,
+      v, 0, 0, 0, o,
+      0, v, 0, 0, o,
+      0, 0, v, 0, o,
+      0, 0, 0, 1, 0,
     ])
   }
 
@@ -127,26 +79,10 @@ export class ColorMatrix extends Matrix {
     const v = lerp(1, -1, amount)
     const o = lerp(0, 255, amount)
     return this.multiply([
-      v,
-      0,
-      0,
-      0,
-      o,
-      0,
-      v,
-      0,
-      0,
-      o,
-      0,
-      0,
-      v,
-      0,
-      o,
-      0,
-      0,
-      0,
-      1,
-      0,
+      v, 0, 0, 0, o,
+      0, v, 0, 0, o,
+      0, 0, v, 0, o,
+      0, 0, 0, 1, 0,
     ])
   }
 
@@ -178,26 +114,10 @@ export class ColorMatrix extends Matrix {
 
   opacity(amount = 1): this {
     return this.multiply([
-      1,
-      0,
-      0,
-      0,
-      0,
-      0,
-      1,
-      0,
-      0,
-      0,
-      0,
-      0,
-      1,
-      0,
-      0,
-      0,
-      0,
-      0,
-      amount,
-      0,
+      1, 0, 0, 0, 0,
+      0, 1, 0, 0, 0,
+      0, 0, 1, 0, 0,
+      0, 0, 0, amount, 0,
     ])
   }
 
@@ -210,26 +130,10 @@ export class ColorMatrix extends Matrix {
     const b = lerp(1, 0.11, v)
     const bb = lerp(0, 0.11, v)
     return this.multiply([
-      r,
-      gg,
-      bb,
-      0,
-      0,
-      rr,
-      g,
-      bb,
-      0,
-      0,
-      rr,
-      gg,
-      b,
-      0,
-      0,
-      0,
-      0,
-      0,
-      1,
-      0,
+      r, gg, bb, 0, 0,
+      rr, g, bb, 0, 0,
+      rr, gg, b, 0, 0,
+      0, 0, 0, 1, 0,
     ])
   }
 
@@ -267,22 +171,10 @@ export class ColorMatrix extends Matrix {
   toMatrix4(): Matrix4 {
     const array = this._array
     return new Matrix4([
-      array[0],
-      array[1],
-      array[2],
-      array[3],
-      array[5],
-      array[6],
-      array[7],
-      array[8],
-      array[10],
-      array[11],
-      array[12],
-      array[13],
-      array[15],
-      array[16],
-      array[17],
-      array[18],
+      array[0], array[1], array[2], array[3],
+      array[5], array[6], array[7], array[8],
+      array[10], array[11], array[12], array[13],
+      array[15], array[16], array[17], array[18],
     ])
   }
 

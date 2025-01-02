@@ -21,7 +21,7 @@ export class Video2D extends Element2D {
 
   constructor(options?: Video2DOptions) {
     super()
-    options && this.setProperties(options)
+    this.setProperties(options)
   }
 
   protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any): void {

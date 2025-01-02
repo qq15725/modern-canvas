@@ -15,7 +15,7 @@ export class VertexBuffer extends Resource {
 
   constructor(options?: VertexBufferOptions) {
     super()
-    options && this.setProperties(options)
+    this.setProperties(options)
   }
 
   /** @internal */

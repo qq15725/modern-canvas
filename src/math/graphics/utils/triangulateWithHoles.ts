@@ -1,4 +1,4 @@
-import { default as earcut } from 'earcut'
+import earcut from 'earcut'
 
 export function triangulateWithHoles(
   points: number[],
@@ -8,7 +8,7 @@ export function triangulateWithHoles(
   verticesOffset: number,
   indices: number[],
   indicesOffset: number,
-) {
+): void {
   const triangles = earcut(points, holes, 2)
 
   if (!triangles) {

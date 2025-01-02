@@ -1,4 +1,4 @@
-import type { WebGLRenderer } from '../../renderer'
+import type { WebGLRenderer, WebGLTextureOptions } from '../../renderer'
 import { IN_BROWSER, SUPPORTS_CREATE_IMAGE_BITMAP } from '../../shared'
 import { Texture } from './Texture'
 
@@ -50,12 +50,12 @@ export class ImageTexture extends Texture<HTMLImageElement> {
 
         const source = this.source
 
-        const onResolve = () => {
+        const onResolve = (): void => {
           source.onload = null
           source.onerror = null
         }
 
-        const onLoad = () => {
+        const onLoad = (): void => {
           onResolve()
           this.requestUpload()
           if (this.useBitmap) {
@@ -66,7 +66,7 @@ export class ImageTexture extends Texture<HTMLImageElement> {
           }
         }
 
-        const onError = (error: string | Event) => {
+        const onError = (error: string | Event): void => {
           onResolve()
           console.warn(`Failed to load ImageTexture, src: ${source.src}`, error)
           this.emit('error', error)
@@ -123,7 +123,7 @@ export class ImageTexture extends Texture<HTMLImageElement> {
   }
 
   /** @internal */
-  override _glTextureOptions(renderer: WebGLRenderer) {
+  override _glTextureOptions(renderer: WebGLRenderer): WebGLTextureOptions {
     return {
       ...super._glTextureOptions(renderer),
       source: this.bitmap ?? this.source,

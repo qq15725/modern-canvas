@@ -31,13 +31,13 @@ export class Input extends EventEmitter {
   enableWheelEvent = true
   enableClickEvent = true
 
-  setTarget(target: HTMLElement) {
+  setTarget(target: HTMLElement): void {
     this.removeEventListeners()
     this.target = target
     this.addEventListeners()
   }
 
-  removeEventListeners() {
+  removeEventListeners(): void {
     if (!this.setuped || !this.target) {
       return
     }
@@ -73,7 +73,7 @@ export class Input extends EventEmitter {
     this.setuped = false
   }
 
-  addEventListeners() {
+  addEventListeners(): void {
     if (this.setuped || !this.target) {
       return
     }
@@ -307,7 +307,7 @@ export class Input extends EventEmitter {
     point.y = ((y - rect.top) * (height / rect.height)) * multiplier
   }
 
-  protected onPointerDown = (nativeEvent: PointerEvent | TouchEvent | MouseEvent) => {
+  protected onPointerDown = (nativeEvent: PointerEvent | TouchEvent | MouseEvent): void => {
     if (SUPPORTS_TOUCH_EVENTS && (nativeEvent as PointerEvent).pointerType === 'touch')
       return
     const events = this.normalize(nativeEvent)

@@ -61,7 +61,7 @@ void main(void) {
   padding = 20
   offset?: number
 
-  override apply(renderer: WebGLRenderer, source: Viewport) {
+  override apply(renderer: WebGLRenderer, source: Viewport): void {
     const visibleProgress = this.visibleProgress
     let sampler: number
     let progress: number

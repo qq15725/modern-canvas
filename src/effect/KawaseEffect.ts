@@ -34,7 +34,7 @@ void main(void) {
   blur = 10
   quality = 10
 
-  override apply(renderer: WebGLRenderer, target: Viewport) {
+  override apply(renderer: WebGLRenderer, target: Viewport): void {
     const visibleProgress = this.visibleProgress
     let sampler: number
     let progress: number

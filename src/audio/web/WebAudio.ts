@@ -14,7 +14,7 @@ export class WebAudio extends AudioPipeline implements IAudio {
   gain: GainNode
   analyser: AnalyserNode
 
-  get context() { return WebAudioContext.instance }
+  get context(): WebAudioContext { return WebAudioContext.instance }
   get isPlayable(): boolean { return Boolean(this._sourceNode.buffer) }
   get duration(): number { return this._sourceNode.buffer?.duration ?? 0 }
 

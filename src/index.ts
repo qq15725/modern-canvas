@@ -8,6 +8,5 @@ export * from './Engine'
 export * from './input'
 export * from './math'
 export * from './render'
-
 export * from './renderer'
 export * from './shared'

@@ -1,14 +1,28 @@
+import type { EventListenerOptions, EventListenerValue } from '../shared'
+import type { _ObjectEventMap } from './_Object'
+import { _Object } from './_Object'
 import { property } from './decorators'
 import { Ticker } from './global'
-import { Resource } from './Resource'
 
-export abstract class MainLoop extends Resource {
+export interface MainLoopEventMap extends _ObjectEventMap {
+  process: (delta: number) => void
+}
+
+export interface MainLoop {
+  on: (<K extends keyof MainLoopEventMap>(type: K, listener: MainLoopEventMap[K], options?: EventListenerOptions) => this)
+    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
+  off: (<K extends keyof MainLoopEventMap>(type: K, listener: MainLoopEventMap[K], options?: EventListenerOptions) => this)
+    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
+  emit: (<K extends keyof EventListenerOptions>(type: K, ...args: Parameters<EventListenerOptions[K]>) => boolean)
+    & ((type: string, ...args: any[]) => boolean)
+}
+
+export class MainLoop extends _Object {
   @property({ default: 24 }) declare fps: number
   @property({ default: 1 }) declare speed: number
 
   protected _starting = false
   protected _nextDeltaTime = 0
-  protected _process?: (delta: number) => void
 
   get starting(): boolean { return this._starting }
   get spf(): number { return this.fps ? Math.floor(1000 / this.fps) : 0 }
@@ -21,7 +35,8 @@ export abstract class MainLoop extends Resource {
   start(process: (delta: number) => void): this {
     if (!this._starting) {
       this._starting = true
-      this._process = process
+      this.removeAllListeners()
+      this.on('process', process)
       Ticker.on(this._onNextTick, { sort: 0 })
     }
     return this
@@ -35,11 +50,12 @@ export abstract class MainLoop extends Resource {
     return this
   }
 
-  protected _onNextTick = (): void => {
+  protected _onNextTick(): void {
     const elapsed = Ticker.elapsed * this.speed
     const time = this._nextDeltaTime -= elapsed
     if (time <= 0) {
-      this._process?.((this._nextDeltaTime = this.spf) || elapsed)
+      const delta = (this._nextDeltaTime = this.spf) || elapsed
+      this.emit('process', delta)
     }
   }
 }

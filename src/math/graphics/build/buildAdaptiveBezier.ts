@@ -20,7 +20,7 @@ export function buildAdaptiveBezier(
   eX: number,
   eY: number,
   smoothness = 0.5,
-) {
+): number[] {
   // TODO expose as a parameter
   const scale = 1
   const smoothing = Math.min(
@@ -47,7 +47,7 @@ function begin(
   eY: number,
   points: number[],
   distanceTolerance: number,
-) {
+): void {
   // dont need to actually ad this!
   // points.push(sX, sY);
   recursive(sX, sY, cp1x, cp1y, cp2x, cp2y, eX, eY, points, distanceTolerance, 0)
@@ -66,7 +66,7 @@ function recursive(
   points: number[],
   distanceTolerance: number,
   level: number,
-) {
+): void {
   if (level > RECURSION_LIMIT)
     return
 

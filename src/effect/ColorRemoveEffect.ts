@@ -46,7 +46,7 @@ void main(void) {
 
   protected _color = new Color()
 
-  override apply(renderer: WebGLRenderer, source: Viewport) {
+  override apply(renderer: WebGLRenderer, source: Viewport): void {
     const maxColors = 50
     const originalColors = new Float32Array(maxColors * 3)
     const colors = this.colors.map((val) => {

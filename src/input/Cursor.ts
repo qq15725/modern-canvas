@@ -1,4 +1,5 @@
-export type Cursor = 'auto'
+export type Cursor =
+  | 'auto'
   | 'default'
   | 'none'
   | 'context-menu'

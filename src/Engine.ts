@@ -5,7 +5,12 @@ import { Color } from './color'
 import { nextTick, SceneTree } from './core'
 import { Input } from './input'
 import { WebGLRenderer } from './renderer'
-import { DEVICE_PIXEL_RATIO, SUPPORTS_RESIZE_OBSERVER } from './shared'
+import {
+  DEVICE_PIXEL_RATIO,
+  type EventListenerOptions,
+  type EventListenerValue,
+  SUPPORTS_RESIZE_OBSERVER,
+} from './shared'
 
 export interface EngineOptions extends WebGLContextAttributes {
   view?: HTMLCanvasElement | WebGLRenderingContext | WebGL2RenderingContext
@@ -17,19 +22,20 @@ export interface EngineOptions extends WebGLContextAttributes {
 }
 
 interface EngineEventMap {
-  [key: string]: any
-  pointerdown: PointerInputEvent
-  pointerover: PointerInputEvent
-  pointermove: PointerInputEvent
-  pointerup: PointerInputEvent
-  wheel: WheelInputEvent
+  pointerdown: (ev: PointerInputEvent) => void
+  pointerover: (ev: PointerInputEvent) => void
+  pointermove: (ev: PointerInputEvent) => void
+  pointerup: (ev: PointerInputEvent) => void
+  wheel: (ev: WheelInputEvent) => void
 }
 
 export interface Engine {
-  addEventListener: <K extends keyof EngineEventMap>(type: K, listener: (this: Engine, ev: EngineEventMap[K]) => any, options?: boolean | AddEventListenerOptions) => this
-  removeEventListener: <K extends keyof EngineEventMap>(type: K, listener: (this: Engine, ev: EngineEventMap[K]) => any, options?: boolean | EventListenerOptions) => this
-  on: <K extends keyof EngineEventMap>(type: K, listener: (this: Engine, ev: EngineEventMap[K]) => any, options?: boolean | AddEventListenerOptions) => this
-  off: <K extends keyof EngineEventMap>(type: K, listener: (this: Engine, ev: EngineEventMap[K]) => any, options?: boolean | EventListenerOptions) => this
+  on: (<K extends keyof EngineEventMap>(type: K, listener: EngineEventMap[K], options?: EventListenerOptions) => this)
+    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
+  off: (<K extends keyof EngineEventMap>(type: K, listener: EngineEventMap[K], options?: EventListenerOptions) => this)
+    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
+  emit: (<K extends keyof EngineEventMap>(type: K, ...args: Parameters<EngineEventMap[K]>) => boolean)
+    & ((type: string, ...args: any[]) => boolean)
 }
 
 export const defaultOptions = {
@@ -201,14 +207,8 @@ export class Engine extends SceneTree {
     canvas.height = this.height
     canvas.getContext('2d')?.drawImage(
       canvas0,
-      0,
-      0,
-      canvas0.width,
-      canvas0.height,
-      0,
-      0,
-      canvas.width,
-      canvas.height,
+      0, 0, canvas0.width, canvas0.height,
+      0, 0, canvas.width, canvas.height,
     )
     return canvas
   }

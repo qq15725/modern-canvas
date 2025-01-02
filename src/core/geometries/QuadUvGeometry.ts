@@ -8,7 +8,7 @@ import { VertexBuffer } from './VertexBuffer'
 
 export class QuadUvGeometry extends Geometry {
   protected static _instance: QuadUvGeometry
-  static get instance() { return this._instance ??= new this() }
+  static get instance(): QuadUvGeometry { return this._instance ??= new this() }
 
   static draw(
     renderer: WebGLRenderer,

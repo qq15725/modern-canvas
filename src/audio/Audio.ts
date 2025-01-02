@@ -1,4 +1,4 @@
-import type { IAudio, IPlayOptions, ISound } from './interfaces'
+import type { IPlayOptions, ISound } from './interfaces'
 import { customNode, Node } from '../core'
 import { SUPPORTS_WEB_AUDIO } from '../shared'
 import { HTMLAudio } from './html'
@@ -11,11 +11,11 @@ export class Audio extends Node {
   protected _sounds: ISound[] = []
 
   /** PlatformAudio */
-  protected _platformAudio: IAudio = SUPPORTS_WEB_AUDIO
+  protected _platformAudio = SUPPORTS_WEB_AUDIO
     ? new WebAudio(this)
     : new HTMLAudio(this)
 
-  get platformAudio(): IAudio { return this._platformAudio }
+  get platformAudio(): WebAudio | HTMLAudio { return this._platformAudio }
 
   /** Src */
   protected _src!: string

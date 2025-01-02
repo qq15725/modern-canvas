@@ -34,7 +34,7 @@ void main() {
 }`,
   })
 
-  override apply(renderer: WebGLRenderer) {
+  override apply(renderer: WebGLRenderer): void {
     QuadUvGeometry.draw(renderer, LeftEraseEffect.material, {
       previous: 0,
       next: 1,

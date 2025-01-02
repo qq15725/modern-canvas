@@ -15,7 +15,7 @@ export class EmbossEffect extends Effect {
     this.strength = strength
   }
 
-  override apply(renderer: WebGLRenderer, source: Viewport) {
+  override apply(renderer: WebGLRenderer, source: Viewport): void {
     source.redraw(renderer, () => {
       QuadUvGeometry.draw(renderer, EmbossEffect.material, {
         sampler: 0,

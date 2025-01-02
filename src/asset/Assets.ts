@@ -46,7 +46,7 @@ export class Assets {
     return this
   }
 
-  fetch(url: string) {
+  fetch(url: string): Promise<Response> {
     return fetch(url)
   }
 

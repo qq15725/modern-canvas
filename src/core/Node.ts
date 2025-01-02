@@ -1,9 +1,38 @@
 import type { Maskable, WebGLRenderer } from '../renderer'
+import type { EventListenerOptions, EventListenerValue } from '../shared'
+import type { ReferenceEventMap } from './Reference'
 import type { SceneTree } from './SceneTree'
 import type { Viewport } from './Viewport'
 import { clamp } from '../math'
 import { customNode, customNodes, property } from './decorators'
-import { Reactive } from './Reactive'
+import { Reference } from './Reference'
+
+export interface NodeEventMap extends ReferenceEventMap {
+  enterTree: () => void
+  exitTree: () => void
+  childExitingTree: (node: Node) => void
+  childEnteredTree: (node: Node) => void
+  postEnterTree: () => void
+  ready: () => void
+  treeEntered: () => void
+  treeExiting: () => void
+  treeExited: () => void
+  parented: () => void
+  unparented: () => void
+  process: (params: Record<string, any>) => void
+  addChild: (child: Node) => void
+  removeChild: (child: Node, index: number) => void
+  moveChild: (child: Node, newIndex: number, oldIndex: number) => void
+}
+
+export interface Node {
+  on: (<K extends keyof NodeEventMap>(type: K, listener: NodeEventMap[K], options?: EventListenerOptions) => this)
+    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
+  off: (<K extends keyof NodeEventMap>(type: K, listener: NodeEventMap[K], options?: EventListenerOptions) => this)
+    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
+  emit: (<K extends keyof NodeEventMap>(type: K, ...args: Parameters<NodeEventMap[K]>) => boolean)
+    & ((type: string, ...args: any[]) => boolean)
+}
 
 export enum InternalMode {
   DEFAULT = 0,
@@ -21,9 +50,22 @@ export interface NodeOptions {
   visibleDuration?: number
 }
 
+/**
+ * Node 是所有节点的基类，提供了管理场景树的功能。
+ * 在 Godot 中，节点代表了游戏中的元素或对象，所有的节点都是通过继承 Node 类来实现的。
+ * Node 处理与场景树、节点的添加、删除、子父关系、以及输入事件等相关的操作。
+ *
+ * 功能和用途：
+ *  • 管理节点在场景树中的位置和生命周期。
+ *  • 节点可以有 子节点，并且可以通过 add_child() 方法将子节点添加到当前节点。
+ *  • 支持 信号（signals）机制，用于事件通知。
+ *  • 提供 生命周期方法，如 _ready()、_enter_tree()、_exit_tree() 等。
+ *  • 支持 输入事件，通过 _input() 等方法来处理输入。
+ */
 @customNode('Node')
-export class Node extends Reactive {
+export class Node extends Reference {
   readonly declare tag: string
+
   renderable?: boolean
 
   // @ts-expect-error tag
@@ -42,8 +84,8 @@ export class Node extends Reactive {
   _internalMode = InternalMode.DEFAULT
 
   protected _readyed = false
-  protected _tree: SceneTree | null = null
-  protected _parent: Node | null = null
+  protected _tree?: SceneTree
+  protected _parent?: Node
   protected _children: Node[] = []
 
   get children(): Node[] { return this.getChildren() }
@@ -71,7 +113,15 @@ export class Node extends Reactive {
 
   constructor(options?: NodeOptions) {
     super()
-    options && this.setProperties(options)
+
+    this
+      .setProperties(options)
+      .on('enterTree', this._onEnterTree.bind(this))
+      .on('exitTree', this._onExitTree.bind(this))
+      .on('parented', this._onParented.bind(this))
+      .on('unparented', this._onUnparented.bind(this))
+      .on('ready', this._onReady.bind(this))
+      .on('process', this._onProcess.bind(this))
   }
 
   /** Meta */
@@ -91,20 +141,20 @@ export class Node extends Reactive {
   }
 
   /** Tree */
-  getTree(): SceneTree | null { return this._tree }
+  getTree(): SceneTree | undefined { return this._tree }
   getViewport(): Viewport | undefined { return this._tree?.getCurrentViewport() }
   getWindow(): Viewport | undefined { return this._tree?.root }
   isInsideTree(): boolean { return Boolean(this._tree) }
   /** @internal */
-  _setTree(tree: SceneTree | null): this {
+  _setTree(tree: SceneTree | undefined): this {
     const oldTree = this._tree
     if (tree !== oldTree) {
       if (tree) {
         this._tree = tree
-        this.notification('enterTree')
+        this.emit('enterTree')
       }
       else if (oldTree) {
-        this.notification('exitTree')
+        this.emit('exitTree')
         this._tree = tree
       }
 
@@ -116,10 +166,10 @@ export class Node extends Reactive {
       }
 
       if (tree) {
-        this.notification('postEnterTree')
+        this.emit('postEnterTree')
         if (!this._readyed) {
           this._readyed = true
-          this.notification('ready')
+          this.emit('ready')
         }
       }
     }
@@ -165,65 +215,64 @@ export class Node extends Reactive {
     this._computedVisibility = visibility
   }
 
-  notification(what: string, params: Record<string, any> = {}): void {
-    switch (what) {
-      case 'enterTree':
-        this._enterTree()
-        this.emit('treeEntered')
-        break
-      case 'exitTree':
-        this.emit('treeExiting')
-        this._exitTree()
-        this.emit('treeExited')
-        break
-      case 'parented':
-        this._parented()
-        break
-      case 'unparented':
-        this._unparented()
-        break
-      case 'ready':
-        this._ready()
-        this.emit('ready')
-        break
-      case 'process': {
-        this._updateVisibility()
-        const tree = this._tree
-        tree?.emit('nodeProcessing', this)
-        this._process(params.delta ?? 0)
+  protected _onEnterTree(): void {
+    this._enterTree()
+    this.emit('treeEntered')
+  }
 
-        const isRenderable = this.isRenderable()
-        let oldRenderCall
-        if (tree && isRenderable) {
-          const renderCall = tree.renderStack.push(this)
-          oldRenderCall = tree.renderStack.currentCall
-          tree.renderStack.currentCall = renderCall
-        }
+  protected _onExitTree(): void {
+    this.emit('treeExiting')
+    this._exitTree()
+    this.emit('treeExited')
+  }
 
-        if (this.mask instanceof Node) {
-          if (!this.getNode('__$mask')) {
-            this.mask.renderable = false
-            this.addChild(this.mask, InternalMode.FRONT)
-          }
-        }
-        else {
-          const mask = this.getNode('__$mask')
-          if (mask) {
-            this.removeChild(mask)
-          }
-        }
+  protected _onParented(): void {
+    this._parented()
+  }
 
-        for (let len = this._children.length, i = 0; i < len; i++) {
-          this._children[i].notification('process', params)
-        }
+  protected _onUnparented(): void {
+    this._unparented()
+  }
 
-        if (tree && isRenderable) {
-          tree.renderStack.currentCall = oldRenderCall
-        }
-        tree?.emit('nodeProcessed', this)
-        break
+  protected _onReady(): void {
+    this._ready()
+  }
+
+  protected _onProcess(params: Record<string, any>): void {
+    this._updateVisibility()
+    const tree = this._tree
+    tree?.emit('nodeProcessing', this)
+    this._process(params.delta ?? 0)
+
+    const isRenderable = this.isRenderable()
+    let oldRenderCall
+    if (tree && isRenderable) {
+      const renderCall = tree.renderStack.push(this)
+      oldRenderCall = tree.renderStack.currentCall
+      tree.renderStack.currentCall = renderCall
+    }
+
+    if (this.mask instanceof Node) {
+      if (!this.getNode('__$mask')) {
+        this.mask.renderable = false
+        this.addChild(this.mask, InternalMode.FRONT)
       }
     }
+    else {
+      const mask = this.getNode('__$mask')
+      if (mask) {
+        this.removeChild(mask)
+      }
+    }
+
+    for (let len = this._children.length, i = 0; i < len; i++) {
+      this._children[i].emit('process', params)
+    }
+
+    if (tree && isRenderable) {
+      tree.renderStack.currentCall = oldRenderCall
+    }
+    tree?.emit('nodeProcessed', this)
   }
 
   render(renderer: WebGLRenderer, next?: () => void): void {
@@ -252,15 +301,15 @@ export class Node extends Reactive {
   }
 
   /** Parent */
-  get parent(): Node | null { return this._parent }
+  get parent(): Node | undefined { return this._parent }
   hasParent(): boolean { return !!this._parent }
-  getParent(): Node | null { return this._parent }
+  getParent(): Node | undefined { return this._parent }
   /** @internal */
-  _setParent(parent: Node | null): this {
+  _setParent(parent: Node | undefined): this {
     if (!this._parent?.is(parent)) {
       this._parent = parent
-      this._setTree(parent?._tree ?? null)
-      this.notification(parent ? 'parented' : 'unparented')
+      this._setTree(parent?._tree)
+      this.emit(parent ? 'parented' : 'unparented')
     }
     return this
   }
@@ -383,7 +432,7 @@ export class Node extends Reactive {
     const index = child.getIndex(true)
     if (this.is(child.parent) && index > -1) {
       this._children.splice(index, 1)
-      child._setParent(null)
+      child._setParent(undefined)
       this.emit('removeChild', child, index)
     }
     return this

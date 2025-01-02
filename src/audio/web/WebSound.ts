@@ -11,7 +11,7 @@ export class WebSound extends EventEmitter implements ISound {
 
   /** Progress */
   protected _progress = 0
-  get progress() { return this._progress }
+  get progress(): number { return this._progress }
 
   /** Paused */
   protected _pausedReal = false
@@ -93,6 +93,7 @@ export class WebSound extends EventEmitter implements ISound {
       start = 0,
     } = options
 
+    // eslint-disable-next-line no-console
     end && console.assert(end > start, 'End time is before start time')
     this._end = end
     this._elapsed = start
@@ -265,7 +266,7 @@ export class WebSound extends EventEmitter implements ISound {
     this.emit('end', this)
   }
 
-  protected _updateListener = () => this._update()
+  protected _updateListener = (): void => this._update()
 
   protected _enableTicker(enabled: boolean): void {
     Ticker.off(this._updateListener)

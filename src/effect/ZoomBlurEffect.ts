@@ -95,7 +95,7 @@ void main() {
   @property() radius = -1
   @property() strength = 0.1
 
-  override apply(renderer: WebGLRenderer, source: Viewport) {
+  override apply(renderer: WebGLRenderer, source: Viewport): void {
     source.redraw(renderer, () => {
       QuadUvGeometry.draw(renderer, ZoomBlurEffect.material, {
         sampler: 0,

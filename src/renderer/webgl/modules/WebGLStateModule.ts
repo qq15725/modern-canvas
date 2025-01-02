@@ -27,7 +27,7 @@ export class WebGLState {
     'depthMask',
   ]
 
-  static _init() {
+  static _init(): void {
     this._properties.forEach((prop, index) => {
       Object.defineProperty(this.prototype, prop, {
         get() {
@@ -109,13 +109,13 @@ export class WebGLStateModule extends WebGLModule {
     this.blendModes = mapWebGLBlendModes(this._renderer.gl)
   }
 
-  toggle(boundPoint: number, enable: boolean) { this._renderer.gl[enable ? 'enable' : 'disable'](boundPoint) }
+  toggle(boundPoint: number, enable: boolean): void { this._renderer.gl[enable ? 'enable' : 'disable'](boundPoint) }
   setBlend(value: boolean): void { this.toggle(this._renderer.gl.BLEND, value) }
   setOffsets(value: boolean): void { this.toggle(this._renderer.gl.POLYGON_OFFSET_FILL, value) }
   setCulling(value: boolean): void { this.toggle(this._renderer.gl.CULL_FACE, value) }
   setDepthTest(value: boolean): void { this.toggle(this._renderer.gl.DEPTH_TEST, value) }
   setDepthMask(value: boolean): void { this._renderer.gl.depthMask(value) }
-  setClockwiseFrontFace(value: boolean) {
+  setClockwiseFrontFace(value: boolean): void {
     const gl = this._renderer.gl
     gl.frontFace(gl[value ? 'CW' : 'CCW'])
   }

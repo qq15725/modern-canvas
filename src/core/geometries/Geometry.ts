@@ -1,9 +1,8 @@
-import type { WebGLDrawMode, WebGLRenderer } from '../../renderer'
+import type { WebGLDrawMode, WebGLRenderer, WebGLVertexArrayObjectOptions } from '../../renderer'
 import type { Material } from '../materials/Material'
 import type { IndexBuffer } from './IndexBuffer'
 import type { VertexAttribute } from './VertexAttribute'
 import type { VertexBuffer } from './VertexBuffer'
-import { toRaw } from '../../shared'
 import { Resource } from '../Resource'
 
 export interface GeometryOptions {
@@ -31,7 +30,7 @@ export class Geometry extends Resource {
   }
 
   /** @internal */
-  _glVertexArray(renderer: WebGLRenderer) {
+  _glVertexArray(renderer: WebGLRenderer): WebGLVertexArrayObjectOptions {
     return {
       attributes: Object.fromEntries(
         Array.from(this.vertexAttributes).map(([key, attrib]) => {
@@ -52,7 +51,6 @@ export class Geometry extends Resource {
 
   /** @internal */
   _glVertexArrayObject(renderer: WebGLRenderer, material: Material): WebGLVertexArrayObject | null {
-    material = toRaw(material)
     let obj = this._materialWeakMap.get(material)
     if (!obj) {
       obj = {

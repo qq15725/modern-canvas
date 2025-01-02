@@ -1,4 +1,4 @@
-import { DEVICE_PIXEL_RATIO, toRaw } from '../shared'
+import { DEVICE_PIXEL_RATIO } from '../shared'
 
 export abstract class Renderer {
   view?: HTMLCanvasElement
@@ -7,7 +7,6 @@ export abstract class Renderer {
   readonly related = new WeakMap<object, any>()
 
   getRelated<T>(source: object, createFn?: () => T): T {
-    source = toRaw(source)
     let related = this.related.get(source)
     if (related)
       return related
@@ -16,10 +15,10 @@ export abstract class Renderer {
       return null as T
     }
     this.related.set(source, related = createFn())
-    return toRaw(related)
+    return related
   }
 
-  resize(width: number, height: number, updateStyle = true) {
+  resize(width: number, height: number, updateStyle = true): void {
     const viewWidth = Math.floor(width * this.pixelRatio)
     const viewHeight = Math.floor(height * this.pixelRatio)
     const screenWidth = viewWidth / this.pixelRatio

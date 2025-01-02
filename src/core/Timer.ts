@@ -1,7 +1,21 @@
-import type { NodeOptions } from './Node'
+import type { EventListenerOptions, EventListenerValue } from '../shared'
+import type { NodeEventMap, NodeOptions } from './Node'
 import { clamp } from '../math'
 import { customNode, property } from './decorators'
 import { Node } from './Node'
+
+export interface TimerEventMap extends NodeEventMap {
+  update: (current: number, delta: number) => void
+}
+
+export interface Timer {
+  on: (<K extends keyof TimerEventMap>(type: K, listener: TimerEventMap[K], options?: EventListenerOptions) => this)
+    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
+  off: (<K extends keyof TimerEventMap>(type: K, listener: TimerEventMap[K], options?: EventListenerOptions) => this)
+    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
+  emit: (<K extends keyof TimerEventMap>(type: K, ...args: Parameters<TimerEventMap[K]>) => boolean)
+    & ((type: string, ...args: any[]) => boolean)
+}
 
 export interface TimerOptions extends NodeOptions {
   start?: number
@@ -31,7 +45,7 @@ export class Timer extends Node {
 
   constructor(options?: TimerOptions) {
     super()
-    options && this.setProperties(options)
+    this.setProperties(options)
   }
 
   protected _onUpdateProperty(key: PropertyKey, value: any, oldValue: any): void {

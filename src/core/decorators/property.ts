@@ -42,12 +42,12 @@ export function defineProperty(constructor: any, name: PropertyKey, declaration:
   })
 }
 
-export function property(options?: PropertyDeclaration) {
+export function property(options?: PropertyDeclaration): PropertyDecorator {
   return function (proto: any, name: any) {
     defineProperty(proto.constructor, name, options)
   }
 }
 
-export function protectedProperty(options?: Omit<PropertyDeclaration, 'protected'>) {
+export function protectedProperty(options?: Omit<PropertyDeclaration, 'protected'>): PropertyDecorator {
   return property({ ...options, protected: true })
 }

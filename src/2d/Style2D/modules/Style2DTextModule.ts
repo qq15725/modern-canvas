@@ -8,7 +8,7 @@ import type {
   TextWrap,
   VerticalAlign,
   WritingMode,
-} from 'modern-text'
+} from 'modern-idoc'
 import type { Style2D } from '../Style2D'
 import { defineProperty } from '../../../core'
 import { Style2DModule } from './Style2DModule'
