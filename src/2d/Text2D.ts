@@ -46,6 +46,7 @@ export class Text2D extends Node2D {
     switch (key) {
       case 'content':
       case 'effects':
+      case 'measureDom':
       case 'fonts':
       case 'split':
         this._updateSplit()
