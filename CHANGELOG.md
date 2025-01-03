@@ -1,3 +1,12 @@
+## [0.1.1](https://github.com/qq15725/modern-canvas/compare/v0.1.0...v0.1.1) (2025-01-03)
+
+
+### Features
+
+* merge Element2D to Node2D ([5548605](https://github.com/qq15725/modern-canvas/commit/5548605a97ce445d1c3e3510b8e85ed8771b60cc))
+
+
+
 # [0.1.0](https://github.com/qq15725/modern-canvas/compare/v0.0.3...v0.1.0) (2025-01-02)
 
 
