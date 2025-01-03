@@ -32,10 +32,7 @@ function proxy(
   }
 }
 
-@customNode({
-  tag: 'Graphics2D',
-  renderable: true,
-})
+@customNode('Graphics2D')
 export class Graphics2D extends Node2D {
   protected _resetContext = false
 

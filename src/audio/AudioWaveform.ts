@@ -1,18 +1,18 @@
-import type { Element2DOptions } from '../2d'
-import { Element2D } from '../2d'
+import type { Node2DOptions } from '../2d'
+import { Node2D } from '../2d'
 import { customNode, property, Texture } from '../core'
 import { Transform2D } from '../math'
 import { IN_BROWSER } from '../shared'
 import { WebAudioContext } from './web'
 
-export interface AudioWaveformOptions extends Element2DOptions {
+export interface AudioWaveformOptions extends Node2DOptions {
   src?: string
   gap?: number
   color?: string
 }
 
 @customNode('AudioWaveform')
-export class AudioWaveform extends Element2D {
+export class AudioWaveform extends Node2D {
   @property() src?: string
   @property() gap = 0
   @property() color = '#000000'

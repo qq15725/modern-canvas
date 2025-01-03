@@ -1,5 +1,5 @@
-import { Element2D } from '../2d'
+import { Node2D } from '../2d'
 
-export class AudioSpectrum extends Element2D {
+export class AudioSpectrum extends Node2D {
   //
 }

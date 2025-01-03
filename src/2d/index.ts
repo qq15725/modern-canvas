@@ -1,7 +1,6 @@
 export * from './Animation2D'
 export * from './CanvasContext'
 export * from './CanvasItem'
-export * from './Element2D'
 export * from './Graphics2D'
 export * from './Image2D'
 export * from './Image2DResource'

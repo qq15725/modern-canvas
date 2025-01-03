@@ -8,7 +8,10 @@ export interface Node2DOptions extends CanvasItemOptions {
   //
 }
 
-@customNode('Node2D')
+@customNode({
+  tag: 'Node2D',
+  renderable: true,
+})
 export class Node2D extends CanvasItem {
   readonly _transform = new Transform2D()
   protected _parentTransformDirtyId?: number
@@ -56,6 +59,9 @@ export class Node2D extends CanvasItem {
       case 'transformOrigin':
         this._updateTransform()
         break
+      case 'overflow':
+        this._updateOverflow()
+        break
     }
   }
 
@@ -83,7 +89,25 @@ export class Node2D extends CanvasItem {
       transform = t3dT2d
     }
     this._transform.set(transform)
+    this._updateOverflow()
     this.requestReflow()
+  }
+
+  protected _updateOverflow(): void {
+    if (this.style.overflow === 'hidden') {
+      const [a, c, tx, b, d, ty] = this._transform.toArray()
+      const width = this.style.width
+      const height = this.style.height
+      this.mask = {
+        x: tx,
+        y: ty,
+        width: (a * width) + (c * height),
+        height: (b * width) + (d * height),
+      }
+    }
+    else {
+      this.mask = undefined
+    }
   }
 
   protected _transformVertices(vertices: number[]): number[] {

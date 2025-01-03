@@ -1,12 +1,12 @@
 import type { IDOCStyleDeclaration, IDOCTextContent } from 'modern-idoc'
 import type { MeasureResult } from 'modern-text'
-import type { Element2DOptions } from './Element2D'
+import type { Node2DOptions } from './Node2D'
 import { measureText, renderText, textDefaultStyle } from 'modern-text'
 import { customNode, InternalMode, property, Texture } from '../core'
 import { Transform2D } from '../math'
-import { Element2D } from './Element2D'
+import { Node2D } from './Node2D'
 
-export interface Text2DOptions extends Element2DOptions {
+export interface Text2DOptions extends Node2DOptions {
   pixelRatio?: number
   split?: boolean
   content?: IDOCTextContent
@@ -15,8 +15,18 @@ export interface Text2DOptions extends Element2DOptions {
 
 const textStyles = new Set(Object.keys(textDefaultStyle))
 
+/**
+ * @example
+ *
+ * new Text2D({
+ *   style: {
+ *     fontSize: 20,
+ *   },
+ *   content: 'Text2D',
+ * })
+ */
 @customNode('Text2D')
-export class Text2D extends Element2D {
+export class Text2D extends Node2D {
   @property({ default: 2 }) declare pixelRatio: number
   @property({ default: false }) declare split: boolean
   @property({ default: '' }) declare content: IDOCTextContent

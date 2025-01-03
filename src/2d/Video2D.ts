@@ -1,16 +1,16 @@
 import type { VideoTexture } from '../core'
-import type { Element2DOptions } from './Element2D'
+import type { Node2DOptions } from './Node2D'
 import { assets } from '../asset'
 import { customNode, property } from '../core'
 import { Transform2D } from '../math'
-import { Element2D } from './Element2D'
+import { Node2D } from './Node2D'
 
-export interface Video2DOptions extends Element2DOptions {
+export interface Video2DOptions extends Node2DOptions {
   src?: string
 }
 
 @customNode('Video2D')
-export class Video2D extends Element2D {
+export class Video2D extends Node2D {
   @property({ default: '' }) declare src: string
 
   texture?: VideoTexture

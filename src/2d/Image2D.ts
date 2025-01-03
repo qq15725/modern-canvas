@@ -1,20 +1,20 @@
 import type { Texture } from '../core'
 import type { CanvasBatchable } from './CanvasContext'
-import type { Element2DOptions } from './Element2D'
 import type { ImageFrame } from './Image2DResource'
+import type { Node2DOptions } from './Node2D'
 import { assets } from '../asset'
 import { customNode, property, protectedProperty } from '../core'
 import { Transform2D } from '../math'
-import { Element2D } from './Element2D'
 import { Image2DResource } from './Image2DResource'
+import { Node2D } from './Node2D'
 
-export interface Image2DOptions extends Element2DOptions {
+export interface Image2DOptions extends Node2DOptions {
   src?: string
   gif?: boolean
 }
 
 @customNode('Image2D')
-export class Image2D extends Element2D {
+export class Image2D extends Node2D {
   @protectedProperty() resource?: Image2DResource
   @property({ default: false }) declare gif: boolean
   @property({ default: '' }) declare src: string
@@ -142,7 +142,7 @@ export class Image2D extends Element2D {
     const texture = this.currentTexture
     return super._repaint(
       batchables.map((batchable, i) => {
-        if ((this._background ? i === 1 : i === 0) && batchable.type === 'fill') {
+        if ((this._backgroundImage ? i === 1 : i === 0) && batchable.type === 'fill') {
           return {
             ...batchable,
             texture: texture?.valid ? texture : undefined,

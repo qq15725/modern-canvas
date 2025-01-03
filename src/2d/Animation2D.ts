@@ -125,8 +125,8 @@ export class Animation2D extends Node {
 
   constructor(options?: AnimationOptions) {
     super()
-    this.setProperties(options)
     this._onUpdateTime = this._onUpdateTime.bind(this)
+    this.setProperties(options)
   }
 
   protected override _enterTree(): void {
@@ -214,18 +214,21 @@ export class Animation2D extends Node {
 
     const targets = this._getTargets()
     const offset = 1 / targets.length
-
     const progress = this.visibleProgress
+
     targets.forEach((target, i) => {
       const tiem = offset === 1
         ? progress
         : clamp(0, Math.max(0, progress - offset * i) / offset, 1)
+
       const startProps = this._startProps.get(target)
       if (!startProps)
         return
+
       const keyframes = this._parseKeyframes(tiem, startProps)
       if (!keyframes?.length)
         return
+
       this._commitStyle(tiem, target, startProps, keyframes[0], keyframes[1])
     })
   }

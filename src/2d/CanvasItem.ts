@@ -1,11 +1,11 @@
 import type { ColorValue } from '../color'
-import type { NodeOptions, PropertyDeclaration } from '../core'
+import type { NodeOptions, PropertyDeclaration, Texture } from '../core'
 import type { WebGLBlendMode, WebGLRenderer } from '../renderer'
 import type { CanvasBatchable } from './CanvasContext'
 import type { Style2DOptions } from './style2d'
 import { Color } from '../color'
 import { customNode, Node, property } from '../core'
-import { clamp } from '../math'
+import { clamp, Transform2D } from '../math'
 import { CanvasContext } from './CanvasContext'
 import { Style2D } from './style2d'
 
@@ -30,17 +30,17 @@ export class CanvasItem extends Node {
 
   /** @internal */
   opacity = 1
-
   protected _parentOpacity?: number
   protected _tint = new Color(0xFFFFFFFF)
   protected _backgroundColor = new Color(0x00000000)
+  protected _backgroundImage?: Texture
 
-  // 2d batch render
+  // Batch render
   context = new CanvasContext()
   protected _resetContext = true
-  protected _waitingRedraw = false
-  protected _waitingReflow = false
-  protected _waitingRepaint = false
+  protected _redrawing = false
+  protected _reflowing = false
+  protected _repainting = false
   protected _originalBatchables: CanvasBatchable[] = []
   protected _layoutedBatchables: CanvasBatchable[] = []
   protected _batchables: CanvasBatchable[] = []
@@ -79,13 +79,10 @@ export class CanvasItem extends Node {
   protected _onUpdateStyleProperty(key: PropertyKey, newValue: any, oldValue: any, declaration?: PropertyDeclaration): void {
     switch (key) {
       case 'backgroundColor':
-        this._backgroundColor.value = newValue || 0x00000000
-        if (this._originalBatchables.length) {
-          this.requestRepaint()
-        }
-        else if (this._backgroundColor.a > 0) {
-          this.requestRedraw()
-        }
+        this._updateBackgroundColor()
+        break
+      case 'backgroundImage':
+        this._updateBackgroundImage()
         break
       case 'opacity':
         this._updateOpacity()
@@ -93,7 +90,25 @@ export class CanvasItem extends Node {
       case 'filter':
         this.requestRepaint()
         break
+      case 'borderRadius':
+        this.requestRedraw()
+        break
     }
+  }
+
+  protected _updateBackgroundColor(): void {
+    this._backgroundColor.value = this.style.backgroundColor || 0x00000000
+    if (this._originalBatchables.length) {
+      this.requestRepaint()
+    }
+    else if (this._backgroundColor.a > 0) {
+      this.requestRedraw()
+    }
+  }
+
+  protected async _updateBackgroundImage(): Promise<void> {
+    this._backgroundImage = await this.style.getComputedBackgroundImage()
+    this.requestRedraw()
   }
 
   protected _updateOpacity(): void {
@@ -109,9 +124,9 @@ export class CanvasItem extends Node {
     return this.opacity > 0 && super.isVisible()
   }
 
-  requestRedraw(): void { this._waitingRedraw = true }
-  requestReflow(): void { this._waitingReflow = true }
-  requestRepaint(): void { this._waitingRepaint = true }
+  requestRedraw(): void { this._redrawing = true }
+  requestReflow(): void { this._reflowing = true }
+  requestRepaint(): void { this._repainting = true }
 
   protected override _process(delta: number): void {
     const parentOpacity = (this._parent as CanvasItem)?.opacity
@@ -124,7 +139,34 @@ export class CanvasItem extends Node {
   }
 
   protected _draw(): void {
-    /** override */
+    this._drawBackground()
+    this._drawContent()
+  }
+
+  protected _drawBackground(): void {
+    const texture = this._backgroundImage
+    if (texture?.valid) {
+      this.context.fillStyle = texture
+      this.context.textureTransform = new Transform2D().scale(
+        this.style.width / texture.width,
+        this.style.height / texture.height,
+      )
+      this._fill()
+    }
+  }
+
+  protected _drawContent(): void {
+    this._fill()
+  }
+
+  protected _fill(): void {
+    if (this.style.borderRadius) {
+      this.context.roundRect(0, 0, this.style.width, this.style.height, this.style.borderRadius)
+    }
+    else {
+      this.context.rect(0, 0, this.style.width, this.style.height)
+    }
+    this.context.fill()
   }
 
   protected _relayout(batchables: CanvasBatchable[]): CanvasBatchable[] {
@@ -151,7 +193,7 @@ export class CanvasItem extends Node {
 
   protected override _render(renderer: WebGLRenderer): void {
     let batchables: CanvasBatchable[] | undefined
-    if (this._waitingRedraw) {
+    if (this._redrawing) {
       this._draw()
       this._originalBatchables = this.context.toBatchables()
       this._layoutedBatchables = this._relayout(this._originalBatchables)
@@ -160,19 +202,19 @@ export class CanvasItem extends Node {
         this.context.reset()
       }
     }
-    else if (this._waitingReflow) {
+    else if (this._reflowing) {
       this._layoutedBatchables = this._reflow(this._originalBatchables)
       batchables = this._layoutedBatchables
     }
-    else if (this._waitingRepaint) {
+    else if (this._repainting) {
       batchables = this._repaint(this._layoutedBatchables)
     }
 
     if (batchables) {
       this._batchables = batchables
-      this._waitingRedraw = false
-      this._waitingReflow = false
-      this._waitingRepaint = false
+      this._redrawing = false
+      this._reflowing = false
+      this._repainting = false
     }
 
     this._batchables.forEach((batchable) => {

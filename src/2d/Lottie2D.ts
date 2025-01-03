@@ -1,17 +1,17 @@
 import type { AnimationItem } from 'lottie-web'
-import type { Element2DOptions } from './Element2D'
+import type { Node2DOptions } from './Node2D'
 import { assets } from '../asset'
 import { customNode, property, Texture } from '../core'
 import { Transform2D } from '../math'
-import { Element2D } from './Element2D'
+import { Node2D } from './Node2D'
 
-export interface LottieOptions extends Element2DOptions {
+export interface LottieOptions extends Node2DOptions {
   pixelRatio?: number
   src?: string
 }
 
 @customNode('Lottie2D')
-export class Lottie2D extends Element2D {
+export class Lottie2D extends Node2D {
   @property({ default: 2 }) declare pixelRatio: number
   @property({ default: '' }) declare src: string
   duration = 0
