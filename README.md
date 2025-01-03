@@ -53,6 +53,7 @@ loadFallbackFont().then(() => {
     })
       .addChild(
         new Text2D({
+          fonts,
           style: {
             fontSize: 30,
           },

@@ -111,6 +111,7 @@ export class Engine extends SceneTree {
       this.resize(
         width || this.gl.drawingBufferWidth || this.view?.clientWidth || 200,
         height || this.gl.drawingBufferHeight || this.view?.clientHeight || 200,
+        !view,
       )
     }
   }

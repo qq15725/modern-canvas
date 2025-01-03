@@ -19,8 +19,7 @@ export class Style2DTransformModule extends Style2DModule {
   install(Style2D: new () => Style2D): void {
     const style = getDefaultTransformStyle()
     for (const key in style) {
-      const value = (style as any)[key]
-      defineProperty(Style2D, key, { default: value })
+      defineProperty(Style2D, key, { default: (style as any)[key] })
     }
     Style2D.prototype.getComputedTransform = getComputedTransform
     Style2D.prototype.getComputedTransformOrigin = getComputedTransformOrigin

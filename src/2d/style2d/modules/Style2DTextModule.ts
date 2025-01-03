@@ -16,8 +16,7 @@ export class Style2DTextModule extends Style2DModule {
   install(Style2D: new () => Style2D): void {
     const style = getDefaultTextStyle()
     for (const key in style) {
-      const value = (style as any)[key]
-      defineProperty(Style2D, key, { default: value })
+      defineProperty(Style2D, key, { default: (style as any)[key] })
     }
     defineProperty(Style2D, 'direction', { default: 'inherit' })
   }
