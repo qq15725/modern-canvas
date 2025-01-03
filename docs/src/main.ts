@@ -36,14 +36,7 @@ async function init(): Promise<void> {
           duration: 3000,
           loop: true,
           keyframes: [
-            {
-              offset: 0,
-              width: 100,
-            },
-            {
-              offset: 1,
-              width: 0,
-            },
+            { offset: 1, rotate: 180 },
           ],
         }),
       ),

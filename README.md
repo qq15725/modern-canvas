@@ -27,7 +27,7 @@ npm i modern-canvas
 ## 🦄 Usage
 
 ```javascript
-import { Engine, Image2D, Text2D } from 'modern-canvas'
+import { Animation2D, Engine, Image2D, Text2D } from 'modern-canvas'
 import { fonts } from 'modern-font'
 
 async function loadFallbackFont() {
@@ -50,18 +50,24 @@ loadFallbackFont().then(() => {
         filter: 'brightness(102%) contrast(90%) saturate(128%) sepia(18%)',
       },
       src: '/example.png',
-    }),
-  )
-
-  engine.root.addChild(
-    new Text2D({
-      style: {
-        left: 100,
-        top: 100,
-        fontSize: 30,
-      },
-      content: '/example.png',
-    }),
+    })
+      .addChild(
+        new Text2D({
+          style: {
+            fontSize: 30,
+          },
+          content: '/example.png',
+        }),
+      )
+      .addChild(
+        new Animation2D({
+          duration: 3000,
+          loop: true,
+          keyframes: [
+            { offset: 1, rotate: 180 },
+          ],
+        }),
+      )
   )
 
   console.log(engine)
