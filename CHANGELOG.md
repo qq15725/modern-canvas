@@ -1,3 +1,12 @@
+## [0.1.2](https://github.com/qq15725/modern-canvas/compare/v0.1.1...v0.1.2) (2025-01-03)
+
+
+### Bug Fixes
+
+* Text2D ([c6d396b](https://github.com/qq15725/modern-canvas/commit/c6d396b1a84f4740cc0d7820203d686687b0e760))
+
+
+
 ## [0.1.1](https://github.com/qq15725/modern-canvas/compare/v0.1.0...v0.1.1) (2025-01-03)
 
 
