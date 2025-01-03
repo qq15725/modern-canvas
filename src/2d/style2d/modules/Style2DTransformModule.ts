@@ -1,19 +1,13 @@
+import type { IDOCTransformStyleDeclaration } from 'modern-idoc'
 import type { Style2D } from '../Style2D'
+import { getDefaultTransformStyle } from 'modern-idoc'
 import { defineProperty } from '../../../core'
 import { DEG_TO_RAD, Transform2D } from '../../../math'
 import { parseCssFunctions, PI_2 } from '../../../shared'
 import { Style2DModule } from '../Style2DModule'
 
-export interface Style2DTransformProperties {
-  left: number
-  top: number
-  width: number
-  height: number
-  rotate: number
-  scaleX: number
-  scaleY: number
-  transform?: string
-  transformOrigin: string
+export interface Style2DTransformProperties extends IDOCTransformStyleDeclaration {
+  //
 }
 
 export interface Style2DTransformExtend extends Style2DTransformProperties {
@@ -23,15 +17,11 @@ export interface Style2DTransformExtend extends Style2DTransformProperties {
 
 export class Style2DTransformModule extends Style2DModule {
   install(Style2D: new () => Style2D): void {
-    defineProperty(Style2D, 'left', { default: 0 })
-    defineProperty(Style2D, 'top', { default: 0 })
-    defineProperty(Style2D, 'width', { default: 0 })
-    defineProperty(Style2D, 'height', { default: 0 })
-    defineProperty(Style2D, 'rotate', { default: 0 })
-    defineProperty(Style2D, 'scaleX', { default: 1 })
-    defineProperty(Style2D, 'scaleY', { default: 1 })
-    defineProperty(Style2D, 'transform')
-    defineProperty(Style2D, 'transformOrigin', { default: 'center' })
+    const style = getDefaultTransformStyle()
+    for (const key in style) {
+      const value = (style as any)[key]
+      defineProperty(Style2D, key, { default: value })
+    }
     Style2D.prototype.getComputedTransform = getComputedTransform
     Style2D.prototype.getComputedTransformOrigin = getComputedTransformOrigin
   }
@@ -45,7 +35,12 @@ function getComputedTransform(this: Style2D): Transform2D {
     .translate(this.left, this.top)
     .rotate(this.rotate * DEG_TO_RAD)
 
-  parseCssFunctions(this.transform ?? '', { width: this.width, height: this.height })
+  let _transform = this.transform
+  if (!_transform || _transform === 'none') {
+    _transform = ''
+  }
+
+  parseCssFunctions(_transform, { width: this.width, height: this.height })
     .forEach(({ name, args }) => {
       const values = args.map(arg => arg.normalizedIntValue)
       transform.identity()

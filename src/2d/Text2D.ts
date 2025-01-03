@@ -1,16 +1,13 @@
-import type { IDOCStyleDeclaration, IDOCTextContent } from 'modern-idoc'
-import type { MeasureResult } from 'modern-text'
+import type { MeasureResult, TextOptions } from 'modern-text'
 import type { Node2DOptions } from './Node2D'
-import { measureText, renderText, textDefaultStyle } from 'modern-text'
-import { customNode, InternalMode, property, Texture } from '../core'
+import { Text, textDefaultStyle } from 'modern-text'
+import { customNode, InternalMode, property, protectedProperty, Texture } from '../core'
 import { Transform2D } from '../math'
 import { Node2D } from './Node2D'
 
-export interface Text2DOptions extends Node2DOptions {
+export interface Text2DOptions extends Node2DOptions, Omit<TextOptions, 'style'> {
   pixelRatio?: number
   split?: boolean
-  content?: IDOCTextContent
-  effects?: Partial<IDOCStyleDeclaration>[]
 }
 
 const textStyles = new Set(Object.keys(textDefaultStyle))
@@ -29,9 +26,12 @@ const textStyles = new Set(Object.keys(textDefaultStyle))
 export class Text2D extends Node2D {
   @property({ default: 2 }) declare pixelRatio: number
   @property({ default: false }) declare split: boolean
-  @property({ default: '' }) declare content: IDOCTextContent
-  @property() effects?: Partial<IDOCStyleDeclaration>[]
+  @property({ default: '' }) declare content: TextOptions['content']
+  @property() effects?: TextOptions['effects']
+  @protectedProperty() measureDom?: TextOptions['measureDom']
+  @protectedProperty() fonts?: TextOptions['fonts']
 
+  text = new Text()
   readonly texture = new Texture(document.createElement('canvas'))
   protected _subTextsCount = 0
 
@@ -45,6 +45,8 @@ export class Text2D extends Node2D {
 
     switch (key) {
       case 'content':
+      case 'effects':
+      case 'fonts':
       case 'split':
         this._updateSplit()
         this.requestRedraw()
@@ -56,6 +58,14 @@ export class Text2D extends Node2D {
         child.setProperties({ [key]: value })
       })
     }
+  }
+
+  protected _updateText(): void {
+    this.text.style = this.style.toJSON() as any
+    this.text.content = this.content ?? ''
+    this.text.effects = this.effects
+    this.text.fonts = this.fonts
+    this.text.measureDom = this.measureDom
   }
 
   protected override _onUpdateStyleProperty(key: PropertyKey, value: any, oldValue: any): void {
@@ -108,13 +118,8 @@ export class Text2D extends Node2D {
   }
 
   measure(): MeasureResult {
-    const result = measureText({
-      content: this.content,
-      style: {
-        ...this.style.toJSON(),
-        height: undefined,
-      },
-    })
+    this._updateText()
+    const result = this.text.measure()
     if (!this.style.width)
       this.style.width = result.boundingBox.width
     if (!this.style.height)
@@ -163,12 +168,10 @@ export class Text2D extends Node2D {
         onText2DRender()
       }
       else {
-        renderText({
-          view: this.texture.source,
+        this._updateText()
+        this.text.render({
           pixelRatio: this.pixelRatio,
-          content: this.content,
-          effects: this.effects,
-          style: this.style.toJSON(),
+          view: this.texture.source,
         })
       }
       this.texture.requestUpload()

@@ -4,20 +4,22 @@ import type {
   Style2DBackgroundProperties,
   Style2DFilterExtend,
   Style2DFilterProperties,
-  Style2DOffsetExtend,
-  Style2DOffsetProperties,
   Style2DTextExtend,
   Style2DTextProperties,
   Style2DTransformExtend,
   Style2DTransformProperties,
 } from './modules'
 import { _Object, property } from '../../core'
-import * as modules from './modules'
+import {
+  Style2DBackgroundModule,
+  Style2DFilterModule,
+  Style2DTextModule,
+  Style2DTransformModule,
+} from './modules'
 
 export interface Style2DOptions extends
   Partial<Style2DBackgroundProperties>,
   Partial<Style2DFilterProperties>,
-  Partial<Style2DOffsetProperties>,
   Partial<Style2DTextProperties>,
   Partial<Style2DTransformProperties> {
   // shadow
@@ -34,7 +36,6 @@ export interface Style2DOptions extends
 export interface Style2D extends
   Style2DBackgroundExtend,
   Style2DFilterExtend,
-  Style2DOffsetExtend,
   Style2DTextExtend,
   Style2DTransformExtend {
   //
@@ -76,6 +77,11 @@ export class Style2D extends _Object {
   }
 }
 
-Object.values(modules).forEach((Module) => {
+[
+  Style2DBackgroundModule,
+  Style2DFilterModule,
+  Style2DTextModule,
+  Style2DTransformModule,
+].forEach((Module) => {
   new Module().install(Style2D)
 })

@@ -18,8 +18,8 @@ importers:
         specifier: ^0.3.5
         version: 0.3.5
       modern-idoc:
-        specifier: ^0.1.4
-        version: 0.1.4
+        specifier: ^0.1.5
+        version: 0.1.5
       modern-path2d:
         specifier: ^1.0.1
         version: 1.0.1
@@ -2135,8 +2135,8 @@ packages:
   modern-gif@2.0.4:
     resolution: {integrity: sha512-q3Nf6X3kpnGwiKLzTzOjsbvM16/kPcfy0JrrC79TmuKLCWiOkwb0ztuVhZnqGCizSr4o84gFOaBeGDVaE/Bcgw==}
 
-  modern-idoc@0.1.4:
-    resolution: {integrity: sha512-YMxkXGY5opmys0YX7lAYAkIrvj8nneJDvGjRSfacNI05GMj8HuyS6hP/UNIP/PsWUpHcbttZEQ172IxgKf14RQ==}
+  modern-idoc@0.1.5:
+    resolution: {integrity: sha512-hQW890flWTzNx/gDXrwtwAlHEwrUHWEhiIXjqpEsnHZUQtXhcL8B1y0ybA0Pik4wxrAgYGxUO7fsJCu1xIPbEA==}
 
   modern-palette@2.0.0:
     resolution: {integrity: sha512-wKZcom2QzK6sS6h5RLYHEkd3V3maQLzgkI+ekDCimlk7dfXa63aekZcy+7KS+8JEqIDeY/yV1CAvA7l+7u6QHA==}
@@ -5280,7 +5280,7 @@ snapshots:
     dependencies:
       modern-palette: 2.0.0
 
-  modern-idoc@0.1.4: {}
+  modern-idoc@0.1.5: {}
 
   modern-palette@2.0.0: {}
 
@@ -5289,7 +5289,7 @@ snapshots:
   modern-text@1.0.7:
     dependencies:
       modern-font: 0.3.5
-      modern-idoc: 0.1.4
+      modern-idoc: 0.1.5
       modern-path2d: 1.0.1
 
   ms@2.1.3: {}
