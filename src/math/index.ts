@@ -1,6 +1,3 @@
-export * from './Bounds'
-
-export * from './graphics'
 export * from './Matrix'
 export * from './Matrix2'
 export * from './Matrix3'

@@ -161,7 +161,9 @@ export class CanvasItem extends Node {
 
   protected _fill(): void {
     if (this.style.borderRadius) {
-      this.context.roundRect(0, 0, this.style.width, this.style.height, this.style.borderRadius)
+      // TODO
+      // this.context.roundRect(0, 0, this.style.width, this.style.height, this.style.borderRadius)
+      this.context.rect(0, 0, this.style.width, this.style.height)
     }
     else {
       this.context.rect(0, 0, this.style.width, this.style.height)

@@ -1,5 +1,0 @@
-export * from './build'
-export * from './Path2D'
-export * from './Point'
-export * from './shapes'
-export * from './SVGPath'

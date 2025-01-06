@@ -1,6 +1,6 @@
+import type { LineCap, LineJoin } from 'modern-path2d'
 import type { ColorValue } from '../color'
 import type { Texture } from '../core'
-import type { LineCap, LineJoin } from '../math'
 import { customNode } from '../core'
 import { PI_2 } from '../shared'
 import { Node2D } from './Node2D'

@@ -1,7 +1,8 @@
 import type { CanvasBatchable } from './CanvasContext'
 import type { CanvasItemOptions } from './CanvasItem'
+import { BoundingBox } from 'modern-path2d'
 import { customNode } from '../core'
-import { Rectangle, Transform2D } from '../math'
+import { Transform2D } from '../math'
 import { CanvasItem } from './CanvasItem'
 
 export interface Node2DOptions extends CanvasItemOptions {
@@ -21,7 +22,7 @@ export class Node2D extends CanvasItem {
     this.setProperties(options)
   }
 
-  getBoundingBox(): Rectangle {
+  getBoundingBox(): BoundingBox {
     let { left, top, width, height, rotate } = this.style
     if (rotate) {
       rotate = Math.abs(rotate % 180)
@@ -35,7 +36,7 @@ export class Node2D extends CanvasItem {
       width = newWidth
       height = newHeight
     }
-    return new Rectangle(left, top, width, height)
+    return new BoundingBox(left, top, width, height)
   }
 
   protected override _onUpdateStyleProperty(key: PropertyKey, value: any, oldValue: any): void {
