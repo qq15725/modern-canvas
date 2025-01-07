@@ -1,3 +1,18 @@
+## [0.1.3](https://github.com/qq15725/modern-canvas/compare/v0.1.2...v0.1.3) (2025-01-07)
+
+
+### Bug Fixes
+
+* roundRect ([9529d2c](https://github.com/qq15725/modern-canvas/commit/9529d2c944e3919d89a79e4203b5ac90e1c9d80b))
+* Text2D redraw ([587ead0](https://github.com/qq15725/modern-canvas/commit/587ead01275c9564ec80311392fd2cfdd2325ed1))
+
+
+### Features
+
+* up deps ([11ea528](https://github.com/qq15725/modern-canvas/commit/11ea5282a5c279f54971ed2ceda100f274480eab))
+
+
+
 ## [0.1.2](https://github.com/qq15725/modern-canvas/compare/v0.1.1...v0.1.2) (2025-01-03)
 
 
