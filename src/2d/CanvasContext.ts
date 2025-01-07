@@ -62,7 +62,7 @@ export class CanvasContext extends Path2D {
           miterLimit: this.miterLimit ?? 10,
         },
       })
-      this.curves.length = 0
+      this.curves = [this.currentCurve]
     }
   }
 
@@ -93,7 +93,7 @@ export class CanvasContext extends Path2D {
       texture,
       textureTransform: this.textureTransform,
     })
-    this.curves.length = 0
+    this.curves = [this.currentCurve]
   }
 
   reset(): void {
@@ -104,7 +104,7 @@ export class CanvasContext extends Path2D {
     this.lineJoin = undefined
     this.lineWidth = undefined
     this.miterLimit = undefined
-    this.curves.length = 0
+    this.curves = [this.currentCurve]
     this._stroked.length = 0
     this._filled.length = 0
   }
