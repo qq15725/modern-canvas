@@ -1,3 +1,12 @@
+## [0.1.5](https://github.com/qq15725/modern-canvas/compare/v0.1.4...v0.1.5) (2025-01-07)
+
+
+### Bug Fixes
+
+* CanvasContext ([554c39c](https://github.com/qq15725/modern-canvas/commit/554c39cf42debf60fa479883d1ca4840b17411bb))
+
+
+
 ## [0.1.4](https://github.com/qq15725/modern-canvas/compare/v0.1.3...v0.1.4) (2025-01-07)
 
 
