@@ -1,8 +1,8 @@
-import type { CurvePath, LineCap, LineJoin, LineStyle } from 'modern-path2d'
+import type { LineCap, LineJoin, LineStyle } from 'modern-path2d'
 import type { ColorValue } from '../color'
 import type { Transform2D } from '../math'
 import type { Batchable2D } from '../renderer'
-import { Path2D, strokeTriangulate } from 'modern-path2d'
+import { CurvePath, Path2D } from 'modern-path2d'
 import { ColorTexture } from '../color'
 import { Texture } from '../core'
 
@@ -12,14 +12,14 @@ export interface CanvasBatchable extends Batchable2D {
 }
 
 export interface StrokedGraphics {
-  shapes: CurvePath[]
+  path: Path2D
   texture?: Texture
   textureTransform?: Transform2D
   style: LineStyle
 }
 
 export interface FilledGraphics {
-  shapes: CurvePath[]
+  path: Path2D
   texture?: Texture
   textureTransform?: Transform2D
 }
@@ -34,9 +34,9 @@ export class CanvasContext extends Path2D {
   lineWidth?: number
   miterLimit?: number
 
-  protected _defaultStyle = Texture.EMPTY
-  protected _stroked: StrokedGraphics[] = []
-  protected _filled: FilledGraphics[] = []
+  _defaultStyle = Texture.EMPTY
+  _stroke: StrokedGraphics[] = []
+  _fille: FilledGraphics[] = []
 
   stroke(): void {
     let texture: Texture = this._defaultStyle
@@ -50,8 +50,8 @@ export class CanvasContext extends Path2D {
     }
 
     if (this.curves.length) {
-      this._stroked.push({
-        shapes: this.curves.slice(),
+      this._stroke.push({
+        path: new Path2D(this),
         texture,
         textureTransform: this.textureTransform,
         style: {
@@ -62,6 +62,7 @@ export class CanvasContext extends Path2D {
           miterLimit: this.miterLimit ?? 10,
         },
       })
+      this.currentCurve = new CurvePath()
       this.curves = [this.currentCurve]
     }
   }
@@ -88,15 +89,31 @@ export class CanvasContext extends Path2D {
         texture = new ColorTexture(this.fillStyle)
       }
     }
-    this._filled.push({
-      shapes: this.curves.slice(),
+    this._fille.push({
+      path: new Path2D(this),
       texture,
       textureTransform: this.textureTransform,
     })
+    this.currentCurve = new CurvePath()
     this.curves = [this.currentCurve]
   }
 
-  reset(): void {
+  override copy(source: CanvasContext): this {
+    super.copy(source)
+    this.strokeStyle = source.strokeStyle
+    this.fillStyle = source.fillStyle
+    this.textureTransform = source.textureTransform
+    this.lineCap = source.lineCap
+    this.lineJoin = source.lineJoin
+    this.lineWidth = source.lineWidth
+    this.miterLimit = source.miterLimit
+    this._stroke = source._stroke.slice()
+    this._fille = source._fille.slice()
+    return this
+  }
+
+  override reset(): this {
+    super.reset()
     this.strokeStyle = undefined
     this.fillStyle = undefined
     this.textureTransform = undefined
@@ -104,9 +121,9 @@ export class CanvasContext extends Path2D {
     this.lineJoin = undefined
     this.lineWidth = undefined
     this.miterLimit = undefined
-    this.curves = [this.currentCurve]
-    this._stroked.length = 0
-    this._filled.length = 0
+    this._stroke.length = 0
+    this._fille.length = 0
+    return this
   }
 
   buildUvs(
@@ -155,15 +172,11 @@ export class CanvasContext extends Path2D {
       texture = undefined
     }
 
-    for (let len = this._stroked.length, i = 0; i < len; i++) {
+    for (let len = this._stroke.length, i = 0; i < len; i++) {
       startUv = vertices.length
-      const graphics = this._stroked[i]
+      const graphics = this._stroke[i]
       texture ??= graphics.texture
-      const points: number[] = []
-      for (let len = graphics.shapes.length, i = 0; i < len; i++) {
-        graphics.shapes[i].getAdaptivePointArray(points)
-      }
-      strokeTriangulate(points, {
+      graphics.path.strokeTriangulate({
         vertices,
         indices,
         lineStyle: graphics.style,
@@ -174,19 +187,17 @@ export class CanvasContext extends Path2D {
       push('stroke')
     }
 
-    for (let len = this._filled.length, i = 0; i < len; i++) {
-      const graphics = this._filled[i]
+    for (let len = this._fille.length, i = 0; i < len; i++) {
+      const graphics = this._fille[i]
       texture ??= graphics.texture
       if (texture !== graphics.texture) {
         push('fill')
       }
       startUv = vertices.length
-      for (let len = graphics.shapes.length, i = 0; i < len; i++) {
-        graphics.shapes[i].fillTriangulate({
-          vertices,
-          indices,
-        })
-      }
+      graphics.path.fillTriangulate({
+        vertices,
+        indices,
+      })
       this.buildUvs(startUv, vertices, uvs, graphics.texture, graphics.textureTransform)
     }
 

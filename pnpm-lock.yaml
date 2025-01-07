@@ -21,8 +21,8 @@ importers:
         specifier: ^0.1.5
         version: 0.1.5
       modern-path2d:
-        specifier: ^1.2.2
-        version: 1.2.2
+        specifier: ^1.2.3
+        version: 1.2.3
       modern-text:
         specifier: ^1.2.0
         version: 1.2.0
@@ -2141,8 +2141,8 @@ packages:
   modern-palette@2.0.0:
     resolution: {integrity: sha512-wKZcom2QzK6sS6h5RLYHEkd3V3maQLzgkI+ekDCimlk7dfXa63aekZcy+7KS+8JEqIDeY/yV1CAvA7l+7u6QHA==}
 
-  modern-path2d@1.2.2:
-    resolution: {integrity: sha512-RHOFVxVp6bMCOiKLSmy4nsqQIhaeyQGug4tvYSGQncLgV/ZS5MDB++4OAUcgvB+2NmrJ3zBhifje/4+j4rSP0w==}
+  modern-path2d@1.2.3:
+    resolution: {integrity: sha512-nnJYEDEGn3qkf1baA9hUxyIs3CSBl01cET7nZfyDcYMPAgJsc8lMOOhwiQKJtowThpAcTcnyqMlKTC60YtBFoQ==}
 
   modern-text@1.2.0:
     resolution: {integrity: sha512-rkktRRivUJgvrpaEsStrlDRaLawTGQ3YhUMTAp80WeU8Hx4krkCnm5oWzfNI+Ebnz1k4IWVojmHEFO6dSRh+bg==}
@@ -5284,7 +5284,7 @@ snapshots:
 
   modern-palette@2.0.0: {}
 
-  modern-path2d@1.2.2:
+  modern-path2d@1.2.3:
     dependencies:
       earcut: 3.0.1
 
@@ -5292,7 +5292,7 @@ snapshots:
     dependencies:
       modern-font: 0.3.5
       modern-idoc: 0.1.5
-      modern-path2d: 1.2.2
+      modern-path2d: 1.2.3
 
   ms@2.1.3: {}
 
