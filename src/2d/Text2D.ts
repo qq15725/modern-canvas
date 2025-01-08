@@ -67,6 +67,7 @@ export class Text2D extends Node2D {
     this.text.effects = this.effects
     this.text.fonts = this.fonts
     this.text.measureDom = this.measureDom
+    this.text.requestUpdate()
   }
 
   protected override _onUpdateStyleProperty(key: PropertyKey, value: any, oldValue: any): void {
