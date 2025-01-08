@@ -1,3 +1,12 @@
+## [0.1.8](https://github.com/qq15725/modern-canvas/compare/v0.1.7...v0.1.8) (2025-01-08)
+
+
+### Bug Fixes
+
+* Text2D texture update ([2693165](https://github.com/qq15725/modern-canvas/commit/2693165d40a27fa2343739c565e91547038a56b5))
+
+
+
 ## [0.1.7](https://github.com/qq15725/modern-canvas/compare/v0.1.6...v0.1.7) (2025-01-08)
 
 
