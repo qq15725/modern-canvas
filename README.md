@@ -76,3 +76,20 @@ loadFallbackFont().then(() => {
   document.body.append(engine.view)
 })
 ```
+
+## Effect
+
+See the [effect](./src/effect)
+
+```typescript
+import { EmbossEffect, Image2D } from 'modern-canvas'
+
+engine.root.addChild(
+  new Image2D({
+    src: '/example.png',
+  })
+    .addChild(
+      new EmbossEffect(),
+    )
+)
+```
