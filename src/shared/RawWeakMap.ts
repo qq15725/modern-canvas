@@ -1,11 +1,12 @@
 export class RawWeakMap<K extends WeakKey = WeakKey, V = any> {
   protected _map = new WeakMap<K, V>()
 
+  // fix: vue reactive object
   protected _toRaw(value: any): any {
     if (value && typeof value === 'object') {
-      // fix: vue reactive object
-      if ('__v_raw' in value) {
-        value = value.__v_raw
+      const raw = value.__v_raw
+      if (raw) {
+        value = this._toRaw(raw)
       }
     }
     return value
