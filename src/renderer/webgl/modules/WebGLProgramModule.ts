@@ -1,5 +1,6 @@
 import type { WebGLProgramMeta, WebGLProgramOptions } from '../types'
 import type { WebGLRenderer } from '../WebGLRenderer'
+import { RawWeakMap } from '../../../shared'
 import { WebGLModule } from './WebGLModule'
 
 export class WebGLProgramModule extends WebGLModule {
@@ -33,7 +34,7 @@ export class WebGLProgramModule extends WebGLModule {
       return {
         attributes: new Map(),
         uniforms: new Map(),
-        boundUniforms: new WeakMap(),
+        boundUniforms: new RawWeakMap(),
       }
     })
   }

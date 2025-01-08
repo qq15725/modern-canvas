@@ -1,20 +1,11 @@
 import { fonts } from 'modern-font'
-import { Animation2D, Engine, Image2D, Node2D, Text2D } from '../../src'
+import { Animation2D, EmbossEffect, Engine, Image2D, Node2D, Text2D } from '../../src'
 
 const engine = new Engine({ width: 500, height: 500 }).start()
 
 document.body.append(engine.view!)
 
-async function init(): Promise<void> {
-  // load fallback font
-  fonts.fallbackFont = await fonts.load({ family: 'fallbackFont', src: '/fonts/AaHouDiHei.woff' })
-
-  // click
-  engine.on('pointerdown', (e) => {
-    console.warn(e.target)
-  })
-
-  // add elements
+function addTest1(): void {
   engine.root.addChild(
     new Node2D({
       style: {
@@ -96,6 +87,36 @@ async function init(): Promise<void> {
         }),
       ),
   )
+}
+
+function addTest2(): void {
+  engine.root.addChild(
+    new Image2D({
+      style: {
+        left: 200,
+        top: 50,
+        width: 100,
+        height: 100,
+      },
+      src: '/example.jpg',
+    }).moveChild(
+      new EmbossEffect(),
+      0,
+    ),
+  )
+}
+
+async function init(): Promise<void> {
+  // load fallback font
+  fonts.fallbackFont = await fonts.load({ family: 'fallbackFont', src: '/fonts/AaHouDiHei.woff' })
+
+  // click
+  engine.on('pointerdown', (e) => {
+    console.warn(e.target)
+  })
+
+  addTest1()
+  addTest2()
 }
 
 init()

@@ -1,10 +1,10 @@
-import { DEVICE_PIXEL_RATIO } from '../shared'
+import { DEVICE_PIXEL_RATIO, RawWeakMap } from '../shared'
 
 export abstract class Renderer {
   view?: HTMLCanvasElement
   pixelRatio = DEVICE_PIXEL_RATIO
   readonly screen = { x: 0, y: 0, width: 0, height: 0 }
-  readonly related = new WeakMap<object, any>()
+  readonly related = new RawWeakMap<object, any>()
 
   getRelated<T>(source: object, createFn?: () => T): T {
     let related = this.related.get(source)

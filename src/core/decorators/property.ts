@@ -1,10 +1,12 @@
+import { RawWeakMap } from '../../shared'
+
 export interface PropertyDeclaration {
   readonly default?: any
   readonly protected?: boolean
   readonly alias?: string
 }
 
-const declarationMap = new WeakMap<object, Map<PropertyKey, PropertyDeclaration>>()
+const declarationMap = new RawWeakMap<object, Map<PropertyKey, PropertyDeclaration>>()
 
 export function getDeclarations(constructor: any): Map<PropertyKey, PropertyDeclaration> {
   let declarations = declarationMap.get(constructor)

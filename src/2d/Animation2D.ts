@@ -1,7 +1,7 @@
 import type { CssFunction, CssFunctionArg } from '../shared'
 import { customNode, Node, property } from '../core'
 import { clamp, lerp } from '../math'
-import { getDefaultCssPropertyValue, parseCssProperty } from '../shared'
+import { getDefaultCssPropertyValue, parseCssProperty, RawWeakMap } from '../shared'
 import { CanvasItem } from './CanvasItem'
 
 export const linear = (amount: number): number => amount
@@ -121,7 +121,7 @@ export class Animation2D extends Node {
 
   protected _keyframes: NormalizedKeyframe[] = []
   protected _starting = false
-  protected _startProps = new WeakMap<any, Map<string, any>>()
+  protected _startProps = new RawWeakMap<any, Map<string, any>>()
 
   constructor(options?: AnimationOptions) {
     super()

@@ -1,3 +1,5 @@
+import type { RawWeakMap } from '../../shared'
+
 export type WebGLBufferTarget =
   | 'array_buffer'
   | 'element_array_buffer'
@@ -104,7 +106,7 @@ export interface WebGLProgramMeta {
     name: string
     location: WebGLUniformLocation | null
   }>
-  boundUniforms: WeakMap<object, any>
+  boundUniforms: RawWeakMap<object, any>
 }
 
 export interface WebGLProgramOptions {

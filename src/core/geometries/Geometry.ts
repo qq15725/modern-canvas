@@ -3,6 +3,7 @@ import type { Material } from '../materials/Material'
 import type { IndexBuffer } from './IndexBuffer'
 import type { VertexAttribute } from './VertexAttribute'
 import type { VertexBuffer } from './VertexBuffer'
+import { RawWeakMap } from '../../shared'
 import { Resource } from '../Resource'
 
 export interface GeometryOptions {
@@ -18,7 +19,7 @@ export class Geometry extends Resource {
   instanceCount?: number
   mode: WebGLDrawMode
 
-  protected _materialWeakMap = new WeakMap<Material, Record<string, any>>()
+  protected _materialWeakMap = new RawWeakMap<Material, Record<string, any>>()
 
   constructor(options: GeometryOptions = {}) {
     super()
