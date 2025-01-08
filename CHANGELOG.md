@@ -1,3 +1,12 @@
+## [0.1.7](https://github.com/qq15725/modern-canvas/compare/v0.1.6...v0.1.7) (2025-01-08)
+
+
+### Bug Fixes
+
+* toRaw ([19f3ee7](https://github.com/qq15725/modern-canvas/commit/19f3ee764f6da3781f33e71243dc28a8b498f9b6))
+
+
+
 ## [0.1.6](https://github.com/qq15725/modern-canvas/compare/v0.1.5...v0.1.6) (2025-01-08)
 
 
