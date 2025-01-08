@@ -1,3 +1,12 @@
+## [0.1.6](https://github.com/qq15725/modern-canvas/compare/v0.1.5...v0.1.6) (2025-01-08)
+
+
+### Bug Fixes
+
+* add RawWeakMap fix Vue reactive object ([3ae8c54](https://github.com/qq15725/modern-canvas/commit/3ae8c54b5d2310eaf848b6cca77c10cbbefaa0f2))
+
+
+
 ## [0.1.5](https://github.com/qq15725/modern-canvas/compare/v0.1.4...v0.1.5) (2025-01-07)
 
 
