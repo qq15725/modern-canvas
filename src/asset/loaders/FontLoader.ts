@@ -20,6 +20,7 @@ export class FontLoader extends Loader {
     [
       'woff',
       'ttf',
+      'otf',
     ].forEach((mimeType) => {
       assets.register(mimeType, handler)
     })
