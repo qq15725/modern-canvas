@@ -1,9 +1,11 @@
 import { fonts } from 'modern-font'
-import { Animation2D, EmbossEffect, Engine, Image2D, Node2D, Text2D } from '../../src'
+import { Animation2D, EmbossEffect, Engine, Image2D, Node2D, Ruler2D, Text2D } from '../../src'
 
-const engine = new Engine({ width: 500, height: 500 }).start()
+const engine = new Engine({ autoResize: true }).start()
 
 document.body.append(engine.view!)
+
+engine.root.addChild(new Ruler2D())
 
 function addTest1(): void {
   engine.root.addChild(

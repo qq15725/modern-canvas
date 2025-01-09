@@ -105,6 +105,10 @@ export class Engine extends SceneTree {
     this.pixelRatio = pixelRatio
     this.background = background
     if (autoResize) {
+      if (!view && this.renderer.view) {
+        this.renderer.view.style.width = '100%'
+        this.renderer.view.style.height = '100%'
+      }
       this.enableAutoResize(autoResize)
     }
     else {
