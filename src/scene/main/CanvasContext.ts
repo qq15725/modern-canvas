@@ -169,20 +169,7 @@ export class CanvasContext extends Path2D {
       texture = undefined
     }
 
-    for (let len = this._stroke.length, i = 0; i < len; i++) {
-      startUv = vertices.length
-      const graphics = this._stroke[i]
-      texture ??= graphics.texture
-      graphics.path.strokeTriangulate({
-        vertices,
-        indices,
-        lineStyle: graphics.style,
-        flipAlignment: false,
-        closed: true,
-      })
-      this.buildUvs(startUv, vertices, uvs, graphics.texture, graphics.textureTransform)
-      push('stroke')
-    }
+    let verticesLen = vertices.length
 
     for (let len = this._fille.length, i = 0; i < len; i++) {
       const graphics = this._fille[i]
@@ -198,8 +185,29 @@ export class CanvasContext extends Path2D {
       this.buildUvs(startUv, vertices, uvs, graphics.texture, graphics.textureTransform)
     }
 
-    if (vertices.length) {
+    if (vertices.length - verticesLen > 0) {
       push('fill')
+    }
+
+    verticesLen = vertices.length
+
+    for (let len = this._stroke.length, i = 0; i < len; i++) {
+      startUv = vertices.length
+      const graphics = this._stroke[i]
+      texture ??= graphics.texture
+      graphics.path.strokeTriangulate({
+        vertices,
+        indices,
+        lineStyle: graphics.style,
+        flipAlignment: false,
+        closed: true,
+      })
+      this.buildUvs(startUv, vertices, uvs, graphics.texture, graphics.textureTransform)
+      push('stroke')
+    }
+
+    if (vertices.length - verticesLen > 0) {
+      push('stroke')
     }
 
     return batchables

@@ -1,14 +1,14 @@
 import type { ColorValue, PropertyDeclaration, WebGLBlendMode, WebGLRenderer } from '../../core'
-import type { Style2DProperties, Texture } from '../resources'
+import type { CanvasItemStyleProperties, Texture } from '../resources'
 import type { CanvasBatchable } from './CanvasContext'
 import type { NodeProperties } from './Node'
 import { clamp, Color, customNode, property, Transform2D } from '../../core'
-import { Style2D } from '../resources'
+import { CanvasItemStyle } from '../resources'
 import { CanvasContext } from './CanvasContext'
 import { Node } from './Node'
 
 export interface CanvasItemProperties extends NodeProperties {
-  style: Partial<Style2DProperties>
+  style: Partial<CanvasItemStyleProperties>
   tint: string
   blendMode: WebGLBlendMode
 }
@@ -18,8 +18,8 @@ export class CanvasItem extends Node {
   @property() tint?: ColorValue
   @property() blendMode?: WebGLBlendMode
 
-  protected declare _style: Style2D
-  get style(): Style2D { return this._style }
+  protected declare _style: CanvasItemStyle
+  get style(): CanvasItemStyle { return this._style }
   set style(style) {
     style.on('updateProperty', this._onUpdateStyleProperty)
     this._style?.off('updateProperty', this._onUpdateStyleProperty)
@@ -47,7 +47,7 @@ export class CanvasItem extends Node {
     super()
     this._onUpdateStyleProperty = this._onUpdateStyleProperty.bind(this)
     this.setProperties(properties)
-    this.style = new Style2D()
+    this.style = new CanvasItemStyle()
   }
 
   override setProperties(properties?: Record<PropertyKey, any>): this {
@@ -139,6 +139,8 @@ export class CanvasItem extends Node {
   protected _draw(): void {
     this._drawBackground()
     this._drawContent()
+    this._drawBorder()
+    this._drawOutline()
   }
 
   protected _drawBackground(): void {
@@ -157,14 +159,39 @@ export class CanvasItem extends Node {
     this._fill()
   }
 
-  protected _fill(): void {
+  protected _drawBorder(): void {
+    if (this.style.borderWidth && this.style.borderStyle !== 'none') {
+      this.context.lineWidth = this.style.borderWidth
+      this.context.strokeStyle = this.style.borderColor
+      this._stroke()
+    }
+  }
+
+  protected _drawOutline(): void {
+    if (this.style.outlineWidth && this.style.outlineStyle !== 'none') {
+      this.context.lineWidth = this.style.outlineWidth
+      this.context.strokeStyle = this.style.outlineStyle
+      this._stroke()
+    }
+  }
+
+  protected _drawBoundingRect(): void {
     if (this.style.borderRadius) {
       this.context.roundRect(0, 0, this.style.width, this.style.height, this.style.borderRadius)
     }
     else {
       this.context.rect(0, 0, this.style.width, this.style.height)
     }
+  }
+
+  protected _fill(): void {
+    this._drawBoundingRect()
     this.context.fill()
+  }
+
+  protected _stroke(): void {
+    this._drawBoundingRect()
+    this.context.stroke()
   }
 
   protected _relayout(batchables: CanvasBatchable[]): CanvasBatchable[] {
