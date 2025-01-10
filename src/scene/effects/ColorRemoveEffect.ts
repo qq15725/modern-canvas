@@ -1,8 +1,7 @@
-import type { ColorValue } from '../color'
-import type { Viewport } from '../core'
-import type { WebGLRenderer } from '../renderer'
-import { Color } from '../color'
-import { customNode, Material, property, QuadUvGeometry } from '../core'
+import type { ColorValue, WebGLRenderer } from '../../core'
+import type { Viewport } from '../main'
+import { Color, customNode, property } from '../../core'
+import { Material, QuadUvGeometry } from '../resources'
 import { Effect } from './Effect'
 
 @customNode('ColorRemoveEffect')

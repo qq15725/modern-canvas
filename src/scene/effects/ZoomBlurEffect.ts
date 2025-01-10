@@ -1,6 +1,7 @@
-import type { Viewport } from '../core'
-import type { WebGLRenderer } from '../renderer'
-import { customNode, Material, property, QuadUvGeometry } from '../core'
+import type { WebGLRenderer } from '../../core'
+import type { Viewport } from '../main'
+import { customNode, property } from '../../core'
+import { Material, QuadUvGeometry } from '../resources'
 import { Effect } from './Effect'
 
 @customNode('ZoomBlurEffect')

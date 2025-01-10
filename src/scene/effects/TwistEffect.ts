@@ -1,6 +1,7 @@
-import type { Viewport } from '../core'
-import type { WebGLRenderer } from '../renderer'
-import { customNode, Material, QuadUvGeometry } from '../core'
+import type { WebGLRenderer } from '../../core'
+import type { Viewport } from '../main'
+import { customNode } from '../../core'
+import { Material, QuadUvGeometry } from '../resources'
 import { Effect } from './Effect'
 
 @customNode('TwistEffect')
