@@ -44,7 +44,7 @@ void main(void) {
         alpha: 0.5,
       })
     })
-    this.blur.apply(renderer, source)
+    this.blur.apply(renderer, this.viewport3)
     source.redraw(renderer, () => {
       this.viewport3.texture.activate(renderer, 1)
       QuadUvGeometry.draw(renderer, UvMaterial.instance, {
@@ -53,6 +53,7 @@ void main(void) {
       QuadUvGeometry.draw(renderer, UvMaterial.instance, {
         sampler: 0,
       })
+      renderer.texture.unbind(1)
     })
   }
 }
