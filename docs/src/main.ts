@@ -1,9 +1,20 @@
 import { fonts } from 'modern-font'
-import { Animable2D, Engine, Image2D, InternalMode, Node2D, Ruler, Scalable2D, ShadowEffect, Text2D } from '../../src'
+import {
+  Animable2D,
+  Engine,
+  Image2D,
+  InternalMode,
+  Node2D,
+  Ruler,
+  Scalable2D,
+  ShadowEffect,
+  Text2D,
+} from '../../src'
 
 const engine = new Engine({
   autoStart: true,
   autoResize: true,
+  interactivity: true,
   backgroundColor: '#F6F7F9',
 })
 
@@ -118,6 +129,8 @@ async function init(): Promise<void> {
         .addChild(new Scalable2D(), InternalMode.FRONT),
     ]),
   )
+
+  console.warn(engine.root.toJSON())
 }
 
 init()

@@ -3,7 +3,8 @@ import type {
   EventListenerOptions,
   EventListenerValue,
   PointerInputEvent,
-  WheelInputEvent } from '../core'
+  WheelInputEvent,
+} from '../core'
 import { assets } from '../asset'
 import {
   DEVICE_PIXEL_RATIO,
@@ -12,7 +13,7 @@ import {
   SUPPORTS_RESIZE_OBSERVER,
   WebGLRenderer,
 } from '../core'
-import { SceneTree } from '../scene'
+import { Node2D, SceneTree } from '../scene'
 
 export interface EngineOptions extends WebGLContextAttributes {
   view?: HTMLCanvasElement | WebGLRenderingContext | WebGL2RenderingContext
@@ -22,6 +23,7 @@ export interface EngineOptions extends WebGLContextAttributes {
   backgroundColor?: ColorValue
   autoResize?: boolean
   autoStart?: boolean
+  interactivity?: boolean
 }
 
 interface EngineEventMap {
@@ -89,6 +91,7 @@ export class Engine extends SceneTree {
       backgroundColor = 0x00000000,
       autoResize,
       autoStart,
+      interactivity,
       ...glOptions
     } = options
 
@@ -119,9 +122,8 @@ export class Engine extends SceneTree {
       )
     }
 
-    if (autoStart) {
-      this.start()
-    }
+    autoStart && this.start()
+    interactivity && this.setupInteractivity()
   }
 
   protected _setupInput(): this {
@@ -182,6 +184,35 @@ export class Engine extends SceneTree {
     return super.start((delta) => {
       this.render(delta)
     })
+  }
+
+  setupInteractivity(): void {
+    // eslint-disable-next-line ts/no-this-alias
+    const engine = this
+    function onPointerdown(e: PointerInputEvent): void {
+      const target = e.target
+      if (!(target instanceof Node2D))
+        return
+      // target.style.outlineWidth = 2
+      // target.style.outlineStyle = 'solid'
+      // target.style.outlineColor = 'red'
+      const start = {
+        left: target.style.left,
+        top: target.style.top,
+      }
+      const offset = { x: e.offsetX, y: e.offsetY }
+      function onPointermove(e: PointerInputEvent): void {
+        target.style.left = start.left + (e.offsetX - offset.x)
+        target.style.top = start.top + (e.offsetY - offset.y)
+      }
+      function onPointerup(): void {
+        engine.off('pointermove', onPointermove)
+        engine.off('pointerup', onPointerup)
+      }
+      engine.on('pointermove', onPointermove)
+      engine.on('pointerup', onPointerup)
+    }
+    engine.on('pointerdown', onPointerdown)
   }
 
   destroy(): void {

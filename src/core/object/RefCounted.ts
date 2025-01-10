@@ -16,5 +16,5 @@ export interface RefCounted {
 }
 
 export class RefCounted extends CoreObject {
-  protected _refCount = 0
+  //
 }

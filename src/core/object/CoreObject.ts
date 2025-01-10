@@ -25,13 +25,13 @@ export class CoreObject extends EventEmitter {
   protected _defaultProperties?: Record<PropertyKey, any>
   protected _updatedProperties = new Map<PropertyKey, unknown>()
   protected _changedProperties = new Set<PropertyKey>()
-  protected _updatePending = Promise.resolve()
-  protected _isUpdatePending = false
+  protected _updatingPromise = Promise.resolve()
+  protected _updating = false
 
   protected async _enqueueUpdate(): Promise<void> {
-    this._isUpdatePending = true
+    this._updating = true
     try {
-      await this._updatePending
+      await this._updatingPromise
     }
     catch (e) {
       Promise.reject(e)
@@ -41,11 +41,11 @@ export class CoreObject extends EventEmitter {
   }
 
   protected _performUpdate(): void {
-    if (!this._isUpdatePending)
+    if (!this._updating)
       return
     this._onUpdate(this._updatedProperties)
     this._updatedProperties = new Map()
-    this._isUpdatePending = false
+    this._updating = false
   }
 
   // eslint-disable-next-line unused-imports/no-unused-vars
@@ -126,8 +126,8 @@ export class CoreObject extends EventEmitter {
         return
       }
     }
-    if (!this._isUpdatePending) {
-      this._updatePending = this._enqueueUpdate()
+    if (!this._updating) {
+      this._updatingPromise = this._enqueueUpdate()
     }
   }
 
@@ -136,6 +136,6 @@ export class CoreObject extends EventEmitter {
   }
 
   destroy(): void {
-    //
+    this.removeAllListeners()
   }
 }
