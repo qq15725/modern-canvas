@@ -27,7 +27,7 @@ npm i modern-canvas
 ## 🦄 Usage
 
 ```javascript
-import { Animation2D, Engine, Image2D, Text2D } from 'modern-canvas'
+import { Animable2D, Engine, Image2D, Text2D } from 'modern-canvas'
 import { fonts } from 'modern-font'
 
 async function loadFallbackFont() {
@@ -50,25 +50,22 @@ loadFallbackFont().then(() => {
         filter: 'brightness(102%) contrast(90%) saturate(128%) sepia(18%)',
       },
       src: '/example.png',
-    })
-      .addChild(
-        new Text2D({
-          fonts,
-          style: {
-            fontSize: 30,
-          },
-          content: '/example.png',
-        }),
-      )
-      .addChild(
-        new Animation2D({
-          duration: 3000,
-          loop: true,
-          keyframes: [
-            { offset: 1, rotate: 180 },
-          ],
-        }),
-      )
+    }, [
+      new Animable2D({
+        duration: 3000,
+        loop: true,
+        keyframes: [
+          { offset: 1, rotate: 180 },
+        ],
+      }),
+      new Text2D({
+        fonts,
+        style: {
+          fontSize: 30,
+        },
+        content: '/example.png',
+      }),
+    ])
   )
 
   console.log(engine)
@@ -87,9 +84,8 @@ import { EmbossEffect, Image2D } from 'modern-canvas'
 engine.root.addChild(
   new Image2D({
     src: '/example.png',
-  })
-    .addChild(
-      new EmbossEffect(),
-    )
+  }, [
+    new EmbossEffect(),
+  ])
 )
 ```

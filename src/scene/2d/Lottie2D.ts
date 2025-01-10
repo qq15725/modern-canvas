@@ -1,4 +1,5 @@
 import type { AnimationItem } from 'lottie-web'
+import type { Node } from '../main'
 import type { Node2DProperties } from './Node2D'
 import { assets } from '../../asset'
 import { customNode, property, Transform2D } from '../../core'
@@ -19,9 +20,10 @@ export class Lottie2D extends Node2D {
   readonly texture = new Texture<HTMLCanvasElement>(document.createElement('canvas'))
   animation?: AnimationItem
 
-  constructor(properties?: Partial<Lottie2DProperties>) {
+  constructor(properties?: Partial<Lottie2DProperties>, children: Node[] = []) {
     super()
     this.setProperties(properties)
+    this.append(children)
   }
 
   protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any): void {

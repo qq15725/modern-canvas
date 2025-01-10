@@ -1,5 +1,5 @@
 import type { InputEvent, InputEventKey, PointerInputEvent } from '../../core'
-import type { CanvasBatchable, CanvasItemProperties } from '../main'
+import type { CanvasBatchable, CanvasItemProperties, Node } from '../main'
 import { BoundingBox } from 'modern-path2d'
 import { customNode, Transform2D } from '../../core'
 import { CanvasItem } from '../main'
@@ -16,9 +16,10 @@ export class Node2D extends CanvasItem {
   readonly _transform = new Transform2D()
   protected _parentTransformDirtyId?: number
 
-  constructor(properties?: Partial<Node2DProperties>) {
+  constructor(properties?: Partial<Node2DProperties>, children: Node[] = []) {
     super()
     this.setProperties(properties)
+    this.append(children)
   }
 
   getBoundingBox(): BoundingBox {

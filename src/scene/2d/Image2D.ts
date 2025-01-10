@@ -1,4 +1,4 @@
-import type { CanvasBatchable } from '../main'
+import type { CanvasBatchable, Node } from '../main'
 import type { Texture } from '../resources'
 import type { ImageFrame } from './Image2DResource'
 import type { Node2DProperties } from './Node2D'
@@ -30,9 +30,10 @@ export class Image2D extends Node2D {
   protected _complete = false
   protected _wait = Promise.resolve()
 
-  constructor(properties?: Partial<Image2DProperties>) {
+  constructor(properties?: Partial<Image2DProperties>, children: Node[] = []) {
     super()
     this.setProperties(properties)
+    this.append(children)
   }
 
   protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any): void {

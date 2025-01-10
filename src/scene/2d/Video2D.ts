@@ -1,3 +1,4 @@
+import type { Node } from '../main'
 import type { VideoTexture } from '../resources'
 import type { Node2DProperties } from './Node2D'
 import { assets } from '../../asset'
@@ -18,9 +19,10 @@ export class Video2D extends Node2D {
 
   protected _wait = Promise.resolve()
 
-  constructor(properties?: Partial<Video2DProperties>) {
+  constructor(properties?: Partial<Video2DProperties>, children: Node[] = []) {
     super()
     this.setProperties(properties)
+    this.append(children)
   }
 
   protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any): void {

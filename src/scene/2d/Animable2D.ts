@@ -100,7 +100,7 @@ export interface NormalizedKeyframe {
   props: Record<string, any>
 }
 
-export interface AnimationProperties {
+export interface Animable2DProperties {
   mode: 'parent' | 'sibling'
   startTime: number
   duration: number
@@ -108,8 +108,8 @@ export interface AnimationProperties {
   keyframes: Keyframe[]
 }
 
-@customNode('Animation2D')
-export class Animation2D extends Node {
+@customNode('Animable2D')
+export class Animable2D extends Node {
   @property({ default: 'parent' }) declare mode: 'parent' | 'sibling'
   @property({ default: false }) declare loop: boolean
   @property({ default: [] }) declare keyframes: Keyframe[]
@@ -121,7 +121,7 @@ export class Animation2D extends Node {
   protected _starting = false
   protected _startProps = new RawWeakMap<any, Map<string, any>>()
 
-  constructor(properties?: Partial<AnimationProperties>) {
+  constructor(properties?: Partial<Animable2DProperties>) {
     super()
     this._onUpdateTime = this._onUpdateTime.bind(this)
     this.setProperties(properties)

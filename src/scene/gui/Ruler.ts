@@ -1,3 +1,4 @@
+import type { Node } from '../main'
 import type { ControlProperties } from './Control'
 import { customNode, property, Transform2D } from '../../core'
 import { Viewport } from '../main'
@@ -30,9 +31,10 @@ export class Ruler extends Control {
 
   texture = new Texture<HTMLCanvasElement>(document.createElement('canvas'))
 
-  constructor(properties?: Partial<RulerProperties>) {
+  constructor(properties?: Partial<RulerProperties>, children: Node[] = []) {
     super()
     this.setProperties(properties)
+    this.append(children)
   }
 
   protected _parented(): void {

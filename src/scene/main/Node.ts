@@ -344,7 +344,16 @@ export class Node extends CoreObject {
     return this
   }
 
-  append(...nodes: Node[]): this {
+  append(children: Node[]): this
+  append(...children: Node[]): this
+  append(...children: any[]): this {
+    let nodes
+    if (Array.isArray(children[0])) {
+      nodes = children[0]
+    }
+    else {
+      nodes = children
+    }
     nodes.forEach((node) => {
       this.addChild(node)
     })
@@ -472,9 +481,12 @@ export class Node extends CoreObject {
   protected _exitTree(): void { /** override */ }
   protected _parented(): void { /** override */ }
   protected _unparented(): void { /** override */ }
-  protected _process(_delta: number): void { /** override */ }
-  protected _input(_key: InputEventKey, _event: InputEvent): void { /** override */ }
-  protected _render(_renderer: WebGLRenderer): void { /** override */ }
+  // eslint-disable-next-line unused-imports/no-unused-vars
+  protected _process(delta: number): void { /** override */ }
+  // eslint-disable-next-line unused-imports/no-unused-vars
+  protected _input(key: InputEventKey, event: InputEvent): void { /** override */ }
+  // eslint-disable-next-line unused-imports/no-unused-vars
+  protected _render(renderer: WebGLRenderer): void { /** override */ }
 
   override toJSON(): Record<string, any> {
     return {

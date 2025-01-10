@@ -2,7 +2,7 @@ import type { MeasureResult, TextOptions } from 'modern-text'
 import type { Node2DProperties } from './Node2D'
 import { Text, textDefaultStyle } from 'modern-text'
 import { customNode, property, protectedProperty, Transform2D } from '../../core'
-import { InternalMode } from '../main'
+import { InternalMode, type Node } from '../main'
 import { Texture } from '../resources'
 import { Node2D } from './Node2D'
 
@@ -36,9 +36,10 @@ export class Text2D extends Node2D {
   readonly texture = new Texture(document.createElement('canvas'))
   protected _subTextsCount = 0
 
-  constructor(properties?: Partial<Text2DProperties>) {
+  constructor(properties?: Partial<Text2DProperties>, children: Node[] = []) {
     super()
     this.setProperties(properties)
+    this.append(children)
   }
 
   protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any): void {
