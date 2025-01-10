@@ -62,16 +62,7 @@ export class WebGLState {
     this._polygonOffset = value
   }
 
-  constructor(
-    options?: {
-      blend?: boolean
-      offsets?: boolean
-      culling?: boolean
-      depthTest?: boolean
-      clockwiseFrontFace?: boolean
-      depthMask?: boolean
-    },
-  ) {
+  constructor(options?: Partial<WebGLState>) {
     if (options) {
       for (const key in options) {
         (this as any)[key] = (options as any)[key]

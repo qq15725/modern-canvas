@@ -6,7 +6,6 @@ import type {
   WheelInputEvent } from '../core'
 import { assets } from '../asset'
 import {
-  Color,
   DEVICE_PIXEL_RATIO,
   Input,
   nextTick,
@@ -68,10 +67,6 @@ export class Engine extends SceneTree {
       this.view.dataset.pixelRatio = String(val)
     }
   }
-
-  protected _backgroundColor = new Color()
-  get backgroundColor(): ColorValue { return this._backgroundColor.value }
-  set backgroundColor(val) { this._backgroundColor.value = val }
 
   protected _resizeObserver = SUPPORTS_RESIZE_OBSERVER
     ? new ResizeObserver((entries) => {
@@ -179,7 +174,6 @@ export class Engine extends SceneTree {
   }
 
   render(delta = 0): this {
-    this.gl.clearColor(...this._backgroundColor.toArray())
     return this._render(this.renderer, delta)
   }
 

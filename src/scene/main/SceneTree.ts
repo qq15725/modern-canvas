@@ -1,6 +1,12 @@
-import type { EventListenerOptions, EventListenerValue, MainLoopEventMap, WebGLRenderer } from '../../core'
+import type {
+  ColorValue,
+  EventListenerOptions,
+  EventListenerValue,
+  MainLoopEventMap,
+  PropertyDeclaration, WebGLRenderer,
+} from '../../core'
 import type { Node } from './Node'
-import { MainLoop } from '../../core'
+import { Color, MainLoop, property } from '../../core'
 import { QuadUvGeometry } from '../resources'
 import { RenderStack } from './RenderStack'
 import { Timer } from './Timer'
@@ -23,6 +29,9 @@ export interface SceneTree {
 }
 
 export class SceneTree extends MainLoop {
+  protected _backgroundColor = new Color()
+  @property() declare backgroundColor?: ColorValue
+
   readonly renderStack = new RenderStack()
   readonly root = new Viewport(true)._setTree(this)
   readonly timeline = new Timer({ loop: true })._setTree(this)
@@ -30,6 +39,16 @@ export class SceneTree extends MainLoop {
   protected _currentViewport?: Viewport
   getCurrentViewport(): Viewport | undefined { return this._currentViewport }
   setCurrentViewport(viewport: Viewport | undefined): void { this._currentViewport = viewport }
+
+  protected override _onUpdateProperty(key: PropertyKey, newValue: any, oldValue: any, declaration?: PropertyDeclaration): void {
+    super._onUpdateProperty(key, newValue, oldValue, declaration)
+
+    switch (key) {
+      case 'backgroundColor':
+        this._backgroundColor.value = newValue
+        break
+    }
+  }
 
   protected _render(renderer: WebGLRenderer, delta = 0): this {
     this.timeline.addTime(delta)
@@ -53,7 +72,13 @@ export class SceneTree extends MainLoop {
       width: width * pixelRatio,
       height: height * pixelRatio,
     })
+    if (this.backgroundColor) {
+      renderer.gl.clearColor(...this._backgroundColor.toArray())
+    }
     renderer.clear()
+    if (this.backgroundColor) {
+      renderer.gl.clearColor(0, 0, 0, 0)
+    }
     const texture = this.root.texture
     texture.activate(renderer, 0)
     QuadUvGeometry.draw(renderer)

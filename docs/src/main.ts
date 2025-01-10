@@ -1,5 +1,5 @@
 import { fonts } from 'modern-font'
-import { Animable2D, Engine, Image2D, InternalMode, Node2D, Ruler, Scalable2D, Text2D } from '../../src'
+import { Animable2D, Engine, Image2D, InternalMode, Node2D, Ruler, Scalable2D, ShadowEffect, Text2D } from '../../src'
 
 const engine = new Engine({
   autoStart: true,
@@ -38,6 +38,13 @@ async function init(): Promise<void> {
             backgroundColor: '#00ff00',
           },
         }, [
+          new Animable2D({
+            duration: 3000,
+            loop: true,
+            keyframes: [
+              { offset: 1, rotate: 180 },
+            ],
+          }),
           new Image2D({
             style: {
               width: 100,
@@ -95,13 +102,6 @@ async function init(): Promise<void> {
               },
             ],
           }),
-          new Animable2D({
-            duration: 3000,
-            loop: true,
-            keyframes: [
-              { offset: 1, rotate: 180 },
-            ],
-          }),
         ]),
         new Image2D({
           style: {
@@ -111,7 +111,9 @@ async function init(): Promise<void> {
             height: 100,
           },
           src: '/example.jpg',
-        }),
+        }, [
+          new ShadowEffect(),
+        ]),
       ])
         .addChild(new Scalable2D(), InternalMode.FRONT),
     ]),

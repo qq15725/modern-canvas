@@ -1,7 +1,7 @@
+import type { Node2D } from '../2d'
 import type { WebGLRenderer } from '../../core'
 import type { NodeProperties } from '../main'
 import type { Material } from '../resources'
-import { Node2D } from '../2d'
 import { assets } from '../../asset'
 import { customNode, property, protectedProperty } from '../../core'
 import { Node, Viewport } from '../main'
@@ -53,7 +53,7 @@ export class Effect extends Node {
   protected get _mode(): EffectMode { return this.mode ?? 'parent' }
 
   /** Viewports */
-  readonly viewport = new Viewport()
+  readonly viewport1 = new Viewport()
   readonly viewport2 = new Viewport()
 
   /** Render call */
@@ -97,7 +97,7 @@ export class Effect extends Node {
     const tree = this._tree!
     tree.on('processing', this._onProcessing)
     tree.on('nodeProcessed', this._onNodeProcessed)
-    this.viewport._setTree(tree)
+    this.viewport1._setTree(tree)
     this.viewport2._setTree(tree)
   }
 
@@ -105,7 +105,7 @@ export class Effect extends Node {
     const tree = this._tree!
     tree.off('processing', this._onProcessing)
     tree.off('nodeProcessed', this._onNodeProcessed)
-    this.viewport._setTree(undefined)
+    this.viewport1._setTree(undefined)
     this.viewport2._setTree(undefined)
   }
 
@@ -191,9 +191,9 @@ export class Effect extends Node {
   }
 
   protected _renderBefore(renderer: WebGLRenderer): void {
-    const viewport = this._tree?.getCurrentViewport()
-    if (viewport) {
-      this.apply(renderer, viewport, { redraw: true })
+    const viewport1 = this._tree?.getCurrentViewport()
+    if (viewport1) {
+      this.apply(renderer, viewport1, { redraw: true })
     }
   }
 
@@ -201,7 +201,7 @@ export class Effect extends Node {
     if (this._renderId % 2 === 0) {
       this._renderViewport = this._tree?.getCurrentViewport()
       if (this._renderViewport) {
-        this.viewport.activateWithCopy(renderer, this._renderViewport)
+        this.viewport1.activateWithCopy(renderer, this._renderViewport)
         this.viewport2.resize(this._renderViewport.width, this._renderViewport.height)
       }
       this.viewport2.activate(renderer)
@@ -213,10 +213,10 @@ export class Effect extends Node {
       if (oldViewport) {
         oldViewport.activate(renderer)
         renderer.clear()
-        this.viewport.texture.activate(renderer, 0)
+        this.viewport1.texture.activate(renderer, 0)
         this.viewport2.texture.activate(renderer, 1)
         this.apply(renderer, oldViewport, {
-          from: this.viewport,
+          from: this.viewport1,
           to: this.viewport2,
         })
         renderer.texture.unbind(0)
@@ -229,17 +229,17 @@ export class Effect extends Node {
     if (this._renderId % 2 === 0) {
       this._renderViewport = this._tree?.getCurrentViewport()
       if (this._renderViewport) {
-        this.viewport.resize(this._renderViewport.width, this._renderViewport.height)
+        this.viewport1.resize(this._renderViewport.width, this._renderViewport.height)
       }
-      this.viewport.activate(renderer)
+      this.viewport1.activate(renderer)
       renderer.clear()
     }
     else {
       const oldViewport = this._renderViewport
       this._renderViewport = undefined
       if (oldViewport) {
-        this.viewport.activate(renderer)
-        this.apply(renderer, this.viewport, {
+        this.viewport1.activate(renderer)
+        this.apply(renderer, this.viewport1, {
           redraw: true,
           target: this._mode === 'parent'
             ? (this._parent ?? undefined)
@@ -247,20 +247,20 @@ export class Effect extends Node {
           targetArea: this._parseTargetArea() as any,
         })
         oldViewport.activate(renderer)
-        this.viewport.texture.activate(renderer, 0)
+        this.viewport1.texture.activate(renderer, 0)
         QuadUvGeometry.draw(renderer)
       }
     }
   }
 
   protected _parseTargetArea(): number[] | undefined {
-    if (this._mode === 'parent' && this._parent instanceof Node2D) {
-      const bbox = this._parent.getBoundingBox()
+    if (this._mode === 'parent' && this._parent?.tag === 'Node2D') {
+      const bbox = (this._parent as Node2D).getBoundingBox()
       return [
-        bbox.left / this.viewport.width,
-        bbox.top / this.viewport.height,
-        bbox.width / this.viewport.width,
-        bbox.height / this.viewport.height,
+        bbox.left / this.viewport1.width,
+        bbox.top / this.viewport1.height,
+        bbox.width / this.viewport1.width,
+        bbox.height / this.viewport1.height,
       ]
     }
   }
