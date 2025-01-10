@@ -6,8 +6,8 @@ import { Control } from './Control'
 
 export interface RulerProperties extends ControlProperties {
   pixelRatio: number
-  x: number
-  y: number
+  offsetX: number
+  offsetY: number
   thickness: number
   markHeight: number
   color: string
@@ -19,8 +19,8 @@ export interface RulerProperties extends ControlProperties {
 @customNode('Ruler')
 export class Ruler extends Control {
   @property({ default: 2 }) declare pixelRatio: number
-  @property({ default: 0 }) declare x: number
-  @property({ default: 0 }) declare y: number
+  @property({ default: 0 }) declare offsetX: number
+  @property({ default: 0 }) declare offsetY: number
   @property({ default: 20 }) declare thickness: number
   @property({ default: 3 }) declare markHeight: number
   @property({ default: '#b2b6bc' }) declare color: string
@@ -59,8 +59,8 @@ export class Ruler extends Control {
 
     const {
       pixelRatio,
-      x: _x,
-      y: _y,
+      offsetX,
+      offsetY,
       thickness,
       markHeight,
       markBackgroundColor,
@@ -78,8 +78,8 @@ export class Ruler extends Control {
     const ctx = canvas.getContext('2d')!
     ctx.scale(this.pixelRatio, this.pixelRatio)
 
-    const x = Math.round(_x)
-    const y = Math.round(_y)
+    const x = Math.round(offsetX)
+    const y = Math.round(offsetY)
 
     ctx.beginPath()
 

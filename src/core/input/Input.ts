@@ -1,6 +1,6 @@
 import type { Cursor } from './Cursor'
 import type { MouseInputEvent } from './MouseInputEvent'
-import { EventEmitter } from '../object'
+import { EventEmitter, type EventListenerOptions, type EventListenerValue } from '../object'
 import { SUPPORTS_POINTER_EVENTS, SUPPORTS_TOUCH_EVENTS, SUPPORTS_WHEEL_EVENTS } from '../shared'
 import { PointerInputEvent } from './PointerInputEvent'
 import { WheelInputEvent } from './WheelInputEvent'
@@ -11,6 +11,25 @@ const TOUCH_TO_POINTER: Record<string, string> = {
   touchendoutside: 'pointerupoutside',
   touchmove: 'pointermove',
   touchcancel: 'pointercancel',
+}
+
+export interface InputEventMap {
+  pointerdown: (ev: PointerInputEvent) => void
+  pointerover: (ev: PointerInputEvent) => void
+  pointermove: (ev: PointerInputEvent) => void
+  pointerup: (ev: PointerInputEvent) => void
+  wheel: (ev: WheelInputEvent) => void
+}
+
+export type InputEventKey = keyof InputEventMap
+
+export interface Input {
+  on: (<K extends keyof InputEventMap>(type: K, listener: InputEventMap[K], options?: EventListenerOptions) => this)
+    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
+  off: (<K extends keyof InputEventMap>(type: K, listener: InputEventMap[K], options?: EventListenerOptions) => this)
+    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
+  emit: (<K extends keyof InputEventMap>(type: K, ...args: Parameters<InputEventMap[K]>) => boolean)
+    & ((type: string, ...args: any[]) => boolean)
 }
 
 export class Input extends EventEmitter {

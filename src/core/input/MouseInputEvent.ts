@@ -1,6 +1,6 @@
-import { UIInputEvent } from './UIInputEvent'
+import { InputEvent } from './InputEvent'
 
-export class MouseInputEvent extends UIInputEvent implements MouseEvent {
+export class MouseInputEvent extends InputEvent implements MouseEvent {
   altKey!: boolean
   button!: number
   buttons!: number

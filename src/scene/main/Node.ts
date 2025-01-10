@@ -1,10 +1,24 @@
 import type { Visibility } from 'modern-idoc'
-import type { CoreObjectEventMap, EventListenerOptions, EventListenerValue, Maskable, WebGLRenderer } from '../../core'
+import type {
+  CoreObjectEventMap,
+  EventListenerOptions,
+  EventListenerValue,
+  InputEvent,
+  InputEventKey,
+  InputEventMap,
+  Maskable,
+  WebGLRenderer,
+} from '../../core'
 import type { SceneTree } from './SceneTree'
 import type { Viewport } from './Viewport'
-import { clamp, CoreObject, customNode, customNodes, property } from '../../core'
+import {
+  clamp,
+  CoreObject,
+  customNode,
+  customNodes, property,
+} from '../../core'
 
-export interface NodeEventMap extends CoreObjectEventMap {
+export interface NodeEventMap extends CoreObjectEventMap, InputEventMap {
   enterTree: () => void
   exitTree: () => void
   childExitingTree: (node: Node) => void
@@ -276,11 +290,11 @@ export class Node extends CoreObject {
     }
   }
 
-  input(event: UIEvent): void {
+  input(key: InputEventKey, event: InputEvent): void {
     for (let i = this._children.length - 1; i >= 0; i--) {
-      this._children[i].input(event)
+      this._children[i].input(key, event)
     }
-    this._input(event)
+    this._input(key, event)
   }
 
   /** Parent */
@@ -459,7 +473,7 @@ export class Node extends CoreObject {
   protected _parented(): void { /** override */ }
   protected _unparented(): void { /** override */ }
   protected _process(_delta: number): void { /** override */ }
-  protected _input(_event: UIEvent): void { /** override */ }
+  protected _input(_key: InputEventKey, _event: InputEvent): void { /** override */ }
   protected _render(_renderer: WebGLRenderer): void { /** override */ }
 
   override toJSON(): Record<string, any> {

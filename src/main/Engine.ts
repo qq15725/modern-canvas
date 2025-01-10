@@ -22,6 +22,7 @@ export interface EngineOptions extends WebGLContextAttributes {
   pixelRatio?: number
   backgroundColor?: ColorValue
   autoResize?: boolean
+  autoStart?: boolean
 }
 
 interface EngineEventMap {
@@ -92,6 +93,7 @@ export class Engine extends SceneTree {
       pixelRatio = DEVICE_PIXEL_RATIO,
       backgroundColor = 0x00000000,
       autoResize,
+      autoStart,
       ...glOptions
     } = options
 
@@ -121,6 +123,10 @@ export class Engine extends SceneTree {
         !view,
       )
     }
+
+    if (autoStart) {
+      this.start()
+    }
   }
 
   protected _setupInput(): this {
@@ -135,10 +141,8 @@ export class Engine extends SceneTree {
         'wheel',
       ].forEach((key) => {
         this.input.on(key, (event: any) => {
-          if (this.hasEventListener(key)) {
-            this.root.input(event)
-            this.emit(key, event)
-          }
+          this.root.input(key as any, event)
+          this.emit(key, event)
         })
       })
     }

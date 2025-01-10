@@ -1,3 +1,4 @@
+import type { InputEvent, InputEventKey, PointerInputEvent } from '../../core'
 import type { CanvasBatchable, CanvasItemProperties } from '../main'
 import { BoundingBox } from 'modern-path2d'
 import { customNode, Transform2D } from '../../core'
@@ -140,16 +141,24 @@ export class Node2D extends CanvasItem {
     super._process(delta)
   }
 
-  override input(event: UIEvent): void {
-    super.input(event)
+  protected override _input(key: InputEventKey, event: InputEvent): void {
+    super._input(key, event)
 
     if (!event.target && this.isRenderable()) {
-      const { screenX, screenY } = event as PointerEvent
-      if (screenX && screenY) {
-        const { width, height } = this.style
-        const [x, y] = this._transform.inverse().applyToPoint(screenX, screenY)
-        if (x >= 0 && x < width && y >= 0 && y < height) {
-          (event as any).target = this
+      switch (key) {
+        case 'pointerdown':
+        case 'pointermove':
+        case 'pointerup': {
+          const { screenX, screenY } = event as PointerInputEvent
+          if (screenX && screenY) {
+            const { width, height } = this.style
+            const [x, y] = this._transform.inverse().applyToPoint(screenX, screenY)
+            if (x >= 0 && x < width && y >= 0 && y < height) {
+              event.target = this
+              this.emit(key, event)
+            }
+          }
+          break
         }
       }
     }
