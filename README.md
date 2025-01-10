@@ -77,9 +77,9 @@ loadFallbackFont().then(() => {
 })
 ```
 
-## Effect
+## Effects
 
-See the [effect](./src/effect)
+See the [scene/effects](./src/scene/effects)
 
 ```typescript
 import { EmbossEffect, Image2D } from 'modern-canvas'
