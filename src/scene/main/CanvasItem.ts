@@ -8,7 +8,7 @@ import { CanvasContext } from './CanvasContext'
 import { Node } from './Node'
 
 export interface CanvasItemProperties extends NodeProperties {
-  style: Style2DProperties
+  style: Partial<Style2DProperties>
   tint: string
   blendMode: WebGLBlendMode
 }
@@ -43,7 +43,7 @@ export class CanvasItem extends Node {
   protected _layoutedBatchables: CanvasBatchable[] = []
   protected _batchables: CanvasBatchable[] = []
 
-  constructor(properties?: Partial<CanvasItemProperties> & { style: Partial<CanvasItemProperties['style']> }) {
+  constructor(properties?: Partial<CanvasItemProperties>) {
     super()
     this._onUpdateStyleProperty = this._onUpdateStyleProperty.bind(this)
     this.setProperties(properties)

@@ -30,7 +30,7 @@ export class Image2D extends Node2D {
   protected _complete = false
   protected _wait = Promise.resolve()
 
-  constructor(properties?: Partial<Image2DProperties> & { style: Partial<Image2DProperties['style']> }) {
+  constructor(properties?: Partial<Image2DProperties>) {
     super()
     this.setProperties(properties)
   }

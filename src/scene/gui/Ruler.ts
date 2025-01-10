@@ -5,7 +5,15 @@ import { Texture } from '../resources'
 import { Control } from './Control'
 
 export interface RulerProperties extends ControlProperties {
-  //
+  pixelRatio: number
+  x: number
+  y: number
+  thickness: number
+  markHeight: number
+  color: string
+  markBackgroundColor: string
+  markColor: string
+  gap: number
 }
 
 @customNode('Ruler')

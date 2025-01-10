@@ -19,7 +19,7 @@ export class Lottie2D extends Node2D {
   readonly texture = new Texture<HTMLCanvasElement>(document.createElement('canvas'))
   animation?: AnimationItem
 
-  constructor(properties?: Partial<Lottie2DProperties> & { style: Partial<Lottie2DProperties['style']> }) {
+  constructor(properties?: Partial<Lottie2DProperties>) {
     super()
     this.setProperties(properties)
   }

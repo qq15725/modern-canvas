@@ -36,7 +36,7 @@ export class Text2D extends Node2D {
   readonly texture = new Texture(document.createElement('canvas'))
   protected _subTextsCount = 0
 
-  constructor(properties?: Partial<Text2DProperties> & { style: Partial<Text2DProperties['style']> }) {
+  constructor(properties?: Partial<Text2DProperties>) {
     super()
     this.setProperties(properties)
   }

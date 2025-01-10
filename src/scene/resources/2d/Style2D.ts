@@ -20,6 +20,7 @@ export interface Style2DProperties extends IDOCTextStyleDeclaration, IDOCTransfo
   direction: 'inherit' | 'ltr' | 'rtl'
   backgroundColor?: string
   backgroundImage?: string
+  filter: string
   shadowColor: string
   shadowOffsetX: number
   shadowOffsetY: number

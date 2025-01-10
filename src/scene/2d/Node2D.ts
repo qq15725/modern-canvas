@@ -15,7 +15,7 @@ export class Node2D extends CanvasItem {
   readonly _transform = new Transform2D()
   protected _parentTransformDirtyId?: number
 
-  constructor(properties?: Partial<Node2DProperties> & { style: Partial<Node2DProperties['style']> }) {
+  constructor(properties?: Partial<Node2DProperties>) {
     super()
     this.setProperties(properties)
   }

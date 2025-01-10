@@ -6,7 +6,10 @@ export interface ControlProperties extends CanvasItemProperties {
   //
 }
 
-@customNode('Control')
+@customNode({
+  tag: 'Control',
+  renderable: true,
+})
 export class Control extends CanvasItem {
   constructor(properties?: Partial<ControlProperties>) {
     super()

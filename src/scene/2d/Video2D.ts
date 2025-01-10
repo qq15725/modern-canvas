@@ -18,7 +18,7 @@ export class Video2D extends Node2D {
 
   protected _wait = Promise.resolve()
 
-  constructor(properties?: Partial<Video2DProperties> & { style: Partial<Video2DProperties['style']> }) {
+  constructor(properties?: Partial<Video2DProperties>) {
     super()
     this.setProperties(properties)
   }
