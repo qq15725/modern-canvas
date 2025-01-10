@@ -1,5 +1,5 @@
 import type { Assets } from '../Assets'
-import { VideoTexture } from '../../core'
+import { VideoTexture } from '../../scene'
 import { Loader } from './Loader'
 
 export class VideoLoader extends Loader {

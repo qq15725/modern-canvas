@@ -1,6 +1,5 @@
 import type { Assets } from '../Assets'
-import { Image2DResource } from '../../2d'
-import { PixelsTexture } from '../../core'
+import { Image2DResource, PixelsTexture } from '../../scene'
 import { Loader } from './Loader'
 
 export class GifLoader extends Loader {

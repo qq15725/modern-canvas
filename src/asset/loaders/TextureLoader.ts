@@ -1,5 +1,5 @@
 import type { Assets } from '../Assets'
-import { Texture } from '../../core'
+import { Texture } from '../../scene'
 import { Loader } from './Loader'
 
 export class TextureLoader extends Loader {
