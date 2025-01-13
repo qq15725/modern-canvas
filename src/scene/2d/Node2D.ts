@@ -13,7 +13,7 @@ export interface Node2DProperties extends CanvasItemProperties {
   renderable: true,
 })
 export class Node2D extends CanvasItem {
-  readonly _transform = new Transform2D()
+  transform = new Transform2D()
   protected _parentTransformDirtyId?: number
 
   constructor(properties?: Partial<Node2DProperties>, children: Node[] = []) {
@@ -68,7 +68,7 @@ export class Node2D extends CanvasItem {
 
   protected _updateTransform(): void {
     const parent = this.getParent() as Node2D
-    const parentTransform = parent?._transform
+    const parentTransform = parent?.transform
     this._parentTransformDirtyId = parentTransform?.dirtyId
     const t3dT2d = this.style.getComputedTransform().toArray()
     let transform
@@ -87,14 +87,14 @@ export class Node2D extends CanvasItem {
     else {
       transform = t3dT2d
     }
-    this._transform.set(transform)
+    this.transform.set(transform)
     this._updateOverflow()
     this.requestReflow()
   }
 
   protected _updateOverflow(): void {
     if (this.style.overflow === 'hidden') {
-      const [a, c, tx, b, d, ty] = this._transform.toArray()
+      const [a, c, tx, b, d, ty] = this.transform.toArray()
       const width = this.style.width
       const height = this.style.height
       this.mask = {
@@ -110,7 +110,7 @@ export class Node2D extends CanvasItem {
   }
 
   protected _transformVertices(vertices: number[]): number[] {
-    const [a, c, tx, b, d, ty] = this._transform.toArray()
+    const [a, c, tx, b, d, ty] = this.transform.toArray()
     const newVertices = vertices.slice()
     for (let len = vertices.length, i = 0; i < len; i += 2) {
       const x = vertices[i]
@@ -134,7 +134,7 @@ export class Node2D extends CanvasItem {
 
   protected override _process(delta: number): void {
     const parent = this.getParent() as Node2D
-    if (parent?._transform?.dirtyId !== this._parentTransformDirtyId) {
+    if (parent?.transform?.dirtyId !== this._parentTransformDirtyId) {
       this._updateTransform()
     }
     super._process(delta)
@@ -151,7 +151,7 @@ export class Node2D extends CanvasItem {
           const { screenX, screenY } = event as PointerInputEvent
           if (screenX && screenY) {
             const { width, height } = this.style
-            const [x, y] = this._transform.inverse().applyToPoint(screenX, screenY)
+            const [x, y] = this.transform.inverse().applyToPoint(screenX, screenY)
             if (x >= 0 && x < width && y >= 0 && y < height) {
               event.target = this
               this.emit(key, event)

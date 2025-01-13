@@ -3,10 +3,13 @@ import type { CanvasItemStyle } from '../scene'
 import { CanvasItem, Node2D, Ruler, Scalable2D } from '../scene'
 
 export class Editor2D extends CanvasItem {
+  name = 'Editor'
+
   ruler = new Ruler({
     name: 'ruler',
     offsetX: 100,
     offsetY: 100,
+    inheritSize: true,
   })
 
   hover = new Node2D({
@@ -26,6 +29,8 @@ export class Editor2D extends CanvasItem {
     internalMode: 'back',
     visibility: 'hidden',
     style: {
+      width: 1,
+      height: 1,
       backgroundColor: 0x00FF000F,
       outlineStyle: 'solid',
       outlineColor: 0x00FF00FF,
@@ -73,6 +78,7 @@ export class Editor2D extends CanvasItem {
             this.selectionRect,
           ),
       )
+    this.inheritSize = true
   }
 
   protected override _input(key: InputEventKey, event: InputEvent): void {
@@ -104,8 +110,8 @@ export class Editor2D extends CanvasItem {
       this.selectionRect.visibility = 'visible'
       this.selectionRect.style.left = e.screen.x
       this.selectionRect.style.top = e.screen.y
-      this.selectionRect.style.width = 0
-      this.selectionRect.style.height = 0
+      this.selectionRect.style.width = 1
+      this.selectionRect.style.height = 1
     }
     this._onHover()
   }
@@ -138,9 +144,7 @@ export class Editor2D extends CanvasItem {
       this.hover.visibility = 'visible'
       this.hover.style.width = selected.style.width
       this.hover.style.height = selected.style.height
-      this.hover._transform.set(selected._transform)
-      // TODO
-      ;(this.hover as any)._updateOverflow()
+      this.hover.transform.set(selected.transform)
       this.hover.requestRedraw()
     }
     else {

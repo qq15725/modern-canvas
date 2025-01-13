@@ -5,6 +5,7 @@ import { getDefaultTextStyle, getDefaultTransformStyle } from 'modern-idoc'
 import { assets } from '../../../asset'
 import {
   clamp,
+  Color,
   ColorMatrix,
   defineProperty,
   DEG_TO_RAD,
@@ -87,6 +88,9 @@ export class CanvasItemStyle extends Resource {
   @property({ default: 'visible' }) declare overflow: Overflow
   @property({ default: 'auto' }) declare pointerEvents: PointerEvents
 
+  protected _parent?: CanvasItemStyle
+  protected _backgroundColor = new Color()
+
   constructor(properties?: Partial<CanvasItemStyleProperties>) {
     super()
     this.setProperties(properties)
@@ -96,17 +100,8 @@ export class CanvasItemStyle extends Resource {
     super._onUpdateProperty(key, value, oldValue)
 
     switch (key) {
-      case 'fontSize':
-        if (value <= 0)
-          this.fontSize = 14
-        break
-      case 'fontWeight':
-        if (!value)
-          this.fontWeight = 'normal'
-        break
-      case 'lineHeight':
-        if (!value)
-          this.lineHeight = 1
+      case 'backgroundColor':
+        this._backgroundColor.value = this.backgroundColor
         break
     }
   }
@@ -119,6 +114,10 @@ export class CanvasItemStyle extends Resource {
     return clamp(0, this.opacity, 1)
   }
 
+  getComputedBackgroundColor(): Color {
+    return this._backgroundColor
+  }
+
   async getComputedBackgroundImage(): Promise<Texture<ImageBitmap> | undefined> {
     if (this.backgroundImage) {
       return await assets.texture.load(this.backgroundImage)
@@ -126,39 +125,46 @@ export class CanvasItemStyle extends Resource {
   }
 
   getComputedTransform(): Transform2D {
+    const {
+      scaleX, scaleY,
+      left, top,
+      width, height,
+      rotate,
+    } = this
+
     const transform = new Transform2D()
     const transform3d = new Transform2D(false)
     const transform2d = new Transform2D(false)
-      .scale(this.scaleX, this.scaleY)
-      .translate(this.left, this.top)
-      .rotate(this.rotate * DEG_TO_RAD)
+      .scale(scaleX, scaleY)
+      .translate(left, top)
+      .rotate(rotate * DEG_TO_RAD)
 
     let _transform = this.transform
     if (!_transform || _transform === 'none') {
       _transform = ''
     }
 
-    parseCssFunctions(_transform, { width: this.width, height: this.height })
+    parseCssFunctions(_transform, { width, height })
       .forEach(({ name, args }) => {
         const values = args.map(arg => arg.normalizedIntValue)
         transform.identity()
         switch (name) {
           case 'translate':
-            transform.translate((values[0]) * this.width, (values[1] ?? values[0]) * this.height)
+            transform.translate((values[0]) * width, (values[1] ?? values[0]) * this.height)
             break
           case 'translateX':
-            transform.translateX(values[0] * this.width)
+            transform.translateX(values[0] * width)
             break
           case 'translateY':
-            transform.translateY(values[0] * this.height)
+            transform.translateY(values[0] * height)
             break
           case 'translateZ':
             transform.translateZ(values[0])
             break
           case 'translate3d':
             transform.translate3d(
-              values[0] * this.width,
-              (values[1] ?? values[0]) * this.height,
+              values[0] * width,
+              (values[1] ?? values[0]) * height,
               values[2] ?? values[1] ?? values[0],
             )
             break
@@ -227,8 +233,8 @@ export class CanvasItemStyle extends Resource {
       1,
     ]
     const [originX, originY] = this.getComputedTransformOrigin()
-    const offsetX = originX * this.width
-    const offsetY = originY * this.height
+    const offsetX = originX * width
+    const offsetY = originY * height
     t3dT2d[2] += (t3dT2d[0] * -offsetX) + (t3dT2d[1] * -offsetY) + offsetX
     t3dT2d[5] += (t3dT2d[3] * -offsetX) + (t3dT2d[4] * -offsetY) + offsetY
     return new Transform2D().set(t3dT2d)

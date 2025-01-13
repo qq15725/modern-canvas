@@ -1,7 +1,6 @@
 import type { Node } from '../main'
 import type { ControlProperties } from './Control'
 import { customNode, property, Transform2D } from '../../core'
-import { Viewport } from '../main'
 import { Texture } from '../resources'
 import { Control } from './Control'
 
@@ -37,24 +36,13 @@ export class Ruler extends Control {
     this.append(children)
   }
 
-  protected _parented(): void {
-    super._parented()
-    this._parent?.on('updateProperty', (key) => {
-      switch (key) {
-        case 'width':
-        case 'height':
-          this.requestRedraw()
-          break
-      }
-    })
+  protected override _updateSize(): void {
+    super._updateSize()
     this.requestRedraw()
   }
 
   protected _drawTexture(): void {
-    if (!(this._parent instanceof Viewport)) {
-      return
-    }
-    const { width, height } = this._parent
+    const { width, height } = this.size
 
     this.style.width = width
     this.style.height = height

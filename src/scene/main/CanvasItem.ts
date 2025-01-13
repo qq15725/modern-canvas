@@ -2,6 +2,7 @@ import type { ColorValue, PropertyDeclaration, WebGLBlendMode, WebGLRenderer } f
 import type { CanvasItemStyleProperties, Texture } from '../resources'
 import type { CanvasBatchable } from './CanvasContext'
 import type { NodeProperties } from './Node'
+import type { Viewport } from './Viewport'
 import { Color, customNode, property, Transform2D } from '../../core'
 import { CanvasItemStyle } from '../resources'
 import { CanvasContext } from './CanvasContext'
@@ -11,26 +12,32 @@ export interface CanvasItemProperties extends NodeProperties {
   style: Partial<CanvasItemStyleProperties>
   tint: string
   blendMode: WebGLBlendMode
+  inheritSize: boolean
 }
 
 @customNode('CanvasItem')
 export class CanvasItem extends Node {
   @property() tint?: ColorValue
   @property() blendMode?: WebGLBlendMode
+  @property() inheritSize?: boolean
 
   protected declare _style: CanvasItemStyle
   get style(): CanvasItemStyle { return this._style }
   set style(style) {
-    style.on('updateProperty', this._onUpdateStyleProperty)
-    this._style?.off('updateProperty', this._onUpdateStyleProperty)
+    const cb = (...args: any[]): void => {
+      this.emit('styleUpdateProperty', ...args)
+      this._onUpdateStyleProperty(args[0], args[1], args[2])
+    }
+    style.on('updateProperty', cb)
+    this._style?.off('updateProperty', cb)
     this._style = style
   }
 
   /** @internal */
   opacity = 1
+  size = { width: 0, height: 0 }
   protected _parentOpacity?: number
   protected _tint = new Color(0xFFFFFFFF)
-  protected _backgroundColor = new Color(0x00000000)
   protected _backgroundImage?: Texture
 
   // Batch render
@@ -46,8 +53,8 @@ export class CanvasItem extends Node {
   constructor(properties?: Partial<CanvasItemProperties>) {
     super()
     this._onUpdateStyleProperty = this._onUpdateStyleProperty.bind(this)
-    this.setProperties(properties)
     this.style = new CanvasItemStyle()
+    this.setProperties(properties)
   }
 
   override setProperties(properties?: Record<PropertyKey, any>): this {
@@ -91,15 +98,34 @@ export class CanvasItem extends Node {
       case 'borderRadius':
         this.requestRedraw()
         break
+      case 'width':
+      case 'height':
+        this._updateSize()
+        break
+    }
+  }
+
+  protected _updateSize(): void {
+    if (this.inheritSize) {
+      this.size.width = this.style.width
+      || (this._parent as CanvasItem)?.size?.width
+      || (this._parent as Viewport)?.width
+      this.size.height = this.style.height
+      || (this._parent as CanvasItem)?.size?.height
+      || (this._parent as Viewport)?.height
+    }
+    else {
+      this.size.width = this.style.width
+      this.size.height = this.style.height
     }
   }
 
   protected _updateBackgroundColor(): void {
-    this._backgroundColor.value = this.style.backgroundColor || 0x00000000
+    const backgroundColor = this.style.getComputedBackgroundColor()
     if (this._originalBatchables.length) {
       this.requestRepaint()
     }
-    else if (this._backgroundColor.a > 0) {
+    else if (backgroundColor.a > 0) {
       this.requestRedraw()
     }
   }
@@ -131,6 +157,16 @@ export class CanvasItem extends Node {
     if (parentOpacity !== this._parentOpacity) {
       this._parentOpacity = parentOpacity
       this._updateOpacity()
+    }
+
+    if (
+      this.inheritSize
+      && (!this.size.width
+        || !this.size.height
+        || this.size.width !== this.style.width
+        || this.size.height !== this.style.height)
+    ) {
+      this._updateSize()
     }
 
     super._process(delta)
@@ -176,7 +212,8 @@ export class CanvasItem extends Node {
   }
 
   protected _drawBoundingRect(): void {
-    const { width, height, borderRadius } = this.style
+    const { borderRadius } = this.style
+    const { width, height } = this.size
     if (width && height) {
       if (borderRadius) {
         this.context.roundRect(0, 0, width, height, borderRadius)
@@ -210,7 +247,7 @@ export class CanvasItem extends Node {
     return batchables.map((batchable) => {
       return {
         ...batchable,
-        backgroundColor: this._backgroundColor.abgr,
+        backgroundColor: this.style.getComputedBackgroundColor().abgr,
         tint: this._tint.toArgb(this.opacity, true),
         colorMatrix: colorMatrix.toMatrix4().toArray(true),
         colorMatrixOffset: colorMatrix.toVector4().toArray(),

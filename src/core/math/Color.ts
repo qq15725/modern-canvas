@@ -11,8 +11,8 @@ export class Color {
   protected declare _value: ColorValue
 
   get value(): ColorValue { return this._value }
-  set value(value) {
-    if (this._value === value)
+  set value(value: ColorValue | undefined) {
+    if (value === undefined || this._value === value)
       return
     this._value = value
     let input
