@@ -9,14 +9,13 @@ import {
   Text2D,
 } from '../../src'
 
+const editor = new Editor2D()
 const engine = new Engine({
   autoStart: true,
   autoResize: true,
   backgroundColor: '#F6F7F9',
 })
-
-const editor = new Editor2D(engine)
-
+engine.root.append(editor)
 document.body.append(engine.view!)
 
 async function init(): Promise<void> {

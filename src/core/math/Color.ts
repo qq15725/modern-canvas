@@ -21,7 +21,7 @@ export class Color {
         r: (value >> 24) & 0xFF,
         g: (value >> 16) & 0xFF,
         b: (value >> 8) & 0xFF,
-        a: value & 0xFF,
+        a: (value & 0xFF) / 255,
       }
     }
     else {
