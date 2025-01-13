@@ -1,8 +1,19 @@
 import type { IDOCTextStyleDeclaration, IDOCTransformStyleDeclaration, Overflow } from 'modern-idoc'
+import type { ColorValue } from '../../../core'
 import type { Texture } from '../textures'
 import { getDefaultTextStyle, getDefaultTransformStyle } from 'modern-idoc'
 import { assets } from '../../../asset'
-import { ColorMatrix, defineProperty, DEG_TO_RAD, parseCssFunctions, PI_2, property, Resource, Transform2D } from '../../../core'
+import {
+  clamp,
+  ColorMatrix,
+  defineProperty,
+  DEG_TO_RAD,
+  parseCssFunctions,
+  PI_2,
+  property,
+  Resource,
+  Transform2D,
+} from '../../../core'
 
 export type CanvasItemStyleFilterKey =
   | 'hue-rotate'
@@ -18,23 +29,24 @@ export type CanvasItemStyleFilter = Record<CanvasItemStyleFilterKey, number>
 
 export interface CanvasItemStyleProperties extends IDOCTextStyleDeclaration, IDOCTransformStyleDeclaration {
   direction: 'inherit' | 'ltr' | 'rtl'
-  backgroundColor?: string
+  backgroundColor?: ColorValue
   backgroundImage?: string
   filter: string
-  shadowColor: string
+  shadowColor: ColorValue
   shadowOffsetX: number
   shadowOffsetY: number
   shadowBlur: number
   opacity: number
   borderWidth: number
   borderRadius: number
-  borderColor: string
+  borderColor: ColorValue
   borderStyle: string
   outlineWidth: number
   outlineOffset: number
-  outlineColor: string
+  outlineColor: ColorValue
   outlineStyle: string
   overflow: Overflow
+  pointerEvents: PointerEvents
 }
 
 export interface CanvasItemStyle extends CanvasItemStyleProperties {
@@ -51,6 +63,8 @@ const style2DFilterDefault: CanvasItemStyleFilter = {
   'saturate': 1,
   'sepia': 0,
 }
+
+export type PointerEvents = 'auto' | 'none'
 
 export class CanvasItemStyle extends Resource {
   @property() declare backgroundColor?: string
@@ -71,6 +85,7 @@ export class CanvasItemStyle extends Resource {
   @property({ default: '#000000' }) declare outlineColor: string
   @property({ default: 'none' }) declare outlineStyle: string
   @property({ default: 'visible' }) declare overflow: Overflow
+  @property({ default: 'auto' }) declare pointerEvents: PointerEvents
 
   constructor(properties?: Partial<CanvasItemStyleProperties>) {
     super()
@@ -94,6 +109,14 @@ export class CanvasItemStyle extends Resource {
           this.lineHeight = 1
         break
     }
+  }
+
+  canPointeEvents(): boolean {
+    return this.pointerEvents !== 'none'
+  }
+
+  getComputedOpacity(): number {
+    return clamp(0, this.opacity, 1)
   }
 
   async getComputedBackgroundImage(): Promise<Texture<ImageBitmap> | undefined> {

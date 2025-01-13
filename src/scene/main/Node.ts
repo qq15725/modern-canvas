@@ -45,11 +45,7 @@ export interface Node {
     & ((type: string, ...args: any[]) => boolean)
 }
 
-export enum InternalMode {
-  DEFAULT = 0,
-  FRONT = 1,
-  BACK = 2,
-}
+export type InternalMode = 'default' | 'front' | 'back'
 
 export interface NodeProperties {
   name: string
@@ -57,6 +53,7 @@ export interface NodeProperties {
   visibility: Visibility
   visibleDelay: number
   visibleDuration: number
+  internalMode: InternalMode
 }
 
 @customNode('Node')
@@ -71,14 +68,12 @@ export class Node extends CoreObject {
   @property({ default: 'visible' }) declare visibility: Visibility
   @property({ default: 0 }) declare visibleDelay: number
   @property({ default: Number.MAX_SAFE_INTEGER }) declare visibleDuration: number
+  @property() internalMode: InternalMode = 'default'
 
   /** @internal */
   _computedVisibleDelay = 0
   _computedVisibleDuration = Number.MAX_SAFE_INTEGER
   _computedVisibility: Visibility = 'visible'
-
-  /** @internal */
-  _internalMode = InternalMode.DEFAULT
 
   protected _readyed = false
   protected _tree?: SceneTree
@@ -252,7 +247,7 @@ export class Node extends CoreObject {
     if (this.mask instanceof Node) {
       if (!this.getNode('__$mask')) {
         this.mask.renderable = false
-        this.addChild(this.mask, InternalMode.FRONT)
+        this.addChild(this.mask, 'front')
       }
     }
     else {
@@ -317,9 +312,9 @@ export class Node extends CoreObject {
       case true:
         return this._children
       case false:
-        return this._children.filter(child => child._internalMode === InternalMode.DEFAULT)
+        return this._children.filter(child => child.internalMode === 'default')
       default:
-        return this._children.filter(child => child._internalMode === includeInternal)
+        return this._children.filter(child => child.internalMode === includeInternal)
     }
   }
 
@@ -339,7 +334,7 @@ export class Node extends CoreObject {
     if (this.is(sibling) || !this.hasParent() || sibling.hasParent()) {
       return this
     }
-    sibling._internalMode = this._internalMode
+    sibling.internalMode = this.internalMode
     this._parent!.moveChild(sibling, this.getIndex(true) + 1)
     return this
   }
@@ -360,17 +355,17 @@ export class Node extends CoreObject {
     return this
   }
 
-  addChild(child: Node, internalMode = child._internalMode): this {
+  addChild(child: Node, internalMode = child.internalMode): this {
     if (this.is(child) || child.hasParent()) {
       return this
     }
     switch (internalMode) {
-      case InternalMode.DEFAULT:
-      case InternalMode.FRONT: {
-        const targetMode = internalMode === InternalMode.DEFAULT
-          ? InternalMode.BACK
-          : InternalMode.FRONT
-        const index = this._children.findIndex(child => child._internalMode === targetMode)
+      case 'default':
+      case 'front': {
+        const targetMode = internalMode === 'default'
+          ? 'back'
+          : 'front'
+        const index = this._children.findIndex(child => child.internalMode === targetMode)
         if (index > -1) {
           this._children.splice(index, 0, child)
         }
@@ -379,29 +374,29 @@ export class Node extends CoreObject {
         }
         break
       }
-      case InternalMode.BACK:
+      case 'back':
         this._children.push(child)
         break
     }
-    child._internalMode = internalMode
+    child.internalMode = internalMode
     child._setParent(this)
     this.emit('addChild', child)
     return this
   }
 
-  moveChild(child: Node, toIndex: number, internalMode = child._internalMode): this {
+  moveChild(child: Node, toIndex: number, internalMode = child.internalMode): this {
     if (this.is(child) || (child.hasParent() && !this.is(child.parent))) {
       return this
     }
-    child._internalMode = internalMode
+    child.internalMode = internalMode
     const oldIndex = this._children.indexOf(child)
     let minIndex = this._children.findIndex((_child) => {
       switch (internalMode) {
-        case InternalMode.DEFAULT:
-          return _child._internalMode !== InternalMode.FRONT
-        case InternalMode.BACK:
-          return _child._internalMode === InternalMode.BACK
-        case InternalMode.FRONT:
+        case 'default':
+          return _child.internalMode !== 'front'
+        case 'back':
+          return _child.internalMode === 'back'
+        case 'front':
         default:
           return true
       }
@@ -409,11 +404,11 @@ export class Node extends CoreObject {
     minIndex = minIndex > -1 ? minIndex : Math.max(0, this._children.length - 1)
     let maxIndex = this._children.slice(minIndex).findIndex((_child) => {
       switch (internalMode) {
-        case InternalMode.FRONT:
-          return _child._internalMode !== InternalMode.FRONT
-        case InternalMode.DEFAULT:
-          return _child._internalMode === InternalMode.BACK
-        case InternalMode.BACK:
+        case 'front':
+          return _child.internalMode !== 'front'
+        case 'default':
+          return _child.internalMode === 'back'
+        case 'back':
         default:
           return false
       }

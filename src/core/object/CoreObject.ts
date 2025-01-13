@@ -135,6 +135,10 @@ export class CoreObject extends EventEmitter {
     return this.getProperties(Array.from(this._changedProperties))
   }
 
+  clone(): this {
+    return new (this.constructor as any)(this.toJSON())
+  }
+
   destroy(): void {
     this.removeAllListeners()
   }

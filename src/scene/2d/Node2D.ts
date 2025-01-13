@@ -81,9 +81,7 @@ export class Node2D extends CanvasItem {
         (t3dT2d[0] * pt[3]) + (t3dT2d[3] * pt[4]),
         (t3dT2d[1] * pt[3]) + (t3dT2d[4] * pt[4]),
         (t3dT2d[2] * pt[3]) + (t3dT2d[5] * pt[4]) + pt[5],
-        0,
-        0,
-        1,
+        0, 0, 1,
       ]
     }
     else {
@@ -145,7 +143,7 @@ export class Node2D extends CanvasItem {
   protected override _input(key: InputEventKey, event: InputEvent): void {
     super._input(key, event)
 
-    if (!event.target && this.isRenderable()) {
+    if (!event.target && this.isRenderable() && this.style.canPointeEvents()) {
       switch (key) {
         case 'pointerdown':
         case 'pointermove':
@@ -163,5 +161,12 @@ export class Node2D extends CanvasItem {
         }
       }
     }
+  }
+
+  clone(): this {
+    return new (this.constructor as any)(
+      this.toJSON(),
+      this.getChildren(true),
+    )
   }
 }

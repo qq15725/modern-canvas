@@ -1,8 +1,8 @@
 import type { MeasureResult, TextOptions } from 'modern-text'
+import type { Node } from '../main'
 import type { Node2DProperties } from './Node2D'
 import { Text, textDefaultStyle } from 'modern-text'
 import { customNode, property, protectedProperty, Transform2D } from '../../core'
-import { InternalMode, type Node } from '../main'
 import { Texture } from '../resources'
 import { Node2D } from './Node2D'
 
@@ -97,7 +97,7 @@ export class Text2D extends Node2D {
   }
 
   protected _getSubTexts(): Text2D[] {
-    return this.getChildren(InternalMode.FRONT)
+    return this.getChildren('front')
       .filter(node => node instanceof Text2D) as Text2D[]
   }
 
@@ -133,7 +133,7 @@ export class Text2D extends Node2D {
 
   protected _updateSplit(): void {
     if (this._subTextsCount) {
-      this.getChildren(InternalMode.FRONT).forEach(child => this.removeChild(child))
+      this.getChildren('front').forEach(child => this.removeChild(child))
       this._subTextsCount = 0
     }
 
@@ -156,7 +156,7 @@ export class Text2D extends Node2D {
                   effects: this.effects,
                 },
               }),
-              InternalMode.FRONT,
+              'front',
             )
             this._subTextsCount++
           })

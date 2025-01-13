@@ -1,5 +1,5 @@
-import { Node } from '../scene'
 import { Engine } from './Engine'
+import { Node } from './scene'
 
 let engine: Engine | undefined
 let renderLoop: Promise<void> | undefined

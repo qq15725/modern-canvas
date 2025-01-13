@@ -2,7 +2,7 @@ import type { ColorValue, PropertyDeclaration, WebGLBlendMode, WebGLRenderer } f
 import type { CanvasItemStyleProperties, Texture } from '../resources'
 import type { CanvasBatchable } from './CanvasContext'
 import type { NodeProperties } from './Node'
-import { clamp, Color, customNode, property, Transform2D } from '../../core'
+import { Color, customNode, property, Transform2D } from '../../core'
 import { CanvasItemStyle } from '../resources'
 import { CanvasContext } from './CanvasContext'
 import { Node } from './Node'
@@ -110,7 +110,7 @@ export class CanvasItem extends Node {
   }
 
   protected _updateOpacity(): void {
-    const opacity = clamp(0, this.style.opacity, 1)
+    const opacity = this.style.getComputedOpacity()
       * ((this._parent as CanvasItem)?.opacity ?? 1)
     if (this.opacity !== opacity) {
       this.opacity = opacity
@@ -168,19 +168,22 @@ export class CanvasItem extends Node {
   }
 
   protected _drawOutline(): void {
-    if (this.style.outlineWidth && this.style.outlineStyle !== 'none') {
+    if (this.style.outlineWidth && this.style.outlineColor !== 'none') {
       this.context.lineWidth = this.style.outlineWidth
-      this.context.strokeStyle = this.style.outlineStyle
+      this.context.strokeStyle = this.style.outlineColor
       this._stroke()
     }
   }
 
   protected _drawBoundingRect(): void {
-    if (this.style.borderRadius) {
-      this.context.roundRect(0, 0, this.style.width, this.style.height, this.style.borderRadius)
-    }
-    else {
-      this.context.rect(0, 0, this.style.width, this.style.height)
+    const { width, height, borderRadius } = this.style
+    if (width && height) {
+      if (borderRadius) {
+        this.context.roundRect(0, 0, width, height, borderRadius)
+      }
+      else {
+        this.context.rect(0, 0, width, height)
+      }
     }
   }
 
