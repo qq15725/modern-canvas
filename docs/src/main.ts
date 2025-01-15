@@ -1,9 +1,9 @@
 import { fonts } from 'modern-font'
 import {
-  Animable2D,
   Editor2D,
   Engine,
   Image2D,
+  KeyframeAnimation,
   Node2D,
   ShadowEffect,
   Text2D,
@@ -31,8 +31,7 @@ async function init(): Promise<void> {
         backgroundColor: '#00ff00',
       },
     }, [
-      new Animable2D({
-        duration: 3000,
+      new KeyframeAnimation({
         loop: true,
         keyframes: [
           { offset: 1, rotate: 180 },

@@ -10,7 +10,7 @@ export interface Batchable2D {
   uvs?: number[]
   texture?: WebGLTexture
   backgroundColor?: number
-  tint?: number
+  modulate?: number
   colorMatrix?: ArrayLike<number>
   colorMatrixOffset?: ArrayLike<number>
   blendMode?: WebGLBlendMode
@@ -39,7 +39,7 @@ export class WebGLBatch2DModule extends WebGLModule {
   protected _vertexSize = 1 + 2 + 2 + 1 + 1 + 4 + 16
   protected _drawCallUid = 0
 
-  protected _defaultTint = 0xFFFFFFFF
+  protected _defaultModulate = 0xFFFFFFFF
   protected _defaultBackgroundColor = 0x00000000
   protected _defaultColorMatrixOffset = [0, 0, 0, 0]
   protected _defaultColorMatrix = [
@@ -60,7 +60,7 @@ export class WebGLBatch2DModule extends WebGLModule {
     aTextureId: { size: 1, normalized: true, type: 'float' }, // 1
     aPosition: { size: 2, normalized: false, type: 'float' }, // 2
     aUv: { size: 2, normalized: false, type: 'float' }, // 2
-    aTint: { size: 4, normalized: true, type: 'unsigned_byte' }, // 1
+    aModulate: { size: 4, normalized: true, type: 'unsigned_byte' }, // 1
     aBackgroundColor: { size: 4, normalized: true, type: 'unsigned_byte' }, // 1
     aColorMatrixOffset: { size: 4, normalized: false, type: 'float' }, // 4
     aColorMatrix: { size: 4, normalized: false, type: 'float' }, // 16
@@ -82,18 +82,18 @@ export class WebGLBatch2DModule extends WebGLModule {
 attribute float aTextureId;
 attribute vec2 aPosition;
 attribute vec2 aUv;
-attribute vec4 aTint;
+attribute vec4 aModulate;
 attribute vec4 aBackgroundColor;
 attribute mat4 aColorMatrix;
 attribute vec4 aColorMatrixOffset;
 
 uniform mat3 projectionMatrix;
 uniform mat3 translationMatrix;
-uniform vec4 tint;
+uniform vec4 modulate;
 
 varying float vTextureId;
 varying vec2 vUv;
-varying vec4 vTint;
+varying vec4 vModulate;
 varying vec4 vBackgroundColor;
 varying mat4 vColorMatrix;
 varying vec4 vColorMatrixOffset;
@@ -102,7 +102,7 @@ void main(void) {
   vTextureId = aTextureId;
   gl_Position = vec4((projectionMatrix * translationMatrix * vec3(aPosition, 1.0)).xy, 0.0, 1.0);
   vUv = aUv;
-  vTint = aTint * tint;
+  vModulate = aModulate * modulate;
   vBackgroundColor = aBackgroundColor;
   vColorMatrix = aColorMatrix;
   vColorMatrixOffset = aColorMatrixOffset;
@@ -110,7 +110,7 @@ void main(void) {
       frag: `precision highp float;
 varying float vTextureId;
 varying vec2 vUv;
-varying vec4 vTint;
+varying vec4 vModulate;
 varying vec4 vBackgroundColor;
 varying mat4 vColorMatrix;
 varying vec4 vColorMatrixOffset;
@@ -135,7 +135,7 @@ void main(void) {
 
   color += (1.0 - color.a) * vBackgroundColor;
   if (color.a > 0.0) {
-    color *= vTint;
+    color *= vModulate;
     color = vColorMatrix * color;
     color += vColorMatrixOffset;
   }
@@ -186,7 +186,7 @@ void main(void) {
         renderer.program.bind(program)
         renderer.program.updateUniforms(program, {
           samplers,
-          tint: [1, 1, 1, 1],
+          modulate: [1, 1, 1, 1],
           translationMatrix: [1, 0, 0, 0, 1, 0, 0, 0, 1],
           ...renderer.program.uniforms,
         })
@@ -267,7 +267,7 @@ void main(void) {
             vertices,
             uvs = [],
             texture,
-            tint = this._defaultTint,
+            modulate = this._defaultModulate,
             backgroundColor = this._defaultBackgroundColor,
             colorMatrix = this._defaultColorMatrix,
             colorMatrixOffset = this._defaultColorMatrixOffset,
@@ -293,7 +293,7 @@ void main(void) {
             float32View[aIndex++] = vertices[i + 1]
             float32View[aIndex++] = uvs[i] ?? 0
             float32View[aIndex++] = uvs[i + 1] ?? 0
-            uint32View[aIndex++] = tint
+            uint32View[aIndex++] = modulate
             uint32View[aIndex++] = backgroundColor
             for (let i = 0; i < 4; i++) {
               float32View[aIndex++] = colorMatrixOffset[i] ?? 0

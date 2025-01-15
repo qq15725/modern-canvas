@@ -15,8 +15,8 @@ export class Editor2D extends CanvasItem {
   hover = new Node2D({
     name: 'hover',
     internalMode: 'back',
-    visibility: 'hidden',
     style: {
+      visibility: 'hidden',
       outlineStyle: 'solid',
       outlineColor: 0x00FF00FF,
       outlineWidth: 2,
@@ -27,8 +27,8 @@ export class Editor2D extends CanvasItem {
   selectionRect = new Node2D({
     name: 'selectionRect',
     internalMode: 'back',
-    visibility: 'hidden',
     style: {
+      visibility: 'hidden',
       width: 1,
       height: 1,
       backgroundColor: 0x00FF000F,
@@ -81,8 +81,8 @@ export class Editor2D extends CanvasItem {
     this.inheritSize = true
   }
 
-  protected override _input(key: InputEventKey, event: InputEvent): void {
-    super._input(key, event)
+  protected override _input(event: InputEvent, key: InputEventKey): void {
+    super._input(event, key)
 
     switch (key) {
       case 'pointerdown':
@@ -107,7 +107,7 @@ export class Editor2D extends CanvasItem {
     else {
       this.selected = undefined
       this._pointerStart = undefined
-      this.selectionRect.visibility = 'visible'
+      this.selectionRect.style.visibility = 'visible'
       this.selectionRect.style.left = e.screen.x
       this.selectionRect.style.top = e.screen.y
       this.selectionRect.style.width = 1
@@ -126,29 +126,31 @@ export class Editor2D extends CanvasItem {
       selected.style.top = _pointerStart.top + offset.y
     }
     else {
-      this.selectionRect.style.width = offset.x
-      this.selectionRect.style.height = offset.y
+      if (this.selectionRect.isVisibleInTree()) {
+        this.selectionRect.style.width = offset.x
+        this.selectionRect.style.height = offset.y
+      }
     }
     this._onHover()
   }
 
   protected _onPointerup(): void {
     this.selected = undefined
-    this.selectionRect.visibility = 'hidden'
+    this.selectionRect.style.visibility = 'hidden'
     this._onHover()
   }
 
   protected _onHover(): void {
     const selected = this.selected
     if (selected instanceof Node2D) {
-      this.hover.visibility = 'visible'
+      this.hover.style.visibility = 'visible'
       this.hover.style.width = selected.style.width
       this.hover.style.height = selected.style.height
       this.hover.transform.set(selected.transform)
       this.hover.requestRedraw()
     }
     else {
-      this.hover.visibility = 'hidden'
+      this.hover.style.visibility = 'hidden'
     }
   }
 }

@@ -203,13 +203,13 @@ export class Audio extends Node {
   protected _process(delta: number): void {
     super._process(delta)
 
-    if (this.isRenderable()) {
+    if (this.canProcess()) {
       const currentTime = this._tree?.timeline.current ?? 0
       if (currentTime - this._prevTime > 0) {
         if (!this._timer) {
           this._setTimeStop()
           this.play({
-            start: this.start + ((currentTime - this.visibleDelay) % this.duration),
+            start: this.start + ((currentTime - this.processDelay) % this.duration),
           })
         }
 

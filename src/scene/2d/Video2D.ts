@@ -15,7 +15,7 @@ export class Video2D extends Node2D {
 
   texture?: VideoTexture
 
-  get duration(): number { return (this.texture?.duration ?? 0) * 1000 }
+  get videoDuration(): number { return (this.texture?.duration ?? 0) * 1000 }
 
   protected _wait = Promise.resolve()
 
@@ -59,7 +59,7 @@ export class Video2D extends Node2D {
   }
 
   protected _updateVideoCurrentTime(): void {
-    let currentTime = this.visibleRelativeTime
+    let currentTime = this.timeRelative
     if (currentTime < 0)
       return
 

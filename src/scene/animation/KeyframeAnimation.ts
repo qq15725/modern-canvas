@@ -1,4 +1,5 @@
 import type { CssFunction, CssFunctionArg } from '../../core'
+import type { NodeProperties } from '../main'
 import { clamp, customNode, getDefaultCssPropertyValue, lerp, parseCssProperty, property, RawWeakMap } from '../../core'
 import { CanvasItem, Node } from '../main'
 
@@ -100,28 +101,31 @@ export interface NormalizedKeyframe {
   props: Record<string, any>
 }
 
-export interface Animable2DProperties {
-  mode: 'parent' | 'sibling'
+export type KeyframeAnimationMode = 'parent' | 'sibling'
+
+export interface KeyframeAnimationProperties extends NodeProperties {
+  mode: KeyframeAnimationMode
   startTime: number
   duration: number
   loop: boolean
   keyframes: Keyframe[]
 }
 
-@customNode('Animable2D')
-export class Animable2D extends Node {
-  @property({ default: 'parent' }) declare mode: 'parent' | 'sibling'
+@customNode<KeyframeAnimationProperties>('KeyframeAnimation', {
+  renderMode: 'disabled',
+  duration: 2000,
+})
+export class KeyframeAnimation extends Node {
+  @property({ default: 'parent' }) declare mode: KeyframeAnimationMode
   @property({ default: false }) declare loop: boolean
   @property({ default: [] }) declare keyframes: Keyframe[]
   @property() easing?: Easing
-  @property({ alias: 'visibleDelay', default: 0 }) declare delay: number
-  @property({ alias: 'visibleDuration', default: 2000 }) declare duration: number
 
   protected _keyframes: NormalizedKeyframe[] = []
   protected _starting = false
   protected _startProps = new RawWeakMap<any, Map<string, any>>()
 
-  constructor(properties?: Partial<Animable2DProperties>) {
+  constructor(properties?: Partial<KeyframeAnimationProperties>) {
     super()
     this._onUpdateTime = this._onUpdateTime.bind(this)
     this.setProperties(properties)
@@ -200,7 +204,7 @@ export class Animable2D extends Node {
     if (!this.keyframes.length)
       return
 
-    if (!this.isVisible()) {
+    if (!this.isInsideTime()) {
       if (!this._starting)
         return
       this._starting = false
@@ -212,7 +216,7 @@ export class Animable2D extends Node {
 
     const targets = this._getTargets()
     const offset = 1 / targets.length
-    const progress = this.visibleProgress
+    const progress = this.timeProgress
 
     targets.forEach((target, i) => {
       const tiem = offset === 1

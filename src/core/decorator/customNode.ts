@@ -1,22 +1,8 @@
-export interface CustomNodeProperties {
-  tag: string
-  renderable?: boolean
-}
+import { defineProperty } from './property'
 
 export const customNodes = new Map<string, any>()
 
-export function customNode(tag: string): ClassDecorator
-export function customNode(options: CustomNodeProperties): ClassDecorator
-export function customNode(options: string | CustomNodeProperties): ClassDecorator {
-  let tag: string
-  let renderable: boolean | undefined
-  if (typeof options === 'string') {
-    tag = options
-  }
-  else {
-    ({ tag, renderable } = options)
-  }
-
+export function customNode<T = Record<string, any>>(tag: string, defaultProperties?: Partial<T>): ClassDecorator {
   return function (constructor: any) {
     Object.defineProperty(constructor.prototype, 'tag', {
       value: tag,
@@ -24,11 +10,9 @@ export function customNode(options: string | CustomNodeProperties): ClassDecorat
       configurable: true,
     })
 
-    if (typeof renderable !== 'undefined') {
-      Object.defineProperty(constructor, 'renderable', {
-        value: renderable,
-        enumerable: false,
-        configurable: false,
+    if (defaultProperties) {
+      Object.keys(defaultProperties).forEach((key) => {
+        defineProperty(constructor, key, { default: (defaultProperties as any)[key] })
       })
     }
 

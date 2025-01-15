@@ -73,9 +73,6 @@ export class Text2D extends Node2D {
   }
 
   protected override _onUpdateStyleProperty(key: PropertyKey, value: any, oldValue: any): void {
-    if (key === 'height')
-      return
-
     super._onUpdateStyleProperty(key, value, oldValue)
 
     switch (key) {

@@ -19,7 +19,6 @@ export type EffectMode =
 
 export interface EffectOptions extends NodeProperties {
   mode?: EffectMode
-  duration?: number
   glsl?: string
   glslSrc?: string
   material?: Material
@@ -27,28 +26,21 @@ export interface EffectOptions extends NodeProperties {
 
 export interface EffectContext {
   redraw?: boolean
-
   /** parent redraw */
   target?: Node
   targetArea?: [number, number, number, number]
-
   /** transition */
   from?: Viewport
   to?: Viewport
 }
 
-@customNode({
-  tag: 'Effect',
-  renderable: true,
-})
+@customNode('Effect')
 export class Effect extends Node {
   @protectedProperty() material?: Material
 
   @property() mode?: EffectMode
   @property({ default: '' }) declare glsl: string
   @property({ default: '' }) declare glslSrc: string
-  @property({ alias: 'visibleDelay' }) declare delay: number
-  @property({ alias: 'visibleDuration' }) declare duration: number
 
   protected get _mode(): EffectMode { return this.mode ?? 'parent' }
 
@@ -66,6 +58,8 @@ export class Effect extends Node {
 
   constructor(options?: EffectOptions) {
     super()
+    this._onProcessing = this._onProcessing.bind(this)
+    this._onNodeProcessed = this._onNodeProcessed.bind(this)
     this.setProperties(options)
   }
 
@@ -97,20 +91,20 @@ export class Effect extends Node {
     const tree = this._tree!
     tree.on('processing', this._onProcessing)
     tree.on('nodeProcessed', this._onNodeProcessed)
-    this.viewport1._setTree(tree)
-    this.viewport2._setTree(tree)
+    this.viewport1.setTree(tree)
+    this.viewport2.setTree(tree)
   }
 
   protected override _exitTree(): void {
     const tree = this._tree!
     tree.off('processing', this._onProcessing)
     tree.off('nodeProcessed', this._onNodeProcessed)
-    this.viewport1._setTree(undefined)
-    this.viewport2._setTree(undefined)
+    this.viewport1.setTree(undefined)
+    this.viewport2.setTree(undefined)
   }
 
-  protected _onProcessing = (): void => {
-    this._updateVisibility()
+  protected _onProcessing(): void {
+    this._updateTime()
     switch (this._mode) {
       case 'transition':
         this._previousSibling = this.previousSibling
@@ -123,8 +117,8 @@ export class Effect extends Node {
     }
   }
 
-  protected _onNodeProcessed = (node: Node): void => {
-    if (!this.isRenderable())
+  protected _onNodeProcessed(node: Node): void {
+    if (!this.isInsideTime())
       return
     const renderStack = this._tree?.renderStack
     if (!renderStack)
@@ -147,22 +141,22 @@ export class Effect extends Node {
     const renderStack = this._tree?.renderStack
     if (!renderStack)
       return
-    const parentParentCell = renderStack.currentCall?.parentCall
-    if (!parentParentCell)
+    const parentParentCall = renderStack.currentCall?.parentCall
+    if (!parentParentCall)
       return
-    const cells = parentParentCell.calls
+    const calls = parentParentCall.calls
     let start: number | undefined
     let end: number | undefined
-    cells.forEach((cell, index) => {
-      if (cell.renderable.is(this._parent) || cell.renderable.parent?.is(this._parent)) {
+    calls.forEach((call, index) => {
+      if (call.renderable.is(this._parent) || call.renderable.parent?.is(this._parent)) {
         start = start ?? index
         end = index
       }
     })
     if (start === undefined || end === undefined)
       return
-    cells.splice(end + 1, 0, renderStack.createCall(this))
-    cells.splice(start, 0, renderStack.createCall(this))
+    calls.splice(end + 1, 0, renderStack.createCall(this))
+    calls.splice(start, 0, renderStack.createCall(this))
   }
 
   protected _processChildren(): void {
@@ -292,7 +286,7 @@ export class Effect extends Node {
         QuadUvGeometry.draw(renderer, this.material!, {
           from: 0,
           to: 1,
-          progress: this.visibleProgress,
+          progress: this.timeProgress,
           ratio: viewport.width / viewport.height,
         })
       })
@@ -301,7 +295,7 @@ export class Effect extends Node {
       QuadUvGeometry.draw(renderer, this.material, {
         from: 0,
         to: 1,
-        progress: this.visibleProgress,
+        progress: this.timeProgress,
         ratio: context?.from ? context.from.width / context.from.height : 0,
       })
     }

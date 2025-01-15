@@ -135,7 +135,7 @@ export class Engine extends SceneTree {
         'wheel',
       ].forEach((key) => {
         this.input.on(key, (event: any) => {
-          this.root.input(key as any, event)
+          this.root.input(event, key as any)
           this.emit(key, event)
         })
       })

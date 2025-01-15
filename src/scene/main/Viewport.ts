@@ -8,10 +8,7 @@ export interface ViewportFramebuffer {
   needsUpload: boolean
 }
 
-@customNode({
-  tag: 'Viewport',
-  renderable: true,
-})
+@customNode('Viewport')
 export class Viewport extends Node {
   @property({ default: 0 }) declare x: number
   @property({ default: 0 }) declare y: number

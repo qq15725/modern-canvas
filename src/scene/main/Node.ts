@@ -1,4 +1,3 @@
-import type { Visibility } from 'modern-idoc'
 import type {
   CoreObjectEventMap,
   EventListenerOptions,
@@ -10,6 +9,7 @@ import type {
   WebGLRenderer,
 } from '../../core'
 import type { SceneTree } from './SceneTree'
+import type { Timer } from './Timer'
 import type { Viewport } from './Viewport'
 import {
   clamp,
@@ -46,99 +46,68 @@ export interface Node {
 }
 
 export type InternalMode = 'default' | 'front' | 'back'
+export type ProcessMode = 'inherit' | 'pausable' | 'when_paused' | 'always' | 'disabled'
+export type RenderMode = 'inherit' | 'always' | 'disabled'
 
 export interface NodeProperties {
   name: string
-  mask: Maskable
-  visibility: Visibility
-  visibleDelay: number
-  visibleDuration: number
+  processMode: ProcessMode
+  renderMode: RenderMode
   internalMode: InternalMode
+  mask: Maskable
 }
 
 @customNode('Node')
 export class Node extends CoreObject {
   readonly declare tag: string
 
-  renderable?: boolean
-
   // @ts-expect-error tag
   @property() name = `${this.tag}:${String(this.instanceId)}`
   @property() mask?: Maskable
-  @property({ default: 'visible' }) declare visibility: Visibility
-  @property({ default: 0 }) declare visibleDelay: number
-  @property({ default: Number.MAX_SAFE_INTEGER }) declare visibleDuration: number
-  @property() internalMode: InternalMode = 'default'
-
-  /** @internal */
-  _computedVisibleDelay = 0
-  _computedVisibleDuration = Number.MAX_SAFE_INTEGER
-  _computedVisibility: Visibility = 'visible'
+  @property({ default: 'inherit' }) declare processMode: ProcessMode
+  @property({ default: 'inherit' }) declare renderMode: RenderMode
+  @property({ default: 'default' }) declare internalMode: InternalMode
+  @property({ default: 0 }) declare delay: number
+  @property({ default: 0 }) declare duration: number
 
   protected _readyed = false
-  protected _tree?: SceneTree
-  protected _parent?: Node
-  protected _children: Node[] = []
-
-  get children(): Node[] { return this.getChildren() }
-
-  get visibleTimeline(): number[] {
-    const delay = this._computedVisibleDelay
-    return [delay, delay + this._computedVisibleDuration]
-  }
-
-  get visibleRelativeTime(): number { return (this._tree?.timeline.current ?? 0) - this.visibleTimeline[0] }
-  get visibleProgress(): number {
-    const [start, end] = this.visibleTimeline
-    return clamp(0, this.visibleRelativeTime / (end - start), 1)
-  }
-
-  get siblingIndex(): number { return this.getIndex() }
-  set siblingIndex(toIndex) { this._parent?.moveChild(this, toIndex) }
-  get previousSibling(): Node | undefined { return this._parent?.getChildren()[this.getIndex() - 1] }
-  get nextSibling(): Node | undefined { return this._parent?.getChildren()[this.getIndex() + 1] }
-  get firstSibling(): Node | undefined { return this._parent?.getChildren()[0] }
-  get lastSibling(): Node | undefined {
-    const children = this._parent?.getChildren()
-    return children ? children[children.length - 1] : undefined
-  }
 
   constructor(properties?: Partial<NodeProperties>) {
     super()
 
+    this._onEnterTree = this._onEnterTree.bind(this)
+    this._onExitTree = this._onExitTree.bind(this)
+    this._onParented = this._onParented.bind(this)
+    this._onUnparented = this._onUnparented.bind(this)
+    this._onReady = this._onReady.bind(this)
+    this._onProcess = this._onProcess.bind(this)
+
     this
       .setProperties(properties)
-      .on('enterTree', this._onEnterTree.bind(this))
-      .on('exitTree', this._onExitTree.bind(this))
-      .on('parented', this._onParented.bind(this))
-      .on('unparented', this._onUnparented.bind(this))
-      .on('ready', this._onReady.bind(this))
-      .on('process', this._onProcess.bind(this))
+      .on('enterTree', this._onEnterTree)
+      .on('exitTree', this._onExitTree)
+      .on('parented', this._onParented)
+      .on('unparented', this._onUnparented)
+      .on('ready', this._onReady)
+      .on('process', this._onProcess)
   }
 
-  /** Meta */
-  protected _meta = new Map<string, unknown>()
-  hasMeta(name: string): boolean { return this._meta.has(name) }
-  getMeta<T = any>(name: string): T | undefined
-  getMeta<T = any>(name: string, defaultVal: T): T
-  getMeta(name: string, defaultVal?: any): any { return this._meta.get(name) ?? defaultVal }
-  setMeta(name: string, value: any): void { this._meta.set(name, value) }
-  deleteMeta(name: string): void { this._meta.delete(name) }
-  clearMeta(): void { this._meta.clear() }
-
   /** Name */
+  getName(): string { return this.name }
   setName(value: string): this {
     this.name = value
     return this
   }
 
   /** Tree */
+  protected _tree?: SceneTree
+  get tree(): SceneTree | undefined { return this.getTree() }
+  set tree(tree: SceneTree | undefined) { this.setTree(tree) }
   getTree(): SceneTree | undefined { return this._tree }
   getViewport(): Viewport | undefined { return this._tree?.getCurrentViewport() }
   getWindow(): Viewport | undefined { return this._tree?.root }
   isInsideTree(): boolean { return Boolean(this._tree) }
-  /** @internal */
-  _setTree(tree: SceneTree | undefined): this {
+  setTree(tree: SceneTree | undefined): this {
     const oldTree = this._tree
     if (tree !== oldTree) {
       if (tree) {
@@ -153,7 +122,7 @@ export class Node extends CoreObject {
       for (let len = this._children.length, i = 0; i < len; i++) {
         const node = this._children[i]
         !tree && this.emit('childExitingTree', node)
-        node._setTree(tree)
+        node.setTree(tree)
         tree && this.emit('childEnteredTree', node)
       }
 
@@ -169,42 +138,97 @@ export class Node extends CoreObject {
     return this
   }
 
-  isRenderable(): boolean {
-    return (
-      this.renderable !== false
-      && (this.constructor as any).renderable
-    )
-    && this.isVisible()
+  /** Timeline */
+  _computedDelay = 0
+  _computedDuration = 0
+  get timeline(): Timer | undefined { return this._tree?.timeline }
+  get timeStart(): number { return this._computedDelay }
+  get timeEnd(): number { return this._computedDelay + this._computedDuration }
+  get timeRelative(): number { return (this.timeline?.current ?? 0) - this._computedDelay }
+  get timeProgress(): number { return clamp(0, this.timeRelative / (this._computedDuration), 1) }
+  isInsideTime(): boolean {
+    if (!this._computedDuration)
+      return true
+    const current = this.timeline?.current ?? 0
+    return current >= this.timeStart && current <= this.timeEnd
   }
 
-  isVisible(): boolean {
-    return this._computedVisibility !== 'hidden'
-  }
-
-  protected _updateVisibility(): void {
+  protected _updateTime(): void {
     const parent = this._parent
+    this._computedDelay = this.delay + (parent?._computedDelay ?? 0)
+    this._computedDuration = parent?._computedDuration
+      ? Math.min(this._computedDelay + this.duration, parent.timeEnd) - this._computedDelay
+      : this.duration
+  }
 
-    this._computedVisibleDelay = this.visibleDelay + (parent?._computedVisibleDelay ?? 0)
-    if (parent?._computedVisibleDuration) {
-      this._computedVisibleDuration = Math.min(this._computedVisibleDelay + this.visibleDuration, parent.visibleTimeline[1]) - this._computedVisibleDelay
+  /** Parent */
+  protected _parent?: Node
+  get parent(): Node | undefined { return this._parent }
+  set parent(parent: Node | undefined) { this.setParent(parent) }
+  hasParent(): boolean { return !!this._parent }
+  getParent(): Node | undefined { return this._parent }
+  setParent(parent: Node | undefined): this {
+    if (!this._parent?.is(parent)) {
+      this._parent = parent
+      this.setTree(parent?._tree)
+      this.emit(parent ? 'parented' : 'unparented')
     }
-    else {
-      this._computedVisibleDuration = this.visibleDuration
+    return this
+  }
+
+  /** Children */
+  protected _children: Node[] = []
+  get children(): Node[] { return this.getChildren() }
+  get siblingIndex(): number { return this.getIndex() }
+  set siblingIndex(toIndex) { this._parent?.moveChild(this, toIndex) }
+  get previousSibling(): Node | undefined { return this._parent?.getChildren()[this.getIndex() - 1] }
+  get nextSibling(): Node | undefined { return this._parent?.getChildren()[this.getIndex() + 1] }
+  get firstSibling(): Node | undefined { return this._parent?.getChildren()[0] }
+  get lastSibling(): Node | undefined {
+    const children = this._parent?.getChildren()
+    return children ? children[children.length - 1] : undefined
+  }
+
+  /** Meta */
+  protected _meta = new Map<string, unknown>()
+  hasMeta(name: string): boolean { return this._meta.has(name) }
+  getMeta<T = any>(name: string): T | undefined
+  getMeta<T = any>(name: string, defaultVal: T): T
+  getMeta(name: string, defaultVal?: any): any { return this._meta.get(name) ?? defaultVal }
+  setMeta(name: string, value: any): void { this._meta.set(name, value) }
+  deleteMeta(name: string): void { this._meta.delete(name) }
+  clearMeta(): void { this._meta.clear() }
+
+  canProcess(): boolean {
+    if (!this._tree)
+      return false
+    switch (this.processMode) {
+      case 'inherit':
+        return this._parent?.canProcess() ?? true
+      case 'pausable':
+        return this._tree.paused
+      case 'when_paused':
+        return !this._tree.paused
+      case 'always':
+        return true
+      case 'disabled':
+      default:
+        return false
     }
+  }
 
-    let visibility = this.visibility
-      ?? parent?._computedVisibility
-      ?? 'visible'
-
-    const current = this._tree?.timeline.current ?? 0
-    if (visibility !== 'hidden') {
-      const [start, end] = this.visibleTimeline
-      if (current < start || current > end) {
-        visibility = 'hidden'
-      }
+  canRender(): boolean {
+    if (!this._tree)
+      return false
+    switch (this.renderMode) {
+      case 'inherit':
+        return this._parent?.canRender() ?? true
+      case 'always':
+        return true
+      case 'disabled':
+      default:
+        return false
     }
-
-    this._computedVisibility = visibility
   }
 
   protected _onEnterTree(): void {
@@ -218,35 +242,32 @@ export class Node extends CoreObject {
     this.emit('treeExited')
   }
 
-  protected _onParented(): void {
-    this._parented()
-  }
-
-  protected _onUnparented(): void {
-    this._unparented()
-  }
-
-  protected _onReady(): void {
-    this._ready()
-  }
-
+  protected _onParented(): void { this._parented() }
+  protected _onUnparented(): void { this._unparented() }
+  protected _onReady(): void { this._ready() }
   protected _onProcess(delta = 0): void {
-    this._updateVisibility()
+    this._updateTime()
+
     const tree = this._tree
     tree?.emit('nodeProcessing', this)
-    this._process(delta)
 
-    const isRenderable = this.isRenderable()
-    let oldRenderCall
-    if (tree && isRenderable) {
-      const renderCall = tree.renderStack.push(this)
-      oldRenderCall = tree.renderStack.currentCall
-      tree.renderStack.currentCall = renderCall
+    if (this.canProcess()) {
+      this._process(delta)
     }
 
+    const canRender = this.canRender()
+
+    let oldRenderCall
+    if (canRender) {
+      const renderCall = tree!.renderStack.push(this)
+      oldRenderCall = tree!.renderStack.currentCall
+      tree!.renderStack.currentCall = renderCall
+    }
+
+    // mask
     if (this.mask instanceof Node) {
       if (!this.getNode('__$mask')) {
-        this.mask.renderable = false
+        this.mask.processMode = 'disabled'
         this.addChild(this.mask, 'front')
       }
     }
@@ -261,9 +282,10 @@ export class Node extends CoreObject {
       this._children[i].emit('process', delta)
     }
 
-    if (tree && isRenderable) {
-      tree.renderStack.currentCall = oldRenderCall
+    if (canRender) {
+      tree!.renderStack.currentCall = oldRenderCall
     }
+
     tree?.emit('nodeProcessed', this)
   }
 
@@ -285,25 +307,11 @@ export class Node extends CoreObject {
     }
   }
 
-  input(key: InputEventKey, event: InputEvent): void {
+  input(event: InputEvent, key: InputEventKey): void {
     for (let i = this._children.length - 1; i >= 0; i--) {
-      this._children[i].input(key, event)
+      this._children[i].input(event, key)
     }
-    this._input(key, event)
-  }
-
-  /** Parent */
-  get parent(): Node | undefined { return this._parent }
-  hasParent(): boolean { return !!this._parent }
-  getParent(): Node | undefined { return this._parent }
-  /** @internal */
-  _setParent(parent: Node | undefined): this {
-    if (!this._parent?.is(parent)) {
-      this._parent = parent
-      this._setTree(parent?._tree)
-      this.emit(parent ? 'parented' : 'unparented')
-    }
-    return this
+    this._input(event, key)
   }
 
   /** Children */
@@ -379,7 +387,7 @@ export class Node extends CoreObject {
         break
     }
     child.internalMode = internalMode
-    child._setParent(this)
+    child.setParent(this)
     this.emit('addChild', child)
     return this
   }
@@ -419,7 +427,7 @@ export class Node extends CoreObject {
       if (oldIndex > -1) {
         this._children.splice(oldIndex, 1)
       }
-      child._setParent(this)
+      child.setParent(this)
       if (newIndex > -1 && newIndex < this._children.length) {
         this._children.splice(newIndex, 0, child)
       }
@@ -440,7 +448,7 @@ export class Node extends CoreObject {
     const index = child.getIndex(true)
     if (this.is(child.parent) && index > -1) {
       this._children.splice(index, 1)
-      child._setParent(undefined)
+      child.setParent(undefined)
       this.emit('removeChild', child, index)
     }
     return this
@@ -479,7 +487,7 @@ export class Node extends CoreObject {
   // eslint-disable-next-line unused-imports/no-unused-vars
   protected _process(delta: number): void { /** override */ }
   // eslint-disable-next-line unused-imports/no-unused-vars
-  protected _input(key: InputEventKey, event: InputEvent): void { /** override */ }
+  protected _input(event: InputEvent, key: InputEventKey): void { /** override */ }
   // eslint-disable-next-line unused-imports/no-unused-vars
   protected _render(renderer: WebGLRenderer): void { /** override */ }
 

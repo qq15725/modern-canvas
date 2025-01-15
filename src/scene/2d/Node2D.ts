@@ -8,10 +8,7 @@ export interface Node2DProperties extends CanvasItemProperties {
   //
 }
 
-@customNode({
-  tag: 'Node2D',
-  renderable: true,
-})
+@customNode('Node2D')
 export class Node2D extends CanvasItem {
   transform = new Transform2D()
   protected _parentTransformDirtyId?: number
@@ -140,10 +137,10 @@ export class Node2D extends CanvasItem {
     super._process(delta)
   }
 
-  protected override _input(key: InputEventKey, event: InputEvent): void {
-    super._input(key, event)
+  protected override _input(event: InputEvent, key: InputEventKey): void {
+    super._input(event, key)
 
-    if (!event.target && this.isRenderable() && this.style.canPointeEvents()) {
+    if (!event.target && this.isVisibleInTree() && this.style.canPointeEvents()) {
       switch (key) {
         case 'pointerdown':
         case 'pointermove':

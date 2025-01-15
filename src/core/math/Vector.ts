@@ -149,16 +149,6 @@ export abstract class Vector extends EventEmitter {
     return cloned
   }
 
-  onUpdate(callback: (array: number[]) => void): this {
-    this.on('update', callback)
-    return this
-  }
-
-  offUpdate(callback: (array: number[]) => void): this {
-    this.off('update', callback)
-    return this
-  }
-
   protected _emitUpdate(array: number[]): void {
     this._onUpdate(array)
     this.emit('update', array)

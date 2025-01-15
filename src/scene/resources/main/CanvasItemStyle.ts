@@ -1,4 +1,4 @@
-import type { IDOCTextStyleDeclaration, IDOCTransformStyleDeclaration, Overflow } from 'modern-idoc'
+import type { IDOCTextStyleDeclaration, IDOCTransformStyleDeclaration, Overflow, Visibility } from 'modern-idoc'
 import type { ColorValue } from '../../../core'
 import type { Texture } from '../textures'
 import { getDefaultTextStyle, getDefaultTransformStyle } from 'modern-idoc'
@@ -46,6 +46,7 @@ export interface CanvasItemStyleProperties extends IDOCTextStyleDeclaration, IDO
   outlineOffset: number
   outlineColor: ColorValue
   outlineStyle: string
+  visibility: Visibility
   overflow: Overflow
   pointerEvents: PointerEvents
 }
@@ -85,10 +86,10 @@ export class CanvasItemStyle extends Resource {
   @property({ default: 0 }) declare outlineOffset: number
   @property({ default: '#000000' }) declare outlineColor: string
   @property({ default: 'none' }) declare outlineStyle: string
+  @property({ default: 'visible' }) declare visibility: Visibility
   @property({ default: 'visible' }) declare overflow: Overflow
   @property({ default: 'auto' }) declare pointerEvents: PointerEvents
 
-  protected _parent?: CanvasItemStyle
   protected _backgroundColor = new Color()
 
   constructor(properties?: Partial<CanvasItemStyleProperties>) {
@@ -228,9 +229,7 @@ export class CanvasItemStyle extends Resource {
       (t3d[0] * t2d[3]) + (t3d[3] * t2d[4]),
       (t3d[1] * t2d[3]) + (t3d[4] * t2d[4]),
       (t3d[2] * t2d[3]) + (t3d[5] * t2d[4]) + t2d[5],
-      0,
-      0,
-      1,
+      0, 0, 1,
     ]
     const [originX, originY] = this.getComputedTransformOrigin()
     const offsetX = originX * width

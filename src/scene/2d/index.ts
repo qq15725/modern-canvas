@@ -1,4 +1,3 @@
-export * from './Animable2D'
 export * from './Graphics2D'
 export * from './Image2D'
 export * from './Image2DResource'

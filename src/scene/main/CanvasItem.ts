@@ -1,7 +1,14 @@
-import type { ColorValue, PropertyDeclaration, WebGLBlendMode, WebGLRenderer } from '../../core'
+import type {
+  ColorValue,
+  EventListenerOptions,
+  EventListenerValue,
+  PropertyDeclaration,
+  WebGLBlendMode,
+  WebGLRenderer,
+} from '../../core'
 import type { CanvasItemStyleProperties, Texture } from '../resources'
 import type { CanvasBatchable } from './CanvasContext'
-import type { NodeProperties } from './Node'
+import type { NodeEventMap, NodeProperties } from './Node'
 import type { Viewport } from './Viewport'
 import { Color, customNode, property, Transform2D } from '../../core'
 import { CanvasItemStyle } from '../resources'
@@ -9,17 +16,33 @@ import { CanvasContext } from './CanvasContext'
 import { Node } from './Node'
 
 export interface CanvasItemProperties extends NodeProperties {
+  visible: boolean
   style: Partial<CanvasItemStyleProperties>
-  tint: string
+  modulate: ColorValue
   blendMode: WebGLBlendMode
   inheritSize: boolean
 }
 
+export interface CanvasItemEventMap extends NodeEventMap {
+  styleUpdateProperty: (key: PropertyKey, newValue: any, oldValue: any, declaration?: PropertyDeclaration) => void
+  draw: () => void
+}
+
+export interface CanvasItem {
+  on: (<K extends keyof CanvasItemEventMap>(type: K, listener: CanvasItemEventMap[K], options?: EventListenerOptions) => this)
+    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
+  off: (<K extends keyof CanvasItemEventMap>(type: K, listener: CanvasItemEventMap[K], options?: EventListenerOptions) => this)
+    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
+  emit: (<K extends keyof CanvasItemEventMap>(type: K, ...args: Parameters<CanvasItemEventMap[K]>) => boolean)
+    & ((type: string, ...args: any[]) => boolean)
+}
+
 @customNode('CanvasItem')
 export class CanvasItem extends Node {
-  @property() tint?: ColorValue
-  @property() blendMode?: WebGLBlendMode
-  @property() inheritSize?: boolean
+  @property({ default: true }) declare visible: boolean
+  @property() declare modulate?: ColorValue
+  @property() declare blendMode?: WebGLBlendMode
+  @property() declare inheritSize?: boolean
 
   protected declare _style: CanvasItemStyle
   get style(): CanvasItemStyle { return this._style }
@@ -37,8 +60,9 @@ export class CanvasItem extends Node {
   opacity = 1
   size = { width: 0, height: 0 }
   protected _parentOpacity?: number
-  protected _tint = new Color(0xFFFFFFFF)
+  protected _modulate = new Color(0xFFFFFFFF)
   protected _backgroundImage?: Texture
+  _computedVisible = true
 
   // Batch render
   context = new CanvasContext()
@@ -73,9 +97,12 @@ export class CanvasItem extends Node {
       case 'blendMode':
         this.requestRepaint()
         break
-      case 'tint':
-        this._tint.value = newValue || 0xFFFFFFFF
+      case 'modulate':
+        this._modulate.value = newValue
         this.requestRepaint()
+        break
+      case 'visible':
+        this._updateVisible()
         break
     }
   }
@@ -97,6 +124,9 @@ export class CanvasItem extends Node {
         break
       case 'borderRadius':
         this.requestRedraw()
+        break
+      case 'visibility':
+        this.visible = newValue === 'visible'
         break
       case 'width':
       case 'height':
@@ -136,28 +166,59 @@ export class CanvasItem extends Node {
   }
 
   protected _updateOpacity(): void {
-    const opacity = this.style.getComputedOpacity()
-      * ((this._parent as CanvasItem)?.opacity ?? 1)
-    if (this.opacity !== opacity) {
-      this.opacity = opacity
-      this.requestRepaint()
-    }
-  }
-
-  override isVisible(): boolean {
-    return this.opacity > 0 && super.isVisible()
-  }
-
-  requestRedraw(): void { this._redrawing = true }
-  requestReflow(): void { this._reflowing = true }
-  requestRepaint(): void { this._repainting = true }
-
-  protected override _process(delta: number): void {
     const parentOpacity = (this._parent as CanvasItem)?.opacity
     if (parentOpacity !== this._parentOpacity) {
       this._parentOpacity = parentOpacity
-      this._updateOpacity()
+      const opacity = this.style.getComputedOpacity()
+        * ((this._parent as CanvasItem)?.opacity ?? 1)
+      if (this.opacity !== opacity) {
+        this.opacity = opacity
+        this.requestRepaint()
+      }
     }
+  }
+
+  protected _updateVisible(): void {
+    let visible = this.visible
+      ?? (this._parent as CanvasItem)?._computedVisible
+      ?? true
+    if (visible && !this.isInsideTime()) {
+      visible = false
+    }
+    this._computedVisible = visible
+  }
+
+  show(): void {
+    this.visible = true
+  }
+
+  hide(): void {
+    this.visible = false
+  }
+
+  isVisibleInTree(): boolean {
+    return this.opacity > 0 && this._computedVisible
+  }
+
+  override canRender(): boolean {
+    return super.canRender() && this.isVisibleInTree()
+  }
+
+  requestRedraw(): void {
+    this._redrawing = true
+  }
+
+  requestReflow(): void {
+    this._reflowing = true
+  }
+
+  requestRepaint(): void {
+    this._repainting = true
+  }
+
+  protected override _process(delta: number): void {
+    this._updateVisible()
+    this._updateOpacity()
 
     if (
       this.inheritSize
@@ -248,7 +309,7 @@ export class CanvasItem extends Node {
       return {
         ...batchable,
         backgroundColor: this.style.getComputedBackgroundColor().abgr,
-        tint: this._tint.toArgb(this.opacity, true),
+        modulate: this._modulate.toArgb(this.opacity, true),
         colorMatrix: colorMatrix.toMatrix4().toArray(true),
         colorMatrixOffset: colorMatrix.toVector4().toArray(),
         blendMode: this.blendMode,
@@ -259,6 +320,7 @@ export class CanvasItem extends Node {
   protected override _render(renderer: WebGLRenderer): void {
     let batchables: CanvasBatchable[] | undefined
     if (this._redrawing) {
+      this.emit('draw')
       this._draw()
       this._originalBatchables = this.context.toBatchables()
       this._layoutedBatchables = this._relayout(this._originalBatchables)

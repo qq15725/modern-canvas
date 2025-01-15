@@ -19,7 +19,7 @@ export class Image2D extends Node2D {
   @property({ default: '' }) declare src: string
 
   get currentTexture(): Texture | undefined { return this.resource?.frames[this._frameIndex]?.texture }
-  get duration(): number { return this.resource?.duration ?? 0 }
+  get imageDuration(): number { return this.resource?.duration ?? 0 }
 
   // HTMLImageElement
   get naturalWidth(): number { return this.currentTexture?.realWidth ?? 0 }
@@ -92,7 +92,7 @@ export class Image2D extends Node2D {
     const duration = this.resource?.duration ?? 0
     if (!duration || !this._tree)
       return 0
-    const currentTime = this.visibleRelativeTime
+    const currentTime = this.timeRelative
     if (currentTime < 0)
       return 0
     return currentTime % duration

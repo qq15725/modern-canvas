@@ -44,8 +44,8 @@ export class Scalable2D extends Node {
     }
   }
 
-  protected override _input(key: InputEventKey, event: InputEvent): void {
-    super._input(key, event)
+  protected override _input(event: InputEvent, key: InputEventKey): void {
+    super._input(event, key)
 
     switch (key) {
       case 'wheel':

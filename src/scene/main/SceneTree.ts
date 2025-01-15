@@ -29,13 +29,14 @@ export interface SceneTree {
 }
 
 export class SceneTree extends MainLoop {
-  protected _backgroundColor = new Color()
+  @property({ default: false }) declare paused: boolean
   @property() declare backgroundColor?: ColorValue
 
   readonly renderStack = new RenderStack()
-  readonly root = new Viewport(true)._setTree(this)
-  readonly timeline = new Timer({ loop: true })._setTree(this)
+  readonly root = new Viewport(true).setTree(this)
+  readonly timeline = new Timer({ duration: Number.MAX_SAFE_INTEGER }).setTree(this)
 
+  protected _backgroundColor = new Color()
   protected _currentViewport?: Viewport
   getCurrentViewport(): Viewport | undefined { return this._currentViewport }
   setCurrentViewport(viewport: Viewport | undefined): void { this._currentViewport = viewport }
