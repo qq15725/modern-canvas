@@ -1,5 +1,5 @@
 import type { CanvasBatchable, Node } from '../main'
-import type { Texture } from '../resources'
+import type { Texture2D } from '../resources'
 import type { ImageFrame } from './Image2DResource'
 import type { Node2DProperties } from './Node2D'
 import { assets } from '../../asset'
@@ -18,7 +18,7 @@ export class Image2D extends Node2D {
   @property({ default: false }) declare gif: boolean
   @property({ default: '' }) declare src: string
 
-  get currentTexture(): Texture | undefined { return this.resource?.frames[this._frameIndex]?.texture }
+  get currentTexture(): Texture2D | undefined { return this.resource?.frames[this._frameIndex]?.texture }
   get imageDuration(): number { return this.resource?.duration ?? 0 }
 
   // HTMLImageElement
@@ -48,7 +48,7 @@ export class Image2D extends Node2D {
 
   decode(): Promise<void> { return this._wait }
 
-  setResource(source: Texture | ImageFrame[] | Image2DResource): this {
+  setResource(source: Texture2D | ImageFrame[] | Image2DResource): this {
     let resource: Image2DResource
     if (source instanceof Image2DResource) {
       resource = source

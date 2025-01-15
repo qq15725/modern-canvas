@@ -1,28 +1,28 @@
 import type { WebGLRenderer, WebGLTextureFilterMode, WebGLTextureOptions, WebGLTextureWrapMode } from '../../../core'
 import { isPow2, protectedProperty, Resource, SUPPORTS_IMAGE_BITMAP } from '../../../core'
 
-export type TextureFilterMode = WebGLTextureFilterMode
-export type TextureWrapMode = WebGLTextureWrapMode
-export interface TexturePixelsSource {
+export type Texture2DFilterMode = WebGLTextureFilterMode
+export type Texture2DWrapMode = WebGLTextureWrapMode
+export interface Texture2DPixelsSource {
   width: number
   height: number
   pixels: Uint8Array | null
 }
-export type TextureSource = TexImageSource | TexturePixelsSource
+export type Texture2DSource = TexImageSource | Texture2DPixelsSource
 
-export class Texture<T extends TextureSource = TextureSource> extends Resource {
-  static get EMPTY(): Texture { return new this({ width: 1, height: 1, pixels: null }) }
-  static get WHITE(): Texture { return new this({ width: 1, height: 1, pixels: new Uint8Array([255, 255, 255, 255]) }) }
-  static get BLACK(): Texture { return new this({ width: 1, height: 1, pixels: new Uint8Array([0, 0, 0, 255]) }) }
-  static get RED(): Texture { return new this({ width: 1, height: 1, pixels: new Uint8Array([255, 0, 0, 255]) }) }
-  static get GREEN(): Texture { return new this({ width: 1, height: 1, pixels: new Uint8Array([0, 255, 0, 255]) }) }
-  static get BLUE(): Texture { return new this({ width: 1, height: 1, pixels: new Uint8Array([0, 0, 255, 255]) }) }
+export class Texture2D<T extends Texture2DSource = Texture2DSource> extends Resource {
+  static get EMPTY(): Texture2D { return new this({ width: 1, height: 1, pixels: null }) }
+  static get WHITE(): Texture2D { return new this({ width: 1, height: 1, pixels: new Uint8Array([255, 255, 255, 255]) }) }
+  static get BLACK(): Texture2D { return new this({ width: 1, height: 1, pixels: new Uint8Array([0, 0, 0, 255]) }) }
+  static get RED(): Texture2D { return new this({ width: 1, height: 1, pixels: new Uint8Array([255, 0, 0, 255]) }) }
+  static get GREEN(): Texture2D { return new this({ width: 1, height: 1, pixels: new Uint8Array([0, 255, 0, 255]) }) }
+  static get BLUE(): Texture2D { return new this({ width: 1, height: 1, pixels: new Uint8Array([0, 0, 255, 255]) }) }
 
   @protectedProperty() declare source: T
   @protectedProperty({ default: 0 }) declare width: number
   @protectedProperty({ default: 0 }) declare height: number
-  @protectedProperty({ default: 'linear' }) declare filterMode: TextureFilterMode
-  @protectedProperty({ default: 'clamp_to_edge' }) declare wrapMode: TextureWrapMode
+  @protectedProperty({ default: 'linear' }) declare filterMode: Texture2DFilterMode
+  @protectedProperty({ default: 'clamp_to_edge' }) declare wrapMode: Texture2DWrapMode
   @protectedProperty({ default: 1 }) declare pixelRatio: number
 
   protected _isPowerOfTwo = false

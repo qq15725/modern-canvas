@@ -1,7 +1,7 @@
 import type { WebGLRenderer } from '../../core'
 import type { Viewport } from '../main'
 import { customNode, property } from '../../core'
-import { Material, QuadUvGeometry, Texture } from '../resources'
+import { Material, QuadUvGeometry, Texture2D } from '../resources'
 import { Effect } from './Effect'
 
 @customNode('GlitchEffect')
@@ -113,7 +113,7 @@ void main(void) {
   })
 
   protected _canvas: HTMLCanvasElement
-  protected _texture: Texture
+  protected _texture: Texture2D
   protected _sizes: Float32Array
   protected _offsets: Float32Array
   protected _redraw = false
@@ -134,7 +134,7 @@ void main(void) {
     this._canvas = document.createElement('canvas')
     this._canvas.width = 4
     this._canvas.height = this.sampleSize
-    this._texture = new Texture(this._canvas)
+    this._texture = new Texture2D(this._canvas)
     this._sizes = new Float32Array(this.slices)
     this._offsets = new Float32Array(this.slices)
   }

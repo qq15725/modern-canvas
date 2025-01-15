@@ -1,14 +1,14 @@
 import type { Assets } from '../Assets'
-import { Texture } from '../../scene'
+import { Texture2D } from '../../scene'
 import { Loader } from './Loader'
 
 export class TextureLoader extends Loader {
-  declare load: (url: string) => Promise<Texture<ImageBitmap>>
+  declare load: (url: string) => Promise<Texture2D<ImageBitmap>>
 
   install(assets: Assets): this {
-    const handler = (url: string): Promise<Texture<ImageBitmap>> => {
+    const handler = (url: string): Promise<Texture2D<ImageBitmap>> => {
       return assets.fetchImageBitmap(url, { premultiplyAlpha: 'premultiply' })
-        .then(bitmap => new Texture(bitmap))
+        .then(bitmap => new Texture2D(bitmap))
     }
 
     this.load = (url) => {

@@ -1,7 +1,7 @@
-import type { TexturePixelsSource } from './Texture'
-import { Texture } from './Texture'
+import type { Texture2DPixelsSource } from './Texture2D'
+import { Texture2D } from './Texture2D'
 
-export class PixelsTexture extends Texture<TexturePixelsSource> {
+export class PixelsTexture extends Texture2D<Texture2DPixelsSource> {
   constructor(
     pixels?: ArrayLike<number> | ArrayBufferLike | ArrayBufferView | null,
     width = 1,

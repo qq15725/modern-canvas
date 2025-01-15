@@ -1,6 +1,6 @@
 import type { WebGLRenderer } from '../../core'
 import type { Viewport } from '../main'
-import type { Texture } from '../resources'
+import type { Texture2D } from '../resources'
 import type { EffectContext, EffectOptions } from './Effect'
 import { assets } from '../../asset'
 import { customNode, property, protectedProperty } from '../../core'
@@ -13,7 +13,7 @@ export interface MaskEffectOptions extends EffectOptions {
 
 @customNode('MaskEffect')
 export class MaskEffect extends Effect {
-  @protectedProperty() texture?: Texture<ImageBitmap>
+  @protectedProperty() texture?: Texture2D<ImageBitmap>
 
   @property({ default: '' }) declare src: string
 

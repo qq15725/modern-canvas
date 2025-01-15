@@ -3,7 +3,7 @@ import type { Node } from '../main'
 import type { Node2DProperties } from './Node2D'
 import { assets } from '../../asset'
 import { customNode, property, Transform2D } from '../../core'
-import { Texture } from '../resources'
+import { Texture2D } from '../resources'
 import { Node2D } from './Node2D'
 
 export interface Lottie2DProperties extends Node2DProperties {
@@ -17,7 +17,7 @@ export class Lottie2D extends Node2D {
   @property({ default: '' }) declare src: string
   duration = 0
 
-  readonly texture = new Texture<HTMLCanvasElement>(document.createElement('canvas'))
+  readonly texture = new Texture2D<HTMLCanvasElement>(document.createElement('canvas'))
   animation?: AnimationItem
 
   constructor(properties?: Partial<Lottie2DProperties>, children: Node[] = []) {

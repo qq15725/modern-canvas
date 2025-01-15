@@ -1,6 +1,13 @@
 import { Vector2 } from './Vector2'
 
 export class Rect2 {
+  get x(): number { return this.position.x }
+  get y(): number { return this.position.y }
+  get left(): number { return this.position.x }
+  get top(): number { return this.position.y }
+  get width(): number { return this.size.x }
+  get height(): number { return this.size.y }
+
   readonly end = new Vector2()
   readonly position: Vector2
   readonly size: Vector2

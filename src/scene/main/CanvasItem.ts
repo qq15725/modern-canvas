@@ -6,7 +6,7 @@ import type {
   WebGLBlendMode,
   WebGLRenderer,
 } from '../../core'
-import type { CanvasItemStyleProperties, Texture } from '../resources'
+import type { CanvasItemStyleProperties, Texture2D } from '../resources'
 import type { CanvasBatchable } from './CanvasContext'
 import type { NodeEventMap, NodeProperties } from './Node'
 import type { Viewport } from './Viewport'
@@ -61,7 +61,7 @@ export class CanvasItem extends Node {
   size = { width: 0, height: 0 }
   protected _parentOpacity?: number
   protected _modulate = new Color(0xFFFFFFFF)
-  protected _backgroundImage?: Texture
+  protected _backgroundImage?: Texture2D
   _computedVisible = true
 
   // Batch render

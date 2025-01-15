@@ -1,5 +1,5 @@
 import { crossOrigin, isVideoElement, protectedProperty, Ticker } from '../../../core'
-import { Texture } from './Texture'
+import { Texture2D } from './Texture2D'
 
 export interface VideoTextureOptions {
   autoLoad?: boolean
@@ -28,7 +28,7 @@ function resolveOptions(options?: VideoTextureOptions): Required<VideoTextureOpt
   }
 }
 
-export class VideoTexture extends Texture<HTMLVideoElement> {
+export class VideoTexture extends Texture2D<HTMLVideoElement> {
   @protectedProperty({ default: true }) declare autoUpdate: boolean
   @protectedProperty({ default: 0 }) declare fps: number
 

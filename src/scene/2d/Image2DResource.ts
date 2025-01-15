@@ -1,8 +1,8 @@
 import { Resource } from '../../core'
-import { Texture } from '../resources'
+import { Texture2D } from '../resources'
 
 export interface ImageFrame {
-  texture: Texture
+  texture: Texture2D
   duration: number
 }
 
@@ -11,14 +11,14 @@ export class Image2DResource extends Resource {
   declare duration: number
 
   constructor(
-    source: Texture | ImageFrame[],
+    source: Texture2D | ImageFrame[],
   ) {
     super()
     let frames
     if (Array.isArray(source)) {
       frames = source
     }
-    else if (source instanceof Texture) {
+    else if (source instanceof Texture2D) {
       frames = [{ texture: source, duration: 0 }]
     }
     else {

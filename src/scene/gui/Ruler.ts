@@ -1,7 +1,7 @@
 import type { Node } from '../main'
 import type { ControlProperties } from './Control'
 import { customNode, property, Transform2D } from '../../core'
-import { Texture } from '../resources'
+import { Texture2D } from '../resources'
 import { Control } from './Control'
 
 export interface RulerProperties extends ControlProperties {
@@ -28,7 +28,7 @@ export class Ruler extends Control {
   @property({ default: '#b2b6bc' }) declare markColor: string
   @property({ default: 300 }) declare gap: number
 
-  texture = new Texture<HTMLCanvasElement>(document.createElement('canvas'))
+  texture = new Texture2D<HTMLCanvasElement>(document.createElement('canvas'))
 
   constructor(properties?: Partial<RulerProperties>, children: Node[] = []) {
     super()

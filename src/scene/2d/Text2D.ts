@@ -3,7 +3,7 @@ import type { Node } from '../main'
 import type { Node2DProperties } from './Node2D'
 import { Text, textDefaultStyle } from 'modern-text'
 import { customNode, property, protectedProperty, Transform2D } from '../../core'
-import { Texture } from '../resources'
+import { Texture2D } from '../resources'
 import { Node2D } from './Node2D'
 
 export interface Text2DProperties extends Node2DProperties, Omit<TextOptions, 'style'> {
@@ -33,7 +33,7 @@ export class Text2D extends Node2D {
   @protectedProperty() fonts?: TextOptions['fonts']
 
   text = new Text()
-  readonly texture = new Texture(document.createElement('canvas'))
+  readonly texture = new Texture2D(document.createElement('canvas'))
   protected _subTextsCount = 0
 
   constructor(properties?: Partial<Text2DProperties>, children: Node[] = []) {

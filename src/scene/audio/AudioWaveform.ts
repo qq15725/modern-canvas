@@ -1,7 +1,7 @@
 import type { Node2DProperties } from '../2d'
 import { Node2D } from '../2d'
 import { customNode, IN_BROWSER, property, Transform2D } from '../../core'
-import { Texture } from '../resources'
+import { Texture2D } from '../resources'
 import { WebAudioContext } from './web'
 
 export interface AudioWaveformProperties extends Node2DProperties {
@@ -18,7 +18,7 @@ export class AudioWaveform extends Node2D {
 
   protected _audioBuffer?: AudioBuffer
   protected _src = IN_BROWSER
-    ? new Texture(document.createElement('canvas'))
+    ? new Texture2D(document.createElement('canvas'))
     : undefined
 
   protected _needsUpdateTexture = false

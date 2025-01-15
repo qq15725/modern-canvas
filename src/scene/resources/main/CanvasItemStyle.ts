@@ -1,6 +1,6 @@
 import type { IDOCTextStyleDeclaration, IDOCTransformStyleDeclaration, Overflow, Visibility } from 'modern-idoc'
 import type { ColorValue } from '../../../core'
-import type { Texture } from '../textures'
+import type { Texture2D } from '../textures'
 import { getDefaultTextStyle, getDefaultTransformStyle } from 'modern-idoc'
 import { assets } from '../../../asset'
 import {
@@ -119,7 +119,7 @@ export class CanvasItemStyle extends Resource {
     return this._backgroundColor
   }
 
-  async getComputedBackgroundImage(): Promise<Texture<ImageBitmap> | undefined> {
+  async getComputedBackgroundImage(): Promise<Texture2D<ImageBitmap> | undefined> {
     if (this.backgroundImage) {
       return await assets.texture.load(this.backgroundImage)
     }

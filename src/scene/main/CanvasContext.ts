@@ -1,44 +1,44 @@
 import type { LineCap, LineJoin, LineStyle } from 'modern-path2d'
 import type { Batchable2D, ColorValue, Transform2D } from '../../core'
 import { CurvePath, Path2D } from 'modern-path2d'
-import { ColorTexture, Texture } from '../resources'
+import { ColorTexture, Texture2D } from '../resources'
 
 export interface CanvasBatchable extends Batchable2D {
   type: 'stroke' | 'fill'
-  texture?: Texture
+  texture?: Texture2D
 }
 
 export interface StrokedGraphics {
   path: Path2D
-  texture?: Texture
+  texture?: Texture2D
   textureTransform?: Transform2D
   style: LineStyle
 }
 
 export interface FilledGraphics {
   path: Path2D
-  texture?: Texture
+  texture?: Texture2D
   textureTransform?: Transform2D
 }
 
 export class CanvasContext extends Path2D {
   textureTransform?: Transform2D
 
-  fillStyle?: ColorValue | Texture
-  strokeStyle?: ColorValue | Texture
+  fillStyle?: ColorValue | Texture2D
+  strokeStyle?: ColorValue | Texture2D
   lineCap?: LineCap
   lineJoin?: LineJoin
   lineWidth?: number
   miterLimit?: number
 
-  _defaultStyle = Texture.EMPTY
+  _defaultStyle = Texture2D.EMPTY
   _stroke: StrokedGraphics[] = []
   _fille: FilledGraphics[] = []
 
   stroke(): void {
-    let texture: Texture = this._defaultStyle
+    let texture: Texture2D = this._defaultStyle
     if (this.strokeStyle) {
-      if (this.strokeStyle instanceof Texture) {
+      if (this.strokeStyle instanceof Texture2D) {
         texture = this.strokeStyle
       }
       else {
@@ -77,9 +77,9 @@ export class CanvasContext extends Path2D {
   }
 
   fill(): void {
-    let texture: Texture = this._defaultStyle
+    let texture: Texture2D = this._defaultStyle
     if (this.fillStyle) {
-      if (this.fillStyle instanceof Texture) {
+      if (this.fillStyle instanceof Texture2D) {
         texture = this.fillStyle
       }
       else {
@@ -127,7 +127,7 @@ export class CanvasContext extends Path2D {
     start: number,
     vertices: number[],
     uvs: number[],
-    texture?: Texture,
+    texture?: Texture2D,
     textureTransform?: Transform2D,
   ): void {
     if (texture) {
@@ -153,7 +153,7 @@ export class CanvasContext extends Path2D {
     let indices: number[] = []
     let uvs: number[] = []
     let startUv = 0
-    let texture: Texture | undefined
+    let texture: Texture2D | undefined
 
     const push = (type: CanvasBatchable['type']): void => {
       batchables.push({

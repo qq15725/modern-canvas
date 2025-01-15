@@ -1,9 +1,8 @@
-import type { Node2D } from '../2d'
 import type { WebGLRenderer } from '../../core'
 import type { NodeProperties } from '../main'
 import type { Material } from '../resources'
 import { assets } from '../../asset'
-import { customNode, property, protectedProperty } from '../../core'
+import { customNode, property, protectedProperty, Rect2 } from '../../core'
 import { Node, Viewport } from '../main'
 import { EffectMaterial, QuadUvGeometry } from '../resources'
 
@@ -248,14 +247,16 @@ export class Effect extends Node {
   }
 
   protected _parseTargetArea(): number[] | undefined {
-    if (this._mode === 'parent' && this._parent?.tag === 'Node2D') {
-      const bbox = (this._parent as Node2D).getBoundingBox()
-      return [
-        bbox.left / this.viewport1.width,
-        bbox.top / this.viewport1.height,
-        bbox.width / this.viewport1.width,
-        bbox.height / this.viewport1.height,
-      ]
+    if (this._mode === 'parent' && this._parent && 'getRect' in this._parent) {
+      const rect = (this._parent as any).getRect()
+      if (rect instanceof Rect2) {
+        return [
+          rect.left / this.viewport1.width,
+          rect.top / this.viewport1.height,
+          rect.width / this.viewport1.width,
+          rect.height / this.viewport1.height,
+        ]
+      }
     }
   }
 

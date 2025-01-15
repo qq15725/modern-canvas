@@ -1,6 +1,6 @@
 import type { WebGLRenderer, WebGLTextureOptions } from '../../../core'
 import { IN_BROWSER, SUPPORTS_CREATE_IMAGE_BITMAP } from '../../../core'
-import { Texture } from './Texture'
+import { Texture2D } from './Texture2D'
 
 export interface ImageTextureOptions {
   autoLoad?: boolean
@@ -17,7 +17,7 @@ function resolveOptions(options?: ImageTextureOptions): Required<ImageTextureOpt
   }
 }
 
-export class ImageTexture extends Texture<HTMLImageElement> {
+export class ImageTexture extends Texture2D<HTMLImageElement> {
   bitmap?: ImageBitmap
   useBitmap: boolean
   preserveBitmap = false

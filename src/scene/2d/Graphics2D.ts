@@ -1,6 +1,6 @@
 import type { LineCap, LineJoin } from 'modern-path2d'
 import type { ColorValue } from '../../core'
-import type { Texture } from '../resources'
+import type { Texture2D } from '../resources'
 import { customNode, PI_2 } from '../../core'
 import { Node2D } from './Node2D'
 
@@ -37,8 +37,8 @@ export class Graphics2D extends Node2D {
 
   @proxy() lineCap?: LineCap
   @proxy() lineJoin?: LineJoin
-  @proxy() fillStyle?: ColorValue | Texture
-  @proxy() strokeStyle?: ColorValue | Texture
+  @proxy() fillStyle?: ColorValue | Texture2D
+  @proxy() strokeStyle?: ColorValue | Texture2D
   @proxy() lineWidth?: number
   @proxy() miterLimit?: number
   @proxy({ method: true }) declare rect: (x: number, y: number, width: number, height: number) => this

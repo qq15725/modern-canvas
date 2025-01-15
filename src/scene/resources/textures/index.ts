@@ -1,6 +1,6 @@
 export * from './ColorTexture'
 export * from './ImageTexture'
 export * from './PixelsTexture'
-export * from './Texture'
+export * from './Texture2D'
 export * from './VideoTexture'
 export * from './ViewportTexture'
