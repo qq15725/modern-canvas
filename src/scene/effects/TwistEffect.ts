@@ -63,16 +63,16 @@ void main(void) {
   offset?: number
 
   override apply(renderer: WebGLRenderer, source: Viewport): void {
-    const visibleProgress = this.visibleProgress
+    const timeProgress = this.timeProgress
     let sampler: number
     let progress: number
-    if (visibleProgress < 0.5) {
+    if (timeProgress < 0.5) {
       sampler = 0
-      progress = (0.5 - visibleProgress) / 0.5
+      progress = (0.5 - timeProgress) / 0.5
     }
     else {
       sampler = 1
-      progress = (visibleProgress - 0.5) / 0.5
+      progress = (timeProgress - 0.5) / 0.5
     }
 
     const width = source.width
