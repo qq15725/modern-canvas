@@ -10,21 +10,25 @@ const declarationMap = new RawWeakMap<object, Map<PropertyKey, PropertyDeclarati
 
 export function getDeclarations(constructor: any): Map<PropertyKey, PropertyDeclaration> {
   let declarations = declarationMap.get(constructor)
+
   if (!declarations) {
     const superConstructor = Object.getPrototypeOf(constructor)
     declarations = new Map(superConstructor ? getDeclarations(superConstructor) : undefined)
     declarationMap.set(constructor, declarations)
   }
+
   return declarations
 }
 
 export function defineProperty(constructor: any, name: PropertyKey, declaration: PropertyDeclaration = {}): void {
   getDeclarations(constructor).set(name, declaration)
+
   const {
     default: defaultValue,
     alias,
   } = declaration
   let descriptor = Object.getOwnPropertyDescriptor(constructor.prototype, name)
+
   if (!descriptor) {
     const key = alias ?? Symbol.for(String(name))
     descriptor = {
@@ -32,6 +36,7 @@ export function defineProperty(constructor: any, name: PropertyKey, declaration:
       set(this: any, v: unknown) { (this as any)[key] = v },
     }
   }
+
   Object.defineProperty(constructor.prototype, name, {
     get(this: any) { return descriptor!.get?.call(this) ?? defaultValue },
     set(this: any, value: unknown) {

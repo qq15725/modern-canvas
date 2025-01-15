@@ -34,7 +34,7 @@ export class SceneTree extends MainLoop {
 
   readonly renderStack = new RenderStack()
   readonly root = new Viewport(true).setTree(this)
-  readonly timeline = new Timer({ duration: Number.MAX_SAFE_INTEGER }).setTree(this)
+  readonly timeline = new Timer({ end: Number.MAX_SAFE_INTEGER }).setTree(this)
 
   protected _backgroundColor = new Color()
   protected _currentViewport?: Viewport

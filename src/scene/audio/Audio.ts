@@ -36,7 +36,7 @@ export class Audio extends Node {
   get isPlayable(): boolean { return this.isLoaded && this._platformAudio.isPlayable }
 
   /** Duration */
-  get duration(): number { return this._platformAudio.duration * 1000 }
+  get audioDuration(): number { return this._platformAudio.duration * 1000 }
 
   /** Volume */
   protected _volume = 1
@@ -209,7 +209,7 @@ export class Audio extends Node {
         if (!this._timer) {
           this._setTimeStop()
           this.play({
-            start: this.start + ((currentTime - this.processDelay) % this.duration),
+            start: this.start + ((currentTime - this.delay) % this.duration),
           })
         }
 
