@@ -1,6 +1,6 @@
 import type { InputEvent, InputEventKey, PointerInputEvent } from '../../core'
 import type { CanvasBatchable, CanvasItemProperties, Node } from '../main'
-import { customNode, Rect2, Transform2D } from '../../core'
+import { customNode, Transform2D } from '../../core'
 import { CanvasItem } from '../main'
 
 export interface Node2DProperties extends CanvasItemProperties {
@@ -16,23 +16,6 @@ export class Node2D extends CanvasItem {
     super()
     this.setProperties(properties)
     this.append(children)
-  }
-
-  getRect(): Rect2 {
-    let { left, top, width, height, rotate } = this.style
-    if (rotate) {
-      rotate = Math.abs(rotate % 180)
-      rotate = (rotate / 180) * Math.PI
-      const sin = Math.abs(Math.sin(rotate))
-      const cos = Math.abs(Math.cos(rotate))
-      const newWidth = height * sin + width * cos
-      const newHeight = height * cos + width * sin
-      left += (width - newWidth) / 2
-      top += (height - newHeight) / 2
-      width = newWidth
-      height = newHeight
-    }
-    return new Rect2(left, top, width, height)
   }
 
   protected override _onUpdateStyleProperty(key: PropertyKey, value: any, oldValue: any): void {

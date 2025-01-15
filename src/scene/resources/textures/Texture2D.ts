@@ -1,5 +1,12 @@
-import type { WebGLRenderer, WebGLTextureFilterMode, WebGLTextureOptions, WebGLTextureWrapMode } from '../../../core'
-import { isPow2, protectedProperty, Resource, SUPPORTS_IMAGE_BITMAP } from '../../../core'
+import type {
+  PropertyDeclaration,
+  WebGLRenderer,
+  WebGLTextureFilterMode,
+  WebGLTextureOptions, WebGLTextureWrapMode,
+} from '../../../core'
+import {
+  isPow2, property, protectedProperty, Resource, SUPPORTS_IMAGE_BITMAP,
+} from '../../../core'
 
 export type Texture2DFilterMode = WebGLTextureFilterMode
 export type Texture2DWrapMode = WebGLTextureWrapMode
@@ -19,11 +26,11 @@ export class Texture2D<T extends Texture2DSource = Texture2DSource> extends Reso
   static get BLUE(): Texture2D { return new this({ width: 1, height: 1, pixels: new Uint8Array([0, 0, 255, 255]) }) }
 
   @protectedProperty() declare source: T
-  @protectedProperty({ default: 0 }) declare width: number
-  @protectedProperty({ default: 0 }) declare height: number
-  @protectedProperty({ default: 'linear' }) declare filterMode: Texture2DFilterMode
-  @protectedProperty({ default: 'clamp_to_edge' }) declare wrapMode: Texture2DWrapMode
-  @protectedProperty({ default: 1 }) declare pixelRatio: number
+  @property({ default: 0 }) declare width: number
+  @property({ default: 0 }) declare height: number
+  @property({ default: 'linear' }) declare filterMode: Texture2DFilterMode
+  @property({ default: 'clamp_to_edge' }) declare wrapMode: Texture2DWrapMode
+  @property({ default: 1 }) declare pixelRatio: number
 
   protected _isPowerOfTwo = false
   protected _needsUpload = false
@@ -36,10 +43,6 @@ export class Texture2D<T extends Texture2DSource = Texture2DSource> extends Reso
     super()
     this.source = source
     this._updateSize()
-  }
-
-  protected _refreshPOT(): void {
-    this._isPowerOfTwo = isPow2(this.realWidth) && isPow2(this.realHeight)
   }
 
   /** @internal */
@@ -77,19 +80,28 @@ export class Texture2D<T extends Texture2DSource = Texture2DSource> extends Reso
     })
   }
 
-  protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any): void {
-    super._onUpdateProperty(key, value, oldValue)
+  protected override _onUpdateProperty(key: PropertyKey, newValue: any, oldValue: any, declaration?: PropertyDeclaration): void {
+    super._onUpdateProperty(key, newValue, oldValue, declaration)
 
     switch (key) {
       case 'width':
       case 'height':
+        this._updatePOT()
+        break
+      case 'source':
+        this._updateSize()
+        break
       case 'filterMode':
       case 'wrapMode':
       case 'pixelRatio':
-      case 'source':
         this.requestUpload()
         break
     }
+  }
+
+  protected _updatePOT(): void {
+    this._isPowerOfTwo = isPow2(this.realWidth) && isPow2(this.realHeight)
+    this.requestUpload()
   }
 
   protected _updateSize(): void {
@@ -102,16 +114,15 @@ export class Texture2D<T extends Texture2DSource = Texture2DSource> extends Reso
       this.width = Number(source.naturalWidth || source.videoWidth || source.width || 0)
       this.height = Number(source.naturalHeight || source.videoHeight || source.height || 0)
     }
+    this.requestUpload()
   }
 
   requestUpload(): void {
     this._needsUpload = true
-    this._updateSize()
-    this._refreshPOT()
   }
 
   upload(renderer: WebGLRenderer, options?: Partial<WebGLTextureOptions>): boolean {
-    if (this._needsUpload) {
+    if (this._needsUpload && this.valid) {
       this._needsUpload = false
       renderer.texture.update(
         this._glTexture(renderer, options),

@@ -2,18 +2,16 @@ import type { Node } from '../main'
 import type { VideoTexture } from '../resources'
 import type { Node2DProperties } from './Node2D'
 import { assets } from '../../asset'
-import { customNode, property, Transform2D } from '../../core'
-import { Node2D } from './Node2D'
+import { customNode, property } from '../../core'
+import { TextureRect2D } from './TextureRect2D'
 
 export interface Video2DProperties extends Node2DProperties {
   src: string
 }
 
 @customNode('Video2D')
-export class Video2D extends Node2D {
+export class Video2D extends TextureRect2D<VideoTexture> {
   @property({ default: '' }) declare src: string
-
-  texture?: VideoTexture
 
   get videoDuration(): number { return (this.texture?.duration ?? 0) * 1000 }
 
@@ -44,18 +42,6 @@ export class Video2D extends Node2D {
       this.style.height = this.texture!.height
     }
     this.requestRedraw()
-  }
-
-  protected override _drawContent(): void {
-    const src = this.texture
-    if (src) {
-      this.context.fillStyle = src
-      this.context.textureTransform = new Transform2D().scale(
-        this.style.width! / src.width,
-        this.style.height! / src.height,
-      )
-    }
-    super._drawContent()
   }
 
   protected _updateVideoCurrentTime(): void {

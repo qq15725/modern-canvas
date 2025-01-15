@@ -2,12 +2,11 @@ import type { MeasureResult, TextOptions } from 'modern-text'
 import type { Node } from '../main'
 import type { Node2DProperties } from './Node2D'
 import { Text, textDefaultStyle } from 'modern-text'
-import { customNode, property, protectedProperty, Transform2D } from '../../core'
-import { Texture2D } from '../resources'
-import { Node2D } from './Node2D'
+import { customNode, property, protectedProperty } from '../../core'
+import { CanvasTexture } from '../resources'
+import { TextureRect2D } from './TextureRect2D'
 
 export interface Text2DProperties extends Node2DProperties, Omit<TextOptions, 'style'> {
-  pixelRatio: number
   split: boolean
 }
 
@@ -24,16 +23,16 @@ const textStyles = new Set(Object.keys(textDefaultStyle))
  * })
  */
 @customNode('Text2D')
-export class Text2D extends Node2D {
-  @property({ default: 2 }) declare pixelRatio: number
+export class Text2D extends TextureRect2D<CanvasTexture> {
   @property({ default: false }) declare split: boolean
   @property({ default: '' }) declare content: TextOptions['content']
   @property() effects?: TextOptions['effects']
   @protectedProperty() measureDom?: TextOptions['measureDom']
   @protectedProperty() fonts?: TextOptions['fonts']
 
+  override texture = new CanvasTexture()
+
   text = new Text()
-  readonly texture = new Texture2D(document.createElement('canvas'))
   protected _subTextsCount = 0
 
   constructor(properties?: Partial<Text2DProperties>, children: Node[] = []) {
@@ -142,7 +141,6 @@ export class Text2D extends Node2D {
           f.characters.forEach((c) => {
             this.addChild(
               new Text2D({
-                pixelRatio: this.pixelRatio,
                 content: c.content,
                 style: {
                   ...c.computedStyle as any,
@@ -171,16 +169,11 @@ export class Text2D extends Node2D {
       else {
         this._updateText()
         this.text.render({
-          pixelRatio: this.pixelRatio,
+          pixelRatio: this.texture.pixelRatio,
           view: this.texture.source,
         })
       }
       this.texture.requestUpload()
-      this.context.fillStyle = this.texture
-      this.context.textureTransform = new Transform2D().scale(
-        1 / this.pixelRatio,
-        1 / this.pixelRatio,
-      )
       super._drawContent()
     }
   }

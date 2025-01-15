@@ -2,22 +2,19 @@ import type { AnimationItem } from 'lottie-web'
 import type { Node } from '../main'
 import type { Node2DProperties } from './Node2D'
 import { assets } from '../../asset'
-import { customNode, property, Transform2D } from '../../core'
-import { Texture2D } from '../resources'
-import { Node2D } from './Node2D'
+import { customNode, property } from '../../core'
+import { CanvasTexture } from '../resources'
+import { TextureRect2D } from './TextureRect2D'
 
 export interface Lottie2DProperties extends Node2DProperties {
-  pixelRatio: number
   src: string
 }
 
 @customNode('Lottie2D')
-export class Lottie2D extends Node2D {
-  @property({ default: 2 }) declare pixelRatio: number
+export class Lottie2D extends TextureRect2D {
   @property({ default: '' }) declare src: string
-  duration = 0
 
-  readonly texture = new Texture2D<HTMLCanvasElement>(document.createElement('canvas'))
+  readonly texture = new CanvasTexture()
   animation?: AnimationItem
 
   constructor(properties?: Partial<Lottie2DProperties>, children: Node[] = []) {
@@ -39,10 +36,10 @@ export class Lottie2D extends Node2D {
     super._onUpdateStyleProperty(key, value, oldValue)
     switch (key) {
       case 'width':
-        this.texture.source.width = this.style.width * this.pixelRatio
+        this.texture.width = this.style.width
         break
       case 'height':
-        this.texture.source.height = this.style.height * this.pixelRatio
+        this.texture.height = this.style.height
         break
     }
   }
@@ -59,17 +56,5 @@ export class Lottie2D extends Node2D {
     this.texture.requestUpload()
     this.requestRepaint()
     super._process(delta)
-  }
-
-  protected override _drawContent(): void {
-    const texture = this.texture
-    if (texture.valid) {
-      this.context.fillStyle = texture
-      this.context.textureTransform = new Transform2D().scale(
-        this.style.width! / texture.width,
-        this.style.height! / texture.height,
-      )
-      super._drawContent()
-    }
   }
 }

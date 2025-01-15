@@ -6,7 +6,7 @@ import {
   KeyframeAnimation,
   Node2D,
   ShadowEffect,
-  Text2D,
+  Text2D, Video2D,
 } from '../../src'
 
 const editor = new Editor2D()
@@ -103,6 +103,17 @@ async function init(): Promise<void> {
         height: 100,
       },
       src: '/example.jpg',
+    }, [
+      new ShadowEffect(),
+    ]),
+    new Video2D({
+      style: {
+        left: 200,
+        top: 200,
+        width: 100,
+        height: 100,
+      },
+      src: '/example.mp4',
     }, [
       new ShadowEffect(),
     ]),
