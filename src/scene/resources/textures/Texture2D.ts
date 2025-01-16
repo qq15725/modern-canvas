@@ -80,8 +80,8 @@ export class Texture2D<T extends Texture2DSource = Texture2DSource> extends Reso
     })
   }
 
-  protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    super._onUpdateProperty(key, value, oldValue, declaration)
+  protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+    super._updateProperty(key, value, oldValue, declaration)
 
     switch (key) {
       case 'width':

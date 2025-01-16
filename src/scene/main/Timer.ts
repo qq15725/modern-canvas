@@ -47,8 +47,8 @@ export class Timer extends Node {
     this.setProperties(properties)
   }
 
-  protected _onUpdateProperty(key: PropertyKey, value: any, oldValue: any): void {
-    super._onUpdateProperty(key, value, oldValue)
+  protected _updateProperty(key: PropertyKey, value: any, oldValue: any): void {
+    super._updateProperty(key, value, oldValue)
 
     switch (key) {
       case 'start':

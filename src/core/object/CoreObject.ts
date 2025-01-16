@@ -54,7 +54,7 @@ export class CoreObject extends EventEmitter {
   }
 
   // eslint-disable-next-line unused-imports/no-unused-vars
-  protected _onUpdateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     /** override */
   }
 
@@ -119,7 +119,7 @@ export class CoreObject extends EventEmitter {
         this._updatedProperties.set(key, oldValue)
         this._changedProperties.add(key)
         declaration ??= this.getPropertyDeclaration(key)
-        this._onUpdateProperty(key, newValue, oldValue, declaration)
+        this._updateProperty(key, newValue, oldValue, declaration)
         this.emit('updateProperty', key, newValue, oldValue, declaration)
       }
       else {

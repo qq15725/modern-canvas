@@ -1,6 +1,6 @@
 import type { InputEvent, InputEventKey, PointerInputEvent } from '../core'
 import type { CanvasItemStyle } from '../scene'
-import { CanvasItem, Node2D, Ruler, Scalable2D } from '../scene'
+import { CanvasItem, Node2D, Ruler, Scaler } from '../scene'
 
 export class Editor2D extends CanvasItem {
   name = 'Editor'
@@ -58,6 +58,11 @@ export class Editor2D extends CanvasItem {
     },
   })
 
+  scaler = new Scaler()
+    .on('updateScale', (scale) => {
+      this.ruler.gap = scale * 300
+    })
+
   protected _pointerStart?: CanvasItemStyle
   protected _pointerOffset?: { x: number, y: number }
   selected?: CanvasItem
@@ -71,7 +76,7 @@ export class Editor2D extends CanvasItem {
       .append(
         this.ruler.addChild(
           this.drawboard
-            .addChild(new Scalable2D(), 'back'),
+            .addChild(this.scaler, 'back'),
         )
           .append(
             this.hover,

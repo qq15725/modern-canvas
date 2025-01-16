@@ -97,8 +97,8 @@ export class CanvasItemStyle extends Resource {
     this.setProperties(properties)
   }
 
-  protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    super._onUpdateProperty(key, value, oldValue, declaration)
+  protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+    super._updateProperty(key, value, oldValue, declaration)
 
     switch (key) {
       case 'backgroundColor':
