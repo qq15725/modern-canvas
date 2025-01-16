@@ -1,12 +1,12 @@
 import type { AnimationItem } from 'lottie-web'
 import type { Node } from '../main'
-import type { Node2DProperties } from './Node2D'
+import type { TextureRect2DProperties } from './TextureRect2D'
 import { assets } from '../../asset'
 import { customNode, property, type PropertyDeclaration } from '../../core'
 import { CanvasTexture } from '../resources'
 import { TextureRect2D } from './TextureRect2D'
 
-export interface Lottie2DProperties extends Node2DProperties {
+export interface Lottie2DProperties extends TextureRect2DProperties {
   src: string
 }
 

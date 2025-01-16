@@ -1,12 +1,12 @@
 import type { MeasureResult, TextOptions } from 'modern-text'
 import type { Node } from '../main'
-import type { Node2DProperties } from './Node2D'
+import type { TextureRect2DProperties } from './TextureRect2D'
 import { Text, textDefaultStyle } from 'modern-text'
 import { customNode, property, type PropertyDeclaration, protectedProperty } from '../../core'
 import { CanvasTexture } from '../resources'
 import { TextureRect2D } from './TextureRect2D'
 
-export interface Text2DProperties extends Node2DProperties, Omit<TextOptions, 'style'> {
+export interface Text2DProperties extends TextureRect2DProperties, Omit<TextOptions, 'style'> {
   split: boolean
 }
 
