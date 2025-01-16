@@ -1,3 +1,43 @@
+# [0.2.0](https://github.com/qq15725/modern-canvas/compare/v0.1.10...v0.2.0) (2025-01-16)
+
+
+### Bug Fixes
+
+* `Viewport` ([2851326](https://github.com/qq15725/modern-canvas/commit/2851326876a5b76c16e610862350b14e22d9734e))
+* Audio ([82304da](https://github.com/qq15725/modern-canvas/commit/82304da9d715441884a7105de5549ce8cb953c74))
+* color a ([a813405](https://github.com/qq15725/modern-canvas/commit/a813405c280f8a4ec1d2ba6a6d0773a83e15da40))
+* rename `visibleProgress` to `timeProgress` ([14cf394](https://github.com/qq15725/modern-canvas/commit/14cf394d23637842977a49c08e6401d7daf3f295))
+* style type ([a149a38](https://github.com/qq15725/modern-canvas/commit/a149a38f14c1fd02df51c0f95e94ea36de8c9034))
+* type ([259c9dd](https://github.com/qq15725/modern-canvas/commit/259c9dd1a487ee95689e98577d7a988d975d6d9f))
+* type ([3908f8b](https://github.com/qq15725/modern-canvas/commit/3908f8b3b3e5d2baa0966f2371edc0ef8f4b1bb7))
+
+
+### Features
+
+* add `play`、`stop`、`pause` methods to `Animation` ([5aca44f](https://github.com/qq15725/modern-canvas/commit/5aca44f8b9f39234f7773bef1867d964a7e948eb))
+* add `Scalable2D` ([e636310](https://github.com/qq15725/modern-canvas/commit/e63631036af767f3678ecc5a64e471c64b5e682c))
+* add `TimelineNode` ([8f0bc9e](https://github.com/qq15725/modern-canvas/commit/8f0bc9e4e9c0fa7e1ca4270663fb50677d556ef3))
+* add `Viewport.valid` prop ([d858273](https://github.com/qq15725/modern-canvas/commit/d85827363968810a3f350fe816bd22c5ea7556d0))
+* add border、outline feature ([5f002f0](https://github.com/qq15725/modern-canvas/commit/5f002f0a2d5a19ad3013c665da9bebcf0e141c3e))
+* adjust directory structure ([5e0346b](https://github.com/qq15725/modern-canvas/commit/5e0346bc0ef22a2436b5be95f11d86c86b49298b))
+* adjust directory structure ([d7e7b2a](https://github.com/qq15725/modern-canvas/commit/d7e7b2a080074c1c259294579235816e4fa4cf6d))
+* adjust directory structure ([d329825](https://github.com/qq15725/modern-canvas/commit/d329825794ad7eb132741b839953b439b290e4e5))
+* adjust directory structure ([a206ae5](https://github.com/qq15725/modern-canvas/commit/a206ae508c55475a051da94c03abd6544254c6bf))
+* CanvasTexture ([0c0d623](https://github.com/qq15725/modern-canvas/commit/0c0d623c3fb29d7c36af6634f96010b0184fadc8))
+* change node time logic ([17ea9c0](https://github.com/qq15725/modern-canvas/commit/17ea9c0219f7edaa43da0c4b1083bb1848100277))
+* Editor2D ([9daf420](https://github.com/qq15725/modern-canvas/commit/9daf420f6e86f2ad37da7aad8b9001b32e7cedab))
+* Editor2D ([748e856](https://github.com/qq15725/modern-canvas/commit/748e856d70d64f5f0a5d8d20895ccd7c7b7615b8))
+* input event ([3818bd9](https://github.com/qq15725/modern-canvas/commit/3818bd98cadf5ffe1e865383d0da7f92575feef8))
+* interactivity ([b3ea112](https://github.com/qq15725/modern-canvas/commit/b3ea1129f82ebd5cad812769c87de88076286c1c))
+* rename `_onUpdateProperty` to `_updateProperty` ([8e7b5fd](https://github.com/qq15725/modern-canvas/commit/8e7b5fdb08cf45835dc5aa5e18d895bd8e0c13b5))
+* rename `_onUpdateStyleProperty` to `_updateStyleProperty` ([283ce64](https://github.com/qq15725/modern-canvas/commit/283ce642b78f907f76febd2703b6405cdfc49a80))
+* rename `Texture` to `Texture2D` ([0aa900e](https://github.com/qq15725/modern-canvas/commit/0aa900eca465946d286cf3fb731cf11e9a1b42d4))
+* Ruler2D ([b33d0c8](https://github.com/qq15725/modern-canvas/commit/b33d0c88dd11227d3b8a393b87af1abac670be7e))
+* ShadowEffect ([e9ba268](https://github.com/qq15725/modern-canvas/commit/e9ba26889e33867ffcad87878e8d1f1da1b003ba))
+* ShadowEffect ([ddff50d](https://github.com/qq15725/modern-canvas/commit/ddff50def3cd9d2d1f0845b750e8b77f49ed6b91))
+
+
+
 ## [0.1.10](https://github.com/qq15725/modern-canvas/compare/v0.1.9...v0.1.10) (2025-01-09)
 
 
