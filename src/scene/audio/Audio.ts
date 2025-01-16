@@ -1,3 +1,4 @@
+import type { PropertyDeclaration } from '../../core'
 import type { HTMLSound } from './html'
 import type { IPlayOptions } from './interfaces'
 import type { WebSound } from './web'
@@ -82,16 +83,6 @@ export class Audio extends TimelineNode {
   protected _isPlaying = false
   get isPlaying(): boolean { return this._isPlaying }
 
-  /** Paused */
-  protected _paused = false
-  get paused(): boolean { return this._paused }
-  set paused(val: boolean) {
-    if (this._paused !== val) {
-      this._paused = val
-      this.refreshPaused()
-    }
-  }
-
   multiple = false
   start = 0
   end = 0
@@ -99,6 +90,15 @@ export class Audio extends TimelineNode {
   constructor(src = '') {
     super()
     this.src = src
+  }
+
+  protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+    super._updateProperty(key, value, oldValue, declaration)
+    switch (key) {
+      case 'paused':
+        this.refreshPaused()
+        break
+    }
   }
 
   async load(): Promise<this> {
