@@ -134,13 +134,13 @@ export class KeyframeAnimation extends TimelineNode {
       .append(children)
   }
 
-  protected override _enterTree(): void {
-    this._tree?.timeline.on('updateCurrentTime', this._updateAnimationPosition)
+  protected override _parented(parent: Node): void {
+    parent.on('processing', this._updateAnimationPosition)
     this._updateStartProps()
   }
 
-  protected override _exitTree(): void {
-    this._tree?.timeline.off('updateCurrentTime', this._updateAnimationPosition)
+  protected override _unparented(oldParent: Node): void {
+    oldParent.on('processing', this._updateAnimationPosition)
     this.cancel()
   }
 

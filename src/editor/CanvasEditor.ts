@@ -1,16 +1,9 @@
 import type { InputEvent, InputEventKey, PointerInputEvent } from '../core'
 import type { CanvasItemStyle } from '../scene'
-import { CanvasItem, Node2D, Ruler, Scaler } from '../scene'
+import { CanvasItem, Node2D, Ruler, Scaler, ScrollBar } from '../scene'
 
 export class CanvasEditor extends CanvasItem {
   name = 'CanvasEditor'
-
-  ruler = new Ruler({
-    name: 'ruler',
-    offsetX: 100,
-    offsetY: 100,
-    inheritSize: true,
-  })
 
   hover = new Node2D({
     name: 'hover',
@@ -43,6 +36,20 @@ export class CanvasEditor extends CanvasItem {
     name: 'selector',
   })
 
+  scaler = new Scaler({
+    internalMode: 'back',
+  }).on('updateScale', (scale) => {
+    this.ruler.gap = scale * 300
+  })
+
+  xScrollBar = new ScrollBar({
+    internalMode: 'back',
+  })
+
+  yScrollBar = new ScrollBar({
+    internalMode: 'back',
+  })
+
   drawboard = new Node2D({
     name: 'drawboard',
     style: {
@@ -55,13 +62,24 @@ export class CanvasEditor extends CanvasItem {
       borderStyle: 'solid',
       borderWidth: 2,
       pointerEvents: 'none',
+      transformOrigin: 'left top',
     },
-  })
+  }).append(
+    this.scaler,
+  )
 
-  scaler = new Scaler()
-    .on('updateScale', (scale) => {
-      this.ruler.gap = scale * 300
-    })
+  ruler = new Ruler({
+    name: 'ruler',
+    offsetX: 100,
+    offsetY: 100,
+    inheritSize: true,
+  }).append(
+    this.drawboard,
+    this.hover,
+    this.selectionRect,
+    this.xScrollBar,
+    this.yScrollBar,
+  )
 
   protected _pointerStart?: CanvasItemStyle
   protected _pointerOffset?: { x: number, y: number }
@@ -72,17 +90,7 @@ export class CanvasEditor extends CanvasItem {
     this._onPointerdown = this._onPointerdown.bind(this)
     this._onPointermove = this._onPointermove.bind(this)
     this._onPointerup = this._onPointerup.bind(this)
-    this
-      .append(
-        this.ruler.addChild(
-          this.drawboard
-            .addChild(this.scaler, 'back'),
-        )
-          .append(
-            this.hover,
-            this.selectionRect,
-          ),
-      )
+    this.append(this.ruler)
     this.inheritSize = true
   }
 

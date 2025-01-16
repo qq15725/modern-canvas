@@ -47,24 +47,12 @@ export class Texture2D<T extends Texture2DSource = Texture2DSource> extends Reso
 
   /** @internal */
   _glTextureOptions(renderer: WebGLRenderer, options?: Partial<WebGLTextureOptions>): WebGLTextureOptions {
-    let value = this.source
-
-    if ('pixels' in value) {
-      value = {
-        pixels: value.pixels,
-        width: this.realWidth,
-        height: this.realHeight,
-      } as any
-    }
-
     let wrapMode = this.wrapMode
-
     if (renderer.version === 1 && !this._isPowerOfTwo) {
       wrapMode = 'clamp_to_edge'
     }
-
     return {
-      value,
+      value: this.source,
       target: 'texture_2d' as const,
       location: 0,
       filterMode: this.filterMode,
@@ -107,12 +95,12 @@ export class Texture2D<T extends Texture2DSource = Texture2DSource> extends Reso
   protected _updateSize(): void {
     const source = this.source as any
     if ('pixels' in source) {
-      this.width = Math.max(this.width, source.width)
-      this.height = Math.max(this.height, source.height)
+      this.width = source.width / this.pixelRatio
+      this.height = source.height / this.pixelRatio
     }
     else {
-      this.width = Number(source.naturalWidth || source.videoWidth || source.width || 0)
-      this.height = Number(source.naturalHeight || source.videoHeight || source.height || 0)
+      this.width = Number(source.naturalWidth || source.videoWidth || source.width || 0) / this.pixelRatio
+      this.height = Number(source.naturalHeight || source.videoHeight || source.height || 0) / this.pixelRatio
     }
     this.requestUpload()
   }

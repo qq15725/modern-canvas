@@ -127,18 +127,15 @@ export class Viewport extends Node {
     return false
   }
 
-  activateWithCopy(renderer: WebGLRenderer, target: Viewport): boolean {
-    if (this.valid) {
-      this.resize(target.width, target.height)
-      this.activate(renderer)
+  activateWithCopy(renderer: WebGLRenderer, target: Viewport): void {
+    this.resize(target.width, target.height)
+    if (this.activate(renderer)) {
       renderer.clear()
       target.texture.activate(renderer, 0)
       QuadUvGeometry.draw(renderer, UvMaterial.instance, {
         sampler: 0,
       })
-      return true
     }
-    return false
   }
 
   override render(renderer: WebGLRenderer, next?: () => void): void {

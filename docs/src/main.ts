@@ -122,7 +122,7 @@ async function init(): Promise<void> {
     ]),
   ])
 
-  console.warn(editor.drawboard.toJSON())
+  console.warn(editor, editor.drawboard.toJSON())
 }
 
 init()

@@ -18,18 +18,20 @@ import {
 } from '../../core'
 
 export interface NodeEventMap extends CoreObjectEventMap, InputEventMap {
-  enterTree: () => void
-  exitTree: () => void
+  treeEnter: (tree: SceneTree) => void
+  treeEntered: (tree: SceneTree) => void
+  treePostEnter: (tree: SceneTree) => void
+  treeExit: (oldTree: SceneTree) => void
+  treeExiting: (oldTree: SceneTree) => void
+  treeExited: (oldTree: SceneTree) => void
   childExitingTree: (node: Node) => void
   childEnteredTree: (node: Node) => void
-  postEnterTree: () => void
   ready: () => void
-  treeEntered: () => void
-  treeExiting: () => void
-  treeExited: () => void
-  parented: () => void
-  unparented: () => void
+  parented: (parent: Node) => void
+  unparented: (oldParent: Node) => void
+  processing: (delta?: number) => void
   process: (delta?: number) => void
+  processed: (delta?: number) => void
   addChild: (child: Node) => void
   removeChild: (child: Node, index: number) => void
   moveChild: (child: Node, newIndex: number, oldIndex: number) => void
@@ -72,8 +74,8 @@ export class Node extends CoreObject {
   constructor(properties?: Partial<NodeProperties>, children: Node[] = []) {
     super()
 
-    this._onEnterTree = this._onEnterTree.bind(this)
-    this._onExitTree = this._onExitTree.bind(this)
+    this._onTreeEnter = this._onTreeEnter.bind(this)
+    this._onTreeExit = this._onTreeExit.bind(this)
     this._onParented = this._onParented.bind(this)
     this._onUnparented = this._onUnparented.bind(this)
     this._onReady = this._onReady.bind(this)
@@ -82,8 +84,8 @@ export class Node extends CoreObject {
     this
       .setProperties(properties)
       .append(children)
-      .on('enterTree', this._onEnterTree)
-      .on('exitTree', this._onExitTree)
+      .on('treeEnter', this._onTreeEnter)
+      .on('treeExit', this._onTreeExit)
       .on('parented', this._onParented)
       .on('unparented', this._onUnparented)
       .on('ready', this._onReady)
@@ -110,10 +112,10 @@ export class Node extends CoreObject {
     if (tree !== oldTree) {
       if (tree) {
         this._tree = tree
-        this.emit('enterTree')
+        this.emit('treeEnter', tree)
       }
       else if (oldTree) {
-        this.emit('exitTree')
+        this.emit('treeExit', oldTree)
         this._tree = tree
       }
 
@@ -125,7 +127,7 @@ export class Node extends CoreObject {
       }
 
       if (tree) {
-        this.emit('postEnterTree')
+        this.emit('treePostEnter', tree)
         if (!this._readyed) {
           this._readyed = true
           this.emit('ready')
@@ -144,9 +146,15 @@ export class Node extends CoreObject {
   getParent(): Node | undefined { return this._parent }
   setParent(parent: Node | undefined): this {
     if (!this._parent?.is(parent)) {
+      const oldParent = this._parent
       this._parent = parent
       this.setTree(parent?._tree)
-      this.emit(parent ? 'parented' : 'unparented')
+      if (parent) {
+        this.emit('parented', parent)
+      }
+      else if (oldParent) {
+        this.emit('unparented', oldParent)
+      }
     }
     return this
   }
@@ -206,29 +214,39 @@ export class Node extends CoreObject {
     }
   }
 
-  protected _onEnterTree(): void {
-    this._enterTree()
-    this.emit('treeEntered')
+  protected _onTreeEnter(tree: SceneTree): void {
+    this._treeEnter(tree)
+    this.emit('treeEntered', tree)
   }
 
-  protected _onExitTree(): void {
-    this.emit('treeExiting')
-    this._exitTree()
-    this.emit('treeExited')
+  protected _onTreeExit(oldTree: SceneTree): void {
+    this.emit('treeExiting', oldTree)
+    this._treeExit(oldTree)
+    this.emit('treeExited', oldTree)
   }
 
-  protected _onParented(): void { this._parented() }
-  protected _onUnparented(): void { this._unparented() }
-  protected _onReady(): void { this._ready() }
+  protected _onParented(parent: Node): void {
+    this._parented(parent)
+  }
+
+  protected _onUnparented(oldParent: Node): void {
+    this._unparented(oldParent)
+  }
+
+  protected _onReady(): void {
+    this._ready()
+  }
+
   protected _onProcess(delta = 0): void {
     const tree = this._tree
-    tree?.emit('nodeProcessing', this)
+    const canRender = this.canRender()
+    const canProcess = this.canProcess()
 
-    if (this.canProcess()) {
+    if (canProcess) {
+      tree?.emit('nodeProcessing', this)
+      this.emit('processing', delta)
       this._process(delta)
     }
-
-    const canRender = this.canRender()
 
     let oldRenderCall
     if (canRender) {
@@ -259,7 +277,10 @@ export class Node extends CoreObject {
       tree!.renderStack.currentCall = oldRenderCall
     }
 
-    tree?.emit('nodeProcessed', this)
+    if (canProcess) {
+      this.emit('processed', delta)
+      tree?.emit('nodeProcessed', this)
+    }
   }
 
   render(renderer: WebGLRenderer, next?: () => void): void {
@@ -452,17 +473,22 @@ export class Node extends CoreObject {
     return Boolean(target && this.instanceId === target.instanceId)
   }
 
-  protected _enterTree(): void { /** override */ }
-  protected _ready(): void { /** override */ }
-  protected _exitTree(): void { /** override */ }
-  protected _parented(): void { /** override */ }
-  protected _unparented(): void { /** override */ }
+  /** override */
+  protected _ready(): void {}
   // eslint-disable-next-line unused-imports/no-unused-vars
-  protected _process(delta: number): void { /** override */ }
+  protected _treeEnter(tree: SceneTree): void {}
   // eslint-disable-next-line unused-imports/no-unused-vars
-  protected _input(event: InputEvent, key: InputEventKey): void { /** override */ }
+  protected _treeExit(oldTree: SceneTree): void {}
   // eslint-disable-next-line unused-imports/no-unused-vars
-  protected _render(renderer: WebGLRenderer): void { /** override */ }
+  protected _parented(parent: Node): void {}
+  // eslint-disable-next-line unused-imports/no-unused-vars
+  protected _unparented(oldParent: Node): void {}
+  // eslint-disable-next-line unused-imports/no-unused-vars
+  protected _process(delta: number): void {}
+  // eslint-disable-next-line unused-imports/no-unused-vars
+  protected _input(event: InputEvent, key: InputEventKey): void {}
+  // eslint-disable-next-line unused-imports/no-unused-vars
+  protected _render(renderer: WebGLRenderer): void {}
 
   override toJSON(): Record<string, any> {
     return {

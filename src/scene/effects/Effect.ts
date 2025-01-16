@@ -1,5 +1,5 @@
 import type { PropertyDeclaration, WebGLRenderer } from '../../core'
-import type { Node, TimelineNodeProperties } from '../main'
+import type { Node, SceneTree, TimelineNodeProperties } from '../main'
 import type { Material } from '../resources'
 import { assets } from '../../asset'
 import { customNode, property, protectedProperty, Rect2 } from '../../core'
@@ -86,18 +86,16 @@ export class Effect extends TimelineNode {
     }
   }
 
-  protected override _enterTree(): void {
-    const tree = this._tree!
+  protected override _treeEnter(tree: SceneTree): void {
     tree.on('processing', this._onProcessing)
     tree.on('nodeProcessed', this._onNodeProcessed)
     this.viewport1.setTree(tree)
     this.viewport2.setTree(tree)
   }
 
-  protected override _exitTree(): void {
-    const tree = this._tree!
-    tree.off('processing', this._onProcessing)
-    tree.off('nodeProcessed', this._onNodeProcessed)
+  protected override _treeExit(oldTree: SceneTree): void {
+    oldTree.off('processing', this._onProcessing)
+    oldTree.off('nodeProcessed', this._onNodeProcessed)
     this.viewport1.setTree(undefined)
     this.viewport2.setTree(undefined)
   }

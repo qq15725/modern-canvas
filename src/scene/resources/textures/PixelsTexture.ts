@@ -1,3 +1,4 @@
+import type { PropertyDeclaration } from '../../../core'
 import type { Texture2DPixelsSource } from './Texture2D'
 import { Texture2D } from './Texture2D'
 
@@ -23,5 +24,18 @@ export class PixelsTexture extends Texture2D<Texture2DPixelsSource> {
     }
 
     super(source)
+  }
+
+  protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+    switch (key) {
+      case 'width':
+        this.source.width = Math.round(value * this.pixelRatio)
+        break
+      case 'height':
+        this.source.height = Math.round(value * this.pixelRatio)
+        break
+    }
+
+    super._updateProperty(key, value, oldValue, declaration)
   }
 }

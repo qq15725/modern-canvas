@@ -70,7 +70,7 @@ export class SceneTree extends MainLoop {
 
   protected _renderScreen(renderer: WebGLRenderer): void {
     renderer.state.reset()
-    const pixelRatio = renderer.pixelRatio
+    const { pixelRatio } = renderer
     const { width, height } = this.root
     renderer.framebuffer.bind(null)
     renderer.viewport.bind({
