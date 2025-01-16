@@ -39,7 +39,7 @@ void main() {
     QuadUvGeometry.draw(renderer, LeftEraseEffect.material, {
       previous: 0,
       next: 1,
-      progress: this.timeProgress,
+      progress: this.currentTimeProgress,
     })
   }
 }

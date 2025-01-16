@@ -1,1 +1,1 @@
-export * from './KeyframeAnimation'
+export * from './Animation'

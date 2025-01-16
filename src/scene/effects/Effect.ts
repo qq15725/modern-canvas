@@ -101,7 +101,7 @@ export class Effect extends TimelineNode {
   }
 
   protected _onProcessing(): void {
-    this._updateTime()
+    this._updateCurrentTime()
     switch (this._mode) {
       case 'transition':
         this._previousSibling = this.previousSibling
@@ -115,7 +115,7 @@ export class Effect extends TimelineNode {
   }
 
   protected _onNodeProcessed(node: Node): void {
-    if (!this.isInsideTime())
+    if (!this.isInsideTimeRange())
       return
     const renderStack = this._tree?.renderStack
     if (!renderStack)
@@ -285,7 +285,7 @@ export class Effect extends TimelineNode {
         QuadUvGeometry.draw(renderer, this.material!, {
           from: 0,
           to: 1,
-          progress: this.timeProgress,
+          progress: this.currentTimeProgress,
           ratio: viewport.width / viewport.height,
         })
       })
@@ -294,7 +294,7 @@ export class Effect extends TimelineNode {
       QuadUvGeometry.draw(renderer, this.material, {
         from: 0,
         to: 1,
-        progress: this.timeProgress,
+        progress: this.currentTimeProgress,
         ratio: context?.from ? context.from.width / context.from.height : 0,
       })
     }

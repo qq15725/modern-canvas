@@ -1,9 +1,9 @@
 import { fonts } from 'modern-font'
 import {
+  Animation,
   CanvasEditor,
   Engine,
   Image2D,
-  KeyframeAnimation,
   Node2D,
   ShadowEffect,
   Text2D,
@@ -16,7 +16,7 @@ const engine = new Engine({
   autoStart: true,
   autoResize: true,
   backgroundColor: '#F6F7F9',
-  timeline: Timeline.from([0, 3000], true),
+  timeline: Timeline.from([0, 5000], true),
 })
 engine.root.append(editor)
 document.body.append(engine.view!)
@@ -34,13 +34,14 @@ async function init(): Promise<void> {
         backgroundColor: '#00ff00',
       },
     }, [
-      new KeyframeAnimation({
+      new Animation({
         loop: true,
         keyframes: [
           { offset: 1, rotate: 180 },
         ],
       }),
       new Image2D({
+        name: 'example.png',
         style: {
           width: 100,
           height: 100,
@@ -99,6 +100,7 @@ async function init(): Promise<void> {
       }),
     ]),
     new Image2D({
+      delay: 1000,
       style: {
         left: 200,
         top: 50,

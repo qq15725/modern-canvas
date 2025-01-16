@@ -14,10 +14,11 @@ import { Node } from './Node'
 export interface TimelineNodeProperties extends NodeProperties {
   delay: number
   duration: number
+  paused: boolean
 }
 
 export interface TimelineNodeEventMap extends NodeEventMap {
-  //
+  updateCurrentTime: (currentTime: number) => void
 }
 
 export interface TimelineNode {
@@ -33,6 +34,7 @@ export interface TimelineNode {
 export class TimelineNode extends Node {
   @property({ default: 0 }) declare delay: number
   @property({ default: 0 }) declare duration: number
+  @property({ default: false }) declare paused: boolean
 
   constructor(properties?: Partial<TimelineNodeProperties>, children: Node[] = []) {
     super()
@@ -43,30 +45,45 @@ export class TimelineNode extends Node {
   }
 
   /** Timeline */
-  computedDelay = 0
   computedDuration = 0
+  protected _currentTime = 0
+  protected _startTime = 0
   get timeline(): Timeline | undefined { return this._tree?.timeline }
-  get timeRange(): [number, number] { return [this.computedDelay, this.computedDelay + this.computedDuration] }
-  get timeAfterDelay(): number { return (this.timeline?.currentTime ?? 0) - this.computedDelay }
-  get timeProgress(): number { return clamp(0, this.timeAfterDelay / (this.computedDuration), 1) }
-  isInsideTime(): boolean {
-    if (!this.computedDuration)
-      return true
-    const [start, end] = this.timeRange
-    const current = this.timeline?.currentTime ?? 0
-    return current >= start && current <= end
+  get timelineCurrentTime(): number { return this.timeline?.currentTime ?? 0 }
+  get parentStartTime(): number { return (this._parent as TimelineNode)?.startTime ?? 0 }
+  get currentTime(): number { return clamp(0, this._currentTime, this.computedDuration) }
+  get startTime(): number { return this._startTime }
+  set startTime(val: number) {
+    this.delay = val - this.parentStartTime
+    this._updateCurrentTime(true)
   }
 
-  protected _updateTime(): void {
-    const parent = this._parent as TimelineNode
-    this.computedDelay = this.delay + (parent?.computedDelay ?? 0)
-    this.computedDuration = parent?.computedDuration
-      ? Math.min(this.computedDelay + this.duration, parent.timeRange[1]) - this.computedDelay
-      : this.duration
+  get endTime(): number { return this._startTime + this.computedDuration }
+  get currentTimeProgress(): number { return this.computedDuration ? clamp(0, this._currentTime / this.computedDuration, 1) : 0 }
+  isInsideTimeRange(): boolean {
+    const current = this._currentTime
+    if (this.computedDuration) {
+      return current >= 0 && current <= this.computedDuration
+    }
+    else {
+      return current >= 0
+    }
   }
 
-  protected _onProcess(delta = 0): void {
-    this._updateTime()
-    super._onProcess(delta)
+  protected _updateCurrentTime(force = false): void {
+    if (force || !this.paused) {
+      const parent = this._parent as TimelineNode
+      this._startTime = this.delay + this.parentStartTime
+      this.computedDuration = parent?.computedDuration
+        ? Math.min(this._startTime + this.duration, parent.endTime) - this._startTime
+        : this.duration
+      this._currentTime = this.timelineCurrentTime - this._startTime
+      this.emit('updateCurrentTime', this._currentTime)
+    }
+  }
+
+  protected _process(delta: number): void {
+    this._updateCurrentTime()
+    super._process(delta)
   }
 }

@@ -185,7 +185,7 @@ export class CanvasItem extends TimelineNode {
     let visible = this.visible
       ?? (this._parent as CanvasItem)?._computedVisible
       ?? true
-    if (visible && !this.isInsideTime()) {
+    if (visible && !this.isInsideTimeRange()) {
       visible = false
     }
     this._computedVisible = visible

@@ -1,5 +1,5 @@
 import type { CssFunction, CssFunctionArg, PropertyDeclaration } from '../../core'
-import type { Node, TimelineNodeProperties } from '../main'
+import type { Node, SceneTree, TimelineNodeProperties } from '../main'
 import { clamp, customNode, getDefaultCssPropertyValue, lerp, parseCssProperty, property, RawWeakMap } from '../../core'
 import { CanvasItem, TimelineNode } from '../main'
 
@@ -101,46 +101,49 @@ export interface NormalizedKeyframe {
   props: Record<string, any>
 }
 
-export type KeyframeAnimationMode = 'parent' | 'sibling'
+export type AnimationMode = 'parent' | 'sibling'
 
-export interface KeyframeAnimationProperties extends TimelineNodeProperties {
-  mode: KeyframeAnimationMode
+export interface AnimationProperties extends TimelineNodeProperties {
+  animationMode: AnimationMode
   startTime: number
   duration: number
   loop: boolean
   keyframes: Keyframe[]
 }
 
-@customNode<KeyframeAnimationProperties>('KeyframeAnimation', {
+@customNode<AnimationProperties>('Animation', {
   renderMode: 'disabled',
+  processMode: 'disabled',
   duration: 2000,
 })
-export class KeyframeAnimation extends TimelineNode {
-  @property({ default: 'parent' }) declare mode: KeyframeAnimationMode
+export class Animation extends TimelineNode {
+  @property({ default: 'parent' }) declare animationMode: AnimationMode
   @property({ default: false }) declare loop: boolean
   @property({ default: [] }) declare keyframes: Keyframe[]
+  @property({ default: true }) declare autoplay: boolean
   @property() easing?: Easing
 
   protected _keyframes: NormalizedKeyframe[] = []
-  protected _starting = false
-  protected _startProps = new RawWeakMap<any, Map<string, any>>()
+  protected _isFirstUpdatePosition = false
+  protected _cachedProps = new RawWeakMap<any, Map<string, any>>()
+  protected _stoped = false
 
-  constructor(properties?: Partial<KeyframeAnimationProperties>, children: Node[] = []) {
+  constructor(properties?: Partial<AnimationProperties>, children: Node[] = []) {
     super()
-    this._updateAnimationPosition = this._updateAnimationPosition.bind(this)
+    this.commitStyles = this.commitStyles.bind(this)
 
     this
       .setProperties(properties)
       .append(children)
   }
 
-  protected override _parented(parent: Node): void {
-    parent.on('processing', this._updateAnimationPosition)
-    this._updateStartProps()
+  protected override _treeEnter(tree: SceneTree): void {
+    tree.timeline.on('updateCurrentTime', this.commitStyles)
+    this._updateCachedProps()
   }
 
-  protected override _unparented(oldParent: Node): void {
-    oldParent.on('processing', this._updateAnimationPosition)
+  protected override _treeExit(oldTree: SceneTree): void {
+    oldTree.timeline.on('updateCurrentTime', this.commitStyles)
     this.cancel()
   }
 
@@ -157,7 +160,7 @@ export class KeyframeAnimation extends TimelineNode {
 
   protected _getTargets(): any[] {
     let targets
-    switch (this.mode) {
+    switch (this.animationMode) {
       case 'sibling':
         targets = this.getParent()?.getChildren(true).filter(val => val instanceof CanvasItem) ?? []
         break
@@ -201,33 +204,35 @@ export class KeyframeAnimation extends TimelineNode {
       })
     }
     this._keyframes = keyframes
-    this._updateStartProps()
+    this._updateCachedProps()
   }
 
-  protected _updateAnimationPosition(): void {
+  commitStyles(): void {
     if (!this.keyframes.length)
       return
 
-    if (!this.isInsideTime()) {
-      if (!this._starting)
+    this._updateCurrentTime()
+
+    if (!this.isInsideTimeRange()) {
+      if (!this._isFirstUpdatePosition)
         return
-      this._starting = false
+      this._isFirstUpdatePosition = false
     }
-    else if (!this._starting) {
-      this._starting = true
-      this._updateStartProps()
+    else if (!this._isFirstUpdatePosition) {
+      this._isFirstUpdatePosition = true
+      this._updateCachedProps()
     }
 
     const targets = this._getTargets()
     const offset = 1 / targets.length
-    const progress = this.timeProgress
+    const progress = this.currentTimeProgress
 
     targets.forEach((target, i) => {
       const tiem = offset === 1
         ? progress
         : clamp(0, Math.max(0, progress - offset * i) / offset, 1)
 
-      const startProps = this._startProps.get(target)
+      const startProps = this._cachedProps.get(target)
       if (!startProps)
         return
 
@@ -239,7 +244,7 @@ export class KeyframeAnimation extends TimelineNode {
     })
   }
 
-  protected _updateStartProps(): void {
+  protected _updateCachedProps(): void {
     this.cancel()
     this._getTargets().forEach((target) => {
       const startProps = new Map<string, any>()
@@ -249,7 +254,7 @@ export class KeyframeAnimation extends TimelineNode {
           startProps.set(name, (target as any)[name])
         })
       }
-      this._startProps.set(target, startProps)
+      this._cachedProps.set(target, startProps)
     })
   }
 
@@ -388,12 +393,40 @@ export class KeyframeAnimation extends TimelineNode {
     }
   }
 
+  isPlaying(): boolean {
+    return !this.paused && this.isInsideTimeRange()
+  }
+
+  play(): boolean {
+    if (this._stoped) {
+      this._stoped = false
+      this.startTime = this.timelineCurrentTime
+    }
+    else {
+      this.startTime = this.timelineCurrentTime - this.currentTime
+    }
+    this.paused = false
+    return true
+  }
+
+  pause(): boolean {
+    this.paused = true
+    return true
+  }
+
+  stop(): boolean {
+    this._stoped = true
+    this.paused = true
+    this._currentTime = 0
+    return true
+  }
+
   cancel(): void {
     this._getTargets().forEach((target) => {
-      this._startProps.get(target)?.forEach((value, key) => {
+      this._cachedProps.get(target)?.forEach((value, key) => {
         (target as any)[key] = value
       })
-      this._startProps.delete(target)
+      this._cachedProps.delete(target)
     })
   }
 }

@@ -59,16 +59,16 @@ void main(void) {
   gradientBlur = 600
 
   override apply(renderer: WebGLRenderer, target: Viewport): void {
-    const timeProgress = this.timeProgress
+    const currentTimeProgress = this.currentTimeProgress
     let sampler: number
     let progress: number
-    if (timeProgress < 0.5) {
+    if (currentTimeProgress < 0.5) {
       sampler = 0
-      progress = (0.5 - timeProgress) / 0.5
+      progress = (0.5 - currentTimeProgress) / 0.5
     }
     else {
       sampler = 1
-      progress = (timeProgress - 0.5) / 0.5
+      progress = (currentTimeProgress - 0.5) / 0.5
     }
 
     const width = target.width
