@@ -2,7 +2,7 @@ import type { HTMLSound } from './html'
 import type { IPlayOptions } from './interfaces'
 import type { WebSound } from './web'
 import { customNode, SUPPORTS_WEB_AUDIO } from '../../core'
-import { Node } from '../main'
+import { TimelineNode } from '../main'
 import { HTMLAudio } from './html'
 import { WebAudio } from './web'
 
@@ -10,7 +10,7 @@ export type PlatformAudio = WebAudio | HTMLAudio
 export type PlatformSound = WebSound | HTMLSound
 
 @customNode('Audio')
-export class Audio extends Node {
+export class Audio extends TimelineNode {
   protected static _soundPool: PlatformSound[] = []
 
   protected _sounds: PlatformSound[] = []
@@ -204,7 +204,7 @@ export class Audio extends Node {
     super._process(delta)
 
     if (this.canProcess()) {
-      const currentTime = this._tree?.timeline.current ?? 0
+      const currentTime = this._tree?.timeline.currentTime ?? 0
       if (currentTime - this._prevTime > 0) {
         if (!this._timer) {
           this._setTimeStop()
