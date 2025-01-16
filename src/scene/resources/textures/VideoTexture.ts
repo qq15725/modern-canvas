@@ -1,4 +1,4 @@
-import { crossOrigin, isVideoElement, protectedProperty, Ticker } from '../../../core'
+import { crossOrigin, isVideoElement, type PropertyDeclaration, protectedProperty, Ticker } from '../../../core'
 import { Texture2D } from './Texture2D'
 
 export interface VideoTextureOptions {
@@ -113,8 +113,8 @@ export class VideoTexture extends Texture2D<HTMLVideoElement> {
     this._setupAutoUpdate()
   }
 
-  protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any): void {
-    super._onUpdateProperty(key, value, oldValue)
+  protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+    super._onUpdateProperty(key, value, oldValue, declaration)
 
     switch (key) {
       case 'fps':

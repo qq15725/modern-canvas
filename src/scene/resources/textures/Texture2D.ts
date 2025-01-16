@@ -80,8 +80,8 @@ export class Texture2D<T extends Texture2DSource = Texture2DSource> extends Reso
     })
   }
 
-  protected override _onUpdateProperty(key: PropertyKey, newValue: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    super._onUpdateProperty(key, newValue, oldValue, declaration)
+  protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+    super._onUpdateProperty(key, value, oldValue, declaration)
 
     switch (key) {
       case 'width':
@@ -133,17 +133,18 @@ export class Texture2D<T extends Texture2DSource = Texture2DSource> extends Reso
     return false
   }
 
-  activate(
-    renderer: WebGLRenderer,
-    location = 0,
-  ): void {
-    renderer.texture.bind({
-      target: 'texture_2d',
-      value: this._glTexture(renderer, { location }),
-      location,
-    })
+  activate(renderer: WebGLRenderer, location = 0): boolean {
+    if (this.valid) {
+      renderer.texture.bind({
+        target: 'texture_2d',
+        value: this._glTexture(renderer, { location }),
+        location,
+      })
 
-    this.upload(renderer, { location })
+      this.upload(renderer, { location })
+      return true
+    }
+    return false
   }
 
   inactivate(renderer: WebGLRenderer): void {

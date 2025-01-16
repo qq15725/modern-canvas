@@ -9,16 +9,16 @@ export class CanvasTexture extends Texture2D<HTMLCanvasElement> {
     super(source)
   }
 
-  protected override _onUpdateProperty(key: PropertyKey, newValue: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     switch (key) {
       case 'width':
-        this.source.width = newValue * this.pixelRatio
+        this.source.width = value * this.pixelRatio
         break
       case 'height':
-        this.source.height = newValue * this.pixelRatio
+        this.source.height = value * this.pixelRatio
         break
     }
 
-    super._onUpdateProperty(key, newValue, oldValue, declaration)
+    super._onUpdateProperty(key, value, oldValue, declaration)
   }
 }

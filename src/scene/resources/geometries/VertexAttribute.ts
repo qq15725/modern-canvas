@@ -1,4 +1,4 @@
-import { protectedProperty, Resource } from '../../../core'
+import { type PropertyDeclaration, protectedProperty, Resource } from '../../../core'
 import { VertexBuffer } from './VertexBuffer'
 
 export interface VertexAttributeOptions {
@@ -30,8 +30,8 @@ export class VertexAttribute extends Resource {
     })
   }
 
-  protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any): void {
-    super._onUpdateProperty(key, value, oldValue)
+  protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+    super._onUpdateProperty(key, value, oldValue, declaration)
 
     switch (key) {
       case 'buffer':

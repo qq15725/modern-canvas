@@ -1,6 +1,6 @@
 import type { Node2DProperties } from '../2d'
 import { Node2D } from '../2d'
-import { customNode, IN_BROWSER, property, Transform2D } from '../../core'
+import { customNode, IN_BROWSER, property, type PropertyDeclaration, Transform2D } from '../../core'
 import { Texture2D } from '../resources'
 import { WebAudioContext } from './web'
 
@@ -28,8 +28,8 @@ export class AudioWaveform extends Node2D {
     this.setProperties(options)
   }
 
-  protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any): void {
-    super._onUpdateProperty(key, value, oldValue)
+  protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+    super._onUpdateProperty(key, value, oldValue, declaration)
 
     switch (key) {
       case 'src':

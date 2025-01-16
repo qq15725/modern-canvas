@@ -41,12 +41,12 @@ export class SceneTree extends MainLoop {
   getCurrentViewport(): Viewport | undefined { return this._currentViewport }
   setCurrentViewport(viewport: Viewport | undefined): void { this._currentViewport = viewport }
 
-  protected override _onUpdateProperty(key: PropertyKey, newValue: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    super._onUpdateProperty(key, newValue, oldValue, declaration)
+  protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+    super._onUpdateProperty(key, value, oldValue, declaration)
 
     switch (key) {
       case 'backgroundColor':
-        this._backgroundColor.value = newValue
+        this._backgroundColor.value = value
         break
     }
   }

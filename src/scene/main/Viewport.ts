@@ -1,4 +1,4 @@
-import type { WebGLFramebufferOptions, WebGLRenderer } from '../../core'
+import type { PropertyDeclaration, WebGLFramebufferOptions, WebGLRenderer } from '../../core'
 import { customNode, Projection2D, property } from '../../core'
 import { QuadUvGeometry, UvMaterial, ViewportTexture } from '../resources'
 import { Node } from './Node'
@@ -14,6 +14,8 @@ export class Viewport extends Node {
   @property({ default: 0 }) declare y: number
   @property({ default: 0 }) declare width: number
   @property({ default: 0 }) declare height: number
+
+  get valid(): boolean { return Boolean(this.width && this.height) }
 
   protected _projection = new Projection2D()
   protected _framebufferIndex = 0
@@ -61,8 +63,8 @@ export class Viewport extends Node {
     })
   }
 
-  protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any): void {
-    super._onUpdateProperty(key, value, oldValue)
+  protected _onUpdateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+    super._onUpdateProperty(key, value, oldValue, declaration)
 
     switch (key) {
       case 'x':
@@ -89,7 +91,7 @@ export class Viewport extends Node {
 
   upload(renderer: WebGLRenderer): boolean {
     const framebuffer = this.framebuffer
-    if (framebuffer.needsUpload) {
+    if (framebuffer.needsUpload && this.valid) {
       framebuffer.needsUpload = false
       renderer.framebuffer.update(
         this._glFramebuffer(renderer),
@@ -100,31 +102,43 @@ export class Viewport extends Node {
     return false
   }
 
-  activate(renderer: WebGLRenderer): void {
-    renderer.flush()
-    this._tree?.setCurrentViewport(this)
-    renderer.framebuffer.bind(this._glFramebuffer(renderer))
-    this.upload(renderer)
+  activate(renderer: WebGLRenderer): boolean {
+    if (this.valid) {
+      renderer.flush()
+      this._tree?.setCurrentViewport(this)
+      renderer.framebuffer.bind(this._glFramebuffer(renderer))
+      this.upload(renderer)
+      return true
+    }
+    return false
   }
 
-  redraw(renderer: WebGLRenderer, cb: () => void): void {
-    renderer.flush()
-    const texture = this.framebuffer.texture
-    this._framebufferIndex = (this._framebufferIndex + 1) % this._framebuffers.length
-    this.activate(renderer)
-    renderer.clear()
-    texture.activate(renderer, 0)
-    cb()
+  redraw(renderer: WebGLRenderer, cb: () => void): boolean {
+    if (this.valid) {
+      renderer.flush()
+      const texture = this.framebuffer.texture
+      this._framebufferIndex = (this._framebufferIndex + 1) % this._framebuffers.length
+      this.activate(renderer)
+      renderer.clear()
+      texture.activate(renderer, 0)
+      cb()
+      return true
+    }
+    return false
   }
 
-  activateWithCopy(renderer: WebGLRenderer, target: Viewport): void {
-    this.resize(target.width, target.height)
-    this.activate(renderer)
-    renderer.clear()
-    target.texture.activate(renderer, 0)
-    QuadUvGeometry.draw(renderer, UvMaterial.instance, {
-      sampler: 0,
-    })
+  activateWithCopy(renderer: WebGLRenderer, target: Viewport): boolean {
+    if (this.valid) {
+      this.resize(target.width, target.height)
+      this.activate(renderer)
+      renderer.clear()
+      target.texture.activate(renderer, 0)
+      QuadUvGeometry.draw(renderer, UvMaterial.instance, {
+        sampler: 0,
+      })
+      return true
+    }
+    return false
   }
 
   override render(renderer: WebGLRenderer, next?: () => void): void {

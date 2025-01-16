@@ -3,7 +3,7 @@ import type { Texture2D } from '../resources'
 import type { ImageFrame } from './Image2DResource'
 import type { Node2DProperties } from './Node2D'
 import { assets } from '../../asset'
-import { customNode, property, protectedProperty, Transform2D } from '../../core'
+import { customNode, property, type PropertyDeclaration, protectedProperty, Transform2D } from '../../core'
 import { Image2DResource } from './Image2DResource'
 import { Node2D } from './Node2D'
 
@@ -36,8 +36,8 @@ export class Image2D extends Node2D {
     this.append(children)
   }
 
-  protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any): void {
-    super._onUpdateProperty(key, value, oldValue)
+  protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+    super._onUpdateProperty(key, value, oldValue, declaration)
 
     switch (key) {
       case 'src':

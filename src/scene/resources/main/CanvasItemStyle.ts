@@ -1,5 +1,5 @@
 import type { IDOCTextStyleDeclaration, IDOCTransformStyleDeclaration, Overflow, Visibility } from 'modern-idoc'
-import type { ColorValue } from '../../../core'
+import type { ColorValue, PropertyDeclaration } from '../../../core'
 import type { Texture2D } from '../textures'
 import { getDefaultTextStyle, getDefaultTransformStyle } from 'modern-idoc'
 import { assets } from '../../../asset'
@@ -97,8 +97,8 @@ export class CanvasItemStyle extends Resource {
     this.setProperties(properties)
   }
 
-  protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any): void {
-    super._onUpdateProperty(key, value, oldValue)
+  protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+    super._onUpdateProperty(key, value, oldValue, declaration)
 
     switch (key) {
       case 'backgroundColor':

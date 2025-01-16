@@ -2,7 +2,7 @@ import type { AnimationItem } from 'lottie-web'
 import type { Node } from '../main'
 import type { Node2DProperties } from './Node2D'
 import { assets } from '../../asset'
-import { customNode, property } from '../../core'
+import { customNode, property, type PropertyDeclaration } from '../../core'
 import { CanvasTexture } from '../resources'
 import { TextureRect2D } from './TextureRect2D'
 
@@ -23,8 +23,9 @@ export class Lottie2D extends TextureRect2D {
     this.append(children)
   }
 
-  protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any): void {
-    super._onUpdateProperty(key, value, oldValue)
+  protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+    super._onUpdateProperty(key, value, oldValue, declaration)
+
     switch (key) {
       case 'src':
         this._load()

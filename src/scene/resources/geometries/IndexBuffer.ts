@@ -1,4 +1,4 @@
-import type { WebGLBufferOptions, WebGLRenderer } from '../../../core'
+import type { PropertyDeclaration, WebGLBufferOptions, WebGLRenderer } from '../../../core'
 import { protectedProperty, Resource } from '../../../core'
 
 export interface IndexBufferOptions {
@@ -33,8 +33,8 @@ export class IndexBuffer extends Resource {
     })
   }
 
-  protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any): void {
-    super._onUpdateProperty(key, value, oldValue)
+  protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+    super._onUpdateProperty(key, value, oldValue, declaration)
 
     switch (key) {
       case 'data':

@@ -49,7 +49,7 @@ export class CanvasItem extends Node {
   set style(style) {
     const cb = (...args: any[]): void => {
       this.emit('styleUpdateProperty', ...args)
-      this._onUpdateStyleProperty(args[0], args[1], args[2])
+      this._onUpdateStyleProperty(args[0], args[1], args[2], args[3])
     }
     style.on('updateProperty', cb)
     this._style?.off('updateProperty', cb)
@@ -90,15 +90,15 @@ export class CanvasItem extends Node {
     return this
   }
 
-  protected override _onUpdateProperty(key: PropertyKey, newValue: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    super._onUpdateProperty(key, newValue, oldValue, declaration)
+  protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+    super._onUpdateProperty(key, value, oldValue, declaration)
 
     switch (key) {
       case 'blendMode':
         this.requestRepaint()
         break
       case 'modulate':
-        this._modulate.value = newValue
+        this._modulate.value = value
         this.requestRepaint()
         break
       case 'visible':
@@ -108,7 +108,7 @@ export class CanvasItem extends Node {
   }
 
   // eslint-disable-next-line unused-imports/no-unused-vars
-  protected _onUpdateStyleProperty(key: PropertyKey, newValue: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected _onUpdateStyleProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     switch (key) {
       case 'backgroundColor':
         this._updateBackgroundColor()
@@ -126,7 +126,7 @@ export class CanvasItem extends Node {
         this.requestRedraw()
         break
       case 'visibility':
-        this.visible = newValue === 'visible'
+        this.visible = value === 'visible'
         break
       case 'width':
       case 'height':

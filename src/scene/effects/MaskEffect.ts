@@ -1,4 +1,4 @@
-import type { WebGLRenderer } from '../../core'
+import type { PropertyDeclaration, WebGLRenderer } from '../../core'
 import type { Viewport } from '../main'
 import type { Texture2D } from '../resources'
 import type { EffectContext, EffectOptions } from './Effect'
@@ -29,8 +29,8 @@ export class MaskEffect extends Effect {
     }
   }
 
-  protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any): void {
-    super._onUpdateProperty(key, value, oldValue)
+  protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+    super._onUpdateProperty(key, value, oldValue, declaration)
 
     switch (key) {
       case 'src':

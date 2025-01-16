@@ -2,7 +2,7 @@ import type { MeasureResult, TextOptions } from 'modern-text'
 import type { Node } from '../main'
 import type { Node2DProperties } from './Node2D'
 import { Text, textDefaultStyle } from 'modern-text'
-import { customNode, property, protectedProperty } from '../../core'
+import { customNode, property, type PropertyDeclaration, protectedProperty } from '../../core'
 import { CanvasTexture } from '../resources'
 import { TextureRect2D } from './TextureRect2D'
 
@@ -41,8 +41,8 @@ export class Text2D extends TextureRect2D<CanvasTexture> {
     this.append(children)
   }
 
-  protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any): void {
-    super._onUpdateProperty(key, value, oldValue)
+  protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+    super._onUpdateProperty(key, value, oldValue, declaration)
 
     switch (key) {
       case 'content':

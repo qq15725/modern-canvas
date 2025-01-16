@@ -2,7 +2,7 @@ import type { Node } from '../main'
 import type { VideoTexture } from '../resources'
 import type { Node2DProperties } from './Node2D'
 import { assets } from '../../asset'
-import { customNode, property } from '../../core'
+import { customNode, property, type PropertyDeclaration } from '../../core'
 import { TextureRect2D } from './TextureRect2D'
 
 export interface Video2DProperties extends Node2DProperties {
@@ -23,8 +23,8 @@ export class Video2D extends TextureRect2D<VideoTexture> {
     this.append(children)
   }
 
-  protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any): void {
-    super._onUpdateProperty(key, value, oldValue)
+  protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+    super._onUpdateProperty(key, value, oldValue, declaration)
 
     switch (key) {
       case 'src':

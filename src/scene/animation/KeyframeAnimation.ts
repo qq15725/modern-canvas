@@ -1,4 +1,4 @@
-import type { CssFunction, CssFunctionArg } from '../../core'
+import type { CssFunction, CssFunctionArg, PropertyDeclaration } from '../../core'
 import type { NodeProperties } from '../main'
 import { clamp, customNode, getDefaultCssPropertyValue, lerp, parseCssProperty, property, RawWeakMap } from '../../core'
 import { CanvasItem, Node } from '../main'
@@ -141,8 +141,9 @@ export class KeyframeAnimation extends Node {
     this.cancel()
   }
 
-  protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any): void {
-    super._onUpdateProperty(key, value, oldValue)
+  protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+    super._onUpdateProperty(key, value, oldValue, declaration)
+
     switch (key) {
       case 'mode':
       case 'keyframes':

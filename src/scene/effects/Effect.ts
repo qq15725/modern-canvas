@@ -1,4 +1,4 @@
-import type { WebGLRenderer } from '../../core'
+import type { PropertyDeclaration, WebGLRenderer } from '../../core'
 import type { NodeProperties } from '../main'
 import type { Material } from '../resources'
 import { assets } from '../../asset'
@@ -62,8 +62,8 @@ export class Effect extends Node {
     this.setProperties(options)
   }
 
-  protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any): void {
-    super._onUpdateProperty(key, value, oldValue)
+  protected override _onUpdateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+    super._onUpdateProperty(key, value, oldValue, declaration)
 
     switch (key) {
       case 'glsl': {
