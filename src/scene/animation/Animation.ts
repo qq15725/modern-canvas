@@ -120,7 +120,6 @@ export class Animation extends TimelineNode {
   @property({ default: 'parent' }) declare animationMode: AnimationMode
   @property({ default: false }) declare loop: boolean
   @property({ default: [] }) declare keyframes: Keyframe[]
-  @property({ default: true }) declare autoplay: boolean
   @property() easing?: Easing
 
   protected _keyframes: NormalizedKeyframe[] = []

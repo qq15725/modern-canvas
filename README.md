@@ -27,7 +27,7 @@ npm i modern-canvas
 ## 🦄 Usage
 
 ```javascript
-import { Animable2D, Engine, Image2D, Text2D } from 'modern-canvas'
+import { Animation, Engine, Image2D, Text2D } from 'modern-canvas'
 import { fonts } from 'modern-font'
 
 async function loadFallbackFont() {
@@ -51,7 +51,7 @@ loadFallbackFont().then(() => {
       },
       src: '/example.png',
     }, [
-      new Animable2D({
+      new Animation({
         duration: 3000,
         loop: true,
         keyframes: [
