@@ -92,7 +92,7 @@ export class Image2D extends Node2D {
     const duration = this.resource?.duration ?? 0
     if (!duration || !this._tree)
       return 0
-    const currentTime = this.timeRelative
+    const currentTime = this.timeAfterDelay
     if (currentTime < 0)
       return 0
     return currentTime % duration

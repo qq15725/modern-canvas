@@ -1,19 +1,22 @@
 import { fonts } from 'modern-font'
 import {
-  Editor2D,
+  CanvasEditor,
   Engine,
   Image2D,
   KeyframeAnimation,
   Node2D,
   ShadowEffect,
-  Text2D, Video2D,
+  Text2D,
+  Timeline,
+  Video2D,
 } from '../../src'
 
-const editor = new Editor2D()
+const editor = new CanvasEditor()
 const engine = new Engine({
   autoStart: true,
   autoResize: true,
   backgroundColor: '#F6F7F9',
+  timeline: Timeline.from([0, 3000], true),
 })
 engine.root.append(editor)
 document.body.append(engine.view!)

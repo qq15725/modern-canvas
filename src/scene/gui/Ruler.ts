@@ -1,7 +1,8 @@
+import type { PropertyDeclaration } from '../../core'
 import type { Node } from '../main'
 import type { ControlProperties } from './Control'
 import { customNode, property, Transform2D } from '../../core'
-import { Texture2D } from '../resources'
+import { CanvasTexture } from '../resources'
 import { Control } from './Control'
 
 export interface RulerProperties extends ControlProperties {
@@ -28,12 +29,30 @@ export class Ruler extends Control {
   @property({ default: '#b2b6bc' }) declare markColor: string
   @property({ default: 300 }) declare gap: number
 
-  texture = new Texture2D<HTMLCanvasElement>(document.createElement('canvas'))
+  texture = new CanvasTexture()
 
   constructor(properties?: Partial<RulerProperties>, children: Node[] = []) {
     super()
     this.setProperties(properties)
     this.append(children)
+  }
+
+  protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+    super._updateProperty(key, value, oldValue, declaration)
+
+    switch (key) {
+      case 'pixelRatio':
+      case 'offsetX':
+      case 'offsetY':
+      case 'thickness':
+      case 'markHeight':
+      case 'color':
+      case 'markBackgroundColor':
+      case 'markColor':
+      case 'gap':
+        this.requestRedraw()
+        break
+    }
   }
 
   protected override _updateSize(): void {

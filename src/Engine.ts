@@ -5,6 +5,7 @@ import type {
   PointerInputEvent,
   WheelInputEvent,
 } from './core'
+import type { Timeline } from './scene'
 import { assets } from './asset'
 import {
   DEVICE_PIXEL_RATIO,
@@ -23,6 +24,7 @@ export interface EngineOptions extends WebGLContextAttributes {
   backgroundColor?: ColorValue
   autoResize?: boolean
   autoStart?: boolean
+  timeline?: Timeline
 }
 
 interface EngineEventMap {
@@ -90,10 +92,11 @@ export class Engine extends SceneTree {
       backgroundColor = 0x00000000,
       autoResize,
       autoStart,
+      timeline,
       ...glOptions
     } = options
 
-    super()
+    super(timeline)
 
     this.renderer = new WebGLRenderer(view, {
       ...defaultOptions,

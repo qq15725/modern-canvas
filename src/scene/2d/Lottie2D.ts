@@ -53,7 +53,7 @@ export class Lottie2D extends TextureRect2D {
   }
 
   protected override _process(delta: number): void {
-    this.animation?.goToAndStop(this.timeRelative, false)
+    this.animation?.goToAndStop(this.timeAfterDelay, false)
     this.texture.requestUpload()
     this.requestRepaint()
     super._process(delta)

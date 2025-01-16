@@ -9,7 +9,6 @@ import type {
   WebGLRenderer,
 } from '../../core'
 import type { SceneTree } from './SceneTree'
-import type { Timer } from './Timer'
 import type { Viewport } from './Viewport'
 import {
   clamp,
@@ -67,12 +66,10 @@ export class Node extends CoreObject {
   @property({ default: 'inherit' }) declare processMode: ProcessMode
   @property({ default: 'inherit' }) declare renderMode: RenderMode
   @property({ default: 'default' }) declare internalMode: InternalMode
-  @property({ default: 0 }) declare delay: number
-  @property({ default: 0 }) declare duration: number
 
   protected _readyed = false
 
-  constructor(properties?: Partial<NodeProperties>) {
+  constructor(properties?: Partial<NodeProperties>, children: Node[] = []) {
     super()
 
     this._onEnterTree = this._onEnterTree.bind(this)
@@ -84,6 +81,7 @@ export class Node extends CoreObject {
 
     this
       .setProperties(properties)
+      .append(children)
       .on('enterTree', this._onEnterTree)
       .on('exitTree', this._onExitTree)
       .on('parented', this._onParented)
@@ -136,29 +134,6 @@ export class Node extends CoreObject {
     }
 
     return this
-  }
-
-  /** Timeline */
-  _computedDelay = 0
-  _computedDuration = 0
-  get timeline(): Timer | undefined { return this._tree?.timeline }
-  get timeStart(): number { return this._computedDelay }
-  get timeEnd(): number { return this._computedDelay + this._computedDuration }
-  get timeRelative(): number { return (this.timeline?.current ?? 0) - this._computedDelay }
-  get timeProgress(): number { return clamp(0, this.timeRelative / (this._computedDuration), 1) }
-  isInsideTime(): boolean {
-    if (!this._computedDuration)
-      return true
-    const current = this.timeline?.current ?? 0
-    return current >= this.timeStart && current <= this.timeEnd
-  }
-
-  protected _updateTime(): void {
-    const parent = this._parent
-    this._computedDelay = this.delay + (parent?._computedDelay ?? 0)
-    this._computedDuration = parent?._computedDuration
-      ? Math.min(this._computedDelay + this.duration, parent.timeEnd) - this._computedDelay
-      : this.duration
   }
 
   /** Parent */
@@ -246,8 +221,6 @@ export class Node extends CoreObject {
   protected _onUnparented(): void { this._unparented() }
   protected _onReady(): void { this._ready() }
   protected _onProcess(delta = 0): void {
-    this._updateTime()
-
     const tree = this._tree
     tree?.emit('nodeProcessing', this)
 

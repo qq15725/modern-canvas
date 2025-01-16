@@ -1,7 +1,7 @@
 import type { CssFunction, CssFunctionArg, PropertyDeclaration } from '../../core'
-import type { NodeProperties } from '../main'
+import type { Node, TimelineNodeProperties } from '../main'
 import { clamp, customNode, getDefaultCssPropertyValue, lerp, parseCssProperty, property, RawWeakMap } from '../../core'
-import { CanvasItem, Node } from '../main'
+import { CanvasItem, TimelineNode } from '../main'
 
 export const linear = (amount: number): number => amount
 export const ease = cubicBezier(0.25, 0.1, 0.25, 1)
@@ -103,7 +103,7 @@ export interface NormalizedKeyframe {
 
 export type KeyframeAnimationMode = 'parent' | 'sibling'
 
-export interface KeyframeAnimationProperties extends NodeProperties {
+export interface KeyframeAnimationProperties extends TimelineNodeProperties {
   mode: KeyframeAnimationMode
   startTime: number
   duration: number
@@ -115,7 +115,7 @@ export interface KeyframeAnimationProperties extends NodeProperties {
   renderMode: 'disabled',
   duration: 2000,
 })
-export class KeyframeAnimation extends Node {
+export class KeyframeAnimation extends TimelineNode {
   @property({ default: 'parent' }) declare mode: KeyframeAnimationMode
   @property({ default: false }) declare loop: boolean
   @property({ default: [] }) declare keyframes: Keyframe[]
@@ -125,19 +125,22 @@ export class KeyframeAnimation extends Node {
   protected _starting = false
   protected _startProps = new RawWeakMap<any, Map<string, any>>()
 
-  constructor(properties?: Partial<KeyframeAnimationProperties>) {
+  constructor(properties?: Partial<KeyframeAnimationProperties>, children: Node[] = []) {
     super()
-    this._onUpdateTime = this._onUpdateTime.bind(this)
-    this.setProperties(properties)
+    this._updateAnimationPosition = this._updateAnimationPosition.bind(this)
+
+    this
+      .setProperties(properties)
+      .append(children)
   }
 
   protected override _enterTree(): void {
-    this._tree?.timeline.on('update', this._onUpdateTime)
+    this._tree?.timeline.on('updateCurrentTime', this._updateAnimationPosition)
     this._updateStartProps()
   }
 
   protected override _exitTree(): void {
-    this._tree?.timeline.off('update', this._onUpdateTime)
+    this._tree?.timeline.off('updateCurrentTime', this._updateAnimationPosition)
     this.cancel()
   }
 
@@ -201,7 +204,7 @@ export class KeyframeAnimation extends Node {
     this._updateStartProps()
   }
 
-  protected _onUpdateTime(): void {
+  protected _updateAnimationPosition(): void {
     if (!this.keyframes.length)
       return
 

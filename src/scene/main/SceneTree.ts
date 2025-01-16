@@ -9,7 +9,7 @@ import type { Node } from './Node'
 import { Color, MainLoop, property } from '../../core'
 import { QuadUvGeometry } from '../resources'
 import { RenderStack } from './RenderStack'
-import { Timer } from './Timer'
+import { Timeline } from './Timeline'
 import { Viewport } from './Viewport'
 
 export interface SceneTreeEventMap extends MainLoopEventMap {
@@ -34,12 +34,18 @@ export class SceneTree extends MainLoop {
 
   readonly renderStack = new RenderStack()
   readonly root = new Viewport(true).setTree(this)
-  readonly timeline = new Timer({ end: Number.MAX_SAFE_INTEGER }).setTree(this)
+  readonly timeline: Timeline
 
   protected _backgroundColor = new Color()
   protected _currentViewport?: Viewport
   getCurrentViewport(): Viewport | undefined { return this._currentViewport }
   setCurrentViewport(viewport: Viewport | undefined): void { this._currentViewport = viewport }
+
+  constructor(timeline = new Timeline()) {
+    super()
+
+    this.timeline = timeline.setTree(this)
+  }
 
   protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     super._updateProperty(key, value, oldValue, declaration)

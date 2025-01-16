@@ -2,8 +2,8 @@ import type { InputEvent, InputEventKey, PointerInputEvent } from '../core'
 import type { CanvasItemStyle } from '../scene'
 import { CanvasItem, Node2D, Ruler, Scaler } from '../scene'
 
-export class Editor2D extends CanvasItem {
-  name = 'Editor'
+export class CanvasEditor extends CanvasItem {
+  name = 'CanvasEditor'
 
   ruler = new Ruler({
     name: 'ruler',

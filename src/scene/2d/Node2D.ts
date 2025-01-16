@@ -14,8 +14,10 @@ export class Node2D extends CanvasItem {
 
   constructor(properties?: Partial<Node2DProperties>, children: Node[] = []) {
     super()
-    this.setProperties(properties)
-    this.append(children)
+
+    this
+      .setProperties(properties)
+      .append(children)
   }
 
   protected override _updateStyleProperty(key: PropertyKey, value: any, oldValue: any): void {

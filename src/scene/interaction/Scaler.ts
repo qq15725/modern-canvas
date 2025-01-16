@@ -54,15 +54,19 @@ export class Scaler extends Node {
       case 'scale':
       case 'min':
       case 'max': {
-        const target = this.target
-        if (target) {
-          const scale = clamp(this.min, this.scale, this.max)
-          target.style.scaleX = scale
-          target.style.scaleY = scale
-          this.emit('updateScale', scale)
-        }
+        this.scale = clamp(this.min, this.scale, this.max)
+        this._updateScale()
         break
       }
+    }
+  }
+
+  protected _updateScale(): void {
+    const target = this.target
+    if (target) {
+      target.style.scaleX = this.scale
+      target.style.scaleY = this.scale
+      this.emit('updateScale', this.scale)
     }
   }
 

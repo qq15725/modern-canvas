@@ -1,9 +1,9 @@
 import type { PropertyDeclaration, WebGLRenderer } from '../../core'
-import type { NodeProperties } from '../main'
+import type { Node, TimelineNodeProperties } from '../main'
 import type { Material } from '../resources'
 import { assets } from '../../asset'
 import { customNode, property, protectedProperty, Rect2 } from '../../core'
-import { Node, Viewport } from '../main'
+import { TimelineNode, Viewport } from '../main'
 import { EffectMaterial, QuadUvGeometry } from '../resources'
 
 export type EffectMode =
@@ -16,7 +16,7 @@ export type EffectMode =
   // Apply the effect to previous node and next node
   | 'transition'
 
-export interface EffectOptions extends NodeProperties {
+export interface EffectOptions extends TimelineNodeProperties {
   mode?: EffectMode
   glsl?: string
   glslSrc?: string
@@ -34,7 +34,7 @@ export interface EffectContext {
 }
 
 @customNode('Effect')
-export class Effect extends Node {
+export class Effect extends TimelineNode {
   @protectedProperty() material?: Material
 
   @property() mode?: EffectMode

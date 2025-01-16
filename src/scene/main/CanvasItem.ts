@@ -8,14 +8,15 @@ import type {
 } from '../../core'
 import type { CanvasItemStyleProperties, Texture2D } from '../resources'
 import type { CanvasBatchable } from './CanvasContext'
-import type { NodeEventMap, NodeProperties } from './Node'
+import type { Node } from './Node'
+import type { TimelineNodeEventMap, TimelineNodeProperties } from './TimelineNode'
 import type { Viewport } from './Viewport'
 import { Color, customNode, property, Transform2D } from '../../core'
 import { CanvasItemStyle } from '../resources'
 import { CanvasContext } from './CanvasContext'
-import { Node } from './Node'
+import { TimelineNode } from './TimelineNode'
 
-export interface CanvasItemProperties extends NodeProperties {
+export interface CanvasItemProperties extends TimelineNodeProperties {
   visible: boolean
   style: Partial<CanvasItemStyleProperties>
   modulate: ColorValue
@@ -23,8 +24,8 @@ export interface CanvasItemProperties extends NodeProperties {
   inheritSize: boolean
 }
 
-export interface CanvasItemEventMap extends NodeEventMap {
-  styleUpdateProperty: (key: PropertyKey, newValue: any, oldValue: any, declaration?: PropertyDeclaration) => void
+export interface CanvasItemEventMap extends TimelineNodeEventMap {
+  updateStyleProperty: (key: PropertyKey, newValue: any, oldValue: any, declaration?: PropertyDeclaration) => void
   draw: () => void
 }
 
@@ -38,7 +39,7 @@ export interface CanvasItem {
 }
 
 @customNode('CanvasItem')
-export class CanvasItem extends Node {
+export class CanvasItem extends TimelineNode {
   @property({ default: true }) declare visible: boolean
   @property() declare modulate?: ColorValue
   @property() declare blendMode?: WebGLBlendMode
@@ -48,7 +49,7 @@ export class CanvasItem extends Node {
   get style(): CanvasItemStyle { return this._style }
   set style(style) {
     const cb = (...args: any[]): void => {
-      this.emit('styleUpdateProperty', ...args)
+      this.emit('updateStyleProperty', ...args)
       this._updateStyleProperty(args[0], args[1], args[2], args[3])
     }
     style.on('updateProperty', cb)
@@ -74,11 +75,13 @@ export class CanvasItem extends Node {
   protected _layoutedBatchables: CanvasBatchable[] = []
   protected _batchables: CanvasBatchable[] = []
 
-  constructor(properties?: Partial<CanvasItemProperties>) {
+  constructor(properties?: Partial<CanvasItemProperties>, children: Node[] = []) {
     super()
     this._updateStyleProperty = this._updateStyleProperty.bind(this)
     this.style = new CanvasItemStyle()
-    this.setProperties(properties)
+    this
+      .setProperties(properties)
+      .append(children)
   }
 
   override setProperties(properties?: Record<PropertyKey, any>): this {
