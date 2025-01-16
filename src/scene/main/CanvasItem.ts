@@ -49,7 +49,7 @@ export class CanvasItem extends Node {
   set style(style) {
     const cb = (...args: any[]): void => {
       this.emit('styleUpdateProperty', ...args)
-      this._onUpdateStyleProperty(args[0], args[1], args[2], args[3])
+      this._updateStyleProperty(args[0], args[1], args[2], args[3])
     }
     style.on('updateProperty', cb)
     this._style?.off('updateProperty', cb)
@@ -76,7 +76,7 @@ export class CanvasItem extends Node {
 
   constructor(properties?: Partial<CanvasItemProperties>) {
     super()
-    this._onUpdateStyleProperty = this._onUpdateStyleProperty.bind(this)
+    this._updateStyleProperty = this._updateStyleProperty.bind(this)
     this.style = new CanvasItemStyle()
     this.setProperties(properties)
   }
@@ -108,7 +108,7 @@ export class CanvasItem extends Node {
   }
 
   // eslint-disable-next-line unused-imports/no-unused-vars
-  protected _onUpdateStyleProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected _updateStyleProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     switch (key) {
       case 'backgroundColor':
         this._updateBackgroundColor()

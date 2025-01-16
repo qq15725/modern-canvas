@@ -18,8 +18,8 @@ export class Node2D extends CanvasItem {
     this.append(children)
   }
 
-  protected override _onUpdateStyleProperty(key: PropertyKey, value: any, oldValue: any): void {
-    super._onUpdateStyleProperty(key, value, oldValue)
+  protected override _updateStyleProperty(key: PropertyKey, value: any, oldValue: any): void {
+    super._updateStyleProperty(key, value, oldValue)
 
     switch (key) {
       case 'width':

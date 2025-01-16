@@ -71,8 +71,8 @@ export class Text2D extends TextureRect2D<CanvasTexture> {
     this.text.requestUpdate()
   }
 
-  protected override _onUpdateStyleProperty(key: PropertyKey, value: any, oldValue: any): void {
-    super._onUpdateStyleProperty(key, value, oldValue)
+  protected override _updateStyleProperty(key: PropertyKey, value: any, oldValue: any): void {
+    super._updateStyleProperty(key, value, oldValue)
 
     switch (key) {
       case 'width':
