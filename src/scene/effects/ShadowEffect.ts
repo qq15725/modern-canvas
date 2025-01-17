@@ -1,9 +1,9 @@
 import type { WebGLRenderer } from '../../core'
 import { customNode } from '../../core'
 import { Viewport } from '../main'
+import { Effect } from '../main/Effect'
 import { Material, QuadUvGeometry, UvMaterial } from '../resources'
 import { BlurEffect } from './BlurEffect'
-import { Effect } from './Effect'
 
 @customNode('ShadowEffect')
 export class ShadowEffect extends Effect {

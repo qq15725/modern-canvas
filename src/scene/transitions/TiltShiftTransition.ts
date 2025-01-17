@@ -1,11 +1,11 @@
 import type { WebGLRenderer } from '../../core'
 import type { Viewport } from '../main'
 import { customNode } from '../../core'
+import { Transition } from '../main/Transition'
 import { Material, QuadUvGeometry } from '../resources'
-import { Effect } from './Effect'
 
-@customNode('TiltShiftEffect')
-export class TiltShiftEffect extends Effect {
+@customNode('TiltShiftTransition')
+export class TiltShiftTransition extends Transition {
   static material = new Material({
     vert: `attribute vec2 position;
 attribute vec2 uv;
@@ -81,7 +81,7 @@ void main(void) {
     const dy = end[1] - start[1]
     const d = Math.sqrt((dx * dx) + (dy * dy))
 
-    QuadUvGeometry.draw(renderer, TiltShiftEffect.material, {
+    QuadUvGeometry.draw(renderer, TiltShiftTransition.material, {
       sampler,
       progress,
       blur: this.blur,
@@ -92,7 +92,7 @@ void main(void) {
       texSize,
     })
 
-    QuadUvGeometry.draw(renderer, TiltShiftEffect.material, {
+    QuadUvGeometry.draw(renderer, TiltShiftTransition.material, {
       sampler,
       progress,
       blur: this.blur,

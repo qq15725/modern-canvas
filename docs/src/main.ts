@@ -7,7 +7,7 @@ import {
   Node2D,
   Text2D,
   Timeline,
-  Video2D,
+  TwistTransition, Video2D,
 } from '../../src'
 
 const editor = new CanvasEditor()
@@ -117,6 +117,16 @@ async function init(): Promise<void> {
         maskImage: '/example.png',
       },
       src: '/example.mp4',
+    }),
+    new TwistTransition(),
+    new Image2D({
+      style: {
+        left: 200,
+        top: 50,
+        width: 200,
+        height: 200,
+      },
+      src: '/example.jpg',
     }),
   ])
 

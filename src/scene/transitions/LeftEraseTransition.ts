@@ -1,10 +1,10 @@
 import type { WebGLRenderer } from '../../core'
 import { customNode } from '../../core'
+import { Transition } from '../main/Transition'
 import { Material, QuadUvGeometry } from '../resources'
-import { Effect } from './Effect'
 
-@customNode('LeftEraseEffect')
-export class LeftEraseEffect extends Effect {
+@customNode('LeftEraseTransition')
+export class LeftEraseTransition extends Transition {
   static material = new Material({
     vert: `attribute vec2 position;
 attribute vec2 uv;
@@ -36,7 +36,7 @@ void main() {
   })
 
   override apply(renderer: WebGLRenderer): void {
-    QuadUvGeometry.draw(renderer, LeftEraseEffect.material, {
+    QuadUvGeometry.draw(renderer, LeftEraseTransition.material, {
       previous: 0,
       next: 1,
       progress: this.currentTimeProgress,

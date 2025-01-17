@@ -1,11 +1,11 @@
 import type { WebGLRenderer } from '../../core'
 import type { Viewport } from '../main'
 import { customNode } from '../../core'
+import { Transition } from '../main/Transition'
 import { Material, QuadUvGeometry } from '../resources'
-import { Effect } from './Effect'
 
-@customNode('TwistEffect')
-export class TwistEffect extends Effect {
+@customNode('TwistTransition')
+export class TwistTransition extends Transition {
   static material = new Material({
     vert: `attribute vec2 position;
 attribute vec2 uv;
@@ -78,7 +78,7 @@ void main(void) {
     const width = source.width
     const height = source.height
 
-    QuadUvGeometry.draw(renderer, TwistEffect.material, {
+    QuadUvGeometry.draw(renderer, TwistTransition.material, {
       sampler,
       progress,
       filterArea: [width, height, 0, 0],

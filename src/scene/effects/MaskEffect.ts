@@ -1,11 +1,10 @@
 import type { PropertyDeclaration, WebGLRenderer } from '../../core'
-import type { Node, Viewport } from '../main'
+import type { EffectContext, EffectProperties, Node, Viewport } from '../main'
 import type { Texture2D } from '../resources'
-import type { EffectContext, EffectProperties } from './Effect'
 import { assets } from '../../asset'
 import { customNode, property, protectedProperty } from '../../core'
+import { Effect } from '../main/Effect'
 import { Material, QuadUvGeometry } from '../resources'
-import { Effect } from './Effect'
 
 export interface MaskEffectProperties extends EffectProperties {
   src?: string

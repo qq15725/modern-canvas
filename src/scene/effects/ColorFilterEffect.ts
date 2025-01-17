@@ -1,8 +1,8 @@
 import type { WebGLRenderer } from '../../core'
 import type { Viewport } from '../main'
 import { ColorMatrix, customNode, parseCssFunctions, PI_2, property } from '../../core'
+import { Effect } from '../main/Effect'
 import { Material, QuadUvGeometry } from '../resources'
-import { Effect } from './Effect'
 
 export interface ColorFilterEffectProperties {
   filter?: string

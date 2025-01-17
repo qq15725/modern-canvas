@@ -1,8 +1,8 @@
 import type { WebGLRenderer } from '../../core'
 import type { Viewport } from '../main'
 import { customNode, property } from '../../core'
+import { Effect } from '../main/Effect'
 import { Material, QuadUvGeometry } from '../resources'
-import { Effect } from './Effect'
 
 @customNode('ColorAdjustEffect')
 export class ColorAdjustEffect extends Effect {

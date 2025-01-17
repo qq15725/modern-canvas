@@ -1,8 +1,8 @@
 import type { WebGLRenderer } from '../../core'
 import type { Viewport } from '../main'
 import { customNode, property } from '../../core'
+import { Effect } from '../main/Effect'
 import { Material, QuadUvGeometry, Texture2D } from '../resources'
-import { Effect } from './Effect'
 
 @customNode('GlitchEffect')
 export class GlitchEffect extends Effect {

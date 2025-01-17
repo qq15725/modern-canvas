@@ -1,11 +1,11 @@
 import type { WebGLRenderer } from '../../core'
 import type { Viewport } from '../main'
 import { customNode } from '../../core'
+import { Transition } from '../main/Transition'
 import { Material, QuadUvGeometry } from '../resources'
-import { Effect } from './Effect'
 
-@customNode('KawaseEffect')
-export class KawaseEffect extends Effect {
+@customNode('KawaseTransition')
+export class KawaseTransition extends Transition {
   static material = new Material({
     vert: `attribute vec2 position;
 attribute vec2 uv;
@@ -84,7 +84,7 @@ void main(void) {
     })
 
     drawCalls.forEach((uniforms) => {
-      QuadUvGeometry.draw(renderer, KawaseEffect.material, {
+      QuadUvGeometry.draw(renderer, KawaseTransition.material, {
         sampler,
         progress,
         ...uniforms,

@@ -1,25 +1,19 @@
 import type { PropertyDeclaration, WebGLRenderer } from '../../core'
-import type { Node, SceneTree, TimelineNodeProperties } from '../main'
-import type { Rectangulable } from '../main/interfaces'
 import type { Material } from '../resources'
+import type { Rectangulable } from './interfaces'
+import type { Node } from './Node'
+import type { SceneTree } from './SceneTree'
+import type { TimelineNodeProperties } from './TimelineNode'
 import { assets } from '../../asset'
 import { customNode, property, protectedProperty } from '../../core'
-import { Viewport } from '../main'
-import { TimelineNode } from '../main/TimelineNode'
 import { EffectMaterial, QuadUvGeometry } from '../resources'
+import { TimelineNode } from './TimelineNode'
+import { Viewport } from './Viewport'
 
-export type EffectMode =
-  // Apply the effect to all previous nodes
-  | 'before'
-  // Apply the effect to parent node
-  | 'parent'
-  // Apply the effect to all child nodes
-  | 'children'
-  // Apply the effect to previous node and next node
-  | 'transition'
+export type EffectMode = 'before' | 'parent' | 'children' | 'transition'
 
 export interface EffectProperties extends TimelineNodeProperties {
-  mode: EffectMode
+  effectMode: EffectMode
   glsl: string
   glslSrc: string
   material: Material
@@ -39,11 +33,11 @@ export interface EffectContext {
 export class Effect extends TimelineNode {
   @protectedProperty() material?: Material
 
-  @property() mode?: EffectMode
+  @property() effectMode?: EffectMode
   @property({ default: '' }) declare glsl: string
   @property({ default: '' }) declare glslSrc: string
 
-  protected get _mode(): EffectMode { return this.mode ?? 'parent' }
+  protected get _effectMode(): EffectMode { return this.effectMode ?? 'parent' }
 
   /** Viewports */
   readonly viewport1 = new Viewport()
@@ -73,8 +67,8 @@ export class Effect extends TimelineNode {
     switch (key) {
       case 'glsl': {
         const material = new EffectMaterial(value)
-        if (!this.mode && material.has.transition) {
-          this.mode = 'transition'
+        if (!this.effectMode && material.has.transition) {
+          this.effectMode = 'transition'
         }
         this.material = material
         break
@@ -107,7 +101,7 @@ export class Effect extends TimelineNode {
 
   protected _onProcessing(): void {
     this._updateCurrentTime()
-    switch (this._mode) {
+    switch (this._effectMode) {
       case 'transition':
         this._previousSibling = this.previousSibling
         this._nextSibling = this.nextSibling
@@ -125,7 +119,7 @@ export class Effect extends TimelineNode {
     const renderStack = this._tree?.renderStack
     if (!renderStack)
       return
-    switch (this._mode) {
+    switch (this._effectMode) {
       case 'transition':
         if (node.is(this._previousSibling)) {
           this._previousSibling = undefined
@@ -170,7 +164,7 @@ export class Effect extends TimelineNode {
 
   override _onProcess(delta = 0): void {
     this._renderId = 0
-    switch (this._mode) {
+    switch (this._effectMode) {
       case 'before':
         super._onProcess(delta)
         break
@@ -237,7 +231,7 @@ export class Effect extends TimelineNode {
         this.viewport1.activate(renderer)
         this.apply(renderer, this.viewport1, {
           redraw: true,
-          target: this._mode === 'parent'
+          target: this._effectMode === 'parent'
             ? (this._parent ?? undefined)
             : undefined,
           targetArea: this._parseTargetArea() as any,
@@ -250,7 +244,7 @@ export class Effect extends TimelineNode {
   }
 
   protected _parseTargetArea(): number[] | undefined {
-    if (this._mode === 'parent' && this._parent && 'getRect' in this._parent) {
+    if (this._effectMode === 'parent' && this._parent && 'getRect' in this._parent) {
       const rect = (this._parent as Rectangulable).getRect()
       if (rect) {
         return [
@@ -264,7 +258,7 @@ export class Effect extends TimelineNode {
   }
 
   protected override _render(renderer: WebGLRenderer): void {
-    switch (this._mode) {
+    switch (this._effectMode) {
       case 'before':
         this._renderBefore(renderer)
         break

@@ -96,9 +96,9 @@ loadFallbackFont().then(() => {
 })
 ```
 
-## Effects
+## Special effect
 
-See the [scene/effects](./src/scene/effects)
+See all [scene/effects](./src/scene/effects)
 
 ```typescript
 import { EmbossEffect, Image2D } from 'modern-canvas'
@@ -109,5 +109,23 @@ engine.root.addChild(
   }, [
     new EmbossEffect(),
   ])
+)
+```
+
+## Transition effect
+
+See all [scene/transitions](./src/scene/transitions)
+
+```typescript
+import { Image2D, TiltShiftTransition } from 'modern-canvas'
+
+engine.root.addChild(
+  new Image2D({
+    src: '/example.png',
+  }),
+  new TiltShiftTransition(),
+  new Image2D({
+    src: '/example.gif',
+  }),
 )
 ```
