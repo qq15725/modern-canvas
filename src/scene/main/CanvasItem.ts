@@ -16,7 +16,6 @@ import { CanvasContext } from './CanvasContext'
 import { TimelineNode } from './TimelineNode'
 
 export interface CanvasItemProperties extends TimelineNodeProperties {
-  visible: boolean
   style: Partial<CanvasItemStyleProperties>
   modulate: ColorValue
   blendMode: WebGLBlendMode
@@ -38,7 +37,6 @@ export interface CanvasItem {
 
 @customNode('CanvasItem')
 export class CanvasItem extends TimelineNode {
-  @property({ default: true }) declare visible: boolean
   @property() declare modulate?: ColorValue
   @property() declare blendMode?: WebGLBlendMode
 
@@ -56,10 +54,11 @@ export class CanvasItem extends TimelineNode {
 
   /** @internal */
   opacity = 1
+  visible = true
   protected _parentOpacity?: number
+  protected _parentVisible?: boolean
   protected _modulate = new Color(0xFFFFFFFF)
   protected _backgroundImage?: Texture2D
-  _computedVisible = true
 
   // Batch render
   context = new CanvasContext()
@@ -100,9 +99,6 @@ export class CanvasItem extends TimelineNode {
         this._modulate.value = value
         this.requestRepaint()
         break
-      case 'visible':
-        this._updateVisible()
-        break
     }
   }
 
@@ -125,7 +121,7 @@ export class CanvasItem extends TimelineNode {
         this.requestRedraw()
         break
       case 'visibility':
-        this.visible = value === 'visible'
+        this._updateVisible()
         break
     }
   }
@@ -154,26 +150,30 @@ export class CanvasItem extends TimelineNode {
     }
   }
 
+  protected _updateCurrentTime(force = false): void {
+    super._updateCurrentTime(force)
+    this._updateVisible()
+  }
+
   protected _updateVisible(): void {
-    let visible = this.visible
-      ?? (this._parent as CanvasItem)?._computedVisible
-      ?? true
+    let visible = this.style.visibility === 'visible'
+      && ((this._parent as CanvasItem)?.visible ?? true)
     if (visible && !this.isInsideTimeRange()) {
       visible = false
     }
-    this._computedVisible = visible
+    this.visible = visible
   }
 
   show(): void {
-    this.visible = true
+    this.style.visibility = 'visible'
   }
 
   hide(): void {
-    this.visible = false
+    this.style.visibility = 'hidden'
   }
 
   isVisibleInTree(): boolean {
-    return this.opacity > 0 && this._computedVisible
+    return this.opacity > 0 && this.visible
   }
 
   override canRender(): boolean {
@@ -193,11 +193,15 @@ export class CanvasItem extends TimelineNode {
   }
 
   protected override _process(delta: number): void {
-    this._updateVisible()
+    const parent = this._parent as CanvasItem | undefined
 
-    const parentOpacity = (this._parent as CanvasItem)?.opacity
-    if (parentOpacity !== this._parentOpacity) {
-      this._parentOpacity = parentOpacity
+    if (this._parentVisible !== parent?.visible) {
+      this._parentVisible = parent?.visible
+      this._updateVisible()
+    }
+
+    if (this._parentOpacity !== parent?.opacity) {
+      this._parentOpacity = parent?.opacity
       this._updateOpacity()
     }
 
