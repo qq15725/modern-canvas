@@ -3,12 +3,13 @@ import type { Node } from './Node'
 import { customNode } from '../../core'
 import { Effect } from './Effect'
 
-export interface TransitionProperties extends Omit<EffectProperties, 'effectMode'> {
+export interface TransitionProperties extends Omit<EffectProperties, 'effectMode' | 'processMode'> {
   //
 }
 
 @customNode<EffectProperties>('Transition', {
   effectMode: 'transition',
+  processMode: 'pausable',
   duration: 2000,
 })
 export class Transition extends Effect {

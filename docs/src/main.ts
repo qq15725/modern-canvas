@@ -6,7 +6,6 @@ import {
   Image2D,
   Node2D,
   Text2D,
-  TiltShiftTransition,
   Timeline, Video2D,
 } from '../../src'
 
@@ -17,6 +16,7 @@ const engine = new Engine({
   backgroundColor: '#F6F7F9',
   timeline: Timeline.from([0, 5000], true),
 })
+;(window as any).engine = engine
 engine.root.append(editor)
 document.body.append(engine.view!)
 
@@ -117,20 +117,6 @@ async function init(): Promise<void> {
         maskImage: '/example.png',
       },
       src: '/example.mp4',
-    }),
-    new TiltShiftTransition({
-      delay: 1500,
-      duration: 3000,
-    }),
-    new Image2D({
-      delay: 2000,
-      style: {
-        left: 200,
-        top: 50,
-        width: 200,
-        height: 200,
-      },
-      src: '/example.jpg',
     }),
   ])
 

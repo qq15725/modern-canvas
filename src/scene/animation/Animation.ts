@@ -103,15 +103,15 @@ export interface NormalizedKeyframe {
 
 export type AnimationEffectMode = 'parent' | 'sibling'
 
-export interface AnimationProperties extends TimelineNodeProperties {
+export interface AnimationProperties extends Omit<TimelineNodeProperties, 'renderMode' | 'processMode'> {
   effectMode: AnimationEffectMode
   loop: boolean
   keyframes: Keyframe[]
 }
 
-@customNode<AnimationProperties>('Animation', {
+@customNode<TimelineNodeProperties>('Animation', {
   renderMode: 'disabled',
-  processMode: 'disabled',
+  processMode: 'pausable',
   duration: 2000,
 })
 export class Animation extends TimelineNode {
@@ -127,7 +127,7 @@ export class Animation extends TimelineNode {
 
   constructor(properties?: Partial<AnimationProperties>, children: Node[] = []) {
     super()
-    this.commitStyles = this.commitStyles.bind(this)
+    this._process = this._process.bind(this)
 
     this
       .setProperties(properties)
@@ -135,13 +135,23 @@ export class Animation extends TimelineNode {
   }
 
   protected override _treeEnter(tree: SceneTree): void {
-    tree.timeline.on('updateCurrentTime', this.commitStyles)
+    tree.timeline.on('updateCurrentTime', this._process)
     this._updateCachedProps()
   }
 
   protected override _treeExit(oldTree: SceneTree): void {
-    oldTree.timeline.on('updateCurrentTime', this.commitStyles)
+    oldTree.timeline.on('updateCurrentTime', this._process)
     this.cancel()
+  }
+
+  protected override _onProcess(): void {
+    // disabled
+  }
+
+  protected _process(): void {
+    if (this.canProcess()) {
+      this.commitStyles()
+    }
   }
 
   protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {

@@ -163,6 +163,8 @@ export class Effect extends TimelineNode {
   }
 
   override _onProcess(delta = 0): void {
+    if (!this.canProcess())
+      return
     this._renderId = 0
     switch (this._effectMode) {
       case 'before':
