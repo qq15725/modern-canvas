@@ -1,3 +1,13 @@
+## [0.2.1](https://github.com/qq15725/modern-canvas/compare/v0.2.0...v0.2.1) (2025-01-17)
+
+
+### Bug Fixes
+
+* _updateOpacity ([6e3a9fb](https://github.com/qq15725/modern-canvas/commit/6e3a9fb6533aa6f79e8026596bc8aa2f919a696f))
+* Control _updateRect ([441b05f](https://github.com/qq15725/modern-canvas/commit/441b05fd68749773bf95ce070c4c15c102866b58))
+
+
+
 # [0.2.0](https://github.com/qq15725/modern-canvas/compare/v0.1.10...v0.2.0) (2025-01-16)
 
 
