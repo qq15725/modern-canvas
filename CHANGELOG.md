@@ -1,3 +1,12 @@
+## [0.2.3](https://github.com/qq15725/modern-canvas/compare/v0.2.2...v0.2.3) (2025-01-17)
+
+
+### Features
+
+* support `style.maskImage`、`style.boxShadow` ([0e32b9d](https://github.com/qq15725/modern-canvas/commit/0e32b9d667d3ad9ee9c197dde98086785f3bd5fd))
+
+
+
 ## [0.2.2](https://github.com/qq15725/modern-canvas/compare/v0.2.1...v0.2.2) (2025-01-17)
 
 
