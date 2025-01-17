@@ -101,10 +101,10 @@ export interface NormalizedKeyframe {
   props: Record<string, any>
 }
 
-export type AnimationMode = 'parent' | 'sibling'
+export type AnimationEffectMode = 'parent' | 'sibling'
 
 export interface AnimationProperties extends TimelineNodeProperties {
-  animationMode: AnimationMode
+  effectMode: AnimationEffectMode
   loop: boolean
   keyframes: Keyframe[]
 }
@@ -115,7 +115,7 @@ export interface AnimationProperties extends TimelineNodeProperties {
   duration: 2000,
 })
 export class Animation extends TimelineNode {
-  @property({ default: 'parent' }) declare animationMode: AnimationMode
+  @property({ default: 'parent' }) declare effectMode: AnimationEffectMode
   @property({ default: false }) declare loop: boolean
   @property({ default: [] }) declare keyframes: Keyframe[]
   @property() easing?: Easing
@@ -148,7 +148,7 @@ export class Animation extends TimelineNode {
     super._updateProperty(key, value, oldValue, declaration)
 
     switch (key) {
-      case 'animationMode':
+      case 'effectMode':
       case 'keyframes':
         this._updateKeyframes()
         break
@@ -157,7 +157,7 @@ export class Animation extends TimelineNode {
 
   protected _getTargets(): any[] {
     let targets
-    switch (this.animationMode) {
+    switch (this.effectMode) {
       case 'sibling':
         targets = this.getParent()?.getChildren(true).filter(val => val instanceof CanvasItem) ?? []
         break

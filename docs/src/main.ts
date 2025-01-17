@@ -6,8 +6,8 @@ import {
   Image2D,
   Node2D,
   Text2D,
-  Timeline,
-  TwistTransition, Video2D,
+  TiltShiftTransition,
+  Timeline, Video2D,
 } from '../../src'
 
 const editor = new CanvasEditor()
@@ -118,8 +118,12 @@ async function init(): Promise<void> {
       },
       src: '/example.mp4',
     }),
-    new TwistTransition(),
+    new TiltShiftTransition({
+      delay: 1500,
+      duration: 3000,
+    }),
     new Image2D({
+      delay: 2000,
       style: {
         left: 200,
         top: 50,

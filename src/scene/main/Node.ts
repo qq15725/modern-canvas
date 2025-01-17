@@ -46,9 +46,9 @@ export interface Node {
     & ((type: string, ...args: any[]) => boolean)
 }
 
-export type InternalMode = 'default' | 'front' | 'back'
 export type ProcessMode = 'inherit' | 'pausable' | 'when_paused' | 'always' | 'disabled'
 export type RenderMode = 'inherit' | 'always' | 'disabled'
+export type InternalMode = 'default' | 'front' | 'back'
 
 export interface NodeProperties {
   name: string
