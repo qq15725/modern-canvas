@@ -4,7 +4,8 @@ import type { Rectangulable } from '../main/interfaces'
 import type { Material } from '../resources'
 import { assets } from '../../asset'
 import { customNode, property, protectedProperty } from '../../core'
-import { TimelineNode, Viewport } from '../main'
+import { Viewport } from '../main'
+import { TimelineNode } from '../main/TimelineNode'
 import { EffectMaterial, QuadUvGeometry } from '../resources'
 
 export type EffectMode =

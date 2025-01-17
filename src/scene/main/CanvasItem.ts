@@ -11,6 +11,7 @@ import type { CanvasBatchable } from './CanvasContext'
 import type { Node } from './Node'
 import type { TimelineNodeEventMap, TimelineNodeProperties } from './TimelineNode'
 import { Color, customNode, property, Transform2D } from '../../core'
+import { MaskEffect, ShadowEffect } from '../effects'
 import { CanvasItemStyle } from '../resources'
 import { CanvasContext } from './CanvasContext'
 import { TimelineNode } from './TimelineNode'
@@ -92,11 +93,11 @@ export class CanvasItem extends TimelineNode {
     super._updateProperty(key, value, oldValue, declaration)
 
     switch (key) {
-      case 'blendMode':
-        this.requestRepaint()
-        break
       case 'modulate':
         this._modulate.value = value
+        this.requestRepaint()
+        break
+      case 'blendMode':
         this.requestRepaint()
         break
     }
@@ -114,15 +115,60 @@ export class CanvasItem extends TimelineNode {
       case 'opacity':
         this._updateOpacity()
         break
+      case 'visibility':
+        this._updateVisible()
+        break
       case 'filter':
         this.requestRepaint()
+        break
+      case 'boxShadow':
+        this._updateBoxShadow()
+        break
+      case 'maskImage':
+        this._updateMaskImage()
         break
       case 'borderRadius':
         this.requestRedraw()
         break
-      case 'visibility':
-        this._updateVisible()
-        break
+    }
+  }
+
+  protected _updateBoxShadow(): void {
+    const nodePath = '__$style.shadow'
+    if (this.style.boxShadow !== 'none') {
+      const node = this.getNode<ShadowEffect>(nodePath)
+      if (node) {
+        // TODO
+      }
+      else {
+        this.addChild(new ShadowEffect(), 'back')
+      }
+    }
+    else {
+      const node = this.getNode(nodePath)
+      if (node) {
+        this.removeChild(node)
+      }
+    }
+  }
+
+  protected _updateMaskImage(): void {
+    const nodePath = '__$style.maskImage'
+    const maskImage = this.style.maskImage
+    if (maskImage && maskImage !== 'none') {
+      const node = this.getNode<MaskEffect>(nodePath)
+      if (node) {
+        node.src = maskImage
+      }
+      else {
+        this.addChild(new MaskEffect({ src: maskImage }), 'back')
+      }
+    }
+    else {
+      const node = this.getNode(nodePath)
+      if (node) {
+        this.removeChild(node)
+      }
     }
   }
 
@@ -137,7 +183,7 @@ export class CanvasItem extends TimelineNode {
   }
 
   protected async _updateBackgroundImage(): Promise<void> {
-    this._backgroundImage = await this.style.getComputedBackgroundImage()
+    this._backgroundImage = await this.style.loadBackgroundImage()
     this.requestRedraw()
   }
 
@@ -223,19 +269,19 @@ export class CanvasItem extends TimelineNode {
         this.style.width / texture.width,
         this.style.height / texture.height,
       )
-      this._fill()
+      this._fillBoundingRect()
     }
   }
 
   protected _drawContent(): void {
-    this._fill()
+    this._fillBoundingRect()
   }
 
   protected _drawBorder(): void {
     if (this.style.borderWidth && this.style.borderStyle !== 'none') {
       this.context.lineWidth = this.style.borderWidth
       this.context.strokeStyle = this.style.borderColor
-      this._stroke()
+      this._strokeBoundingRect()
     }
   }
 
@@ -243,7 +289,7 @@ export class CanvasItem extends TimelineNode {
     if (this.style.outlineWidth && this.style.outlineColor !== 'none') {
       this.context.lineWidth = this.style.outlineWidth
       this.context.strokeStyle = this.style.outlineColor
-      this._stroke()
+      this._strokeBoundingRect()
     }
   }
 
@@ -259,12 +305,12 @@ export class CanvasItem extends TimelineNode {
     }
   }
 
-  protected _fill(): void {
+  protected _fillBoundingRect(): void {
     this._drawBoundingRect()
     this.context.fill()
   }
 
-  protected _stroke(): void {
+  protected _strokeBoundingRect(): void {
     this._drawBoundingRect()
     this.context.stroke()
   }

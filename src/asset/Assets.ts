@@ -85,13 +85,17 @@ export class Assets {
         })
     }
     else {
-      if (url.startsWith('data:image/svg+xml;')) {
+      if (url.startsWith('data:image/svg+xml;charset=utf-8,')) {
         url = this._fixSVG(url)
       }
       return new Promise<HTMLImageElement>((resolve) => {
         const img = new Image()
         img.src = url
-        img.onload = () => img.decode().finally(() => resolve(img))
+        img.onload = () => {
+          img.decode().finally(() => {
+            resolve(img)
+          })
+        }
       }).then(img => createImageBitmap(img, options))
     }
   }

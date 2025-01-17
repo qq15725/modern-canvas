@@ -1,6 +1,6 @@
 import type { InputEvent, InputEventKey, PointerInputEvent } from '../../core'
 import type { CanvasBatchable, CanvasItemProperties, Node } from '../main'
-import { customNode, Transform2D } from '../../core'
+import { customNode, Rect2, Transform2D } from '../../core'
 import { CanvasItem } from '../main'
 
 export interface Node2DProperties extends CanvasItemProperties {
@@ -73,16 +73,26 @@ export class Node2D extends CanvasItem {
     this.requestReflow()
   }
 
+  getRect(): Rect2 {
+    const [a, c, tx, b, d, ty] = this.transform.toArray()
+    const width = this.style.width
+    const height = this.style.height
+    return new Rect2(
+      tx,
+      ty,
+      (a * width) + (c * height),
+      (b * width) + (d * height),
+    )
+  }
+
   protected _updateOverflow(): void {
     if (this.style.overflow === 'hidden') {
-      const [a, c, tx, b, d, ty] = this.transform.toArray()
-      const width = this.style.width
-      const height = this.style.height
+      const rect = this.getRect()
       this.mask = {
-        x: tx,
-        y: ty,
-        width: (a * width) + (c * height),
-        height: (b * width) + (d * height),
+        x: rect.x,
+        y: rect.y,
+        width: rect.width,
+        height: rect.height,
       }
     }
     else {

@@ -1,6 +1,6 @@
 import type { InputEvent, InputEventKey, PointerInputEvent, PropertyDeclaration } from '../core'
 import type { CanvasItem, CanvasItemStyle } from '../scene'
-import { Control, Node2D, Ruler, Scaler, ShadowEffect, XScrollBar, YScrollBar } from '../scene'
+import { Control, Node2D, Ruler, Scaler, XScrollBar, YScrollBar } from '../scene'
 
 export class CanvasEditor extends Control {
   name = 'CanvasEditor'
@@ -82,12 +82,10 @@ export class CanvasEditor extends Control {
       backgroundColor: 0xFFFFFFFF,
       overflow: 'hidden',
       pointerEvents: 'none',
+      boxShadow: '2px 2px 2px 1px rgba(0, 0, 0, 0.2)',
     },
   }).append(
     this.scaler,
-    new ShadowEffect({
-      internalMode: 'back',
-    }),
   )
 
   ruler = new Ruler({

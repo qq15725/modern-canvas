@@ -5,7 +5,6 @@ import {
   Engine,
   Image2D,
   Node2D,
-  ShadowEffect,
   Text2D,
   Timeline,
   Video2D,
@@ -101,17 +100,15 @@ async function init(): Promise<void> {
       }),
     ]),
     new Image2D({
-      delay: 1000,
       style: {
         left: 200,
         top: 50,
         width: 100,
         height: 100,
+        maskImage: '/example.png',
       },
       src: '/example.jpg',
-    }, [
-      new ShadowEffect(),
-    ]),
+    }),
     new Video2D({
       style: {
         left: 200,
@@ -120,9 +117,7 @@ async function init(): Promise<void> {
         height: 100,
       },
       src: '/example.mp4',
-    }, [
-      new ShadowEffect(),
-    ]),
+    }),
   ])
 
   console.warn(editor, editor.drawboard.toJSON())

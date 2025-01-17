@@ -1,4 +1,4 @@
-import type { CanvasBatchable, Node } from '../main'
+import type { Node } from '../main'
 import type { Texture2D } from '../resources'
 import type { ImageFrame } from './Image2DResource'
 import type { Node2DProperties } from './Node2D'
@@ -136,20 +136,5 @@ export class Image2D extends Node2D {
       )
       super._drawContent()
     }
-  }
-
-  protected override _repaint(batchables: CanvasBatchable[]): CanvasBatchable[] {
-    const texture = this.currentTexture
-    return super._repaint(
-      batchables.map((batchable, i) => {
-        if ((this._backgroundImage ? i === 1 : i === 0) && batchable.type === 'fill') {
-          return {
-            ...batchable,
-            texture: texture?.valid ? texture : undefined,
-          }
-        }
-        return batchable
-      }),
-    )
   }
 }

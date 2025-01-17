@@ -30,21 +30,19 @@ export type CanvasItemStyleFilter = Record<CanvasItemStyleFilterKey, number>
 
 export interface CanvasItemStyleProperties extends IDOCTextStyleDeclaration, IDOCTransformStyleDeclaration {
   direction: 'inherit' | 'ltr' | 'rtl'
-  backgroundColor?: ColorValue
+  backgroundColor?: 'none' | ColorValue
   backgroundImage?: string
   filter: string
-  shadowColor: ColorValue
-  shadowOffsetX: number
-  shadowOffsetY: number
-  shadowBlur: number
+  boxShadow: 'none' | string
+  maskImage: 'none' | string
   opacity: number
   borderWidth: number
   borderRadius: number
-  borderColor: ColorValue
+  borderColor: 'none' | ColorValue
   borderStyle: string
   outlineWidth: number
   outlineOffset: number
-  outlineColor: ColorValue
+  outlineColor: 'none' | ColorValue
   outlineStyle: string
   visibility: Visibility
   overflow: Overflow
@@ -69,23 +67,21 @@ const style2DFilterDefault: CanvasItemStyleFilter = {
 export type PointerEvents = 'auto' | 'none'
 
 export class CanvasItemStyle extends Resource {
-  @property() declare backgroundColor?: string
-  @property() declare backgroundImage?: string
-  @property({ default: '' }) declare filter: string
+  @property({ default: 'none' }) declare backgroundColor: 'none' | ColorValue
+  @property({ default: 'none' }) declare backgroundImage: 'none' | string
+  @property({ default: 'none' }) declare filter: 'none' | string
   @property({ default: 'inherit' }) declare direction: 'inherit' | 'ltr' | 'rtl'
-  @property({ default: '#000000' }) declare shadowColor: string
-  @property({ default: 0 }) declare shadowOffsetX: number
-  @property({ default: 0 }) declare shadowOffsetY: number
-  @property({ default: 0 }) declare shadowBlur: number
+  @property({ default: 'none' }) declare boxShadow: 'none' | string
+  @property({ default: 'none' }) declare maskImage: 'none' | string
   @property({ default: 1 }) declare opacity: number
   @property({ default: 0 }) declare borderWidth: number
   @property({ default: 0 }) declare borderRadius: number
-  @property({ default: '#000000' }) declare borderColor: string
-  @property({ default: 'none' }) declare borderStyle: string
+  @property({ default: '#000000' }) declare borderColor: 'none' | ColorValue
+  @property({ default: 'none' }) declare borderStyle: 'none' | string
   @property({ default: 0 }) declare outlineWidth: number
   @property({ default: 0 }) declare outlineOffset: number
-  @property({ default: '#000000' }) declare outlineColor: string
-  @property({ default: 'none' }) declare outlineStyle: string
+  @property({ default: '#000000' }) declare outlineColor: 'none' | ColorValue
+  @property({ default: 'none' }) declare outlineStyle: 'none' | string
   @property({ default: 'visible' }) declare visibility: Visibility
   @property({ default: 'visible' }) declare overflow: Overflow
   @property({ default: 'auto' }) declare pointerEvents: PointerEvents
@@ -102,7 +98,9 @@ export class CanvasItemStyle extends Resource {
 
     switch (key) {
       case 'backgroundColor':
-        this._backgroundColor.value = this.backgroundColor
+        this._backgroundColor.value = this.backgroundColor === 'none'
+          ? undefined
+          : this.backgroundColor
         break
     }
   }
@@ -119,8 +117,8 @@ export class CanvasItemStyle extends Resource {
     return this._backgroundColor
   }
 
-  async getComputedBackgroundImage(): Promise<Texture2D<ImageBitmap> | undefined> {
-    if (this.backgroundImage) {
+  async loadBackgroundImage(): Promise<Texture2D<ImageBitmap> | undefined> {
+    if (this.backgroundImage !== 'none') {
       return await assets.texture.load(this.backgroundImage)
     }
   }
@@ -259,10 +257,17 @@ export class CanvasItemStyle extends Resource {
   }
 
   getComputedFilter(): CanvasItemStyleFilter {
-    const filter = parseCssFunctions(this.filter).reduce((filter, { name, args }) => {
-      (filter as any)[name] = args[0].normalizedIntValue
+    let filter = {} as CanvasItemStyleFilter
+
+    if (this.filter === 'none') {
       return filter
-    }, {} as CanvasItemStyleFilter)
+    }
+
+    filter = parseCssFunctions(this.filter)
+      .reduce((filter, { name, args }) => {
+        (filter as any)[name] = args[0].normalizedIntValue
+        return filter
+      }, filter)
 
     Object.keys(style2DFilterDefault).forEach((name) => {
       (filter as any)[name] = (filter as any)[name] ?? (style2DFilterDefault as any)[name]
