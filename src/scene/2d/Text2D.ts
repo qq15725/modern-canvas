@@ -162,7 +162,7 @@ export class Text2D extends TextureRect2D<CanvasTexture> {
 
   protected override _drawContent(): void {
     if (!this.split) {
-      const onText2DRender = (this.children?.find(child => 'onText2DRender' in child) as any)?.onText2DRender
+      const onText2DRender = (this.getChildren()?.find(child => 'onText2DRender' in child) as any)?.onText2DRender
       if (onText2DRender) {
         onText2DRender()
       }

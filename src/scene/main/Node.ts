@@ -161,7 +161,6 @@ export class Node extends CoreObject {
 
   /** Children */
   protected _children: Node[] = []
-  get children(): Node[] { return this.getChildren() }
   get siblingIndex(): number { return this.getIndex() }
   set siblingIndex(toIndex) { this._parent?.moveChild(this, toIndex) }
   get previousSibling(): Node | undefined { return this._parent?.getChildren()[this.getIndex() - 1] }
@@ -449,7 +448,7 @@ export class Node extends CoreObject {
   }
 
   removeChildren(): void {
-    this.children.forEach(child => this.removeChild(child))
+    this.getChildren().forEach(child => this.removeChild(child))
   }
 
   remove(): void {
@@ -457,12 +456,12 @@ export class Node extends CoreObject {
   }
 
   forEach(fn: (child: Node) => void): this {
-    this.children.forEach(fn)
+    this.getChildren().forEach(fn)
     return this
   }
 
   deepForEach(fn: (descendant: Node) => void): this {
-    this.children.forEach((child) => {
+    this.getChildren().forEach((child) => {
       fn(child)
       child.deepForEach(fn)
     })
@@ -494,7 +493,7 @@ export class Node extends CoreObject {
     return {
       tag: this.tag,
       props: super.toJSON(),
-      children: this.children.map(child => child.toJSON()),
+      children: this.getChildren().map(child => child.toJSON()),
     }
   }
 

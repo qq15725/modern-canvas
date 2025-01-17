@@ -1,8 +1,8 @@
 import type { InputEvent, InputEventKey, PointerInputEvent } from '../core'
-import type { CanvasItemStyle } from '../scene'
-import { CanvasItem, Node2D, Ruler, Scaler, ScrollBar } from '../scene'
+import type { CanvasItem, CanvasItemStyle } from '../scene'
+import { Control, Node2D, Ruler, Scaler, ScrollBar } from '../scene'
 
-export class CanvasEditor extends CanvasItem {
+export class CanvasEditor extends Control {
   name = 'CanvasEditor'
 
   hover = new Node2D({
@@ -39,15 +39,17 @@ export class CanvasEditor extends CanvasItem {
   scaler = new Scaler({
     internalMode: 'back',
   }).on('updateScale', (scale) => {
-    this.ruler.gap = scale * 300
+    this.ruler.scale = scale
   })
 
   xScrollBar = new ScrollBar({
     internalMode: 'back',
+    direction: 'horizontal',
   })
 
   yScrollBar = new ScrollBar({
     internalMode: 'back',
+    direction: 'vertical',
   })
 
   drawboard = new Node2D({
@@ -72,7 +74,6 @@ export class CanvasEditor extends CanvasItem {
     name: 'ruler',
     offsetX: 100,
     offsetY: 100,
-    inheritSize: true,
   }).append(
     this.drawboard,
     this.hover,
@@ -91,7 +92,6 @@ export class CanvasEditor extends CanvasItem {
     this._onPointermove = this._onPointermove.bind(this)
     this._onPointerup = this._onPointerup.bind(this)
     this.append(this.ruler)
-    this.inheritSize = true
   }
 
   protected override _input(event: InputEvent, key: InputEventKey): void {

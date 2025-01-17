@@ -1,8 +1,9 @@
 import type { PropertyDeclaration, WebGLRenderer } from '../../core'
 import type { Node, SceneTree, TimelineNodeProperties } from '../main'
+import type { Rectangulable } from '../main/interfaces'
 import type { Material } from '../resources'
 import { assets } from '../../asset'
-import { customNode, property, protectedProperty, Rect2 } from '../../core'
+import { customNode, property, protectedProperty } from '../../core'
 import { TimelineNode, Viewport } from '../main'
 import { EffectMaterial, QuadUvGeometry } from '../resources'
 
@@ -246,8 +247,8 @@ export class Effect extends TimelineNode {
 
   protected _parseTargetArea(): number[] | undefined {
     if (this._mode === 'parent' && this._parent && 'getRect' in this._parent) {
-      const rect = (this._parent as any).getRect()
-      if (rect instanceof Rect2) {
+      const rect = (this._parent as Rectangulable).getRect()
+      if (rect) {
         return [
           rect.left / this.viewport1.width,
           rect.top / this.viewport1.height,

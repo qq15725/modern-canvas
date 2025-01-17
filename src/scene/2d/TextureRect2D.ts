@@ -1,3 +1,4 @@
+import type { Rectangulable } from '../main/interfaces'
 import type { Texture2D } from '../resources'
 import type { Node2DProperties } from './Node2D'
 import { Rect2, Transform2D } from '../../core'
@@ -7,7 +8,7 @@ export interface TextureRect2DProperties extends Node2DProperties {
   //
 }
 
-export class TextureRect2D<T extends Texture2D = Texture2D> extends Node2D {
+export class TextureRect2D<T extends Texture2D = Texture2D> extends Node2D implements Rectangulable {
   texture?: T
 
   getRect(): Rect2 {

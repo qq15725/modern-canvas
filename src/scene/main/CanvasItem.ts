@@ -10,7 +10,6 @@ import type { CanvasItemStyleProperties, Texture2D } from '../resources'
 import type { CanvasBatchable } from './CanvasContext'
 import type { Node } from './Node'
 import type { TimelineNodeEventMap, TimelineNodeProperties } from './TimelineNode'
-import type { Viewport } from './Viewport'
 import { Color, customNode, property, Transform2D } from '../../core'
 import { CanvasItemStyle } from '../resources'
 import { CanvasContext } from './CanvasContext'
@@ -21,11 +20,10 @@ export interface CanvasItemProperties extends TimelineNodeProperties {
   style: Partial<CanvasItemStyleProperties>
   modulate: ColorValue
   blendMode: WebGLBlendMode
-  inheritSize: boolean
 }
 
 export interface CanvasItemEventMap extends TimelineNodeEventMap {
-  updateStyleProperty: (key: PropertyKey, newValue: any, oldValue: any, declaration?: PropertyDeclaration) => void
+  updateStyleProperty: (key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration) => void
   draw: () => void
 }
 
@@ -43,7 +41,6 @@ export class CanvasItem extends TimelineNode {
   @property({ default: true }) declare visible: boolean
   @property() declare modulate?: ColorValue
   @property() declare blendMode?: WebGLBlendMode
-  @property() declare inheritSize?: boolean
 
   protected declare _style: CanvasItemStyle
   get style(): CanvasItemStyle { return this._style }
@@ -59,7 +56,6 @@ export class CanvasItem extends TimelineNode {
 
   /** @internal */
   opacity = 1
-  size = { width: 0, height: 0 }
   protected _parentOpacity?: number
   protected _modulate = new Color(0xFFFFFFFF)
   protected _backgroundImage?: Texture2D
@@ -131,25 +127,6 @@ export class CanvasItem extends TimelineNode {
       case 'visibility':
         this.visible = value === 'visible'
         break
-      case 'width':
-      case 'height':
-        this._updateSize()
-        break
-    }
-  }
-
-  protected _updateSize(): void {
-    if (this.inheritSize) {
-      this.size.width = this.style.width
-      || (this._parent as CanvasItem)?.size?.width
-      || (this._parent as Viewport)?.width
-      this.size.height = this.style.height
-      || (this._parent as CanvasItem)?.size?.height
-      || (this._parent as Viewport)?.height
-    }
-    else {
-      this.size.width = this.style.width
-      this.size.height = this.style.height
     }
   }
 
@@ -222,17 +199,6 @@ export class CanvasItem extends TimelineNode {
   protected override _process(delta: number): void {
     this._updateVisible()
     this._updateOpacity()
-
-    if (
-      this.inheritSize
-      && (!this.size.width
-        || !this.size.height
-        || this.size.width !== this.style.width
-        || this.size.height !== this.style.height)
-    ) {
-      this._updateSize()
-    }
-
     super._process(delta)
   }
 
@@ -276,8 +242,7 @@ export class CanvasItem extends TimelineNode {
   }
 
   protected _drawBoundingRect(): void {
-    const { borderRadius } = this.style
-    const { width, height } = this.size
+    const { borderRadius, width, height } = this.style
     if (width && height) {
       if (borderRadius) {
         this.context.roundRect(0, 0, width, height, borderRadius)

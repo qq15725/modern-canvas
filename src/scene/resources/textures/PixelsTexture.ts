@@ -4,7 +4,7 @@ import { Texture2D } from './Texture2D'
 
 export class PixelsTexture extends Texture2D<Texture2DPixelsSource> {
   constructor(
-    pixels?: ArrayLike<number> | ArrayBufferLike | ArrayBufferView | null,
+    pixels?: number[] | ArrayBufferLike | ArrayBufferView | null,
     width = 1,
     height = 1,
   ) {

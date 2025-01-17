@@ -6,7 +6,6 @@ import { CanvasTexture } from '../resources'
 import { Control } from './Control'
 
 export interface RulerProperties extends ControlProperties {
-  pixelRatio: number
   offsetX: number
   offsetY: number
   thickness: number
@@ -15,11 +14,11 @@ export interface RulerProperties extends ControlProperties {
   markBackgroundColor: string
   markColor: string
   gap: number
+  scale: number
 }
 
 @customNode('Ruler')
 export class Ruler extends Control {
-  @property({ default: 2 }) declare pixelRatio: number
   @property({ default: 0 }) declare offsetX: number
   @property({ default: 0 }) declare offsetY: number
   @property({ default: 20 }) declare thickness: number
@@ -28,6 +27,7 @@ export class Ruler extends Control {
   @property({ default: '#f9f9fa' }) declare markBackgroundColor: string
   @property({ default: '#b2b6bc' }) declare markColor: string
   @property({ default: 300 }) declare gap: number
+  @property({ default: 1 }) declare scale: number
 
   texture = new CanvasTexture()
 
@@ -41,7 +41,6 @@ export class Ruler extends Control {
     super._updateProperty(key, value, oldValue, declaration)
 
     switch (key) {
-      case 'pixelRatio':
       case 'offsetX':
       case 'offsetY':
       case 'thickness':
@@ -50,24 +49,31 @@ export class Ruler extends Control {
       case 'markBackgroundColor':
       case 'markColor':
       case 'gap':
+      case 'scale':
         this.requestRedraw()
         break
     }
   }
 
-  protected override _updateSize(): void {
-    super._updateSize()
-    this.requestRedraw()
+  protected override _updateStyleProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+    super._updateStyleProperty(key, value, oldValue, declaration)
+
+    switch (key) {
+      case 'width':
+      case 'height':
+        this.texture[key] = value
+        this.requestRedraw()
+        break
+    }
   }
 
   protected _drawTexture(): void {
-    const { width, height } = this.size
-
-    this.style.width = width
-    this.style.height = height
+    const {
+      width,
+      height,
+    } = this.style
 
     const {
-      pixelRatio,
       offsetX,
       offsetY,
       thickness,
@@ -76,31 +82,24 @@ export class Ruler extends Control {
       markColor,
       color,
       gap: _gap,
+      scale: _scale,
     } = this
 
-    const _scale = 1
-
     const canvas = this.texture.source
-    canvas.width = Math.max(1, Math.ceil(width * pixelRatio))
-    canvas.height = Math.max(1, Math.ceil(height * pixelRatio))
-
     const ctx = canvas.getContext('2d')!
-    ctx.scale(this.pixelRatio, this.pixelRatio)
 
+    ctx.reset()
+    ctx.scale(this.texture.pixelRatio, this.texture.pixelRatio)
     const x = Math.round(offsetX)
     const y = Math.round(offsetY)
-
     ctx.beginPath()
-
     ctx.fillStyle = markBackgroundColor || '#EEE'
     ctx.fillRect(0, 0, width, thickness)
     ctx.fillRect(0, 0, thickness, height)
     ctx.fill()
-
     ctx.strokeStyle = markColor || '#000'
     ctx.moveTo(thickness, 0)
     ctx.lineTo(thickness, height)
-
     ctx.moveTo(0, thickness)
     ctx.lineTo(width, thickness)
     ctx.stroke()
@@ -192,7 +191,7 @@ export class Ruler extends Control {
     this.texture.requestUpload()
   }
 
-  protected override _drawContent(): void {
+  protected override _draw(): void {
     this._drawTexture()
     const texture = this.texture
     if (texture?.valid) {
@@ -201,7 +200,8 @@ export class Ruler extends Control {
         this.style.width! / texture.width,
         this.style.height! / texture.height,
       )
-      super._drawContent()
+      this.context.rect(0, 0, texture.width, texture.height)
+      this.context.fill()
     }
   }
 }

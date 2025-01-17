@@ -5,6 +5,8 @@ export class Rect2 {
   get y(): number { return this.position.y }
   get left(): number { return this.position.x }
   get top(): number { return this.position.y }
+  get right(): number { return this.x + this.width }
+  get bottom(): number { return this.y + this.height }
   get width(): number { return this.size.x }
   get height(): number { return this.size.y }
 
@@ -46,5 +48,9 @@ export class Rect2 {
       this.position.y + this.size.y,
     )
     return this
+  }
+
+  toArray(): number[] {
+    return [this.x, this.y, this.width, this.height]
   }
 }

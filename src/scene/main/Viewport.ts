@@ -1,7 +1,26 @@
-import type { PropertyDeclaration, WebGLFramebufferOptions, WebGLRenderer } from '../../core'
-import { customNode, Projection2D, property } from '../../core'
+import type {
+  EventListenerOptions,
+  EventListenerValue,
+  PropertyDeclaration, WebGLFramebufferOptions, WebGLRenderer,
+} from '../../core'
+import type { Rectangulable, RectangulableEventMap } from './interfaces'
+import type { NodeEventMap } from './Node'
+import { customNode, Projection2D, property, Rect2 } from '../../core'
 import { QuadUvGeometry, UvMaterial, ViewportTexture } from '../resources'
 import { Node } from './Node'
+
+export interface ViewportEventMap extends NodeEventMap, RectangulableEventMap {
+  //
+}
+
+export interface Viewport {
+  on: (<K extends keyof ViewportEventMap>(type: K, listener: ViewportEventMap[K], options?: EventListenerOptions) => this)
+    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
+  off: (<K extends keyof ViewportEventMap>(type: K, listener: ViewportEventMap[K], options?: EventListenerOptions) => this)
+    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
+  emit: (<K extends keyof ViewportEventMap>(type: K, ...args: Parameters<ViewportEventMap[K]>) => boolean)
+    & ((type: string, ...args: any[]) => boolean)
+}
 
 export interface ViewportFramebuffer {
   texture: ViewportTexture
@@ -9,7 +28,7 @@ export interface ViewportFramebuffer {
 }
 
 @customNode('Viewport')
-export class Viewport extends Node {
+export class Viewport extends Node implements Rectangulable {
   @property({ default: 0 }) declare x: number
   @property({ default: 0 }) declare y: number
   @property({ default: 0 }) declare width: number
@@ -71,11 +90,13 @@ export class Viewport extends Node {
       case 'y':
         this.requestUpload()
         this._projection.translate(this.x, this.y)
+        this.emit('updateRect')
         break
       case 'width':
       case 'height':
         this.requestUpload()
         this._projection.resize(this.width, this.height)
+        this.emit('updateRect')
         break
     }
   }
@@ -155,6 +176,10 @@ export class Viewport extends Node {
       renderer.framebuffer.bind(null)
       this._tree?.setCurrentViewport(undefined)
     }
+  }
+
+  getRect(): Rect2 {
+    return new Rect2(this.x, this.y, this.width, this.height)
   }
 
   toProjectionArray(transpose = false): number[] {

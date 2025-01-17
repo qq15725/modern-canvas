@@ -12,10 +12,10 @@ export class CanvasTexture extends Texture2D<HTMLCanvasElement> {
   protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     switch (key) {
       case 'width':
-        this.source.width = value * this.pixelRatio
+        this.source.width = Math.max(1, Math.ceil(value * this.pixelRatio))
         break
       case 'height':
-        this.source.height = value * this.pixelRatio
+        this.source.height = Math.max(1, Math.ceil(value * this.pixelRatio))
         break
     }
 

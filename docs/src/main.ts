@@ -37,7 +37,7 @@ async function init(): Promise<void> {
       new Animation({
         loop: true,
         keyframes: [
-          { offset: 1, rotate: 180 },
+          { opacity: 0, rotate: 180 },
         ],
       }),
       new Image2D({
