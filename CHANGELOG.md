@@ -1,3 +1,18 @@
+## [0.2.2](https://github.com/qq15725/modern-canvas/compare/v0.2.1...v0.2.2) (2025-01-17)
+
+
+### Bug Fixes
+
+* _updateVisible ([8634746](https://github.com/qq15725/modern-canvas/commit/86347460df27ad587a584d934b574cd47cc72602))
+* AnimationProperties type ([9e62e63](https://github.com/qq15725/modern-canvas/commit/9e62e637b11ad8751bff9465614b93fdb8590c57))
+
+
+### Features
+
+* add `XScrollBar`、`YScrollBar` gui node ([d87e975](https://github.com/qq15725/modern-canvas/commit/d87e975a5111e6e6a79c32363cc30a59167e19ab))
+
+
+
 ## [0.2.1](https://github.com/qq15725/modern-canvas/compare/v0.2.0...v0.2.1) (2025-01-17)
 
 

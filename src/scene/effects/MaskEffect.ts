@@ -14,7 +14,6 @@ export interface MaskEffectProperties extends EffectProperties {
 @customNode('MaskEffect')
 export class MaskEffect extends Effect {
   @protectedProperty() texture?: Texture2D<ImageBitmap>
-
   @property({ default: '' }) declare src: string
 
   constructor(properties?: Partial<MaskEffectProperties>, children: Node[] = []) {
