@@ -31,9 +31,8 @@ export interface EffectContext {
 
 @customNode('Effect')
 export class Effect extends TimelineNode {
-  @protectedProperty() material?: Material
-
-  @property() effectMode?: EffectMode
+  @protectedProperty() declare material?: Material
+  @property() declare effectMode?: EffectMode
   @property({ default: '' }) declare glsl: string
   @property({ default: '' }) declare glslSrc: string
 

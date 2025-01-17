@@ -6,6 +6,9 @@ import { Material, QuadUvGeometry } from '../resources'
 
 @customNode('TiltShiftTransition')
 export class TiltShiftTransition extends Transition {
+  blur = 100
+  gradientBlur = 600
+
   static material = new Material({
     vert: `attribute vec2 position;
 attribute vec2 uv;
@@ -54,9 +57,6 @@ void main(void) {
   gl_FragColor = color;
 }`,
   })
-
-  blur = 100
-  gradientBlur = 600
 
   override apply(renderer: WebGLRenderer, target: Viewport): void {
     const currentTimeProgress = this.currentTimeProgress

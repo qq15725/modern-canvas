@@ -6,6 +6,11 @@ import { Material, QuadUvGeometry } from '../resources'
 
 @customNode('TwistTransition')
 export class TwistTransition extends Transition {
+  radius?: number
+  angle = 4
+  padding = 20
+  offset?: number
+
   static material = new Material({
     vert: `attribute vec2 position;
 attribute vec2 uv;
@@ -56,11 +61,6 @@ void main(void) {
   gl_FragColor = texture2D(sampler, coord);
 }`,
   })
-
-  radius?: number
-  angle = 4
-  padding = 20
-  offset?: number
 
   override apply(renderer: WebGLRenderer, source: Viewport): void {
     const currentTimeProgress = this.currentTimeProgress

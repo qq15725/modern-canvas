@@ -6,6 +6,9 @@ import { Material, QuadUvGeometry } from '../resources'
 
 @customNode('KawaseTransition')
 export class KawaseTransition extends Transition {
+  blur = 10
+  quality = 10
+
   static material = new Material({
     vert: `attribute vec2 position;
 attribute vec2 uv;
@@ -31,9 +34,6 @@ void main(void) {
   gl_FragColor = color;
 }`,
   })
-
-  blur = 10
-  quality = 10
 
   override apply(renderer: WebGLRenderer, target: Viewport): void {
     const currentTimeProgress = this.currentTimeProgress
