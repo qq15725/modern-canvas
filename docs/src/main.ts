@@ -36,6 +36,7 @@ async function init(): Promise<void> {
     }, [
       new Animation({
         loop: true,
+        delay: 2000,
         keyframes: [
           { opacity: 0, rotate: 180 },
         ],

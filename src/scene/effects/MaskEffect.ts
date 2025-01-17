@@ -1,13 +1,13 @@
 import type { PropertyDeclaration, WebGLRenderer } from '../../core'
-import type { Viewport } from '../main'
+import type { Node, Viewport } from '../main'
 import type { Texture2D } from '../resources'
-import type { EffectContext, EffectOptions } from './Effect'
+import type { EffectContext, EffectProperties } from './Effect'
 import { assets } from '../../asset'
 import { customNode, property, protectedProperty } from '../../core'
 import { Material, QuadUvGeometry } from '../resources'
 import { Effect } from './Effect'
 
-export interface MaskEffectOptions extends EffectOptions {
+export interface MaskEffectProperties extends EffectProperties {
   src?: string
 }
 
@@ -17,9 +17,12 @@ export class MaskEffect extends Effect {
 
   @property({ default: '' }) declare src: string
 
-  constructor(options?: MaskEffectOptions) {
+  constructor(properties?: Partial<MaskEffectProperties>, children: Node[] = []) {
     super()
-    this.setProperties(options)
+
+    this
+      .setProperties(properties)
+      .append(children)
   }
 
   async load(): Promise<void> {

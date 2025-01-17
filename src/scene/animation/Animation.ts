@@ -105,8 +105,6 @@ export type AnimationMode = 'parent' | 'sibling'
 
 export interface AnimationProperties extends TimelineNodeProperties {
   animationMode: AnimationMode
-  startTime: number
-  duration: number
   loop: boolean
   keyframes: Keyframe[]
 }
