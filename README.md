@@ -134,7 +134,7 @@ Use https://github.com/gl-transitions/gl-transitions with `vite`
 
 ```ts
 import bounceGLSL from 'gl-transitions/transitions/Bounce.glsl?raw'
-import { Transition } from 'modern-canvas'
+import { Image2D, Transition } from 'modern-canvas'
 
 engine.root.addChild(
   new Image2D({
