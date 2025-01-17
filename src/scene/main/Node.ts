@@ -143,8 +143,8 @@ export class Node extends CoreObject {
   get parent(): Node | undefined { return this._parent }
   set parent(parent: Node | undefined) { this.setParent(parent) }
   hasParent(): boolean { return !!this._parent }
-  getParent(): Node | undefined { return this._parent }
-  setParent(parent: Node | undefined): this {
+  getParent<T extends Node = Node>(): T | undefined { return this._parent as T }
+  setParent<T extends Node = Node>(parent: T | undefined): this {
     if (!this._parent?.is(parent)) {
       const oldParent = this._parent
       this._parent = parent

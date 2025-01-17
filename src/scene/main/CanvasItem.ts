@@ -143,7 +143,7 @@ export class CanvasItem extends TimelineNode {
 
   protected _updateOpacity(): void {
     const opacity = this.style.getComputedOpacity()
-      * ((this._parent as CanvasItem)?.opacity ?? 1)
+      * (this.getParent<CanvasItem>()?.opacity ?? 1)
     if (this.opacity !== opacity) {
       this.opacity = opacity
       this.requestRepaint()
@@ -157,7 +157,7 @@ export class CanvasItem extends TimelineNode {
 
   protected _updateVisible(): void {
     let visible = this.style.visibility === 'visible'
-      && ((this._parent as CanvasItem)?.visible ?? true)
+      && (this.getParent<CanvasItem>()?.visible ?? true)
     if (visible && !this.isInsideTimeRange()) {
       visible = false
     }
@@ -193,7 +193,7 @@ export class CanvasItem extends TimelineNode {
   }
 
   protected override _process(delta: number): void {
-    const parent = this._parent as CanvasItem | undefined
+    const parent = this.getParent<CanvasItem>()
 
     if (this._parentVisible !== parent?.visible) {
       this._parentVisible = parent?.visible

@@ -1,6 +1,6 @@
-import type { InputEvent, InputEventKey, PointerInputEvent } from '../core'
+import type { InputEvent, InputEventKey, PointerInputEvent, PropertyDeclaration } from '../core'
 import type { CanvasItem, CanvasItemStyle } from '../scene'
-import { Control, Node2D, Ruler, Scaler, ScrollBar } from '../scene'
+import { Control, Node2D, Ruler, Scaler, ShadowEffect, XScrollBar, YScrollBar } from '../scene'
 
 export class CanvasEditor extends Control {
   name = 'CanvasEditor'
@@ -40,34 +40,54 @@ export class CanvasEditor extends Control {
     internalMode: 'back',
   }).on('updateScale', (scale) => {
     this.ruler.scale = scale
+    const scrollHeight = this.drawboard.style.height * scale
+    const scrollWidth = this.drawboard.style.width * scale
+    if (scrollHeight > this.style.height) {
+      this.yScrollBar.style.visibility = 'visible'
+      this.yScrollBar.maxValue = scrollHeight
+      this.yScrollBar.page = this.style.height
+    }
+    else {
+      this.yScrollBar.style.visibility = 'hidden'
+    }
+    if (scrollWidth > this.style.width) {
+      this.xScrollBar.style.visibility = 'visible'
+      this.xScrollBar.maxValue = scrollWidth
+      this.xScrollBar.page = this.style.width
+    }
+    else {
+      this.xScrollBar.style.visibility = 'hidden'
+    }
   })
 
-  xScrollBar = new ScrollBar({
+  xScrollBar = new XScrollBar({
     internalMode: 'back',
-    direction: 'horizontal',
+    style: {
+      visibility: 'hidden',
+    },
   })
 
-  yScrollBar = new ScrollBar({
+  yScrollBar = new YScrollBar({
     internalMode: 'back',
-    direction: 'vertical',
+    style: {
+      visibility: 'hidden',
+    },
   })
 
   drawboard = new Node2D({
     name: 'drawboard',
     style: {
-      left: 100,
-      top: 100,
       width: 500,
       height: 500,
       backgroundColor: 0xFFFFFFFF,
       overflow: 'hidden',
-      borderStyle: 'solid',
-      borderWidth: 2,
       pointerEvents: 'none',
-      transformOrigin: 'left top',
     },
   }).append(
     this.scaler,
+    new ShadowEffect({
+      internalMode: 'back',
+    }),
   )
 
   ruler = new Ruler({
@@ -92,6 +112,21 @@ export class CanvasEditor extends Control {
     this._onPointermove = this._onPointermove.bind(this)
     this._onPointerup = this._onPointerup.bind(this)
     this.append(this.ruler)
+  }
+
+  protected override _updateStyleProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+    super._updateStyleProperty(key, value, oldValue, declaration)
+
+    switch (key) {
+      case 'width':
+        this.drawboard.style.left = (this.style.width - this.drawboard.style.width) / 2
+        this.ruler.offsetX = this.drawboard.style.left
+        break
+      case 'height':
+        this.drawboard.style.top = (this.style.height - this.drawboard.style.height) / 2
+        this.ruler.offsetY = this.drawboard.style.top
+        break
+    }
   }
 
   protected override _guiInput(event: InputEvent, key: InputEventKey): void {

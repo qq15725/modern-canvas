@@ -22,7 +22,9 @@ export interface Scaler {
 }
 
 export interface ScalerProperties extends NodeProperties {
-  //
+  value: number
+  minValue: number
+  maxValue: number
 }
 
 @customNode<ScalerProperties>('Scaler', {
@@ -30,9 +32,9 @@ export interface ScalerProperties extends NodeProperties {
   renderMode: 'disabled',
 })
 export class Scaler extends Node {
-  @property({ default: 1 }) declare scale: number
-  @property({ default: 0.05 }) declare min: number
-  @property({ default: 10 }) declare max: number
+  @property({ default: 1 }) declare value: number
+  @property({ default: 0.05 }) declare minValue: number
+  @property({ default: 10 }) declare maxValue: number
 
   get target(): CanvasItem | undefined {
     if ((this.parent as CanvasItem)?.style) {
@@ -51,10 +53,10 @@ export class Scaler extends Node {
     super._updateProperty(key, value, oldValue, declaration)
 
     switch (key) {
-      case 'scale':
+      case 'value':
       case 'min':
       case 'max': {
-        this.scale = clamp(this.min, this.scale, this.max)
+        this.value = clamp(this.minValue, this.value, this.maxValue)
         this._updateScale()
         break
       }
@@ -64,9 +66,9 @@ export class Scaler extends Node {
   protected _updateScale(): void {
     const target = this.target
     if (target) {
-      target.style.scaleX = this.scale
-      target.style.scaleY = this.scale
-      this.emit('updateScale', this.scale)
+      target.style.scaleX = this.value
+      target.style.scaleY = this.value
+      this.emit('updateScale', this.value)
     }
   }
 
@@ -86,7 +88,7 @@ export class Scaler extends Node {
       e.preventDefault()
       let distance = e.deltaY / (e.ctrlKey ? 1 : 100)
       distance *= -0.015
-      this.scale += distance
+      this.value += distance
     }
   }
 

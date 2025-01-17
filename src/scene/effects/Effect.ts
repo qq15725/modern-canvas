@@ -17,11 +17,11 @@ export type EffectMode =
   // Apply the effect to previous node and next node
   | 'transition'
 
-export interface EffectOptions extends TimelineNodeProperties {
-  mode?: EffectMode
-  glsl?: string
-  glslSrc?: string
-  material?: Material
+export interface EffectProperties extends TimelineNodeProperties {
+  mode: EffectMode
+  glsl: string
+  glslSrc: string
+  material: Material
 }
 
 export interface EffectContext {
@@ -56,11 +56,14 @@ export class Effect extends TimelineNode {
   protected _previousSibling?: Node
   protected _nextSibling?: Node
 
-  constructor(options?: EffectOptions) {
+  constructor(properties?: Partial<EffectProperties>, children: Node[] = []) {
     super()
     this._onProcessing = this._onProcessing.bind(this)
     this._onNodeProcessed = this._onNodeProcessed.bind(this)
-    this.setProperties(options)
+
+    this
+      .setProperties(properties)
+      .append(children)
   }
 
   protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {

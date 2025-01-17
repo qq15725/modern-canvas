@@ -1,44 +1,36 @@
-import type { InputEvent, InputEventKey } from '../../core'
+import type { InputEvent, InputEventKey, PropertyDeclaration } from '../../core'
 import type { Node } from '../main'
-import type { Rectangulable } from '../main/interfaces'
-import type { ControlProperties } from './Control'
+import type { RangeProperties } from './Range'
 import { customNode, property } from '../../core'
-import { Control } from './Control'
+import { Range } from './Range'
 
-export interface ScrollBarProperties extends ControlProperties {
+export interface ScrollBarProperties extends RangeProperties {
   direction: 'vertical' | 'horizontal'
 }
 
 @customNode<ScrollBarProperties>('ScrollBar')
-export class ScrollBar extends Control {
+export class ScrollBar extends Range {
   @property({ default: 'vertical' }) declare direction: 'vertical' | 'horizontal'
-  @property({ default: 10 }) declare padding: number
 
-  constructor(properties: Partial<ScrollBarProperties>, children: Node[] = []) {
+  constructor(properties?: Partial<ScrollBarProperties>, children: Node[] = []) {
     super()
+
     this
       .setProperties(properties)
       .append(children)
   }
 
-  protected override _parentUpdateRect(): void {
-    super._parentUpdateRect()
-    const rect = (this._parent as unknown as Rectangulable).getRect()
-    if (rect && rect.width && rect.height) {
-      if (this.direction === 'vertical') {
-        this.style.width = 10
-        this.style.height = rect.height - this.padding * 2
-        this.style.left = rect.right - this.style.width
-        this.style.top = this.padding
-      }
-      else {
-        this.style.height = 10
-        this.style.width = rect.width - this.padding * 2
-        this.style.left = this.padding
-        this.style.top = rect.bottom - this.style.height
-      }
+  protected override _updateStyleProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+    super._updateStyleProperty(key, value, oldValue, declaration)
+
+    switch (key) {
+      case 'width':
+      case 'height':
+      case 'left':
+      case 'top':
+        this.requestRedraw()
+        break
     }
-    this.requestRedraw()
   }
 
   protected override _guiInput(event: InputEvent, key: InputEventKey): void {
@@ -51,14 +43,23 @@ export class ScrollBar extends Control {
   }
 
   protected override _draw(): void {
-    this.context.roundRect(
-      this.style.left,
-      this.style.top,
-      this.style.width,
-      this.style.height,
-      this.style.borderRadius ?? 20,
-    )
-    this.context.fillStyle = 0x0000000F
+    let left, top, width, height, radii
+    if (this.direction === 'vertical') {
+      width = 10
+      height = this.style.height * (this.page / (this.maxValue - this.minValue))
+      left = (this.style.left + this.style.width) - width
+      top = this.style.height * (this.value / (this.maxValue - this.minValue))
+      radii = width / 2
+    }
+    else {
+      width = this.style.width * (this.page / (this.maxValue - this.minValue))
+      height = 10
+      left = this.style.width * (this.value / (this.maxValue - this.minValue))
+      top = (this.style.top + this.style.height) - height
+      radii = height / 2
+    }
+    this.context.roundRect(left, top, width, height, radii)
+    this.context.fillStyle = 0x00000022
     this.context.fill()
   }
 }
