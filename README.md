@@ -18,6 +18,18 @@
   </a>
 </p>
 
+## Features
+
+- WebGL and WebGL2
+
+- Animation
+
+- Special effects
+
+- Transition effects
+
+- Render it like css
+
 ## 📦 Install
 
 ```shell
