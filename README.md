@@ -27,7 +27,7 @@ npm i modern-canvas
 ## 🦄 Usage
 
 ```javascript
-import { Animation, Engine, Image2D, Text2D } from 'modern-canvas'
+import { Animation, Engine, Image2D, Text2D, Video2D } from 'modern-canvas'
 import { fonts } from 'modern-font'
 
 async function loadFallbackFont() {
@@ -64,6 +64,16 @@ loadFallbackFont().then(() => {
           fontSize: 30,
         },
         content: '/example.png',
+      }),
+      new Video2D({
+        style: {
+          left: 200,
+          top: 200,
+          width: 100,
+          height: 100,
+          maskImage: '/example.png',
+        },
+        src: '/example.mp4',
       }),
     ])
   )

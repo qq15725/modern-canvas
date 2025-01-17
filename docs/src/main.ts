@@ -28,9 +28,9 @@ async function init(): Promise<void> {
       style: {
         width: 100,
         height: 100,
-        opacity: 0.9,
-        filter: 'sepia(0.5)',
-        backgroundColor: '#00ff00',
+        opacity: 0.5,
+        filter: 'brightness(102%) contrast(90%) saturate(128%) sepia(18%)',
+        backgroundColor: '#00FF00',
       },
     }, [
       new Animation({
@@ -105,7 +105,6 @@ async function init(): Promise<void> {
         top: 50,
         width: 100,
         height: 100,
-        maskImage: '/example.png',
       },
       src: '/example.jpg',
     }),
@@ -115,6 +114,7 @@ async function init(): Promise<void> {
         top: 200,
         width: 100,
         height: 100,
+        maskImage: '/example.png',
       },
       src: '/example.mp4',
     }),
