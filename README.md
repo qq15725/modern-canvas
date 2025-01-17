@@ -28,7 +28,7 @@
 
 - Transition effects
 
-- Render it like css
+- Describe element as you would a CSSStyle
 
 ## 📦 Install
 
