@@ -146,15 +146,11 @@ export class CanvasItem extends TimelineNode {
   }
 
   protected _updateOpacity(): void {
-    const parentOpacity = (this._parent as CanvasItem)?.opacity
-    if (parentOpacity !== this._parentOpacity) {
-      this._parentOpacity = parentOpacity
-      const opacity = this.style.getComputedOpacity()
-        * ((this._parent as CanvasItem)?.opacity ?? 1)
-      if (this.opacity !== opacity) {
-        this.opacity = opacity
-        this.requestRepaint()
-      }
+    const opacity = this.style.getComputedOpacity()
+      * ((this._parent as CanvasItem)?.opacity ?? 1)
+    if (this.opacity !== opacity) {
+      this.opacity = opacity
+      this.requestRepaint()
     }
   }
 
@@ -198,7 +194,13 @@ export class CanvasItem extends TimelineNode {
 
   protected override _process(delta: number): void {
     this._updateVisible()
-    this._updateOpacity()
+
+    const parentOpacity = (this._parent as CanvasItem)?.opacity
+    if (parentOpacity !== this._parentOpacity) {
+      this._parentOpacity = parentOpacity
+      this._updateOpacity()
+    }
+
     super._process(delta)
   }
 

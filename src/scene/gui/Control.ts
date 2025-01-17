@@ -30,22 +30,22 @@ export interface ControlProperties extends CanvasItemProperties {
 export class Control extends CanvasItem implements Rectangulable {
   constructor(properties?: Partial<ControlProperties>, children: Node[] = []) {
     super()
-    this._updateRect = this._updateRect.bind(this)
+    this._parentUpdateRect = this._parentUpdateRect.bind(this)
     this.setProperties(properties)
     this.append(children)
   }
 
   protected override _parented(parent: any): void {
     super._parented(parent)
-    ;(parent as Rectangulable).on('updateRect', this._updateRect)
+    ;(parent as Rectangulable).on('updateRect', this._parentUpdateRect)
   }
 
   protected override _unparented(oldParent: any): void {
     super._unparented(oldParent)
-    ;(oldParent as Rectangulable).off('updateRect', this._updateRect)
+    ;(oldParent as Rectangulable).off('updateRect', this._parentUpdateRect)
   }
 
-  protected _updateRect(): void {
+  protected _parentUpdateRect(): void {
     const rect = (this._parent as unknown as Rectangulable).getRect()
     this.style.left = rect.left
     this.style.top = rect.top

@@ -21,8 +21,8 @@ export class ScrollBar extends Control {
       .append(children)
   }
 
-  protected override _updateRect(): void {
-    super._updateRect()
+  protected override _parentUpdateRect(): void {
+    super._parentUpdateRect()
     const rect = (this._parent as unknown as Rectangulable).getRect()
     if (rect && rect.width && rect.height) {
       if (this.direction === 'vertical') {

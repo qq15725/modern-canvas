@@ -94,8 +94,8 @@ export class CanvasEditor extends Control {
     this.append(this.ruler)
   }
 
-  protected override _input(event: InputEvent, key: InputEventKey): void {
-    super._input(event, key)
+  protected override _guiInput(event: InputEvent, key: InputEventKey): void {
+    super._guiInput(event, key)
 
     switch (key) {
       case 'pointerdown':

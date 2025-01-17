@@ -150,7 +150,7 @@ export class Animation extends TimelineNode {
     super._updateProperty(key, value, oldValue, declaration)
 
     switch (key) {
-      case 'mode':
+      case 'animationMode':
       case 'keyframes':
         this._updateKeyframes()
         break
