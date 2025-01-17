@@ -1,3 +1,14 @@
+## [0.2.4](https://github.com/qq15725/modern-canvas/compare/v0.2.3...v0.2.4) (2025-01-17)
+
+
+### Features
+
+* rename `Animation.animationMode` to `Animation.effectMode` ([e3dd342](https://github.com/qq15725/modern-canvas/commit/e3dd34245399753720d76379f38342698716674b))
+* set Animation default processMode to pausable ([e9b54af](https://github.com/qq15725/modern-canvas/commit/e9b54af23e4c203f0456f352990f52ecfd5fc009))
+* transitions ([43dd094](https://github.com/qq15725/modern-canvas/commit/43dd09461d6c06bef6e868234030bd4aabde73bf))
+
+
+
 ## [0.2.3](https://github.com/qq15725/modern-canvas/compare/v0.2.2...v0.2.3) (2025-01-17)
 
 
