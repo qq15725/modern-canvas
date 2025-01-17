@@ -1,3 +1,12 @@
+## [0.2.5](https://github.com/qq15725/modern-canvas/compare/v0.2.4...v0.2.5) (2025-01-17)
+
+
+### Bug Fixes
+
+* Transition ([18ff11e](https://github.com/qq15725/modern-canvas/commit/18ff11ee4bd49332fdbd4102042e7bf197dec722))
+
+
+
 ## [0.2.4](https://github.com/qq15725/modern-canvas/compare/v0.2.3...v0.2.4) (2025-01-17)
 
 
