@@ -4,8 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Modern canvas</title>
+  <script src="https://unpkg.com/stats.js"></script>
 </head>
 <body style="width: 100vw; height: 100vh; margin: 0">
+
+  <script>
+    window.onload = function() {
+      const stats = new window.Stats()
+      document.body.appendChild(stats.dom)
+      stats.dom.style.left = ''
+      stats.dom.style.right = '100px'
+      requestAnimationFrame(function loop() { stats.update(); requestAnimationFrame(loop) })
+    }
+  </script>
   <script type="module" src="./src/main.ts"></script>
 </body>
 </html>

@@ -23,7 +23,7 @@ export class CoreObject extends EventEmitter {
   readonly instanceId = ++UID
 
   protected _defaultProperties?: Record<PropertyKey, any>
-  protected _updatedProperties = new Map<PropertyKey, unknown>()
+  protected _updatedProperties = new Map<PropertyKey, any>()
   protected _changedProperties = new Set<PropertyKey>()
   protected _updatingPromise = Promise.resolve()
   protected _updating = false
@@ -43,13 +43,13 @@ export class CoreObject extends EventEmitter {
   protected _performUpdate(): void {
     if (!this._updating)
       return
-    this._onUpdate(this._updatedProperties)
+    this._update(this._updatedProperties)
     this._updatedProperties = new Map()
     this._updating = false
   }
 
   // eslint-disable-next-line unused-imports/no-unused-vars
-  protected _onUpdate(changed: Map<PropertyKey, unknown>): void {
+  protected _update(changed: Map<PropertyKey, any>): void {
     /** override */
   }
 

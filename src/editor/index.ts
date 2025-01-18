@@ -1,1 +1,1 @@
-export * from './CanvasEditor'
+export * from './CanvasItemEditor'

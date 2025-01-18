@@ -2,9 +2,7 @@ import type { InputEvent, InputEventKey, PointerInputEvent, PropertyDeclaration 
 import type { CanvasItem, CanvasItemStyle } from '../scene'
 import { Control, Node2D, Ruler, Scaler, XScrollBar, YScrollBar } from '../scene'
 
-export class CanvasEditor extends Control {
-  name = 'CanvasEditor'
-
+export class CanvasItemEditor extends Control {
   hover = new Node2D({
     name: 'hover',
     internalMode: 'back',
@@ -40,24 +38,7 @@ export class CanvasEditor extends Control {
     internalMode: 'back',
   }).on('updateScale', (scale) => {
     this.ruler.scale = scale
-    const scrollHeight = this.drawboard.style.height * scale
-    const scrollWidth = this.drawboard.style.width * scale
-    if (scrollHeight > this.style.height) {
-      this.yScrollBar.style.visibility = 'visible'
-      this.yScrollBar.maxValue = scrollHeight
-      this.yScrollBar.page = this.style.height
-    }
-    else {
-      this.yScrollBar.style.visibility = 'hidden'
-    }
-    if (scrollWidth > this.style.width) {
-      this.xScrollBar.style.visibility = 'visible'
-      this.xScrollBar.maxValue = scrollWidth
-      this.xScrollBar.page = this.style.width
-    }
-    else {
-      this.xScrollBar.style.visibility = 'hidden'
-    }
+    this._updateScrollbars()
   })
 
   xScrollBar = new XScrollBar({
@@ -197,6 +178,28 @@ export class CanvasEditor extends Control {
     }
     else {
       this.hover.style.visibility = 'hidden'
+    }
+  }
+
+  protected _updateScrollbars(): void {
+    const scale = this.ruler.scale
+    const scrollHeight = this.drawboard.style.height * scale
+    const scrollWidth = this.drawboard.style.width * scale
+    if (scrollHeight > this.style.height) {
+      this.yScrollBar.style.visibility = 'visible'
+      this.yScrollBar.maxValue = scrollHeight
+      this.yScrollBar.page = this.style.height
+    }
+    else {
+      this.yScrollBar.style.visibility = 'hidden'
+    }
+    if (scrollWidth > this.style.width) {
+      this.xScrollBar.style.visibility = 'visible'
+      this.xScrollBar.maxValue = scrollWidth
+      this.xScrollBar.page = this.style.width
+    }
+    else {
+      this.xScrollBar.style.visibility = 'hidden'
     }
   }
 }
