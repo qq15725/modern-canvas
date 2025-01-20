@@ -10,7 +10,9 @@ export interface MainLoopEventMap extends CoreObjectEventMap {
 export interface MainLoop {
   on: (<K extends keyof MainLoopEventMap>(type: K, listener: MainLoopEventMap[K], options?: EventListenerOptions) => this)
     & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  off: (<K extends keyof MainLoopEventMap>(type: K, listener: MainLoopEventMap[K], options?: EventListenerOptions) => this)
+  once: (<K extends keyof MainLoopEventMap>(type: K, listener: MainLoopEventMap[K], options?: EventListenerOptions) => this)
+    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
+  off: (<K extends keyof MainLoopEventMap>(type: K, listener?: MainLoopEventMap[K], options?: EventListenerOptions) => this)
     & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
   emit: (<K extends keyof EventListenerOptions>(type: K, ...args: Parameters<EventListenerOptions[K]>) => boolean)
     & ((type: string, ...args: any[]) => boolean)
@@ -34,7 +36,7 @@ export class MainLoop extends CoreObject {
   start(process: (delta: number) => void): this {
     if (!this._starting) {
       this._starting = true
-      this.removeAllListeners()
+      this.off('process')
       this.on('process', process)
       Ticker.on(this._onNextTick, { sort: 0 })
     }

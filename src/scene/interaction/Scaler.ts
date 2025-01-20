@@ -15,7 +15,9 @@ export interface ScalerEventMap extends NodeEventMap {
 export interface Scaler {
   on: (<K extends keyof ScalerEventMap>(type: K, listener: ScalerEventMap[K], options?: EventListenerOptions) => this)
     & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  off: (<K extends keyof ScalerEventMap>(type: K, listener: ScalerEventMap[K], options?: EventListenerOptions) => this)
+  once: (<K extends keyof ScalerEventMap>(type: K, listener: ScalerEventMap[K], options?: EventListenerOptions) => this)
+    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
+  off: (<K extends keyof ScalerEventMap>(type: K, listener?: ScalerEventMap[K], options?: EventListenerOptions) => this)
     & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
   emit: (<K extends keyof ScalerEventMap>(type: K, ...args: Parameters<ScalerEventMap[K]>) => boolean)
     & ((type: string, ...args: any[]) => boolean)

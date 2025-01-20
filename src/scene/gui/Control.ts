@@ -16,7 +16,9 @@ export interface ControlEventMap extends CanvasItemEventMap, RectangulableEventM
 export interface Control {
   on: (<K extends keyof ControlEventMap>(type: K, listener: ControlEventMap[K], options?: EventListenerOptions) => this)
     & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  off: (<K extends keyof ControlEventMap>(type: K, listener: ControlEventMap[K], options?: EventListenerOptions) => this)
+  once: (<K extends keyof ControlEventMap>(type: K, listener: ControlEventMap[K], options?: EventListenerOptions) => this)
+    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
+  off: (<K extends keyof ControlEventMap>(type: K, listener?: ControlEventMap[K], options?: EventListenerOptions) => this)
     & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
   emit: (<K extends keyof ControlEventMap>(type: K, ...args: Parameters<ControlEventMap[K]>) => boolean)
     & ((type: string, ...args: any[]) => boolean)

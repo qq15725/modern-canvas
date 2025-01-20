@@ -11,7 +11,9 @@ export interface CoreObjectEventMap {
 export interface CoreObject {
   on: (<K extends keyof CoreObjectEventMap>(type: K, listener: CoreObjectEventMap[K], options?: EventListenerOptions) => this)
     & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  off: (<K extends keyof CoreObjectEventMap>(type: K, listener: CoreObjectEventMap[K], options?: EventListenerOptions) => this)
+  once: (<K extends keyof CoreObjectEventMap>(type: K, listener: CoreObjectEventMap[K], options?: EventListenerOptions) => this)
+    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
+  off: (<K extends keyof CoreObjectEventMap>(type: K, listener?: CoreObjectEventMap[K], options?: EventListenerOptions) => this)
     & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
   emit: (<K extends keyof CoreObjectEventMap>(type: K, ...args: Parameters<CoreObjectEventMap[K]>) => boolean)
     & ((type: string, ...args: any[]) => boolean)
@@ -27,6 +29,10 @@ export class CoreObject extends EventEmitter {
   protected _changedProperties = new Set<PropertyKey>()
   protected _updatingPromise = Promise.resolve()
   protected _updating = false
+
+  is(target: CoreObject | undefined | null): boolean {
+    return Boolean(target && this.instanceId === target.instanceId)
+  }
 
   protected async _enqueueUpdate(): Promise<void> {
     this._updating = true

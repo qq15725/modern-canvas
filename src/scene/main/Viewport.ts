@@ -16,7 +16,9 @@ export interface ViewportEventMap extends NodeEventMap, RectangulableEventMap {
 export interface Viewport {
   on: (<K extends keyof ViewportEventMap>(type: K, listener: ViewportEventMap[K], options?: EventListenerOptions) => this)
     & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  off: (<K extends keyof ViewportEventMap>(type: K, listener: ViewportEventMap[K], options?: EventListenerOptions) => this)
+  once: (<K extends keyof ViewportEventMap>(type: K, listener: ViewportEventMap[K], options?: EventListenerOptions) => this)
+    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
+  off: (<K extends keyof ViewportEventMap>(type: K, listener?: ViewportEventMap[K], options?: EventListenerOptions) => this)
     & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
   emit: (<K extends keyof ViewportEventMap>(type: K, ...args: Parameters<ViewportEventMap[K]>) => boolean)
     & ((type: string, ...args: any[]) => boolean)

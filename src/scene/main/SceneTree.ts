@@ -22,7 +22,9 @@ export interface SceneTreeEventMap extends MainLoopEventMap {
 export interface SceneTree {
   on: (<K extends keyof SceneTreeEventMap>(type: K, listener: SceneTreeEventMap[K], options?: EventListenerOptions) => this)
     & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  off: (<K extends keyof SceneTreeEventMap>(type: K, listener: SceneTreeEventMap[K], options?: EventListenerOptions) => this)
+  once: (<K extends keyof SceneTreeEventMap>(type: K, listener: SceneTreeEventMap[K], options?: EventListenerOptions) => this)
+    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
+  off: (<K extends keyof SceneTreeEventMap>(type: K, listener?: SceneTreeEventMap[K], options?: EventListenerOptions) => this)
     & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
   emit: (<K extends keyof SceneTreeEventMap>(type: K, ...args: Parameters<SceneTreeEventMap[K]>) => boolean)
     & ((type: string, ...args: any[]) => boolean)

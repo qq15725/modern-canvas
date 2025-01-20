@@ -10,7 +10,9 @@ export interface TimelineEventMap extends NodeEventMap {
 export interface Timeline {
   on: (<K extends keyof TimelineEventMap>(type: K, listener: TimelineEventMap[K], options?: EventListenerOptions) => this)
     & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  off: (<K extends keyof TimelineEventMap>(type: K, listener: TimelineEventMap[K], options?: EventListenerOptions) => this)
+  once: (<K extends keyof TimelineEventMap>(type: K, listener: TimelineEventMap[K], options?: EventListenerOptions) => this)
+    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
+  off: (<K extends keyof TimelineEventMap>(type: K, listener?: TimelineEventMap[K], options?: EventListenerOptions) => this)
     & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
   emit: (<K extends keyof TimelineEventMap>(type: K, ...args: Parameters<TimelineEventMap[K]>) => boolean)
     & ((type: string, ...args: any[]) => boolean)

@@ -38,7 +38,9 @@ interface EngineEventMap {
 export interface Engine {
   on: (<K extends keyof EngineEventMap>(type: K, listener: EngineEventMap[K], options?: EventListenerOptions) => this)
     & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  off: (<K extends keyof EngineEventMap>(type: K, listener: EngineEventMap[K], options?: EventListenerOptions) => this)
+  once: (<K extends keyof EngineEventMap>(type: K, listener: EngineEventMap[K], options?: EventListenerOptions) => this)
+    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
+  off: (<K extends keyof EngineEventMap>(type: K, listener?: EngineEventMap[K], options?: EventListenerOptions) => this)
     & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
   emit: (<K extends keyof EngineEventMap>(type: K, ...args: Parameters<EngineEventMap[K]>) => boolean)
     & ((type: string, ...args: any[]) => boolean)

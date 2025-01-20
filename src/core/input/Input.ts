@@ -26,7 +26,9 @@ export type InputEventKey = keyof InputEventMap
 export interface Input {
   on: (<K extends keyof InputEventMap>(type: K, listener: InputEventMap[K], options?: EventListenerOptions) => this)
     & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  off: (<K extends keyof InputEventMap>(type: K, listener: InputEventMap[K], options?: EventListenerOptions) => this)
+  once: (<K extends keyof InputEventMap>(type: K, listener: InputEventMap[K], options?: EventListenerOptions) => this)
+    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
+  off: (<K extends keyof InputEventMap>(type: K, listener?: InputEventMap[K], options?: EventListenerOptions) => this)
     & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
   emit: (<K extends keyof InputEventMap>(type: K, ...args: Parameters<InputEventMap[K]>) => boolean)
     & ((type: string, ...args: any[]) => boolean)

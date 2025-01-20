@@ -40,6 +40,8 @@ export interface NodeEventMap extends CoreObjectEventMap, InputEventMap {
 export interface Node {
   on: (<K extends keyof NodeEventMap>(type: K, listener: NodeEventMap[K], options?: EventListenerOptions) => this)
     & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
+  once: (<K extends keyof NodeEventMap>(type: K, listener?: NodeEventMap[K], options?: EventListenerOptions) => this)
+    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
   off: (<K extends keyof NodeEventMap>(type: K, listener: NodeEventMap[K], options?: EventListenerOptions) => this)
     & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
   emit: (<K extends keyof NodeEventMap>(type: K, ...args: Parameters<NodeEventMap[K]>) => boolean)
@@ -119,7 +121,7 @@ export class Node extends CoreObject {
   isInsideTree(): boolean { return Boolean(this._tree) }
   setTree(tree: SceneTree | undefined): this {
     const oldTree = this._tree
-    if (tree !== oldTree) {
+    if (!tree?.is(oldTree)) {
       if (oldTree) {
         this.emit('treeExit', oldTree)
       }
@@ -476,10 +478,6 @@ export class Node extends CoreObject {
       child.deepForEach(fn)
     })
     return this
-  }
-
-  is(target: Node | undefined | null): boolean {
-    return Boolean(target && this.instanceId === target.instanceId)
   }
 
   /** override */

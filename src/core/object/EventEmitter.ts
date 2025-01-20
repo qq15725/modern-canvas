@@ -36,7 +36,7 @@ export class EventEmitter {
     return this.on(type, listener, { once: true })
   }
 
-  off(type: string, listener: EventListenerValue, options?: EventListenerOptions): this {
+  off(type: string, listener?: EventListenerValue, options?: EventListenerOptions): this {
     if (!listener) {
       this.eventListeners.delete(type)
       return this
