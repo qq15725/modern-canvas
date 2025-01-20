@@ -120,13 +120,14 @@ export class Node extends CoreObject {
   setTree(tree: SceneTree | undefined): this {
     const oldTree = this._tree
     if (tree !== oldTree) {
-      if (tree) {
-        this._tree = tree
-        this.emit('treeEnter', tree)
-      }
-      else if (oldTree) {
+      if (oldTree) {
         this.emit('treeExit', oldTree)
-        this._tree = tree
+      }
+
+      this._tree = tree
+
+      if (tree) {
+        this.emit('treeEnter', tree)
       }
 
       for (let len = this._children.length, i = 0; i < len; i++) {
