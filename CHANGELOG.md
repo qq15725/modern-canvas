@@ -1,3 +1,13 @@
+## [0.3.1](https://github.com/qq15725/modern-canvas/compare/v0.3.0...v0.3.1) (2025-01-20)
+
+
+### Bug Fixes
+
+* eslint ([5c6b61b](https://github.com/qq15725/modern-canvas/commit/5c6b61b1796a4da31b504858b626ba47978c8231))
+* setTree ([fbcb13d](https://github.com/qq15725/modern-canvas/commit/fbcb13dc66e4d299dae38fac657de75bb8f62924))
+
+
+
 # [0.3.0](https://github.com/qq15725/modern-canvas/compare/v0.2.5...v0.3.0) (2025-01-20)
 
 
