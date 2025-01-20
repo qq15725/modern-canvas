@@ -37,10 +37,10 @@ async function performRender(options: RenderOptions): Promise<HTMLCanvasElement>
   engine.resize(width, height)
   ;(Array.isArray(data) ? data : [data]).forEach((v) => {
     if (v instanceof Node) {
-      root.addChild(v)
+      root.appendChild(v)
     }
     else {
-      root.addChild(Node.parse(v) as unknown as Node)
+      root.appendChild(Node.parse(v) as unknown as Node)
     }
   })
   await engine.waitUntilLoad()

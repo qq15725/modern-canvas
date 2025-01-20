@@ -49,7 +49,7 @@ async function loadFallbackFont() {
 loadFallbackFont().then(() => {
   const engine = new Engine({ width: 500, height: 500 }).start()
 
-  engine.root.addChild(
+  engine.root.appendChild(
     new Image2D({
       style: {
         left: 100,
@@ -103,7 +103,7 @@ See all [preset special effects](./src/scene/effects)
 ```typescript
 import { EmbossEffect, Image2D } from 'modern-canvas'
 
-engine.root.addChild(
+engine.root.appendChild(
   new Image2D({
     src: '/example.png',
   }, [
@@ -119,7 +119,7 @@ See all [preset transitions](./src/scene/transitions)
 ```typescript
 import { Image2D, TiltShiftTransition } from 'modern-canvas'
 
-engine.root.addChild(
+engine.root.appendChild(
   new Image2D({
     src: '/example.png',
   }),
@@ -136,7 +136,7 @@ Use https://github.com/gl-transitions/gl-transitions with `vite`
 import bounceGLSL from 'gl-transitions/transitions/Bounce.glsl?raw'
 import { Image2D, Transition } from 'modern-canvas'
 
-engine.root.addChild(
+engine.root.appendChild(
   new Image2D({
     src: '/example.png',
   }),

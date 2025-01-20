@@ -374,7 +374,7 @@ export class Element extends Node {
         // TODO
       }
       else {
-        this.addChild(new ShadowEffect(), 'back')
+        this.appendChild(new ShadowEffect(), 'back')
       }
     }
     else {
@@ -394,7 +394,7 @@ export class Element extends Node {
         node.src = maskImage
       }
       else {
-        this.addChild(new MaskEffect({ src: maskImage }), 'back')
+        this.appendChild(new MaskEffect({ src: maskImage }), 'back')
       }
     }
     else {

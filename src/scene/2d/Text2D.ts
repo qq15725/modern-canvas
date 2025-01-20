@@ -139,7 +139,7 @@ export class Text2D extends TextureRect2D<CanvasTexture> {
       result.paragraphs.forEach((p) => {
         p.fragments.forEach((f) => {
           f.characters.forEach((c) => {
-            this.addChild(
+            this.appendChild(
               new Text2D({
                 content: c.content,
                 style: {

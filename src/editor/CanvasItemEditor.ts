@@ -65,21 +65,21 @@ export class CanvasItemEditor extends Control {
       pointerEvents: 'none',
       boxShadow: '2px 2px 2px 1px rgba(0, 0, 0, 0.2)',
     },
-  }).append(
+  }, [
     this.scaler,
-  )
+  ])
 
   ruler = new Ruler({
     name: 'ruler',
     offsetX: 100,
     offsetY: 100,
-  }).append(
+  }, [
     this.drawboard,
     this.hover,
     this.selectionRect,
     this.xScrollBar,
     this.yScrollBar,
-  )
+  ])
 
   protected _pointerStart?: CanvasItemStyle
   protected _pointerOffset?: { x: number, y: number }

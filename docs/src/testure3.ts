@@ -19,9 +19,9 @@ async function init(): Promise<void> {
   const node1 = new Node()
   const node2 = new Node()
   const node3 = new Node()
-  engine.root.addChild(node1)
+  engine.root.appendChild(node1)
   node1.addSibling(node2)
-  node2.addSibling(node3)
+  node1.addSibling(node3)
 
   console.warn(engine.root.getChildren().map(v => v.name))
 }

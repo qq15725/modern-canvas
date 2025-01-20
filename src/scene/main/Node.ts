@@ -32,7 +32,7 @@ export interface NodeEventMap extends CoreObjectEventMap, InputEventMap {
   processing: (delta?: number) => void
   process: (delta?: number) => void
   processed: (delta?: number) => void
-  addChild: (child: Node) => void
+  appendChild: (child: Node) => void
   removeChild: (child: Node, index: number) => void
   moveChild: (child: Node, newIndex: number, oldIndex: number) => void
 }
@@ -93,7 +93,8 @@ export class Node extends CoreObject {
     this
       .setProperties(properties)
       .append(children)
-      .on('treeEnter', this._onTreeEnter)
+
+    this.on('treeEnter', this._onTreeEnter)
       .on('treeExit', this._onTreeExit)
       .on('parented', this._onParented)
       .on('unparented', this._onUnparented)
@@ -267,7 +268,7 @@ export class Node extends CoreObject {
     if (this.mask instanceof Node) {
       if (!this.getNode('__$mask')) {
         this.mask.processMode = 'disabled'
-        this.addChild(this.mask, 'front')
+        this.appendChild(this.mask, 'front')
       }
     }
     else {
@@ -349,25 +350,24 @@ export class Node extends CoreObject {
     return this
   }
 
-  append(children: Node[]): this
-  append(...children: Node[]): this
-  append(...children: any[]): this {
-    let nodes
-    if (Array.isArray(children[0])) {
-      nodes = children[0]
+  append(nodes: Node[]): void
+  append(...nodes: Node[]): void
+  append(...nodes: any[]): void {
+    let _nodes
+    if (Array.isArray(nodes[0])) {
+      _nodes = nodes[0]
     }
     else {
-      nodes = children
+      _nodes = nodes
     }
-    nodes.forEach((node) => {
-      this.addChild(node)
+    _nodes.forEach((node) => {
+      this.appendChild(node)
     })
-    return this
   }
 
-  addChild(child: Node, internalMode = child.internalMode): this {
-    if (this.is(child) || child.hasParent()) {
-      return this
+  appendChild<T extends Node>(node: T, internalMode = node.internalMode): T {
+    if (this.is(node) || node.hasParent()) {
+      return node
     }
     switch (internalMode) {
       case 'default':
@@ -375,23 +375,23 @@ export class Node extends CoreObject {
         const targetMode = internalMode === 'default'
           ? 'back'
           : 'front'
-        const index = this._children.findIndex(child => child.internalMode === targetMode)
+        const index = this._children.findIndex(node => node.internalMode === targetMode)
         if (index > -1) {
-          this._children.splice(index, 0, child)
+          this._children.splice(index, 0, node)
         }
         else {
-          this._children.push(child)
+          this._children.push(node)
         }
         break
       }
       case 'back':
-        this._children.push(child)
+        this._children.push(node)
         break
     }
-    child.internalMode = internalMode
-    child.setParent(this)
-    this.emit('addChild', child)
-    return this
+    node.internalMode = internalMode
+    node.setParent(this)
+    this.emit('appendChild', node)
+    return node
   }
 
   moveChild(child: Node, toIndex: number, internalMode = child.internalMode): this {
@@ -440,20 +440,20 @@ export class Node extends CoreObject {
         this.emit('moveChild', child, newIndex, oldIndex)
       }
       else {
-        this.emit('addChild', child)
+        this.emit('appendChild', child)
       }
     }
     return this
   }
 
-  removeChild(child: Node): this {
+  removeChild<T extends Node>(child: T): T {
     const index = child.getIndex(true)
     if (this.is(child.parent) && index > -1) {
       this._children.splice(index, 1)
       child.setParent(undefined)
       this.emit('removeChild', child, index)
     }
-    return this
+    return child
   }
 
   removeChildren(): void {
@@ -515,7 +515,7 @@ export class Node extends CoreObject {
     const { tag, props, children } = JSON
     const NodeClass = (customNodes.get(tag) ?? Node) as any
     const node = new NodeClass(props) as Node
-    children?.forEach((child: Record<string, any>) => node.addChild(this.parse(child)))
+    children?.forEach((child: Record<string, any>) => node.appendChild(this.parse(child)))
     return node
   }
 }

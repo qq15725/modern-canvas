@@ -19,7 +19,7 @@ async function init(): Promise<void> {
 
   fonts.fallbackFont = await fonts.load({ family: 'fallbackFont', src: '/fonts/AaHouDiHei.woff' })
 
-  engine.root.addChild(
+  engine.root.appendChild(
     new Element({
       style: {
         width: 350, height: 350, padding: 20, margin: 100,

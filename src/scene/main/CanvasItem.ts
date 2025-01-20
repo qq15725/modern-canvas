@@ -141,7 +141,7 @@ export class CanvasItem extends TimelineNode {
         // TODO
       }
       else {
-        this.addChild(new ShadowEffect(), 'back')
+        this.appendChild(new ShadowEffect(), 'back')
       }
     }
     else {
@@ -161,7 +161,7 @@ export class CanvasItem extends TimelineNode {
         node.src = maskImage
       }
       else {
-        this.addChild(new MaskEffect({ src: maskImage }), 'back')
+        this.appendChild(new MaskEffect({ src: maskImage }), 'back')
       }
     }
     else {
