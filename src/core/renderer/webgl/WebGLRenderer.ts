@@ -94,7 +94,7 @@ export class WebGLRenderer extends Renderer {
 
     if (!gl) {
       gl = view.getContext('webgl', options)
-      || view.getContext('experimental-webgl', options)
+        || view.getContext('experimental-webgl', options)
       version = 1
     }
 
@@ -141,8 +141,8 @@ export class WebGLRenderer extends Renderer {
       extensions.drawBuffers = gl.getExtension('WEBGL_draw_buffers')
       extensions.depthTexture = gl.getExtension('WEBGL_depth_texture')
       extensions.vertexArrayObject = gl.getExtension('OES_vertex_array_object')
-      || gl.getExtension('MOZ_OES_vertex_array_object')
-      || gl.getExtension('WEBKIT_OES_vertex_array_object')
+        || gl.getExtension('MOZ_OES_vertex_array_object')
+        || gl.getExtension('WEBKIT_OES_vertex_array_object')
       extensions.uint32ElementIndex = gl.getExtension('OES_element_index_uint')
       // Floats and half-floats
       extensions.floatTexture = gl.getExtension('OES_texture_float')

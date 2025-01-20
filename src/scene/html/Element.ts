@@ -431,7 +431,7 @@ export class Element extends Node {
 
   protected _updateVisible(): void {
     this.visible = this.style.visibility === 'visible'
-    && (this.getParent<Element>()?.visible ?? true)
+      && (this.getParent<Element>()?.visible ?? true)
   }
 
   protected _updateTransform(): void {
