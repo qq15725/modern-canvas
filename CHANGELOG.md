@@ -1,3 +1,12 @@
+## [0.3.2](https://github.com/qq15725/modern-canvas/compare/v0.3.1...v0.3.2) (2025-01-20)
+
+
+### Bug Fixes
+
+* engine.start ([d7a7398](https://github.com/qq15725/modern-canvas/commit/d7a7398fdb9acd37b9ebecea515e7b11c61c364b))
+
+
+
 ## [0.3.1](https://github.com/qq15725/modern-canvas/compare/v0.3.0...v0.3.1) (2025-01-20)
 
 
