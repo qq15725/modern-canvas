@@ -1,12 +1,12 @@
-import { Resource } from '../../core'
-import { Texture2D } from '../resources'
+import { Resource } from '../../../core'
+import { Texture2D } from './Texture2D'
 
 export interface ImageFrame {
   texture: Texture2D
   duration: number
 }
 
-export class Image2DResource extends Resource {
+export class AnimatedTexture extends Resource {
   frames: ImageFrame[]
   declare duration: number
 
@@ -22,7 +22,7 @@ export class Image2DResource extends Resource {
       frames = [{ texture: source, duration: 0 }]
     }
     else {
-      throw new TypeError('Failed new Image2DResource')
+      throw new TypeError('Failed new AnimatedTexture')
     }
     this.frames = frames
     this.updateDuration()

@@ -1,17 +1,17 @@
 import type { Assets } from '../Assets'
-import { Image2DResource, PixelsTexture } from '../../scene'
+import { AnimatedTexture, PixelsTexture } from '../../scene'
 import { Loader } from './Loader'
 
-export class GifLoader extends Loader {
-  declare load: (url: string) => Promise<Image2DResource>
+export class GIFLoader extends Loader {
+  declare load: (url: string) => Promise<AnimatedTexture>
 
   install(assets: Assets): this {
-    const handler = async (url: string): Promise<Image2DResource> => {
+    const handler = async (url: string): Promise<AnimatedTexture> => {
       const { decodeFrames } = await import('modern-gif')
       return await assets.fetch(url)
         .then(res => res.arrayBuffer())
         .then(buffer => decodeFrames(buffer))
-        .then(frames => new Image2DResource(
+        .then(frames => new AnimatedTexture(
           frames.map((frame) => {
             return {
               duration: frame.delay,

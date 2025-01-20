@@ -1,3 +1,4 @@
+export * from './AnimatedTexture'
 export * from './CanvasTexture'
 export * from './ColorTexture'
 export * from './ImageTexture'

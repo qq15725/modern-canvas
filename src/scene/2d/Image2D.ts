@@ -1,10 +1,9 @@
 import type { Node } from '../main'
-import type { Texture2D } from '../resources'
-import type { ImageFrame } from './Image2DResource'
+import type { ImageFrame, Texture2D } from '../resources'
 import type { Node2DProperties } from './Node2D'
 import { assets } from '../../asset'
 import { customNode, property, type PropertyDeclaration, protectedProperty, Transform2D } from '../../core'
-import { Image2DResource } from './Image2DResource'
+import { AnimatedTexture } from '../resources'
 import { Node2D } from './Node2D'
 
 export interface Image2DProperties extends Node2DProperties {
@@ -14,7 +13,7 @@ export interface Image2DProperties extends Node2DProperties {
 
 @customNode('Image2D')
 export class Image2D extends Node2D {
-  @protectedProperty() resource?: Image2DResource
+  @protectedProperty() resource?: AnimatedTexture
   @property({ default: false }) declare gif: boolean
   @property({ default: '' }) declare src: string
 
@@ -48,13 +47,13 @@ export class Image2D extends Node2D {
 
   decode(): Promise<void> { return this._wait }
 
-  setResource(source: Texture2D | ImageFrame[] | Image2DResource): this {
-    let resource: Image2DResource
-    if (source instanceof Image2DResource) {
+  setResource(source: Texture2D | ImageFrame[] | AnimatedTexture): this {
+    let resource: AnimatedTexture
+    if (source instanceof AnimatedTexture) {
       resource = source
     }
     else {
-      resource = new Image2DResource(source)
+      resource = new AnimatedTexture(source)
     }
     this.resource = resource.updateDuration()
     if (this.currentTexture && (!this.style.width || !this.style.height)) {
