@@ -1,3 +1,18 @@
+# [0.3.0](https://github.com/qq15725/modern-canvas/compare/v0.2.5...v0.3.0) (2025-01-20)
+
+
+### Bug Fixes
+
+* addSibling ([64a24c5](https://github.com/qq15725/modern-canvas/commit/64a24c5ffde7a6fe26c3097fbec212a831343156))
+
+
+### Features
+
+* add yoga-layout engine ([98807ef](https://github.com/qq15725/modern-canvas/commit/98807efcb8a44c6ebf4f4034f1b2e30d52c23852))
+* rename `addChild` to `appendChild` ([eb5dbb8](https://github.com/qq15725/modern-canvas/commit/eb5dbb82acdef8bf53bf20494b6afd92e8606f3b))
+
+
+
 ## [0.2.5](https://github.com/qq15725/modern-canvas/compare/v0.2.4...v0.2.5) (2025-01-17)
 
 
