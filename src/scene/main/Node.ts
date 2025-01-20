@@ -58,12 +58,21 @@ export interface NodeProperties {
   mask: Maskable
 }
 
+const tagUidMap: Record<string, number> = {}
+
+function getTagUid(tag: any): number {
+  let uid = tagUidMap[tag] ?? 0
+  uid++
+  tagUidMap[tag] = uid
+  return uid
+}
+
 @customNode('Node')
 export class Node extends CoreObject {
   readonly declare tag: string
 
   // @ts-expect-error tag
-  @property() name = `${this.tag}:${String(this.instanceId)}`
+  @property() name = `${this.tag}:${getTagUid(this.tag)}`
   @property() mask?: Maskable
   @property({ default: 'inherit' }) declare processMode: ProcessMode
   @property({ default: 'inherit' }) declare renderMode: RenderMode
@@ -414,7 +423,7 @@ export class Node extends CoreObject {
           return false
       }
     })
-    maxIndex = maxIndex > -1 ? (minIndex + maxIndex) : Math.max(0, this._children.length - 1)
+    maxIndex = maxIndex > -1 ? (minIndex + maxIndex) : Math.max(0, this._children.length)
     const newIndex = clamp(minIndex, toIndex > -1 ? toIndex : maxIndex, maxIndex)
     if (newIndex !== oldIndex) {
       if (oldIndex > -1) {

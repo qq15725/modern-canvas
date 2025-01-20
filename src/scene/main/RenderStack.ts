@@ -1,5 +1,5 @@
 import type { WebGLRenderer } from '../../core'
-import { Node } from './Node'
+import type { Node } from './Node'
 
 export interface RenderCall {
   renderable: Node
@@ -8,7 +8,7 @@ export interface RenderCall {
   calls: RenderCall[]
 }
 
-export class RenderStack extends Node {
+export class RenderStack {
   currentCall?: RenderCall
   calls: RenderCall[] = []
 
