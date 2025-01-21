@@ -8,7 +8,7 @@ export interface CanvasBatchable extends Batchable2D {
   texture?: Texture2D
 }
 
-export interface StrokDraw {
+export interface StrokeDraw {
   type: 'stroke'
   path: Path2D
   texture?: Texture2D
@@ -34,7 +34,7 @@ export class CanvasContext extends Path2D {
   miterLimit?: number
 
   _defaultStyle = Texture2D.EMPTY
-  _draws: (StrokDraw | FillDraw)[] = []
+  _draws: (StrokeDraw | FillDraw)[] = []
 
   stroke(): void {
     let texture: Texture2D = this._defaultStyle
