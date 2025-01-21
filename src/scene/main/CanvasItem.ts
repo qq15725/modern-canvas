@@ -136,18 +136,18 @@ export class CanvasItem extends TimelineNode {
   }
 
   protected _updateBoxShadow(): void {
-    const nodePath = '__$style.shadow'
+    const name = '__$style.shadow'
     if (this.style.boxShadow !== 'none') {
-      const node = this.getNode<ShadowEffect>(nodePath)
+      const node = this.getNode<ShadowEffect>(name)
       if (node) {
         // TODO
       }
       else {
-        this.appendChild(new ShadowEffect(), 'back')
+        this.appendChild(new ShadowEffect({ name }), 'back')
       }
     }
     else {
-      const node = this.getNode(nodePath)
+      const node = this.getNode(name)
       if (node) {
         this.removeChild(node)
       }
@@ -155,19 +155,19 @@ export class CanvasItem extends TimelineNode {
   }
 
   protected _updateMaskImage(): void {
-    const nodePath = '__$style.maskImage'
+    const name = '__$style.maskImage'
     const maskImage = this.style.maskImage
     if (maskImage && maskImage !== 'none') {
-      const node = this.getNode<MaskEffect>(nodePath)
+      const node = this.getNode<MaskEffect>(name)
       if (node) {
         node.src = maskImage
       }
       else {
-        this.appendChild(new MaskEffect({ src: maskImage }), 'back')
+        this.appendChild(new MaskEffect({ name, src: maskImage }), 'back')
       }
     }
     else {
-      const node = this.getNode(nodePath)
+      const node = this.getNode(name)
       if (node) {
         this.removeChild(node)
       }
