@@ -99,6 +99,8 @@ export class Effect extends TimelineNode {
   }
 
   protected _onProcessing(): void {
+    if (!this.canProcess())
+      return
     this._updateCurrentTime()
     switch (this._effectMode) {
       case 'transition':
@@ -113,6 +115,8 @@ export class Effect extends TimelineNode {
   }
 
   protected _onNodeProcessed(node: Node): void {
+    if (!this.canProcess())
+      return
     if (!this.isInsideTimeRange())
       return
     const renderStack = this._tree?.renderStack
