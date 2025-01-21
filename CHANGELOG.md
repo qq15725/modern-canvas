@@ -1,3 +1,19 @@
+## [0.3.3](https://github.com/qq15725/modern-canvas/compare/v0.3.2...v0.3.3) (2025-01-21)
+
+
+### Bug Fixes
+
+* effect processMode ([0868a5f](https://github.com/qq15725/modern-canvas/commit/0868a5fc010bb980d5ada5c98c6f2ec64a291a7f))
+* style.maskImage ([7cffa3f](https://github.com/qq15725/modern-canvas/commit/7cffa3fa78d48093050007fb9a08e5f797e453ee))
+
+
+### Features
+
+* rename `Image2DResource` to `AnimatedTexture` ([d66d69b](https://github.com/qq15725/modern-canvas/commit/d66d69b2d1ad6fc1545dabc3e9f19e7fe8ab39c0))
+* TransformRect2D ([db9e8eb](https://github.com/qq15725/modern-canvas/commit/db9e8ebead25471fbc9d79627cbde17fb1e308db))
+
+
+
 ## [0.3.2](https://github.com/qq15725/modern-canvas/compare/v0.3.1...v0.3.2) (2025-01-20)
 
 
