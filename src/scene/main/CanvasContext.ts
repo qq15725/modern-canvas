@@ -8,14 +8,16 @@ export interface CanvasBatchable extends Batchable2D {
   texture?: Texture2D
 }
 
-export interface StrokedGraphics {
+export interface StrokDraw {
+  type: 'stroke'
   path: Path2D
   texture?: Texture2D
   textureTransform?: Transform2D
   style: LineStyle
 }
 
-export interface FilledGraphics {
+export interface FillDraw {
+  type: 'fill'
   path: Path2D
   texture?: Texture2D
   textureTransform?: Transform2D
@@ -32,8 +34,7 @@ export class CanvasContext extends Path2D {
   miterLimit?: number
 
   _defaultStyle = Texture2D.EMPTY
-  _strokes: StrokedGraphics[] = []
-  _fills: FilledGraphics[] = []
+  _draws: (StrokDraw | FillDraw)[] = []
 
   stroke(): void {
     let texture: Texture2D = this._defaultStyle
@@ -47,7 +48,8 @@ export class CanvasContext extends Path2D {
     }
 
     if (this.curves.length) {
-      this._strokes.push({
+      this._draws.push({
+        type: 'stroke',
         path: new Path2D(this),
         texture,
         textureTransform: this.textureTransform,
@@ -86,7 +88,8 @@ export class CanvasContext extends Path2D {
         texture = new ColorTexture(this.fillStyle)
       }
     }
-    this._fills.push({
+    this._draws.push({
+      type: 'fill',
       path: new Path2D(this),
       texture,
       textureTransform: this.textureTransform,
@@ -104,8 +107,7 @@ export class CanvasContext extends Path2D {
     this.lineJoin = source.lineJoin
     this.lineWidth = source.lineWidth
     this.miterLimit = source.miterLimit
-    this._strokes = source._strokes.slice()
-    this._fills = source._fills.slice()
+    this._draws = source._draws.slice()
     return this
   }
 
@@ -118,8 +120,7 @@ export class CanvasContext extends Path2D {
     this.lineJoin = undefined
     this.lineWidth = undefined
     this.miterLimit = undefined
-    this._strokes.length = 0
-    this._fills.length = 0
+    this._draws.length = 0
     return this
   }
 
@@ -152,9 +153,7 @@ export class CanvasContext extends Path2D {
     let vertices: number[] = []
     let indices: number[] = []
     let uvs: number[] = []
-    let startUv = 0
     let texture: Texture2D | undefined
-    let verticesLen = vertices.length
 
     const push = (type: CanvasBatchable['type']): void => {
       batchables.push({
@@ -168,51 +167,48 @@ export class CanvasContext extends Path2D {
       indices = []
       uvs = []
       texture = undefined
-      verticesLen = vertices.length
     }
 
-    for (let len = this._fills.length, i = 0; i < len; i++) {
-      const graphics = this._fills[i]
-      if (!texture) {
-        texture = graphics.texture
+    for (let len = this._draws.length, i = 0; i < len; i++) {
+      const draw = this._draws[i]
+      const prev = this._draws[i - 1]
+      if (vertices.length && prev && prev?.type !== draw.type) {
+        push(prev.type)
       }
-      else if (!texture.is(graphics.texture)) {
-        push('fill')
+      const oldTexture = texture
+      if (!oldTexture) {
+        texture = draw.texture
       }
-      startUv = vertices.length
-      graphics.path.fillTriangulate({
-        vertices,
-        indices,
-      })
-      this.buildUvs(startUv, vertices, uvs, graphics.texture, graphics.textureTransform)
-      if (!texture) {
-        texture = graphics.texture
+      if (
+        vertices.length
+        && oldTexture !== draw.texture
+        && !oldTexture?.is(draw.texture)
+      ) {
+        push(draw.type)
+      }
+      const start = vertices.length
+      if (draw.type === 'fill') {
+        draw.path.fillTriangulate({
+          vertices,
+          indices,
+        })
+        this.buildUvs(start, vertices, uvs, draw.texture, draw.textureTransform)
+      }
+      else {
+        draw.path.strokeTriangulate({
+          vertices,
+          indices,
+          lineStyle: draw.style,
+          flipAlignment: false,
+          closed: true,
+        })
+        this.buildUvs(start, vertices, uvs, draw.texture, draw.textureTransform)
       }
     }
 
-    if (vertices.length - verticesLen > 0) {
-      push('fill')
-    }
-
-    verticesLen = vertices.length
-
-    for (let len = this._strokes.length, i = 0; i < len; i++) {
-      startUv = vertices.length
-      const graphics = this._strokes[i]
-      texture ??= graphics.texture
-      graphics.path.strokeTriangulate({
-        vertices,
-        indices,
-        lineStyle: graphics.style,
-        flipAlignment: false,
-        closed: true,
-      })
-      this.buildUvs(startUv, vertices, uvs, graphics.texture, graphics.textureTransform)
-      push('stroke')
-    }
-
-    if (vertices.length - verticesLen > 0) {
-      push('stroke')
+    const last = this._draws[this._draws.length - 1]
+    if (last && vertices.length) {
+      push(last.type)
     }
 
     return batchables
