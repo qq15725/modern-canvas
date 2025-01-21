@@ -32,8 +32,8 @@ export class CanvasContext extends Path2D {
   miterLimit?: number
 
   _defaultStyle = Texture2D.EMPTY
-  _stroke: StrokedGraphics[] = []
-  _fille: FilledGraphics[] = []
+  _strokes: StrokedGraphics[] = []
+  _fills: FilledGraphics[] = []
 
   stroke(): void {
     let texture: Texture2D = this._defaultStyle
@@ -47,7 +47,7 @@ export class CanvasContext extends Path2D {
     }
 
     if (this.curves.length) {
-      this._stroke.push({
+      this._strokes.push({
         path: new Path2D(this),
         texture,
         textureTransform: this.textureTransform,
@@ -86,7 +86,7 @@ export class CanvasContext extends Path2D {
         texture = new ColorTexture(this.fillStyle)
       }
     }
-    this._fille.push({
+    this._fills.push({
       path: new Path2D(this),
       texture,
       textureTransform: this.textureTransform,
@@ -104,8 +104,8 @@ export class CanvasContext extends Path2D {
     this.lineJoin = source.lineJoin
     this.lineWidth = source.lineWidth
     this.miterLimit = source.miterLimit
-    this._stroke = source._stroke.slice()
-    this._fille = source._fille.slice()
+    this._strokes = source._strokes.slice()
+    this._fills = source._fills.slice()
     return this
   }
 
@@ -118,8 +118,8 @@ export class CanvasContext extends Path2D {
     this.lineJoin = undefined
     this.lineWidth = undefined
     this.miterLimit = undefined
-    this._stroke.length = 0
-    this._fille.length = 0
+    this._strokes.length = 0
+    this._fills.length = 0
     return this
   }
 
@@ -154,6 +154,7 @@ export class CanvasContext extends Path2D {
     let uvs: number[] = []
     let startUv = 0
     let texture: Texture2D | undefined
+    let verticesLen = vertices.length
 
     const push = (type: CanvasBatchable['type']): void => {
       batchables.push({
@@ -167,14 +168,15 @@ export class CanvasContext extends Path2D {
       indices = []
       uvs = []
       texture = undefined
+      verticesLen = vertices.length
     }
 
-    let verticesLen = vertices.length
-
-    for (let len = this._fille.length, i = 0; i < len; i++) {
-      const graphics = this._fille[i]
-      texture ??= graphics.texture
-      if (texture !== graphics.texture) {
+    for (let len = this._fills.length, i = 0; i < len; i++) {
+      const graphics = this._fills[i]
+      if (!texture) {
+        texture = graphics.texture
+      }
+      else if (!texture.is(graphics.texture)) {
         push('fill')
       }
       startUv = vertices.length
@@ -183,6 +185,9 @@ export class CanvasContext extends Path2D {
         indices,
       })
       this.buildUvs(startUv, vertices, uvs, graphics.texture, graphics.textureTransform)
+      if (!texture) {
+        texture = graphics.texture
+      }
     }
 
     if (vertices.length - verticesLen > 0) {
@@ -191,9 +196,9 @@ export class CanvasContext extends Path2D {
 
     verticesLen = vertices.length
 
-    for (let len = this._stroke.length, i = 0; i < len; i++) {
+    for (let len = this._strokes.length, i = 0; i < len; i++) {
       startUv = vertices.length
-      const graphics = this._stroke[i]
+      const graphics = this._strokes[i]
       texture ??= graphics.texture
       graphics.path.strokeTriangulate({
         vertices,

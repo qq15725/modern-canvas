@@ -1,8 +1,14 @@
 import type { InputEvent, InputEventKey, PointerInputEvent, PropertyDeclaration } from '../core'
 import type { CanvasItem, CanvasItemStyle } from '../scene'
-import { Control, Node2D, Ruler, Scaler, XScrollBar, YScrollBar } from '../scene'
+import { Control, Node2D, Ruler, Scaler, TransformRect2D, XScrollBar, YScrollBar } from '../scene'
 
 export class CanvasItemEditor extends Control {
+  protected _pointerStart?: CanvasItemStyle
+  protected _pointerOffset?: { x: number, y: number }
+  selected?: CanvasItem
+  dragging?: CanvasItem
+  hovered?: CanvasItem
+
   hover = new Node2D({
     name: 'hover',
     internalMode: 'back',
@@ -15,23 +21,13 @@ export class CanvasItemEditor extends Control {
     },
   })
 
-  selectionRect = new Node2D({
-    name: 'selectionRect',
+  transformRect = new TransformRect2D({
+    name: 'transformRect',
     internalMode: 'back',
     style: {
       visibility: 'hidden',
-      width: 1,
-      height: 1,
-      backgroundColor: 0x00FF000F,
-      outlineStyle: 'solid',
-      outlineColor: 0x00FF00FF,
-      outlineWidth: 2,
       pointerEvents: 'none',
     },
-  })
-
-  selector = new Node2D({
-    name: 'selector',
   })
 
   scaler = new Scaler({
@@ -39,6 +35,7 @@ export class CanvasItemEditor extends Control {
   }).on('updateScale', (scale) => {
     this.ruler.scale = scale
     this._updateScrollbars()
+    this._updateSelectionRect()
   })
 
   xScrollBar = new XScrollBar({
@@ -76,14 +73,10 @@ export class CanvasItemEditor extends Control {
   }, [
     this.drawboard,
     this.hover,
-    this.selectionRect,
+    this.transformRect,
     this.xScrollBar,
     this.yScrollBar,
   ])
-
-  protected _pointerStart?: CanvasItemStyle
-  protected _pointerOffset?: { x: number, y: number }
-  selected?: CanvasItem
 
   constructor() {
     super()
@@ -127,57 +120,68 @@ export class CanvasItemEditor extends Control {
   protected _onPointerdown(e: PointerInputEvent): void {
     const target = e.target
     this._pointerOffset = { x: e.offsetX, y: e.offsetY }
+    this.selected = target
+    this.dragging = target
     if (target instanceof Node2D) {
-      this.selected = target
       this._pointerStart = target.style.clone()
     }
     else {
-      this.selected = undefined
       this._pointerStart = undefined
-      this.selectionRect.style.visibility = 'visible'
-      this.selectionRect.style.left = e.screen.x
-      this.selectionRect.style.top = e.screen.y
-      this.selectionRect.style.width = 1
-      this.selectionRect.style.height = 1
     }
-    this._onHover()
+    this._updateHover()
+    this._updateSelectionRect()
   }
 
   protected _onPointermove(e: PointerInputEvent): void {
-    const { selected, _pointerStart, _pointerOffset } = this
+    const target = e.target
+    const { selected, dragging, _pointerStart, _pointerOffset } = this
+    if (selected && target?.is(selected)) {
+      this.hovered = undefined
+    }
+    else {
+      this.hovered = target
+    }
     const offset = _pointerOffset
       ? { x: (e.offsetX - _pointerOffset.x), y: (e.offsetY - _pointerOffset.y) }
       : { x: 0, y: 0 }
-    if (selected && _pointerStart) {
-      selected.style.left = _pointerStart.left + offset.x
-      selected.style.top = _pointerStart.top + offset.y
+    if (dragging && _pointerStart) {
+      dragging.style.left = _pointerStart.left + offset.x
+      dragging.style.top = _pointerStart.top + offset.y
     }
-    else {
-      if (this.selectionRect.isVisibleInTree()) {
-        this.selectionRect.style.width = offset.x
-        this.selectionRect.style.height = offset.y
-      }
-    }
-    this._onHover()
+    this._updateHover()
+    this._updateSelectionRect()
   }
 
   protected _onPointerup(): void {
-    this.selected = undefined
-    this.selectionRect.style.visibility = 'hidden'
-    this._onHover()
+    this.dragging = undefined
+    this._updateHover()
+    this._updateSelectionRect()
   }
 
-  protected _onHover(): void {
-    const selected = this.selected
-    if (selected instanceof Node2D) {
+  protected _updateHover(): void {
+    const hovered = this.hovered
+    if (hovered instanceof Node2D) {
       this.hover.style.visibility = 'visible'
-      this.hover.style.width = selected.style.width
-      this.hover.style.height = selected.style.height
-      this.hover.transform.set(selected.transform)
+      this.hover.style.width = hovered.style.width
+      this.hover.style.height = hovered.style.height
+      this.hover.transform.set(hovered.transform)
       this.hover.requestRedraw()
     }
     else {
       this.hover.style.visibility = 'hidden'
+    }
+  }
+
+  protected _updateSelectionRect(): void {
+    if (this.selected) {
+      this.transformRect.style.visibility = 'visible'
+      this.transformRect.style.width = this.selected.style.width
+      this.transformRect.style.height = this.selected.style.height
+      this.transformRect.transform.set((this.selected as Node2D).transform)
+      this.transformRect.requestReflow()
+    }
+    else {
+      this.transformRect.style.visibility = 'hidden'
     }
   }
 

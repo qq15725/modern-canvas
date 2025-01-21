@@ -1,4 +1,4 @@
-import type { InputEvent, InputEventKey, PointerInputEvent } from '../../core'
+import type { InputEvent, InputEventKey, PointerInputEvent, PropertyDeclaration } from '../../core'
 import type { CanvasBatchable, CanvasItemProperties, Node } from '../main'
 import { customNode, Rect2, Transform2D } from '../../core'
 import { CanvasItem } from '../main'
@@ -20,8 +20,8 @@ export class Node2D extends CanvasItem {
       .append(children)
   }
 
-  protected override _updateStyleProperty(key: PropertyKey, value: any, oldValue: any): void {
-    super._updateStyleProperty(key, value, oldValue)
+  protected _updateStyleProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+    super._updateStyleProperty(key, value, oldValue, declaration)
 
     switch (key) {
       case 'width':
