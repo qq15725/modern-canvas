@@ -145,7 +145,7 @@ export class CoreObject extends EventEmitter {
     return new (this.constructor as any)(this.toJSON())
   }
 
-  destroy(): void {
+  free(): void {
     this.removeAllListeners()
   }
 }

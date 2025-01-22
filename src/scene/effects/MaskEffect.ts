@@ -38,7 +38,7 @@ export class MaskEffect extends Effect {
         this.load()
         break
       case 'texture':
-        oldValue?.destroy?.()
+        oldValue?.free?.()
         break
     }
   }

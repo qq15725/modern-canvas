@@ -33,9 +33,9 @@ export class AnimatedTexture extends Resource {
     return this
   }
 
-  destroy(): void {
+  free(): void {
     this.frames.forEach((frame) => {
-      frame.texture.destroy()
+      frame.texture.free()
     })
   }
 }

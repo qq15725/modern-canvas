@@ -50,7 +50,7 @@ export class HTMLAudioContext extends EventEmitter implements IAudioContext {
     return this.paused
   }
 
-  destroy(): void {
+  free(): void {
     this.removeAllListeners()
   }
 }

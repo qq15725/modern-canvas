@@ -191,7 +191,7 @@ export class Audio extends TimelineNode {
   }
 
   protected _recycleSound(sound: PlatformSound): void {
-    sound.destroy()
+    sound.free()
     if (!Audio._soundPool.includes(sound)) {
       Audio._soundPool.push(sound)
     }

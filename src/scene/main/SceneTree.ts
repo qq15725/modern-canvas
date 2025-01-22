@@ -3,10 +3,10 @@ import type {
   EventListenerOptions,
   EventListenerValue,
   MainLoopEventMap,
-  PropertyDeclaration, WebGLRenderer,
-} from '../../core'
+  PropertyDeclaration, WebGLRenderer } from '../../core'
 import type { Node } from './Node'
-import { Color, MainLoop, property } from '../../core'
+import { Color, Input, MainLoop, property,
+} from '../../core'
 import { QuadUvGeometry } from '../resources'
 import { RenderStack } from './RenderStack'
 import { Timeline } from './Timeline'
@@ -34,6 +34,7 @@ export class SceneTree extends MainLoop {
   @property({ default: false }) declare paused: boolean
   @property() declare backgroundColor?: ColorValue
 
+  readonly input = new Input()
   readonly renderStack = new RenderStack()
   readonly root = new Viewport(true).setTree(this)
   readonly timeline: Timeline
@@ -92,5 +93,12 @@ export class SceneTree extends MainLoop {
     texture.activate(renderer, 0)
     QuadUvGeometry.draw(renderer)
     renderer.texture.unbind(texture)
+  }
+
+  override free(): void {
+    super.free()
+    this.root.getChildren(true)
+      .forEach(node => this.root.removeChild(node))
+    this.input.removeEventListeners()
   }
 }

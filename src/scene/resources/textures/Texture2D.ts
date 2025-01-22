@@ -139,7 +139,7 @@ export class Texture2D<T extends Texture2DSource = Texture2DSource> extends Reso
     renderer.texture.unbind(this._glTexture(renderer))
   }
 
-  destroy(): void {
+  free(): void {
     if (SUPPORTS_IMAGE_BITMAP && this.source instanceof ImageBitmap) {
       this.source.close()
     }

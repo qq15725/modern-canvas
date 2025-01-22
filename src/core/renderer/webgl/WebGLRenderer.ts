@@ -276,8 +276,8 @@ export class WebGLRenderer extends Renderer {
     this._modules.forEach(module => module.flush())
   }
 
-  destroy(): void {
-    this._modules.forEach(module => module.destroy())
+  free(): void {
+    this._modules.forEach(module => module.free())
     this.view?.removeEventListener('webglcontextlost', this._onContextLost as any, false)
     this.view?.removeEventListener('webglcontextrestored', this._onContextRestored as any, false)
     this.extensions.loseContext?.loseContext()

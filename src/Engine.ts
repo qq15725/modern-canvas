@@ -9,7 +9,6 @@ import type { Timeline } from './scene'
 import { assets } from './asset'
 import {
   DEVICE_PIXEL_RATIO,
-  Input,
   nextTick,
   SUPPORTS_RESIZE_OBSERVER,
   WebGLRenderer,
@@ -56,7 +55,6 @@ export const defaultOptions = {
 } as const
 
 export class Engine extends SceneTree {
-  readonly input = new Input()
   readonly renderer: WebGLRenderer
   get view(): HTMLCanvasElement | undefined { return this.renderer.view }
   get gl(): WebGLRenderingContext | WebGL2RenderingContext { return this.renderer.gl }
@@ -188,13 +186,10 @@ export class Engine extends SceneTree {
     })
   }
 
-  destroy(): void {
-    this.stop()
-    this.root.getChildren(true)
-      .forEach(node => this.root.removeChild(node))
-    this.input.removeEventListeners()
+  override free(): void {
+    super.free()
     this.enableAutoResize(false)
-    this.renderer.destroy()
+    this.renderer.free()
   }
 
   toPixels(): Uint8ClampedArray {

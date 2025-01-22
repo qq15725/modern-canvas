@@ -241,7 +241,7 @@ export class HTMLSound extends EventEmitter {
     this.emit('end', this)
   }
 
-  destroy(): void {
+  free(): void {
     Ticker.off(this._onUpdate)
     this.removeAllListeners()
 

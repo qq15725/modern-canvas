@@ -7,5 +7,5 @@ export abstract class WebGLModule {
   onUpdateContext(): void { /** override */ }
   flush(): void { /** override */ }
   reset(): void { /** override */ }
-  destroy(): void { /** override */ }
+  free(): void { /** override */ }
 }

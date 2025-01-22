@@ -274,7 +274,7 @@ export class WebSound extends EventEmitter {
     }
   }
 
-  destroy(): void {
+  free(): void {
     this.removeAllListeners()
     this._stop()
     this._gain?.disconnect()

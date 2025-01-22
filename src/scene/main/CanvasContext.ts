@@ -1,6 +1,6 @@
 import type { LineCap, LineJoin, LineStyle } from 'modern-path2d'
 import type { Batchable2D, ColorValue, Transform2D } from '../../core'
-import { CurvePath, Path2D } from 'modern-path2d'
+import { Path2D } from 'modern-path2d'
 import { ColorTexture, Texture2D } from '../resources'
 
 export interface CanvasBatchable extends Batchable2D {
@@ -61,8 +61,7 @@ export class CanvasContext extends Path2D {
           miterLimit: this.miterLimit ?? 10,
         },
       })
-      this.currentCurve = new CurvePath()
-      this.curves = [this.currentCurve]
+      super.reset()
     }
   }
 
@@ -94,8 +93,7 @@ export class CanvasContext extends Path2D {
       texture,
       textureTransform: this.textureTransform,
     })
-    this.currentCurve = new CurvePath()
-    this.curves = [this.currentCurve]
+    super.reset()
   }
 
   override copy(source: CanvasContext): this {

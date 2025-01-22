@@ -59,4 +59,9 @@ export class MainLoop extends CoreObject {
       this.emit('process', delta)
     }
   }
+
+  override free(): void {
+    super.free()
+    this.stop()
+  }
 }

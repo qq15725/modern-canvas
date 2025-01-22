@@ -269,8 +269,8 @@ export class WebGLProgramModule extends WebGLModule {
     this.uniforms = {}
   }
 
-  destroy(): void {
-    super.destroy()
+  free(): void {
+    super.free()
     this.bind(null)
   }
 }
