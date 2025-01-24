@@ -2,10 +2,10 @@ import { fonts } from 'modern-font'
 import {
   Animation,
   CanvasItemEditor,
+  CSElement2D,
   Engine,
   Image2D,
   LeftEraseTransition,
-  Node2D,
   Text2D,
   Timeline,
   Video2D,
@@ -26,13 +26,12 @@ async function init(): Promise<void> {
   fonts.fallbackFont = await fonts.load({ family: 'fallbackFont', src: '/fonts/AaHouDiHei.woff' })
 
   editor.drawboard.append([
-    new Node2D({
+    new CSElement2D({
       delay: 0,
       duration: 3000,
       style: {
         width: 100,
         height: 100,
-        opacity: 0.5,
         filter: 'brightness(102%) contrast(90%) saturate(128%) sepia(18%)',
         backgroundColor: '#00FF00',
       },

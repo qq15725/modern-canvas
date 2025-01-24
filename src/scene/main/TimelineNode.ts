@@ -38,12 +38,12 @@ export class TimelineNode extends Node {
   @property({ default: 0 }) declare duration: number
   @property({ default: false }) declare paused: boolean
 
-  constructor(properties?: Partial<TimelineNodeProperties>, children: Node[] = []) {
+  constructor(properties?: Partial<TimelineNodeProperties>, nodes: Node[] = []) {
     super()
 
     this
       .setProperties(properties)
-      .append(children)
+      .append(nodes)
   }
 
   /** Timeline */
@@ -85,7 +85,7 @@ export class TimelineNode extends Node {
   }
 
   protected _process(delta: number): void {
-    this._updateCurrentTime()
     super._process(delta)
+    this._updateCurrentTime()
   }
 }

@@ -1,6 +1,7 @@
 export * from './CanvasContext'
 export * from './CanvasItem'
 export * from './Effect'
+export * from './interfaces'
 export * from './Node'
 export * from './SceneTree'
 export * from './Timeline'

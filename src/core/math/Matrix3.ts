@@ -14,15 +14,9 @@ export class Matrix3 extends Matrix {
 
   invert(): this {
     const [
-      n11,
-      n21,
-      n31,
-      n12,
-      n22,
-      n32,
-      n13,
-      n23,
-      n33,
+      n11, n21, n31,
+      n12, n22, n32,
+      n13, n23, n33,
     ] = this._array
     const t11 = n33 * n22 - n32 * n23
     const t12 = n32 * n13 - n33 * n12

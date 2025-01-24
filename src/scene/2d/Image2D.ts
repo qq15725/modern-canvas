@@ -1,28 +1,28 @@
 import type { Node } from '../main'
 import type { ImageFrame, Texture2D } from '../resources'
-import type { Node2DProperties } from './Node2D'
+import type { CSElement2DProperties } from './CSElement2D'
 import { assets } from '../../asset'
 import { customNode, property, type PropertyDeclaration, protectedProperty, Transform2D } from '../../core'
 import { AnimatedTexture } from '../resources'
-import { Node2D } from './Node2D'
+import { CSElement2D } from './CSElement2D'
 
-export interface Image2DProperties extends Node2DProperties {
+export interface Image2DProperties extends CSElement2DProperties {
   src: string
   gif: boolean
 }
 
 @customNode('Image2D')
-export class Image2D extends Node2D {
-  @protectedProperty() resource?: AnimatedTexture
+export class Image2D extends CSElement2D {
+  @protectedProperty() texture?: AnimatedTexture
   @property({ default: false }) declare gif: boolean
   @property({ default: '' }) declare src: string
 
-  get currentTexture(): Texture2D | undefined { return this.resource?.frames[this._frameIndex]?.texture }
-  get framesDuration(): number { return this.resource?.duration ?? 0 }
+  get currentFrameTexture(): Texture2D | undefined { return this.texture?.frames[this._frameIndex]?.texture }
+  get textureDuration(): number { return this.texture?.duration ?? 0 }
 
   // HTMLImageElement
-  get naturalWidth(): number { return this.currentTexture?.realWidth ?? 0 }
-  get naturalHeight(): number { return this.currentTexture?.realHeight ?? 0 }
+  get naturalWidth(): number { return this.currentFrameTexture?.realWidth ?? 0 }
+  get naturalHeight(): number { return this.currentFrameTexture?.realHeight ?? 0 }
   get complete(): boolean { return this._complete }
 
   protected _frameIndex = 0
@@ -48,16 +48,16 @@ export class Image2D extends Node2D {
   decode(): Promise<void> { return this._wait }
 
   setResource(source: Texture2D | ImageFrame[] | AnimatedTexture): this {
-    let resource: AnimatedTexture
+    let texture: AnimatedTexture
     if (source instanceof AnimatedTexture) {
-      resource = source
+      texture = source
     }
     else {
-      resource = new AnimatedTexture(source)
+      texture = new AnimatedTexture(source)
     }
-    this.resource = resource.updateDuration()
-    if (this.currentTexture && (!this.style.width || !this.style.height)) {
-      const texture = this.currentTexture
+    this.texture = texture.updateDuration()
+    if (this.currentFrameTexture && (!this.style.width || !this.style.height)) {
+      const texture = this.currentFrameTexture
       this.style.width = texture.realWidth
       this.style.height = texture.realHeight
     }
@@ -82,13 +82,13 @@ export class Image2D extends Node2D {
       }
     }
     else {
-      this.resource = undefined
+      this.texture = undefined
     }
     this._complete = true
   }
 
   protected _getFrameCurrentTime(): number {
-    const duration = this.framesDuration
+    const duration = this.textureDuration
     if (!duration || !this._tree)
       return 0
     const currentTime = this._currentTime
@@ -98,10 +98,10 @@ export class Image2D extends Node2D {
   }
 
   protected _updateFrameIndex(): this {
-    if (!this.resource)
+    if (!this.texture)
       return this
     const currentTime = this._getFrameCurrentTime()
-    const frames = this.resource.frames
+    const frames = this.texture.frames
     const len = frames.length
     if (len <= 1 && this._frameIndex === 0)
       return this
@@ -126,12 +126,13 @@ export class Image2D extends Node2D {
   }
 
   protected override _drawContent(): void {
-    const texture = this.currentTexture
+    const texture = this.currentFrameTexture
     if (texture?.valid) {
+      const { width, height } = this.size
       this.context.fillStyle = texture
       this.context.textureTransform = new Transform2D().scale(
-        this.style.width! / texture.width,
-        this.style.height! / texture.height,
+        width / texture.width,
+        height / texture.height,
       )
       super._drawContent()
     }

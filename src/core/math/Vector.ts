@@ -104,7 +104,8 @@ export abstract class Vector extends EventEmitter {
               array[i] = val
             }
           }
-          this._emitUpdate(array)
+          this._onUpdate(array)
+          this.emit('update', array)
           return this
         default:
           throw new Error(`Not support operator in '${this.toName()} ${operator} Vector'`)
@@ -116,19 +117,27 @@ export abstract class Vector extends EventEmitter {
 
   add(value: VectorLike): this
   add<T extends VectorOperateOutput>(value: VectorLike, output: T): T
-  add(value: any, output?: any): any { return this._operate('+', value, output) }
+  add(value: any, output?: any): any {
+    return this._operate('+', value, output)
+  }
 
   sub(value: VectorLike): this
   sub<T extends VectorOperateOutput>(value: VectorLike, output: T): T
-  sub(value: any, output?: any): any { return this._operate('-', value, output) }
+  sub(value: any, output?: any): any {
+    return this._operate('-', value, output)
+  }
 
   multiply(value: VectorLike): this
   multiply<T extends VectorOperateOutput>(value: VectorLike, output: T): T
-  multiply(value: any, output?: any): any { return this._operate('*', value, output) }
+  multiply(value: any, output?: any): any {
+    return this._operate('*', value, output)
+  }
 
   divide(value: VectorLike): this
   divide<T extends VectorOperateOutput>(value: VectorLike, output: T): T
-  divide(value: any, output?: any): any { return this._operate('/', value, output) }
+  divide(value: any, output?: any): any {
+    return this._operate('/', value, output)
+  }
 
   rotate(angle: number): this
   rotate<T extends VectorOperateOutput>(angle: number, output: T): T
@@ -141,17 +150,18 @@ export abstract class Vector extends EventEmitter {
     return this._operate('=', value)
   }
 
-  equals(value: VectorLike): boolean { return this._operate('==', value) }
+  equals(value: VectorLike): boolean {
+    return this._operate('==', value)
+  }
+
+  copy(value: VectorLike): this {
+    return this.set(value)
+  }
 
   clone(): this {
     const cloned: this = new (this.constructor as any)()
     cloned.set(this.toArray())
     return cloned
-  }
-
-  protected _emitUpdate(array: number[]): void {
-    this._onUpdate(array)
-    this.emit('update', array)
   }
 
   protected _onUpdate(_array: number[]): void { /** override */ }

@@ -1,6 +1,5 @@
-import type { InputEvent, InputEventKey, PointerInputEvent, PropertyDeclaration } from '../../core'
 import type { CanvasBatchable, CanvasItemProperties, Node } from '../main'
-import { customNode, Rect2, Transform2D } from '../../core'
+import { customNode, Transform2D, Vector2 } from '../../core'
 import { CanvasItem } from '../main'
 
 export interface Node2DProperties extends CanvasItemProperties {
@@ -9,99 +8,62 @@ export interface Node2DProperties extends CanvasItemProperties {
 
 @customNode('Node2D')
 export class Node2D extends CanvasItem {
-  transform = new Transform2D()
+  position = new Vector2()
+  rotation = 0
+  scale = new Vector2(1, 1)
+  skew = new Vector2()
+  transform = new Transform2D(false)
+  globalPosition = new Vector2()
+  globalRotation = 0
+  globalScale = new Vector2()
+  globalSkew = new Vector2()
+  globalTransform = new Transform2D()
+
   protected _parentTransformDirtyId?: number
 
-  constructor(properties?: Partial<Node2DProperties>, children: Node[] = []) {
+  constructor(properties?: Partial<Node2DProperties>, nodes: Node[] = []) {
     super()
 
     this
       .setProperties(properties)
-      .append(children)
-  }
-
-  protected _updateStyleProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    super._updateStyleProperty(key, value, oldValue, declaration)
-
-    switch (key) {
-      case 'width':
-      case 'height':
-        if (this.mask instanceof Node2D) {
-          this.mask.style.width = this.style.width
-          this.mask.style.height = this.style.height
-        }
-        this.requestRedraw()
-      // eslint-disable-next-line no-fallthrough
-      case 'scaleX':
-      case 'scaleY':
-      case 'left':
-      case 'top':
-      case 'rotate':
-      case 'transform':
-      case 'transformOrigin':
-        this._updateTransform()
-        break
-      case 'overflow':
-        this._updateOverflow()
-        break
-    }
+      .append(nodes)
   }
 
   protected _updateTransform(): void {
-    const parent = this.getParent() as Node2D
-    const parentTransform = parent?.transform
-    this._parentTransformDirtyId = parentTransform?.dirtyId
-    const t3dT2d = this.style.getComputedTransform().toArray()
-    let transform
-    if (parentTransform) {
-      const pt = parentTransform.toArray()
-      transform = [
-        (t3dT2d[0] * pt[0]) + (t3dT2d[3] * pt[1]),
-        (t3dT2d[1] * pt[0]) + (t3dT2d[4] * pt[1]),
-        (t3dT2d[2] * pt[0]) + (t3dT2d[5] * pt[1]) + pt[2],
-        (t3dT2d[0] * pt[3]) + (t3dT2d[3] * pt[4]),
-        (t3dT2d[1] * pt[3]) + (t3dT2d[4] * pt[4]),
-        (t3dT2d[2] * pt[3]) + (t3dT2d[5] * pt[4]) + pt[5],
-        0, 0, 1,
-      ]
-    }
-    else {
-      transform = t3dT2d
-    }
-    this.transform.set(transform)
-    this._updateOverflow()
-    this.requestReflow()
+    this.transform
+      .identity()
+      .scale(this.scale.x, this.scale.y)
+      .skew(this.skew.x, this.skew.y)
+      .translate(this.position.x, this.position.y)
+      .rotate(this.rotation)
+      .update()
   }
 
-  getRect(): Rect2 {
-    const [a, c, tx, b, d, ty] = this.transform.toArray()
-    const width = this.style.width
-    const height = this.style.height
-    return new Rect2(
-      tx,
-      ty,
-      (a * width) + (c * height),
-      (b * width) + (d * height),
-    )
-  }
-
-  protected _updateOverflow(): void {
-    if (this.style.overflow === 'hidden') {
-      const rect = this.getRect()
-      this.mask = {
-        x: rect.x,
-        y: rect.y,
-        width: rect.width,
-        height: rect.height,
-      }
+  protected _updateGlobalTransform(): void {
+    const parent = this.getParent<Node2D>()
+    if (parent?.globalTransform) {
+      this._parentTransformDirtyId = parent.globalTransform.dirtyId
+      this.globalScale.set(parent.globalScale.x * this.scale.x, parent.globalScale.y * this.scale.y)
+      this.globalRotation = parent.globalRotation + this.rotation
+      parent.globalTransform.multiply(this.transform, this.globalTransform)
     }
     else {
-      this.mask = undefined
+      this.globalScale = this.scale.clone()
+      this.globalRotation = this.rotation
+      this.globalTransform = this.transform.clone()
     }
+    const [
+      a, c, tx,
+      b, d, ty,
+    ] = this.globalTransform.toArray()
+    this.globalPosition.set(tx, ty)
+    this.globalSkew.x = Math.atan2(c, a) - this.globalRotation
+    this.globalSkew.y = Math.atan2(b, d) - this.globalRotation
+    this.requestRelayout()
   }
 
   protected _transformVertices(vertices: number[]): number[] {
-    const [a, c, tx, b, d, ty] = this.transform.toArray()
+    const [a, c, tx, b, d, ty] = this.globalTransform.toArray()
     const newVertices = vertices.slice()
     for (let len = vertices.length, i = 0; i < len; i += 2) {
       const x = vertices[i]
@@ -112,8 +74,10 @@ export class Node2D extends CanvasItem {
     return newVertices
   }
 
-  protected override _reflow(batchables: CanvasBatchable[]): CanvasBatchable[] {
-    return super._reflow(
+  protected override _relayout(batchables: CanvasBatchable[]): CanvasBatchable[] {
+    this._updateTransform()
+    this._updateGlobalTransform()
+    return super._relayout(
       batchables.map((batchable) => {
         return {
           ...batchable,
@@ -124,40 +88,10 @@ export class Node2D extends CanvasItem {
   }
 
   protected override _process(delta: number): void {
-    const parent = this.getParent() as Node2D
+    const parent = this.getParent<Node2D>()
     if (parent?.transform?.dirtyId !== this._parentTransformDirtyId) {
-      this._updateTransform()
+      this.requestRelayout()
     }
     super._process(delta)
-  }
-
-  protected override _input(event: InputEvent, key: InputEventKey): void {
-    super._input(event, key)
-
-    if (!event.target && this.isVisibleInTree() && this.style.canPointeEvents()) {
-      switch (key) {
-        case 'pointerdown':
-        case 'pointermove':
-        case 'pointerup': {
-          const { screenX, screenY } = event as PointerInputEvent
-          if (screenX && screenY) {
-            const { width, height } = this.style
-            const [x, y] = this.transform.inverse().applyToPoint(screenX, screenY)
-            if (x >= 0 && x < width && y >= 0 && y < height) {
-              event.target = this
-              this.emit(key, event)
-            }
-          }
-          break
-        }
-      }
-    }
-  }
-
-  clone(): this {
-    return new (this.constructor as any)(
-      this.toJSON(),
-      this.getChildren(true),
-    )
   }
 }

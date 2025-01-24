@@ -26,6 +26,12 @@ export class Vector2 extends Vector {
   get height(): number { return this.y }
   set height(val) { this.y = val }
 
+  get left(): number { return this.x }
+  set left(val) { this.x = val }
+
+  get top(): number { return this.y }
+  set top(val) { this.y = val }
+
   constructor(x: VectorLike = 0, y?: number) {
     super(2)
     this.set(typeof x === 'number' ? [x, y ?? x] : x)

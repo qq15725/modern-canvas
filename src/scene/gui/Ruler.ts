@@ -27,7 +27,7 @@ export class Ruler extends Control {
   @property({ default: '#f9f9fa' }) declare markBackgroundColor: string
   @property({ default: '#b2b6bc' }) declare markColor: string
   @property({ default: 300 }) declare gap: number
-  @property({ default: 1 }) declare scale: number
+  @property({ default: 1 }) declare gapScale: number
 
   texture = new CanvasTexture()
 
@@ -68,10 +68,7 @@ export class Ruler extends Control {
   }
 
   protected _drawTexture(): void {
-    const {
-      width,
-      height,
-    } = this.style
+    const { width, height } = this.size
 
     const {
       offsetX,
@@ -82,7 +79,7 @@ export class Ruler extends Control {
       markColor,
       color,
       gap: _gap,
-      scale: _scale,
+      gapScale: _scale,
     } = this
 
     const canvas = this.texture.source
@@ -197,8 +194,8 @@ export class Ruler extends Control {
     if (texture?.valid) {
       this.context.fillStyle = texture
       this.context.textureTransform = new Transform2D().scale(
-        this.style.width! / texture.width,
-        this.style.height! / texture.height,
+        this.size.width / texture.width,
+        this.size.height / texture.height,
       )
       this.context.rect(0, 0, texture.width, texture.height)
       this.context.fill()

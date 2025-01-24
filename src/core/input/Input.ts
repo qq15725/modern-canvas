@@ -278,11 +278,7 @@ export class Input extends EventEmitter {
     event.shiftKey = nativeEvent.shiftKey
   }
 
-  /**
-   * Sets the current cursor mode, handling any callbacks or CSS style changes.
-   * @param mode - cursor mode, a key from the cursorStyles dictionary
-   */
-  setCursor(mode: string): void {
+  setCursor(mode?: Cursor): void {
     if (!this.target)
       return
     mode = mode || 'default'

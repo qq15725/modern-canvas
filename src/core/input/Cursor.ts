@@ -35,3 +35,4 @@ export type Cursor =
   | 'zoom-out'
   | 'grab'
   | 'grabbing'
+  | string

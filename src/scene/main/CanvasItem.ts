@@ -4,26 +4,21 @@ import type {
   EventListenerValue,
   PropertyDeclaration,
   WebGLBlendMode,
-  WebGLRenderer,
-} from '../../core'
-import type { CanvasItemStyleProperties, Texture2D } from '../resources'
+  WebGLRenderer } from '../../core'
+import type { Texture2D } from '../resources'
 import type { CanvasBatchable } from './CanvasContext'
 import type { Node } from './Node'
 import type { TimelineNodeEventMap, TimelineNodeProperties } from './TimelineNode'
-import { Color, customNode, property, Transform2D } from '../../core'
-import { MaskEffect, ShadowEffect } from '../effects'
-import { CanvasItemStyle } from '../resources'
+import { clamp, Color, customNode, property, protectedProperty } from '../../core'
 import { CanvasContext } from './CanvasContext'
 import { TimelineNode } from './TimelineNode'
 
 export interface CanvasItemProperties extends TimelineNodeProperties {
-  style: Partial<CanvasItemStyleProperties>
   modulate: ColorValue
   blendMode: WebGLBlendMode
 }
 
 export interface CanvasItemEventMap extends TimelineNodeEventMap {
-  updateStyleProperty: (key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration) => void
   draw: () => void
 }
 
@@ -42,24 +37,17 @@ export interface CanvasItem {
 export class CanvasItem extends TimelineNode {
   @property() declare modulate?: ColorValue
   @property() declare blendMode?: WebGLBlendMode
+  @protectedProperty({ default: true }) declare visible: boolean
+  @protectedProperty({ default: 1 }) declare opacity: number
 
-  protected declare _style: CanvasItemStyle
-  get style(): CanvasItemStyle { return this._style }
-  set style(style) {
-    const cb = (...args: any[]): void => {
-      this.emit('updateStyleProperty', ...args)
-      this._updateStyleProperty(args[0], args[1], args[2], args[3])
-    }
-    style.on('updateProperty', cb)
-    this._style?.off('updateProperty', cb)
-    this._style = style
-  }
+  protected _parentGlobalVisible?: boolean
+  protected _globalVisible?: boolean
+  get globalVisible(): boolean { return this._globalVisible ?? true }
 
-  /** @internal */
-  opacity = 1
-  visible = true
-  protected _parentOpacity?: number
-  protected _parentVisible?: boolean
+  protected _parentGlobalOpacity?: number
+  protected _globalOpacity?: number
+  get globalOpacity(): number { return this._globalOpacity ?? 1 }
+
   protected _modulate = new Color(0xFFFFFFFF)
   protected _backgroundImage?: Texture2D
 
@@ -67,28 +55,18 @@ export class CanvasItem extends TimelineNode {
   context = new CanvasContext()
   protected _resetContext = true
   protected _redrawing = false
-  protected _reflowing = false
+  protected _relayouting = false
   protected _repainting = false
   protected _originalBatchables: CanvasBatchable[] = []
   protected _layoutedBatchables: CanvasBatchable[] = []
   protected _batchables: CanvasBatchable[] = []
 
-  constructor(properties?: Partial<CanvasItemProperties>, children: Node[] = []) {
+  constructor(properties?: Partial<CanvasItemProperties>, nodes: Node[] = []) {
     super()
-    this._updateStyleProperty = this._updateStyleProperty.bind(this)
-    this.style = new CanvasItemStyle()
+
     this
       .setProperties(properties)
-      .append(children)
-  }
-
-  override setProperties(properties?: Record<PropertyKey, any>): this {
-    if (properties) {
-      const { style, ...restProperties } = properties
-      style && this.style.setProperties(style)
-      super.setProperties(restProperties)
-    }
-    return this
+      .append(nodes)
   }
 
   protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
@@ -102,126 +80,25 @@ export class CanvasItem extends TimelineNode {
       case 'blendMode':
         this.requestRepaint()
         break
-    }
-  }
-
-  // eslint-disable-next-line unused-imports/no-unused-vars
-  protected _updateStyleProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    switch (key) {
-      case 'backgroundColor':
-        this._updateBackgroundColor()
-        break
-      case 'backgroundImage':
-        this._updateBackgroundImage()
-        break
       case 'opacity':
-        this._updateOpacity()
+        this._updateGlobalOpacity()
         break
-      case 'visibility':
-        this._updateVisible()
-        break
-      case 'filter':
-        this.requestRepaint()
-        break
-      case 'boxShadow':
-        this._updateBoxShadow()
-        break
-      case 'maskImage':
-        this._updateMaskImage()
-        break
-      case 'borderRadius':
-        this.requestRedraw()
+      case 'visible':
+        this._updateGlobalVisible()
         break
     }
-  }
-
-  protected _updateBoxShadow(): void {
-    const name = '__$style.shadow'
-    if (this.style.boxShadow !== 'none') {
-      const node = this.getNode<ShadowEffect>(name)
-      if (node) {
-        // TODO
-      }
-      else {
-        this.appendChild(new ShadowEffect({ name }), 'back')
-      }
-    }
-    else {
-      const node = this.getNode(name)
-      if (node) {
-        this.removeChild(node)
-      }
-    }
-  }
-
-  protected _updateMaskImage(): void {
-    const name = '__$style.maskImage'
-    const maskImage = this.style.maskImage
-    if (maskImage && maskImage !== 'none') {
-      const node = this.getNode<MaskEffect>(name)
-      if (node) {
-        node.src = maskImage
-      }
-      else {
-        this.appendChild(new MaskEffect({ name, src: maskImage }), 'back')
-      }
-    }
-    else {
-      const node = this.getNode(name)
-      if (node) {
-        this.removeChild(node)
-      }
-    }
-  }
-
-  protected _updateBackgroundColor(): void {
-    const backgroundColor = this.style.getComputedBackgroundColor()
-    if (this._originalBatchables.length) {
-      this.requestRepaint()
-    }
-    else if (backgroundColor.a > 0) {
-      this.requestRedraw()
-    }
-  }
-
-  protected async _updateBackgroundImage(): Promise<void> {
-    this._backgroundImage = await this.style.loadBackgroundImage()
-    this.requestRedraw()
-  }
-
-  protected _updateOpacity(): void {
-    const opacity = this.style.getComputedOpacity()
-      * (this.getParent<CanvasItem>()?.opacity ?? 1)
-    if (this.opacity !== opacity) {
-      this.opacity = opacity
-      this.requestRepaint()
-    }
-  }
-
-  protected _updateCurrentTime(force = false): void {
-    super._updateCurrentTime(force)
-    this._updateVisible()
-  }
-
-  protected _updateVisible(): void {
-    let visible = this.style.visibility === 'visible'
-      && (this.getParent<CanvasItem>()?.visible ?? true)
-    if (visible && !this.isInsideTimeRange()) {
-      visible = false
-    }
-    this.visible = visible
   }
 
   show(): void {
-    this.style.visibility = 'visible'
+    this.visible = true
   }
 
   hide(): void {
-    this.style.visibility = 'hidden'
+    this.visible = false
   }
 
   isVisibleInTree(): boolean {
-    return this.opacity > 0 && this.visible
+    return this.globalOpacity > 0 && this.globalVisible
   }
 
   override canRender(): boolean {
@@ -230,129 +107,79 @@ export class CanvasItem extends TimelineNode {
 
   requestRedraw(): void {
     this._redrawing = true
+    this.requestUpdate()
   }
 
-  requestReflow(): void {
-    this._reflowing = true
+  requestRelayout(): void {
+    this._relayouting = true
+    this.requestUpdate()
   }
 
   requestRepaint(): void {
     this._repainting = true
+    this.requestUpdate()
   }
 
-  protected override _process(delta: number): void {
-    const parent = this.getParent<CanvasItem>()
+  protected _updateGlobalVisible(): void {
+    this._parentGlobalVisible = this.getParent<CanvasItem>()?.globalVisible
+    this._globalVisible = this.visible && (this._parentGlobalVisible ?? true)
+  }
 
-    if (this._parentVisible !== parent?.visible) {
-      this._parentVisible = parent?.visible
-      this._updateVisible()
+  protected _updateGlobalOpacity(): void {
+    this._parentGlobalOpacity = this.getParent<CanvasItem>()?.opacity
+    const globalOpacity = clamp(0, this.opacity, 1)
+      * (this._parentGlobalOpacity ?? 1)
+    if (this._globalOpacity !== globalOpacity) {
+      this._globalOpacity = globalOpacity
+      this.requestRepaint()
     }
-
-    if (this._parentOpacity !== parent?.opacity) {
-      this._parentOpacity = parent?.opacity
-      this._updateOpacity()
-    }
-
-    super._process(delta)
-  }
-
-  protected _draw(): void {
-    this._drawBackground()
-    this._drawContent()
-    this._drawBorder()
-    this._drawOutline()
-  }
-
-  protected _drawBackground(): void {
-    const texture = this._backgroundImage
-    if (texture?.valid) {
-      this.context.fillStyle = texture
-      this.context.textureTransform = new Transform2D().scale(
-        this.style.width / texture.width,
-        this.style.height / texture.height,
-      )
-      this._fillBoundingRect()
-    }
-  }
-
-  protected _drawContent(): void {
-    this._fillBoundingRect()
-  }
-
-  protected _drawBorder(): void {
-    if (this.style.borderWidth && this.style.borderStyle !== 'none') {
-      this.context.lineWidth = this.style.borderWidth
-      this.context.strokeStyle = this.style.borderColor
-      this._strokeBoundingRect()
-    }
-  }
-
-  protected _drawOutline(): void {
-    if (this.style.outlineWidth && this.style.outlineColor !== 'none') {
-      this.context.lineWidth = this.style.outlineWidth
-      this.context.strokeStyle = this.style.outlineColor
-      this._strokeBoundingRect()
-    }
-  }
-
-  protected _drawBoundingRect(): void {
-    const { borderRadius, width, height } = this.style
-    if (width && height) {
-      if (borderRadius) {
-        this.context.roundRect(0, 0, width, height, borderRadius)
-      }
-      else {
-        this.context.rect(0, 0, width, height)
-      }
-    }
-  }
-
-  protected _fillBoundingRect(): void {
-    this._drawBoundingRect()
-    this.context.fill()
-  }
-
-  protected _strokeBoundingRect(): void {
-    this._drawBoundingRect()
-    this.context.stroke()
   }
 
   protected _relayout(batchables: CanvasBatchable[]): CanvasBatchable[] {
-    return this._reflow(batchables)
-  }
-
-  protected _reflow(batchables: CanvasBatchable[]): CanvasBatchable[] {
     return this._repaint(batchables)
   }
 
   protected _repaint(batchables: CanvasBatchable[]): CanvasBatchable[] {
-    const colorMatrix = this.style.getComputedFilterColorMatrix()
+    // const colorMatrix = this.style.getComputedFilterColorMatrix()
     return batchables.map((batchable) => {
       return {
         ...batchable,
-        backgroundColor: this.style.getComputedBackgroundColor().abgr,
-        modulate: this._modulate.toArgb(this.opacity, true),
-        colorMatrix: colorMatrix.toMatrix4().toArray(true),
-        colorMatrixOffset: colorMatrix.toVector4().toArray(),
+        modulate: this._modulate.toArgb(this.globalOpacity, true),
+        // backgroundColor: this.style.getComputedBackgroundColor().abgr,
+        // colorMatrix: colorMatrix.toMatrix4().toArray(true),
+        // colorMatrixOffset: colorMatrix.toVector4().toArray(),
         blendMode: this.blendMode,
       }
     })
   }
 
-  protected override _render(renderer: WebGLRenderer): void {
+  protected _draw(): void {
+    //
+  }
+
+  protected override _update(): void {
+    const parent = this.getParent<CanvasItem>()
+
+    if (this._parentGlobalVisible !== parent?.globalVisible) {
+      this._updateGlobalVisible()
+    }
+
+    if (this._parentGlobalOpacity !== parent?.globalOpacity) {
+      this._updateGlobalOpacity()
+    }
+
     let batchables: CanvasBatchable[] | undefined
     if (this._redrawing) {
       this.emit('draw')
       this._draw()
       this._originalBatchables = this.context.toBatchables()
-      this._layoutedBatchables = this._relayout(this._originalBatchables)
-      batchables = this._layoutedBatchables
+      batchables = this._relayout(this._originalBatchables)
       if (this._resetContext) {
         this.context.reset()
       }
     }
-    else if (this._reflowing) {
-      this._layoutedBatchables = this._reflow(this._originalBatchables)
+    else if (this._relayouting) {
+      this._layoutedBatchables = this._relayout(this._originalBatchables)
       batchables = this._layoutedBatchables
     }
     else if (this._repainting) {
@@ -362,10 +189,12 @@ export class CanvasItem extends TimelineNode {
     if (batchables) {
       this._batchables = batchables
       this._redrawing = false
-      this._reflowing = false
+      this._relayouting = false
       this._repainting = false
     }
+  }
 
+  protected override _render(renderer: WebGLRenderer): void {
     this._batchables.forEach((batchable) => {
       batchable.texture?.upload(renderer)
 
@@ -376,16 +205,5 @@ export class CanvasItem extends TimelineNode {
     })
 
     super._render(renderer)
-  }
-
-  override toJSON(): Record<string, any> {
-    const json = super.toJSON()
-    return {
-      ...json,
-      props: {
-        style: this.style.toJSON(),
-        ...json.props,
-      },
-    }
   }
 }

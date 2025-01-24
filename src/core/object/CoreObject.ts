@@ -43,15 +43,15 @@ export class CoreObject extends EventEmitter {
       Promise.reject(e)
     }
     await nextTick()
-    this._performUpdate()
-  }
-
-  protected _performUpdate(): void {
     if (!this._updating)
       return
+    this.update()
+    this._updating = false
+  }
+
+  update(): void {
     this._update(this._updatedProperties)
     this._updatedProperties = new Map()
-    this._updating = false
   }
 
   // eslint-disable-next-line unused-imports/no-unused-vars

@@ -1,13 +1,13 @@
+import type { Element2DProperties } from '../2d'
 import type {
   EventListenerOptions,
   EventListenerValue,
   InputEvent,
   InputEventKey, PropertyDeclaration,
 } from '../../core'
-import type { CanvasItemEventMap, CanvasItemProperties, Node } from '../main'
-import type { Rectangulable, RectangulableEventMap } from '../main/interfaces'
-import { customNode, Rect2 } from '../../core'
-import { CanvasItem } from '../main'
+import type { CanvasItemEventMap, Node, Rectangulable, RectangulableEventMap } from '../main'
+import { CSElement2D } from '../2d'
+import { customNode } from '../../core'
 
 export interface ControlEventMap extends CanvasItemEventMap, RectangulableEventMap {
   //
@@ -24,12 +24,12 @@ export interface Control {
     & ((type: string, ...args: any[]) => boolean)
 }
 
-export interface ControlProperties extends CanvasItemProperties {
+export interface ControlProperties extends Element2DProperties {
   //
 }
 
 @customNode('Control')
-export class Control extends CanvasItem implements Rectangulable {
+export class Control extends CSElement2D implements Rectangulable {
   constructor(properties?: Partial<ControlProperties>, children: Node[] = []) {
     super()
     this._parentUpdateRect = this._parentUpdateRect.bind(this)
@@ -75,21 +75,4 @@ export class Control extends CanvasItem implements Rectangulable {
 
   // eslint-disable-next-line unused-imports/no-unused-vars
   protected _guiInput(event: InputEvent, key: InputEventKey): void {}
-
-  getRect(): Rect2 {
-    let { left, top, width, height, rotate } = this.style
-    if (rotate) {
-      rotate = Math.abs(rotate % 180)
-      rotate = (rotate / 180) * Math.PI
-      const sin = Math.abs(Math.sin(rotate))
-      const cos = Math.abs(Math.cos(rotate))
-      const newWidth = height * sin + width * cos
-      const newHeight = height * cos + width * sin
-      left += (width - newWidth) / 2
-      top += (height - newHeight) / 2
-      width = newWidth
-      height = newHeight
-    }
-    return new Rect2(left, top, width, height)
-  }
 }

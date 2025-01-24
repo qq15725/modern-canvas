@@ -43,19 +43,20 @@ export class ScrollBar extends Range {
   }
 
   protected override _draw(): void {
+    const { size, position } = this
     let left, top, width, height, radii
     if (this.direction === 'vertical') {
       width = 10
-      height = this.style.height * (this.page / (this.maxValue - this.minValue))
-      left = (this.style.left + this.style.width) - width
-      top = this.style.height * (this.value / (this.maxValue - this.minValue))
+      height = size.height * (this.page / (this.maxValue - this.minValue))
+      left = (position.left + size.width) - width
+      top = size.height * (this.value / (this.maxValue - this.minValue))
       radii = width / 2
     }
     else {
-      width = this.style.width * (this.page / (this.maxValue - this.minValue))
+      width = size.width * (this.page / (this.maxValue - this.minValue))
       height = 10
-      left = this.style.width * (this.value / (this.maxValue - this.minValue))
-      top = (this.style.top + this.style.height) - height
+      left = size.width * (this.value / (this.maxValue - this.minValue))
+      top = (position.top + size.height) - height
       radii = height / 2
     }
     this.context.roundRect(left, top, width, height, radii)

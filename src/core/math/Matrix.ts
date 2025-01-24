@@ -103,7 +103,8 @@ export abstract class Matrix extends EventEmitter {
               array[i] = val
             }
           }
-          this._emitUpdate(array)
+          this._onUpdate(array)
+          this.emit('update', array)
           return this
         default:
           throw new Error(`Not support operator in '${this.toName()} ${operator} Matrix2'`)
@@ -126,32 +127,25 @@ export abstract class Matrix extends EventEmitter {
     return this.set(array)
   }
 
+  set(value: MatrixLike): this {
+    return this._operate('=', value) as this
+  }
+
+  copy(value: MatrixLike): this {
+    return this.set(value)
+  }
+
   clone(): this {
     const cloned: this = new (this.constructor as any)()
     cloned.set(this.toArray())
     return cloned
   }
 
-  set(value: MatrixLike): this { return this._operate('=', value) as this }
-
   multiply<T extends Vector>(value: T): T
   multiply(value: MatrixLike): this
   multiply<T extends MatrixOperateOutput>(value: MatrixLike, output: T): T
-  multiply(value: any): any { return this._operate('*', value) }
-
-  onUpdate(callback: (array: number[]) => void): this {
-    this.on('update', callback)
-    return this
-  }
-
-  offUpdate(callback: (array: number[]) => void): this {
-    this.off('update', callback)
-    return this
-  }
-
-  protected _emitUpdate(array: number[]): void {
-    this._onUpdate(array)
-    this.emit('update', array)
+  multiply(value: any, output?: any): any {
+    return this._operate('*', value, output)
   }
 
   protected _onUpdate(_array: number[]): void { /** override */ }
@@ -170,6 +164,11 @@ export abstract class Matrix extends EventEmitter {
     return array.slice()
   }
 
-  toName(): string { return `Matrix${this.rows}(${this.rows}x${this.cols})` }
-  toJSON(): number[] { return this._array }
+  toName(): string {
+    return `Matrix${this.rows}(${this.rows}x${this.cols})`
+  }
+
+  toJSON(): number[] {
+    return this._array
+  }
 }

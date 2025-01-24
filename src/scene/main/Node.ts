@@ -82,7 +82,7 @@ export class Node extends CoreObject {
 
   protected _readyed = false
 
-  constructor(properties?: Partial<NodeProperties>, children: Node[] = []) {
+  constructor(properties?: Partial<NodeProperties>, nodes: Node[] = []) {
     super()
 
     this._onTreeEnter = this._onTreeEnter.bind(this)
@@ -94,7 +94,7 @@ export class Node extends CoreObject {
 
     this
       .setProperties(properties)
-      .append(children)
+      .append(nodes)
 
     this.on('treeEnter', this._onTreeEnter)
       .on('treeExit', this._onTreeExit)
@@ -496,6 +496,13 @@ export class Node extends CoreObject {
   protected _input(event: InputEvent, key: InputEventKey): void {}
   // eslint-disable-next-line unused-imports/no-unused-vars
   protected _render(renderer: WebGLRenderer): void {}
+
+  clone(): this {
+    return new (this.constructor as any)(
+      this.toJSON(),
+      this.getChildren(true),
+    )
+  }
 
   override toJSON(): Record<string, any> {
     return {
