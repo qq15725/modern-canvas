@@ -1,3 +1,4 @@
+import type { ImageRect } from 'modern-idoc'
 import type { PropertyDeclaration } from '../../core'
 import type { Node } from '../main'
 import type { ImageFrame, Texture2D } from '../resources'
@@ -9,14 +10,16 @@ import { Element2D } from './Element2D'
 
 export interface Image2DProperties extends Element2DProperties {
   src: string
+  srcRect: ImageRect
   gif: boolean
 }
 
 @customNode('Image2D')
 export class Image2D extends Element2D {
   @protectedProperty() texture?: AnimatedTexture
-  @property({ default: false }) declare gif: boolean
+  @property({ default: { left: 0, top: 0, bottom: 0, right: 0 } }) declare srcRect: ImageRect
   @property({ default: '' }) declare src: string
+  @property({ default: false }) declare gif: boolean
 
   get currentFrameTexture(): Texture2D | undefined { return this.texture?.frames[this._frameIndex]?.texture }
   get textureDuration(): number { return this.texture?.duration ?? 0 }

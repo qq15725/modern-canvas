@@ -1,4 +1,4 @@
-import type { Overflow, TextStyleDeclaration, TransformStyleDeclaration, Visibility } from 'modern-idoc'
+import type { ElementStyleDeclaration, TextStyleDeclaration } from 'modern-idoc'
 import type { ColorValue, PropertyDeclaration } from '../../core'
 import type { Texture2D } from '../resources'
 import { getDefaultTextStyle, getDefaultTransformStyle } from 'modern-idoc'
@@ -9,28 +9,16 @@ import {
   Resource,
 } from '../../core'
 
-export type PointerEvents = 'auto' | 'none'
-
 export interface BaseElement2DStyleProperties extends
   TextStyleDeclaration,
-  Omit<TransformStyleDeclaration, 'left' | 'top' | 'width' | 'height'> {
+  Omit<ElementStyleDeclaration, 'left' | 'top' | 'width' | 'height' | 'backgroundColor' | 'borderColor'> {
   backgroundColor: 'none' | ColorValue
-  backgroundImage: 'none' | string
-  filter: string
-  boxShadow: 'none' | string
   maskImage: 'none' | string
-  opacity: number
-  borderWidth: number
-  borderRadius: number
   borderColor: 'none' | ColorValue
-  borderStyle: string
   outlineWidth: number
   outlineOffset: number
   outlineColor: 'none' | ColorValue
   outlineStyle: string
-  visibility: Visibility
-  overflow: Overflow
-  pointerEvents: PointerEvents
 }
 
 export interface BaseElement2DStyle extends BaseElement2DStyleProperties {
