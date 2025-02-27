@@ -1,6 +1,6 @@
-import type { Element2DStyleProperties } from './Element2DStyle'
+import type { BaseElement2DStyleProperties } from './BaseElement2DStyle'
 import { defineProperty } from '../../core'
-import { Element2DStyle } from './Element2DStyle'
+import { BaseElement2DStyle } from './BaseElement2DStyle'
 
 export type Align = 'auto' | 'flex-start' | 'center' | 'flex-end' | 'stretch' | 'baseline' | 'space-between' | 'space-around' | 'space-evenly'
 export type FlexDirection = 'column' | 'column-reverse' | 'row' | 'row-reverse'
@@ -53,18 +53,18 @@ export interface LayoutStyleDeclaration {
   width: number | 'auto' | `${number}%`
 }
 
-export interface FBElement2DStyleProperties extends
-  Element2DStyleProperties,
+export interface FlexElement2DStyleProperties extends
+  BaseElement2DStyleProperties,
   LayoutStyleDeclaration {
   //
 }
 
-export interface FBElement2DStyle extends FBElement2DStyleProperties {
+export interface FlexElement2DStyle extends FlexElement2DStyleProperties {
   //
 }
 
-export class FBElement2DStyle extends Element2DStyle {
-  constructor(properties?: Partial<FBElement2DStyleProperties>) {
+export class FlexElement2DStyle extends BaseElement2DStyle {
+  constructor(properties?: Partial<FlexElement2DStyleProperties>) {
     super()
     this.setProperties(properties)
   }
@@ -115,5 +115,5 @@ const defaultStyles: LayoutStyleDeclaration = {
 }
 
 for (const key in defaultStyles) {
-  defineProperty(FBElement2DStyle, key, { default: (defaultStyles as any)[key] })
+  defineProperty(FlexElement2DStyle, key, { default: (defaultStyles as any)[key] })
 }

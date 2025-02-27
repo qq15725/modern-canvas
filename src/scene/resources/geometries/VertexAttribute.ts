@@ -1,4 +1,5 @@
-import { type PropertyDeclaration, protectedProperty, Resource } from '../../../core'
+import type { PropertyDeclaration } from '../../../core'
+import { protectedProperty, Resource } from '../../../core'
 import { VertexBuffer } from './VertexBuffer'
 
 export interface VertexAttributeOptions {

@@ -1,18 +1,19 @@
+import type { PropertyDeclaration } from '../../core'
 import type { Node } from '../main'
 import type { ImageFrame, Texture2D } from '../resources'
-import type { CSElement2DProperties } from './CSElement2D'
+import type { Element2DProperties } from './Element2D'
 import { assets } from '../../asset'
-import { customNode, property, type PropertyDeclaration, protectedProperty, Transform2D } from '../../core'
+import { customNode, property, protectedProperty, Transform2D } from '../../core'
 import { AnimatedTexture } from '../resources'
-import { CSElement2D } from './CSElement2D'
+import { Element2D } from './Element2D'
 
-export interface Image2DProperties extends CSElement2DProperties {
+export interface Image2DProperties extends Element2DProperties {
   src: string
   gif: boolean
 }
 
 @customNode('Image2D')
-export class Image2D extends CSElement2D {
+export class Image2D extends Element2D {
   @protectedProperty() texture?: AnimatedTexture
   @property({ default: false }) declare gif: boolean
   @property({ default: '' }) declare src: string

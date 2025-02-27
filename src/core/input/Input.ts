@@ -1,6 +1,7 @@
+import type { EventListenerOptions, EventListenerValue } from '../object'
 import type { Cursor } from './Cursor'
 import type { MouseInputEvent } from './MouseInputEvent'
-import { EventEmitter, type EventListenerOptions, type EventListenerValue } from '../object'
+import { EventEmitter } from '../object'
 import { SUPPORTS_POINTER_EVENTS, SUPPORTS_TOUCH_EVENTS, SUPPORTS_WHEEL_EVENTS } from '../shared'
 import { PointerInputEvent } from './PointerInputEvent'
 import { WheelInputEvent } from './WheelInputEvent'

@@ -1,4 +1,5 @@
-import { crossOrigin, isVideoElement, type PropertyDeclaration, protectedProperty, Ticker } from '../../../core'
+import type { PropertyDeclaration } from '../../../core'
+import { crossOrigin, isVideoElement, protectedProperty, Ticker } from '../../../core'
 import { Texture2D } from './Texture2D'
 
 export interface VideoTextureOptions {

@@ -1,6 +1,6 @@
 import { fonts } from 'modern-font'
 import {
-  CSElement2D,
+  Element2D,
   Engine,
   Image2D, Timeline,
 } from '../../src'
@@ -18,7 +18,7 @@ async function init(): Promise<void> {
   fonts.fallbackFont = await fonts.load({ family: 'fallbackFont', src: '/fonts/AaHouDiHei.woff' })
 
   engine.root.append([
-    new CSElement2D({
+    new Element2D({
       style: {
         left: 100,
         top: 100,

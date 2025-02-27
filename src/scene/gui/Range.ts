@@ -1,6 +1,7 @@
+import type { PropertyDeclaration } from '../../core'
 import type { Node } from '../main'
 import type { ControlProperties } from './Control'
-import { customNode, property, type PropertyDeclaration } from '../../core'
+import { customNode, property } from '../../core'
 import { Control } from './Control'
 
 export interface RangeProperties extends ControlProperties {

@@ -1,4 +1,5 @@
-import { Vector, type VectorLike } from './Vector'
+import type { VectorLike } from './Vector'
+import { Vector } from './Vector'
 
 /**
  * Vector2

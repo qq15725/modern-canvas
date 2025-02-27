@@ -1,8 +1,9 @@
 import type { MeasureResult, TextOptions } from 'modern-text'
+import type { PropertyDeclaration } from '../../core'
 import type { Node } from '../main'
 import type { TextureRect2DProperties } from './TextureRect2D'
 import { Text, textDefaultStyle } from 'modern-text'
-import { customNode, property, type PropertyDeclaration, protectedProperty } from '../../core'
+import { customNode, property, protectedProperty } from '../../core'
 import { CanvasTexture } from '../resources'
 import { TextureRect2D } from './TextureRect2D'
 

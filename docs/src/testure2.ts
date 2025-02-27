@@ -2,8 +2,8 @@ import { fonts } from 'modern-font'
 import {
   Animation,
   Engine,
-  FBElement2D,
   FlexboxLayout,
+  FlexElement2D,
   Timeline,
 } from '../../src'
 
@@ -21,14 +21,14 @@ async function init(): Promise<void> {
   fonts.fallbackFont = await fonts.load({ family: 'fallbackFont', src: '/fonts/AaHouDiHei.woff' })
 
   engine.root.appendChild(
-    new FBElement2D({
+    new FlexElement2D({
       style: {
         width: 350, height: 350, padding: 20, margin: 100,
         backgroundColor: '#0000FF', opacity: 0.5, gap: 10,
         filter: 'brightness(102%) contrast(90%) saturate(128%) sepia(18%)',
       },
     }, [
-      new FBElement2D({
+      new FlexElement2D({
         style: {
           flexGrow: 0.33, backgroundColor: '#00FF00',
         },
@@ -39,12 +39,12 @@ async function init(): Promise<void> {
           ],
         }),
       ]),
-      new FBElement2D({
+      new FlexElement2D({
         style: {
           flexGrow: 0.33, backgroundColor: '#000A00',
         },
       }),
-      new FBElement2D({
+      new FlexElement2D({
         style: {
           flexGrow: 0.33, backgroundColor: '#008F00',
         },

@@ -1,14 +1,14 @@
 import type { InputEvent, InputEventKey, PointerInputEvent, PropertyDeclaration } from '../core'
-import type { CSElement2DStyle } from '../scene'
-import { Control, CSElement2D, Ruler, Scaler, TransformRect2D, XScrollBar, YScrollBar } from '../scene'
+import type { Element2DStyle } from '../scene'
+import { Control, Element2D, Ruler, Scaler, TransformRect2D, XScrollBar, YScrollBar } from '../scene'
 
 export class CanvasItemEditor extends Control {
-  protected _pointerStart?: CSElement2DStyle
+  protected _pointerStart?: Element2DStyle
   protected _pointerOffset?: { x: number, y: number }
-  selected?: CSElement2D
-  dragging?: CSElement2D
-  hovered?: CSElement2D
-  hover = new CSElement2D({
+  selected?: Element2D
+  dragging?: Element2D
+  hovered?: Element2D
+  hover = new Element2D({
     name: 'hover',
     internalMode: 'back',
     style: {
@@ -51,7 +51,7 @@ export class CanvasItemEditor extends Control {
     },
   })
 
-  drawboard = new CSElement2D({
+  drawboard = new Element2D({
     name: 'drawboard',
     style: {
       width: 500,
@@ -121,7 +121,7 @@ export class CanvasItemEditor extends Control {
 
   protected _onPointerdown(e: PointerInputEvent): void {
     let target = e.target
-    if (target.is(this)) {
+    if (target?.is(this)) {
       target = undefined
     }
     if (target?.is(this.transformRect)) {
@@ -130,7 +130,7 @@ export class CanvasItemEditor extends Control {
     this._pointerOffset = { x: e.offsetX, y: e.offsetY }
     this.selected = target
     this.dragging = target
-    if (target instanceof CSElement2D) {
+    if (target instanceof Element2D) {
       this._pointerStart = target.style.clone()
     }
     else {
@@ -142,7 +142,7 @@ export class CanvasItemEditor extends Control {
 
   protected _onPointermove(e: PointerInputEvent): void {
     let target = e.target
-    if (target.is(this)) {
+    if (target?.is(this)) {
       target = undefined
     }
     if (target?.is(this.transformRect)) {
@@ -159,8 +159,8 @@ export class CanvasItemEditor extends Control {
       ? { x: (e.offsetX - _pointerOffset.x), y: (e.offsetY - _pointerOffset.y) }
       : { x: 0, y: 0 }
     if (dragging && _pointerStart) {
-      dragging.style.left = _pointerStart.left + offset.x
-      dragging.style.top = _pointerStart.top + offset.y
+      dragging.style.left = _pointerStart.left + offset.x / this.scaler.value
+      dragging.style.top = _pointerStart.top + offset.y / this.scaler.value
       dragging.update()
     }
     this._updateHover()
@@ -173,22 +173,19 @@ export class CanvasItemEditor extends Control {
     this._updateSelectionRect()
   }
 
-  protected _copyGlobalTransform(a: CSElement2D, b: CSElement2D): void {
+  protected _copyGlobalTransform(a: Element2D, b: Element2D): void {
     a.style.visibility = 'visible'
-    a.style.width = b.size.x
-    a.style.height = b.size.y
+    a.style.width = b.globalScale.x * b.size.x
+    a.style.height = b.globalScale.y * b.size.y
     a.style.left = b.globalPosition.x
     a.style.top = b.globalPosition.y
-    a.style.scaleX = b.globalScale.x
-    a.style.scaleY = b.globalScale.y
-    a.style.skewX = b.globalSkew.x
-    a.style.skewY = b.globalSkew.y
     a.style.rotate = b.globalRotation
+    a.update()
   }
 
   protected _updateHover(): void {
     const hovered = this.hovered
-    if (hovered instanceof CSElement2D) {
+    if (hovered instanceof Element2D) {
       this.hover.style.visibility = 'visible'
       this._copyGlobalTransform(this.hover, hovered)
       this.hover.requestRedraw()

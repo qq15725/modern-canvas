@@ -2,8 +2,8 @@ import type {
   Node as YogaNode,
 } from 'yoga-layout/load'
 import type { PropertyDeclaration } from '../../core'
-import type { FBElement2D } from './FBElement2D'
-import type { FBElement2DStyle } from './FBElement2DStyle'
+import type { FlexElement2D } from './FlexElement2D'
+import type { FlexElement2DStyle } from './FlexElement2DStyle'
 import {
   Align,
   BoxSizing,
@@ -99,7 +99,7 @@ export class FlexboxLayout {
 
   _node: YogaNode = FlexboxLayout._yoga!.Node.create()
 
-  protected get _style(): FBElement2DStyle {
+  protected get _style(): FlexElement2DStyle {
     return this._element.style
   }
 
@@ -120,7 +120,7 @@ export class FlexboxLayout {
   }
 
   constructor(
-    protected _element: FBElement2D,
+    protected _element: FlexElement2D,
   ) {
     //
   }

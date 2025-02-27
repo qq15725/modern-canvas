@@ -1,7 +1,12 @@
-import type { InputEvent, InputEventKey, PropertyDeclaration } from '../../core'
+import type {
+  InputEventKey,
+  PropertyDeclaration } from '../../core'
 import type { Node } from '../main'
 import type { RangeProperties } from './Range'
-import { customNode, property } from '../../core'
+import {
+  customNode,
+  property,
+} from '../../core'
 import { Range } from './Range'
 
 export interface ScrollBarProperties extends RangeProperties {
@@ -33,16 +38,7 @@ export class ScrollBar extends Range {
     }
   }
 
-  protected override _guiInput(event: InputEvent, key: InputEventKey): void {
-    super._guiInput(event, key)
-
-    switch (key) {
-      case 'pointermove':
-        break
-    }
-  }
-
-  protected override _draw(): void {
+  protected _rect(): { left: number, top: number, width: number, height: number, radii: number } {
     const { size, position } = this
     let left, top, width, height, radii
     if (this.direction === 'vertical') {
@@ -59,8 +55,33 @@ export class ScrollBar extends Range {
       top = (position.top + size.height) - height
       radii = height / 2
     }
+    return { left, top, width, height, radii }
+  }
+
+  protected override _draw(): void {
+    const { left, top, width, height, radii } = this._rect()
     this.context.roundRect(left, top, width, height, radii)
     this.context.fillStyle = 0x00000022
     this.context.fill()
+  }
+
+  protected _pointerInput(point: { x: number, y: number }, key: InputEventKey): boolean {
+    const { left, top, width, height } = this._rect()
+    const flag = point.x >= left
+      && point.x < left + width
+      && point.y >= top
+      && point.y < top + height
+    switch (key) {
+      case 'pointerdown':
+      case 'pointermove':
+        if (flag) {
+          this._tree?.input.setCursor('pointer')
+        }
+        else {
+          this._tree?.input.setCursor(undefined)
+        }
+        break
+    }
+    return false
   }
 }

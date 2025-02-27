@@ -1,15 +1,15 @@
 import type { PropertyDeclaration } from '../../core'
 import type { Node } from '../main'
-import type { Element2DProperties } from './Element2D'
+import type { BaseElement2DProperties } from './BaseElement2D'
 import { property } from '../../core'
 import { Texture2D } from '../resources'
-import { CSElement2D } from './CSElement2D'
+import { Element2D } from './Element2D'
 
-export interface TransformRect2DProperties extends Element2DProperties {
+export interface TransformRect2DProperties extends BaseElement2DProperties {
   //
 }
 
-export class TransformRect2D extends CSElement2D {
+export class TransformRect2D extends Element2D {
   @property({ default: 6 }) declare handleSize: number
 
   constructor(properties?: Partial<TransformRect2DProperties>, nodes: Node[] = []) {

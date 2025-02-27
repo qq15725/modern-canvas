@@ -35,11 +35,4 @@ export class UvGeometry extends Geometry {
     this.positionBuffer = positionBuffer
     this.uvBuffer = uvBuffer
   }
-
-  update(vertices: Float32Array, uvs: Float32Array, indices: Uint16Array): this {
-    this.positionBuffer.data = vertices
-    this.uvBuffer.data = uvs
-    this.indexBuffer!.data = indices
-    return this
-  }
 }

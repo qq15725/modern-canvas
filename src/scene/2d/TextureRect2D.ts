@@ -1,14 +1,14 @@
 import type { Node } from '../main'
 import type { Texture2D } from '../resources'
-import type { CSElement2DProperties } from './CSElement2D'
+import type { Element2DProperties } from './Element2D'
 import { Transform2D } from '../../core'
-import { CSElement2D } from './CSElement2D'
+import { Element2D } from './Element2D'
 
-export interface TextureRect2DProperties extends CSElement2DProperties {
+export interface TextureRect2DProperties extends Element2DProperties {
   //
 }
 
-export class TextureRect2D<T extends Texture2D = Texture2D> extends CSElement2D {
+export class TextureRect2D<T extends Texture2D = Texture2D> extends Element2D {
   texture?: T
 
   constructor(properties?: Partial<TextureRect2DProperties>, children: Node[] = []) {

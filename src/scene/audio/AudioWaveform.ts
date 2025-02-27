@@ -1,17 +1,18 @@
-import type { Node2DProperties } from '../2d'
-import { Node2D } from '../2d'
-import { customNode, IN_BROWSER, property, type PropertyDeclaration, Transform2D } from '../../core'
+import type { Element2DProperties } from '../2d'
+import type { PropertyDeclaration } from '../../core'
+import { Element2D } from '../2d'
+import { customNode, IN_BROWSER, property, Transform2D } from '../../core'
 import { Texture2D } from '../resources'
 import { WebAudioContext } from './web'
 
-export interface AudioWaveformProperties extends Node2DProperties {
+export interface AudioWaveformProperties extends Element2DProperties {
   src: string
   gap: number
   color: string
 }
 
 @customNode('AudioWaveform')
-export class AudioWaveform extends Node2D {
+export class AudioWaveform extends Element2D {
   @property() src?: string
   @property() gap = 0
   @property() color = '#000000'

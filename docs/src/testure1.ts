@@ -2,7 +2,7 @@ import { fonts } from 'modern-font'
 import {
   Animation,
   CanvasItemEditor,
-  CSElement2D,
+  Element2D,
   Engine,
   Image2D,
   LeftEraseTransition,
@@ -26,7 +26,7 @@ async function init(): Promise<void> {
   fonts.fallbackFont = await fonts.load({ family: 'fallbackFont', src: '/fonts/AaHouDiHei.woff' })
 
   editor.drawboard.append([
-    new CSElement2D({
+    new Element2D({
       delay: 0,
       duration: 3000,
       style: {

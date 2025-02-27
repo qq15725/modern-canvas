@@ -1,10 +1,11 @@
+import type { Element2D } from '../2d'
 import type {
   EventListenerOptions,
   EventListenerValue,
   InputEvent,
   InputEventKey, PropertyDeclaration, WheelInputEvent,
 } from '../../core'
-import type { CanvasItem, NodeEventMap, NodeProperties } from '../main'
+import type { NodeEventMap, NodeProperties } from '../main'
 import { clamp, customNode, property } from '../../core'
 import { Node } from '../main'
 
@@ -38,9 +39,9 @@ export class Scaler extends Node {
   @property({ default: 0.05 }) declare minValue: number
   @property({ default: 10 }) declare maxValue: number
 
-  get target(): CanvasItem | undefined {
-    if ((this.parent as CanvasItem)?.style) {
-      return this.parent as CanvasItem
+  get target(): Element2D | undefined {
+    if ((this.parent as Element2D)?.style) {
+      return this.parent as Element2D
     }
     return undefined
   }

@@ -1,8 +1,9 @@
 import type { AnimationItem } from 'lottie-web'
+import type { PropertyDeclaration } from '../../core'
 import type { Node } from '../main'
 import type { TextureRect2DProperties } from './TextureRect2D'
 import { assets } from '../../asset'
-import { customNode, property, type PropertyDeclaration } from '../../core'
+import { customNode, property } from '../../core'
 import { CanvasTexture } from '../resources'
 import { TextureRect2D } from './TextureRect2D'
 

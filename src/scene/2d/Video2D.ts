@@ -1,8 +1,9 @@
+import type { PropertyDeclaration } from '../../core'
 import type { Node } from '../main'
 import type { VideoTexture } from '../resources'
 import type { TextureRect2DProperties } from './TextureRect2D'
 import { assets } from '../../asset'
-import { customNode, property, type PropertyDeclaration } from '../../core'
+import { customNode, property } from '../../core'
 import { TextureRect2D } from './TextureRect2D'
 
 export interface Video2DProperties extends TextureRect2DProperties {

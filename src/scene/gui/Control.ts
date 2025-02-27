@@ -1,4 +1,4 @@
-import type { Element2DProperties } from '../2d'
+import type { BaseElement2DProperties } from '../2d'
 import type {
   EventListenerOptions,
   EventListenerValue,
@@ -6,7 +6,7 @@ import type {
   InputEventKey, PropertyDeclaration,
 } from '../../core'
 import type { CanvasItemEventMap, Node, Rectangulable, RectangulableEventMap } from '../main'
-import { CSElement2D } from '../2d'
+import { Element2D } from '../2d'
 import { customNode } from '../../core'
 
 export interface ControlEventMap extends CanvasItemEventMap, RectangulableEventMap {
@@ -24,12 +24,12 @@ export interface Control {
     & ((type: string, ...args: any[]) => boolean)
 }
 
-export interface ControlProperties extends Element2DProperties {
+export interface ControlProperties extends BaseElement2DProperties {
   //
 }
 
 @customNode('Control')
-export class Control extends CSElement2D implements Rectangulable {
+export class Control extends Element2D implements Rectangulable {
   constructor(properties?: Partial<ControlProperties>, children: Node[] = []) {
     super()
     this._parentUpdateRect = this._parentUpdateRect.bind(this)
