@@ -2,8 +2,8 @@ import { fonts } from 'modern-font'
 import {
   Animation,
   Engine,
-  FlexboxLayout,
   FlexElement2D,
+  FlexLayout,
   Timeline,
 } from '../../src'
 
@@ -16,7 +16,7 @@ const engine = new Engine({
 document.body.append(engine.view!)
 
 async function init(): Promise<void> {
-  await FlexboxLayout.load()
+  await FlexLayout.load()
 
   fonts.fallbackFont = await fonts.load({ family: 'fallbackFont', src: '/fonts/AaHouDiHei.woff' })
 

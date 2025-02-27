@@ -9,8 +9,8 @@ import type { FlexElement2DStyleProperties } from './FlexElement2DStyle'
 import { Direction } from 'yoga-layout/load'
 import { customNode } from '../../core'
 import { BaseElement2D } from './BaseElement2D'
-import { FlexboxLayout } from './FlexboxLayout'
 import { FlexElement2DStyle } from './FlexElement2DStyle'
+import { FlexLayout } from './FlexLayout'
 
 export interface FlexBaseElement2DEventMap extends BaseElement2DEventMap {
   updateStyleProperty: (key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration) => void
@@ -48,7 +48,7 @@ export class FlexElement2D extends BaseElement2D implements Rectangulable {
     this._style = style
   }
 
-  _layout = new FlexboxLayout(this)
+  _layout = new FlexLayout(this)
 
   get offsetLeft(): number {
     return this._layout.offsetLeft

@@ -91,13 +91,13 @@ export interface ComputedLayout {
   height: number
 }
 
-export class FlexboxLayout {
+export class FlexLayout {
   static _yoga?: any
   static async load(): Promise<void> {
     this._yoga = await loadYoga()
   }
 
-  _node: YogaNode = FlexboxLayout._yoga!.Node.create()
+  _node: YogaNode = FlexLayout._yoga!.Node.create()
 
   protected get _style(): FlexElement2DStyle {
     return this._element.style
