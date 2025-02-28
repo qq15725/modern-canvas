@@ -1,6 +1,6 @@
 import type { ImageRect } from 'modern-idoc'
 import type { PropertyDeclaration } from '../../core'
-import type { Node } from '../main'
+import type { CanvasBatchable, Node } from '../main'
 import type { ImageFrame, Texture2D } from '../resources'
 import type { Element2DProperties } from './Element2D'
 import { assets } from '../../asset'
@@ -17,7 +17,7 @@ export interface Image2DProperties extends Element2DProperties {
 @customNode('Image2D')
 export class Image2D extends Element2D {
   @protectedProperty() texture?: AnimatedTexture
-  @property({ default: { left: 0, top: 0, bottom: 0, right: 0 } }) declare srcRect: ImageRect
+  @property() declare srcRect: ImageRect
   @property({ default: '' }) declare src: string
   @property({ default: false }) declare gif: boolean
 
@@ -45,6 +45,9 @@ export class Image2D extends Element2D {
     switch (key) {
       case 'src':
         this._wait = this._load(value)
+        break
+      case 'srcRect':
+        this.requestRedraw()
         break
     }
   }
@@ -132,13 +135,24 @@ export class Image2D extends Element2D {
   protected override _drawContent(): void {
     const texture = this.currentFrameTexture
     if (texture?.valid) {
+      const { left = 0, top = 0, right = 0, bottom = 0 } = this.srcRect ?? {}
       const { width, height } = this.size
       this.context.fillStyle = texture
-      this.context.textureTransform = new Transform2D().scale(
-        width / texture.width,
-        height / texture.height,
-      )
+      const sx = 1 / ((1 - left + -right) * width)
+      const sy = 1 / ((1 - top + -bottom) * height)
+      this.context.textureTransform = new Transform2D()
+        .scale(sx, sy)
+        .translate((left * width) * sx, (top * height) * sy)
       super._drawContent()
     }
+  }
+
+  protected _repaint(batchables: CanvasBatchable[]): CanvasBatchable[] {
+    return batchables.map((batchable) => {
+      return {
+        ...batchable,
+        disableWrapMode: true,
+      }
+    })
   }
 }

@@ -194,8 +194,8 @@ export class Ruler extends Control {
     if (texture?.valid) {
       this.context.fillStyle = texture
       this.context.textureTransform = new Transform2D().scale(
-        this.size.width / texture.width,
-        this.size.height / texture.height,
+        1 / this.size.width,
+        1 / this.size.height,
       )
       this.context.rect(0, 0, texture.width, texture.height)
       this.context.fill()

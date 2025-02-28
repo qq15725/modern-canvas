@@ -130,13 +130,20 @@ export class CanvasContext extends Path2D {
     textureTransform?: Transform2D,
   ): void {
     if (texture) {
-      let w = texture.width
-      let h = texture.height
-      if (textureTransform) {
-        [w, h] = textureTransform.applyToPoint(w, h)
-      }
+      const w = texture.width
+      const h = texture.height
       for (let len = vertices.length, i = start; i < len; i += 2) {
-        uvs.push(vertices[i] / w, vertices[i + 1] / h)
+        const x = vertices[i]
+        const y = vertices[i + 1]
+        let uvX
+        let uvY
+        if (textureTransform) {
+          [uvX, uvY] = textureTransform?.applyToPoint(x, y)
+        }
+        else {
+          [uvX, uvY] = [x / w, y / h]
+        }
+        uvs.push(uvX, uvY)
       }
     }
     else {

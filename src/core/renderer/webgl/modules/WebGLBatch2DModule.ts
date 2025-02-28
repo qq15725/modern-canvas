@@ -14,6 +14,7 @@ export interface Batchable2D {
   colorMatrix?: ArrayLike<number>
   colorMatrixOffset?: ArrayLike<number>
   blendMode?: WebGLBlendMode
+  disableWrapMode?: boolean
 }
 
 type DrawCall = Required<WebGLDrawOptions> & {
@@ -36,7 +37,6 @@ export class WebGLBatch2DModule extends WebGLModule {
 
   protected _state = WebGLState.for2D()
   protected _batchSize = 4096 * 4
-  protected _vertexSize = 1 + 2 + 2 + 1 + 1 + 4 + 16
   protected _drawCallUid = 0
 
   protected _defaultModulate = 0xFFFFFFFF
@@ -62,9 +62,12 @@ export class WebGLBatch2DModule extends WebGLModule {
     aUv: { size: 2, normalized: false, type: 'float' }, // 2
     aModulate: { size: 4, normalized: true, type: 'unsigned_byte' }, // 1
     aBackgroundColor: { size: 4, normalized: true, type: 'unsigned_byte' }, // 1
-    aColorMatrixOffset: { size: 4, normalized: false, type: 'float' }, // 4
-    aColorMatrix: { size: 4, normalized: false, type: 'float' }, // 16
+    aDisableWrapMode: { size: 4, normalized: true, type: 'float' }, // 4 只是为了凑4的整数倍
+    aColorMatrixOffset: { size: 4, normalized: false, type: 'float' }, // 4 TODO bug
+    aColorMatrix: { size: 4, normalized: false, type: 'float' }, // 16 TODO bug
   }
+
+  protected _vertexSize = 1 + 2 + 2 + 1 + 1 + 4 + 4 + 16
 
   protected _getShader(maxTextureUnits: number): Shader {
     let shader = this._shaders.get(maxTextureUnits)
@@ -86,6 +89,7 @@ attribute vec4 aModulate;
 attribute vec4 aBackgroundColor;
 attribute mat4 aColorMatrix;
 attribute vec4 aColorMatrixOffset;
+attribute vec4 aDisableWrapMode;
 
 uniform mat3 projectionMatrix;
 uniform mat3 translationMatrix;
@@ -97,6 +101,7 @@ varying vec4 vModulate;
 varying vec4 vBackgroundColor;
 varying mat4 vColorMatrix;
 varying vec4 vColorMatrixOffset;
+varying vec4 vDisableWrapMode;
 
 void main(void) {
   vTextureId = aTextureId;
@@ -106,6 +111,7 @@ void main(void) {
   vBackgroundColor = aBackgroundColor;
   vColorMatrix = aColorMatrix;
   vColorMatrixOffset = aColorMatrixOffset;
+  vDisableWrapMode = aDisableWrapMode;
 }`,
       frag: `precision highp float;
 varying float vTextureId;
@@ -114,11 +120,17 @@ varying vec4 vModulate;
 varying vec4 vBackgroundColor;
 varying mat4 vColorMatrix;
 varying vec4 vColorMatrixOffset;
+varying vec4 vDisableWrapMode;
 
 uniform sampler2D samplers[${maxTextureUnits}];
 
 void main(void) {
   vec4 color;
+  if (vDisableWrapMode.x > 0.0 && (vUv.x < 0.0 || vUv.y < 0.0 || vUv.x > 1.0 || vUv.y > 1.0))
+  {
+    color = vec4(0.0, 0.0, 0.0, 0.0);
+  }
+  else
   if (vTextureId < 0.0)
   {
     color = vec4(0.0, 0.0, 0.0, 0.0);
@@ -272,6 +284,7 @@ void main(void) {
             colorMatrix = this._defaultColorMatrix,
             colorMatrixOffset = this._defaultColorMatrixOffset,
             blendMode = WebGLBlendMode.NORMAL,
+            disableWrapMode = false,
           } = batchables[i]
 
           const textureLocation = (texture ? textureLocationMap.get(texture) : -1) ?? -1
@@ -295,6 +308,10 @@ void main(void) {
             float32View[aIndex++] = uvs[i + 1] ?? 0
             uint32View[aIndex++] = modulate
             uint32View[aIndex++] = backgroundColor
+            float32View[aIndex++] = disableWrapMode ? 1 : 0
+            float32View[aIndex++] = 0
+            float32View[aIndex++] = 0
+            float32View[aIndex++] = 0
             for (let i = 0; i < 4; i++) {
               float32View[aIndex++] = colorMatrixOffset[i] ?? 0
             }

@@ -118,8 +118,8 @@ export class AudioWaveform extends Element2D {
     if (src?.valid) {
       this.context.fillStyle = src
       this.context.textureTransform = new Transform2D().scale(
-        this.style.width! / src.width,
-        this.style.height! / src.height,
+        1 / this.style.width!,
+        1 / this.style.height!,
       )
     }
   }

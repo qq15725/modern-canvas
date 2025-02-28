@@ -258,8 +258,8 @@ export class BaseElement2D extends Node2D implements Rectangulable {
       const { width, height } = this.size
       this.context.fillStyle = texture
       this.context.textureTransform = new Transform2D().scale(
-        width / texture.width,
-        height / texture.height,
+        1 / width,
+        1 / height,
       )
       this._fillBoundingRect()
     }

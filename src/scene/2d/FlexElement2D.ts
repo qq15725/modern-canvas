@@ -31,9 +31,6 @@ export interface FlexElement2DProperties extends BaseElement2DProperties {
   style: Partial<FlexElement2DStyleProperties>
 }
 
-/**
- * Flexbox Element 2D
- */
 @customNode('FlexElement2D')
 export class FlexElement2D extends BaseElement2D implements Rectangulable {
   protected declare _style: FlexElement2DStyle

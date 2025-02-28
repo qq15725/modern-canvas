@@ -32,6 +32,19 @@ async function init(): Promise<void> {
           height: 100,
         },
         src: '/example.jpg',
+        srcRect: {
+          left: 0.5,
+          right: -0.5,
+        },
+      }),
+      new Image2D({
+        style: {
+          left: 0,
+          top: 0,
+          width: 100,
+          height: 100,
+        },
+        src: '/example.jpg',
       }),
     ]),
   ])

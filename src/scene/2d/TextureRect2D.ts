@@ -24,8 +24,8 @@ export class TextureRect2D<T extends Texture2D = Texture2D> extends Element2D {
       const { width, height } = this.size
       this.context.fillStyle = this.texture
       this.context.textureTransform = new Transform2D().scale(
-        width / this.texture.width,
-        height / this.texture.height,
+        1 / width,
+        1 / height,
       )
       super._drawContent()
     }

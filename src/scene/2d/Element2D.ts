@@ -28,9 +28,6 @@ export interface Element2DProperties extends BaseElement2DProperties {
   style: Partial<Element2DStyleProperties>
 }
 
-/**
- * Coordinate System Element 2D
- */
 @customNode('Element2D')
 export class Element2D extends BaseElement2D {
   protected declare _style: Element2DStyle

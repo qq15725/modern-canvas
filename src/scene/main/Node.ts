@@ -6,15 +6,14 @@ import type {
   InputEventKey,
   InputEventMap,
   Maskable,
-  WebGLRenderer,
-} from '../../core'
+  WebGLRenderer } from '../../core'
 import type { SceneTree } from './SceneTree'
 import type { Viewport } from './Viewport'
-import {
-  clamp,
+import { clamp,
   CoreObject,
   customNode,
-  customNodes, property,
+  customNodes,
+  property, protectedProperty,
 } from '../../core'
 
 export interface NodeEventMap extends CoreObjectEventMap, InputEventMap {
@@ -73,9 +72,8 @@ function getTagUid(tag: any): number {
 export class Node extends CoreObject {
   readonly declare tag: string
 
-  // @ts-expect-error tag
-  @property() name = `${this.tag}:${getTagUid(this.tag)}`
-  @property() mask?: Maskable
+  @protectedProperty() declare name: string
+  @property() declare mask?: Maskable
   @property({ default: 'inherit' }) declare processMode: ProcessMode
   @property({ default: 'inherit' }) declare renderMode: RenderMode
   @property({ default: 'default' }) declare internalMode: InternalMode
@@ -93,7 +91,10 @@ export class Node extends CoreObject {
     this._onProcess = this._onProcess.bind(this)
 
     this
-      .setProperties(properties)
+      .setProperties({
+        name: `${this.tag}:${getTagUid(this.tag)}`,
+        ...properties,
+      })
       .append(nodes)
 
     this.on('treeEnter', this._onTreeEnter)
@@ -499,7 +500,7 @@ export class Node extends CoreObject {
 
   clone(): this {
     return new (this.constructor as any)(
-      this.toJSON(),
+      this.toJSON().props,
       this.getChildren(true),
     )
   }
@@ -507,7 +508,11 @@ export class Node extends CoreObject {
   override toJSON(): Record<string, any> {
     return {
       tag: this.tag,
-      props: super.toJSON(),
+      props: {
+        name: this.name,
+        ...super.toJSON(),
+      },
+      meta: Object.fromEntries(this._meta.entries()),
       children: this.getChildren().map(child => child.toJSON()),
     }
   }
