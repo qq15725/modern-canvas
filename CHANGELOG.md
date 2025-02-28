@@ -1,3 +1,24 @@
+# [0.4.0](https://github.com/qq15725/modern-canvas/compare/v0.3.3...v0.4.0) (2025-02-28)
+
+
+### Bug Fixes
+
+* render order ([d3b0562](https://github.com/qq15725/modern-canvas/commit/d3b0562ab5bedaaf634621dca7044ec714b8658e))
+* typo ([18bec62](https://github.com/qq15725/modern-canvas/commit/18bec626c4217c469a730732f5d04ee1950628d0))
+
+
+### Features
+
+* add CSElement2D、FBElement2D、Element2D ([4d5a583](https://github.com/qq15725/modern-canvas/commit/4d5a583fa19d972eef0b54eb879d59948d855778))
+* Image2D srcRect ([c81d5fd](https://github.com/qq15725/modern-canvas/commit/c81d5fd4819faff70230e2b39a7852ad7ceffd96))
+* rename `destroy` to `free` ([cce791c](https://github.com/qq15725/modern-canvas/commit/cce791c3814db5ce206386767b3982fbb4c4d816))
+* rename FlexboxLayout to FlexLayout ([6fa77f1](https://github.com/qq15725/modern-canvas/commit/6fa77f1898319246f44544286ac412ae49399cbe))
+* srcRect ([5a551b6](https://github.com/qq15725/modern-canvas/commit/5a551b65d27b479f94b988467df1c4f03a2eb2be))
+* up deps ([11b7918](https://github.com/qq15725/modern-canvas/commit/11b791801d605d9d2f63ddf7e28fad23f7f0064b))
+* update ([1686edf](https://github.com/qq15725/modern-canvas/commit/1686edf1f3dd13d68cd4d7e26b7589c79bd15f45))
+
+
+
 ## [0.3.3](https://github.com/qq15725/modern-canvas/compare/v0.3.2...v0.3.3) (2025-01-21)
 
 
