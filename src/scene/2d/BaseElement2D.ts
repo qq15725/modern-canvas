@@ -153,7 +153,7 @@ export class BaseElement2D extends Node2D implements Rectangulable {
         // TODO
       }
       else {
-        this.appendChild(new ShadowEffect(), 'back')
+        this.appendChild(new ShadowEffect({ name: nodePath }), 'back')
       }
     }
     else {
@@ -173,7 +173,7 @@ export class BaseElement2D extends Node2D implements Rectangulable {
         node.src = maskImage
       }
       else {
-        this.appendChild(new MaskEffect({ src: maskImage }), 'back')
+        this.appendChild(new MaskEffect({ name: nodePath, src: maskImage }), 'back')
       }
     }
     else {
@@ -220,13 +220,34 @@ export class BaseElement2D extends Node2D implements Rectangulable {
   }
 
   getRect(): Rect2 {
-    const [a, c, tx, b, d, ty] = this.transform.toArray()
-    const { width, height } = this.size
+    const { width: w, height: h } = this.size
+    const x1 = 0
+    const y1 = 0
+    const x2 = x1 + w
+    const y2 = y1 + h
+    const [a, c, tx, b, d, ty] = this.globalTransform.toArray()
+    const points = [
+      [x1, y1],
+      [x1, y2],
+      [x2, y1],
+      [x2, y2],
+    ].map((p) => {
+      return [
+        (a * p[0]) + (c * p[1]) + tx,
+        (b * p[0]) + (d * p[1]) + ty,
+      ]
+    })
+    const xx = points.map(p => p[0])
+    const yy = points.map(p => p[1])
+    const minX = Math.min(...xx)
+    const maxX = Math.max(...xx)
+    const minY = Math.min(...yy)
+    const maxY = Math.max(...yy)
     return new Rect2(
-      tx,
-      ty,
-      (a * width) + (c * height),
-      (b * width) + (d * height),
+      minX,
+      minY,
+      maxX - minX,
+      maxY - minY,
     )
   }
 

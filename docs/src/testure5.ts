@@ -26,6 +26,15 @@ async function init(): Promise<void> {
     }, [
       new Image2D({
         style: {
+          left: 0,
+          top: 0,
+          width: 100,
+          height: 100,
+        },
+        src: '/example.jpg',
+      }),
+      new Image2D({
+        style: {
           left: 100,
           top: 0,
           width: 100,
@@ -39,10 +48,43 @@ async function init(): Promise<void> {
       }),
       new Image2D({
         style: {
-          left: 0,
+          left: 200,
           top: 0,
           width: 100,
           height: 100,
+        },
+        src: '/example.jpg',
+      }),
+      new Image2D({
+        style: {
+          left: 200,
+          top: 0,
+          width: 100,
+          height: 100,
+          rotate: 30,
+        },
+        src: '/example.jpg',
+      }),
+      new Image2D({
+        style: {
+          left: 200,
+          top: 0,
+          width: 100,
+          height: 100,
+          rotate: 30,
+          scaleX: 0.5,
+          scaleY: 0.5,
+        },
+        src: '/example.jpg',
+      }),
+      new Image2D({
+        style: {
+          left: 300,
+          top: 0,
+          width: 100,
+          height: 100,
+          rotate: 30,
+          maskImage: '/mask1.png',
         },
         src: '/example.jpg',
       }),
