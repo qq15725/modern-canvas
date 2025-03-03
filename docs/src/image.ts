@@ -41,7 +41,9 @@ function createTestcase(style: Partial<Element2DStyleProperties> = {}): any {
       src: '/example.jpg',
       srcRect: {
         left: 0.5,
-        right: -0.5,
+        right: 0.5,
+        top: 0.5,
+        bottom: 0.5,
       },
     }),
 

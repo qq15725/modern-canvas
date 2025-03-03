@@ -138,11 +138,15 @@ export class Image2D extends Element2D {
       const { left = 0, top = 0, right = 0, bottom = 0 } = this.srcRect ?? {}
       const { width, height } = this.size
       this.context.fillStyle = texture
-      const sx = 1 / ((1 - left + -right) * width)
-      const sy = 1 / ((1 - top + -bottom) * height)
+      const w = Math.abs(1 + (left + right)) * width
+      const h = Math.abs(1 + (top + bottom)) * height
+      const sx = 1 / w
+      const sy = 1 / h
+      const tx = (left * width) * sx
+      const ty = (top * height) * sy
       this.context.textureTransform = new Transform2D()
         .scale(sx, sy)
-        .translate((left * width) * sx, (top * height) * sy)
+        .translate(tx, ty)
       super._drawContent()
     }
   }
