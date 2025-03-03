@@ -90,6 +90,14 @@ async function init(): Promise<void> {
         top: 200,
       },
     }, [
+      ...createTestcase({ opacity: 0.5 }),
+    ]),
+
+    new Element2D({
+      style: {
+        top: 300,
+      },
+    }, [
       ...createTestcase({ rotate: 60 }),
     ]),
   ])
