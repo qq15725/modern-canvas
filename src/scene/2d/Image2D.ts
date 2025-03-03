@@ -148,7 +148,7 @@ export class Image2D extends Element2D {
   }
 
   protected _repaint(batchables: CanvasBatchable[]): CanvasBatchable[] {
-    return batchables.map((batchable) => {
+    return super._repaint(batchables).map((batchable) => {
       return {
         ...batchable,
         disableWrapMode: true,
