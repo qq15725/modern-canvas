@@ -1,3 +1,12 @@
+## [0.4.2](https://github.com/qq15725/modern-canvas/compare/v0.4.1...v0.4.2) (2025-03-03)
+
+
+### Bug Fixes
+
+* Image2D style.filter ([feead93](https://github.com/qq15725/modern-canvas/commit/feead936d8ce0b1c2b31c965134465be5caac04c))
+
+
+
 ## [0.4.1](https://github.com/qq15725/modern-canvas/compare/v0.4.0...v0.4.1) (2025-03-03)
 
 
