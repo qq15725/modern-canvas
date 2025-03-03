@@ -1,3 +1,4 @@
+import type { Node2D } from '../2d'
 import type { PropertyDeclaration, WebGLRenderer } from '../../core'
 import type { EffectContext, EffectProperties, Node, Viewport } from '../main'
 import type { Texture2D } from '../resources'
@@ -51,6 +52,7 @@ export class MaskEffect extends Effect {
           sampler: 0,
           mask: 1,
           area: context.targetArea,
+          rotation: (context.target as Node2D)?.globalRotation,
         })
         renderer.texture.unbind(1)
       })
@@ -70,6 +72,20 @@ void main() {
 uniform sampler2D sampler;
 uniform sampler2D mask;
 uniform float area[4];
+uniform float rotation;
+
+vec2 rotateUV(vec2 uv, float angle) {
+    uv -= 0.5;
+    float cosAngle = cos(angle);
+    float sinAngle = sin(angle);
+    mat2 rotationMatrix = mat2(
+        cosAngle, -sinAngle,
+        sinAngle,  cosAngle
+    );
+    uv = rotationMatrix * uv;
+    uv += 0.5;
+    return uv;
+}
 
 void main(void) {
   if (
@@ -83,7 +99,7 @@ void main(void) {
       (vUv.x - area[0]) / area[2],
       ((1.0 - vUv.y) - area[1]) / area[3]
     );
-    vec4 maskColor = texture2D(mask, uv);
+    vec4 maskColor = texture2D(mask, rotateUV(uv, rotation));
     gl_FragColor = mix(vec4(0.), color, maskColor.a);
   } else {
     gl_FragColor = vec4(0.);
