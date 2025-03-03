@@ -1,3 +1,13 @@
+## [0.4.3](https://github.com/qq15725/modern-canvas/compare/v0.4.2...v0.4.3) (2025-03-03)
+
+
+### Bug Fixes
+
+* mask rotation ([9cb7788](https://github.com/qq15725/modern-canvas/commit/9cb77887ea83dc1a7d202c7f94d966ec689fc57a))
+* mask rotation ([22af922](https://github.com/qq15725/modern-canvas/commit/22af9222550c0dd93562c45221229e7fba3419fe))
+
+
+
 ## [0.4.2](https://github.com/qq15725/modern-canvas/compare/v0.4.1...v0.4.2) (2025-03-03)
 
 
