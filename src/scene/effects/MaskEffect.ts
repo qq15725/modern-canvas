@@ -52,7 +52,7 @@ export class MaskEffect extends Effect {
           sampler: 0,
           mask: 1,
           area: context.targetArea,
-          rotation: (context.target as Node2D)?.globalRotation,
+          rotation: (context.target as Node2D)?.globalRotation ?? 0,
         })
         renderer.texture.unbind(1)
       })
