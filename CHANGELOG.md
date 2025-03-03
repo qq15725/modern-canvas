@@ -1,3 +1,12 @@
+## [0.4.4](https://github.com/qq15725/modern-canvas/compare/v0.4.3...v0.4.4) (2025-03-03)
+
+
+### Bug Fixes
+
+* srcRect ([c151bca](https://github.com/qq15725/modern-canvas/commit/c151bca35d1145a51a1759db630c8c9a692d7bbe))
+
+
+
 ## [0.4.3](https://github.com/qq15725/modern-canvas/compare/v0.4.2...v0.4.3) (2025-03-03)
 
 
