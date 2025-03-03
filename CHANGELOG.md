@@ -1,3 +1,12 @@
+## [0.4.1](https://github.com/qq15725/modern-canvas/compare/v0.4.0...v0.4.1) (2025-03-03)
+
+
+### Bug Fixes
+
+* getRect ([08fecb3](https://github.com/qq15725/modern-canvas/commit/08fecb30050d8e2a3c0b982b7cf783b3da40ddf5))
+
+
+
 # [0.4.0](https://github.com/qq15725/modern-canvas/compare/v0.3.3...v0.4.0) (2025-02-28)
 
 
