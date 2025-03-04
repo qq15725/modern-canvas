@@ -1,3 +1,17 @@
+## [0.4.6](https://github.com/qq15725/modern-canvas/compare/v0.4.5...v0.4.6) (2025-03-04)
+
+
+### Bug Fixes
+
+* timeline ([5df06f4](https://github.com/qq15725/modern-canvas/commit/5df06f431302adef6b6fe38f9717d2aa9141ad10))
+
+
+### Features
+
+* add onBeforeRender by RenderOptions ([91f1f7e](https://github.com/qq15725/modern-canvas/commit/91f1f7e5665197038db15b181ea5bbc1d7d0189f))
+
+
+
 ## [0.4.5](https://github.com/qq15725/modern-canvas/compare/v0.4.4...v0.4.5) (2025-03-04)
 
 
