@@ -1,3 +1,12 @@
+## [0.4.5](https://github.com/qq15725/modern-canvas/compare/v0.4.4...v0.4.5) (2025-03-04)
+
+
+### Bug Fixes
+
+* waitUntilLoad ([80a9cf9](https://github.com/qq15725/modern-canvas/commit/80a9cf9511353c1ff745e3571c0d6a6890849fda))
+
+
+
 ## [0.4.4](https://github.com/qq15725/modern-canvas/compare/v0.4.3...v0.4.4) (2025-03-03)
 
 
