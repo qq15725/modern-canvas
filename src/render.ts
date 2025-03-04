@@ -9,6 +9,7 @@ export interface RenderOptions {
   data: Record<string, any> | Node | (Node | Record<string, any>)[]
   width: number
   height: number
+  onBeforeRender?: (engine: Engine) => void | Promise<void>
 }
 
 async function startRenderLoop(sleep = 100): Promise<void> {
@@ -44,6 +45,7 @@ async function performRender(options: RenderOptions): Promise<HTMLCanvasElement>
     }
   })
   await engine.waitUntilLoad()
+  await options.onBeforeRender?.(engine)
   return engine.toCanvas2D()
 }
 

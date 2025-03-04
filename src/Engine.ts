@@ -204,18 +204,18 @@ export class Engine extends SceneTree {
 
   toCanvas2D(): HTMLCanvasElement {
     const imageData = this.toImageData()
-    const canvas0 = document.createElement('canvas')
-    canvas0.width = imageData.width
-    canvas0.height = imageData.height
-    canvas0.getContext('2d')?.putImageData(imageData, 0, 0)
-    const canvas = document.createElement('canvas')
-    canvas.width = this.width
-    canvas.height = this.height
-    canvas.getContext('2d')?.drawImage(
-      canvas0,
-      0, 0, canvas0.width, canvas0.height,
-      0, 0, canvas.width, canvas.height,
+    const canvas1 = document.createElement('canvas')
+    canvas1.width = imageData.width
+    canvas1.height = imageData.height
+    canvas1.getContext('2d')?.putImageData(imageData, 0, 0)
+    const canvas2 = document.createElement('canvas')
+    canvas2.width = this.width
+    canvas2.height = this.height
+    canvas2.getContext('2d')?.drawImage(
+      canvas1,
+      0, 0, canvas1.width, canvas1.height,
+      0, 0, canvas2.width, canvas2.height,
     )
-    return canvas
+    return canvas2
   }
 }
