@@ -100,12 +100,20 @@ async function init(): Promise<void> {
         top: 300,
       },
     }, [
-      ...createTestcase({ rotate: 60 }),
+      ...createTestcase({ rotate: 4 }),
     ]),
 
     new Element2D({
       style: {
         top: 400,
+      },
+    }, [
+      ...createTestcase({ rotate: 60 }),
+    ]),
+
+    new Element2D({
+      style: {
+        top: 500,
       },
     }, [
       ...createTestcase({ rotate: 60, scaleX: 0.5, scaleY: 0.5 }),

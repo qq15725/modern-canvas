@@ -171,8 +171,9 @@ export class Engine extends SceneTree {
     return nextTick()
   }
 
-  waitUntilLoad(): Promise<void> {
-    return assets.waitUntilLoad()
+  async waitUntilLoad(): Promise<void> {
+    await assets.waitUntilLoad()
+    await this.nextTick()
   }
 
   render(delta = 0): this {
