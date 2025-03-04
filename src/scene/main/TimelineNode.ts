@@ -1,13 +1,12 @@
 import type {
   EventListenerOptions,
-  EventListenerValue,
-} from '../../core'
+  EventListenerValue } from '../../core'
 import type { NodeEventMap, NodeProperties } from './Node'
 import type { Timeline } from './Timeline'
-import {
-  clamp,
+import { clamp,
   customNode,
   property,
+  protectedProperty,
 } from '../../core'
 import { Node } from './Node'
 
@@ -37,6 +36,7 @@ export class TimelineNode extends Node {
   @property({ default: 0 }) declare delay: number
   @property({ default: 0 }) declare duration: number
   @property({ default: false }) declare paused: boolean
+  @protectedProperty() declare insideTimeRange: boolean
 
   constructor(properties?: Partial<TimelineNodeProperties>, nodes: Node[] = []) {
     super()
@@ -81,6 +81,7 @@ export class TimelineNode extends Node {
         : this.duration
       this._currentTime = this.timelineCurrentTime - this._startTime
       this.emit('updateCurrentTime', this._currentTime)
+      this.insideTimeRange = this.isInsideTimeRange()
     }
   }
 

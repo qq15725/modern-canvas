@@ -84,6 +84,7 @@ export class CanvasItem extends TimelineNode {
         this._updateGlobalOpacity()
         break
       case 'visible':
+      case 'insideTimeRange':
         this._updateGlobalVisible()
         break
     }
@@ -122,7 +123,9 @@ export class CanvasItem extends TimelineNode {
 
   protected _updateGlobalVisible(): void {
     this._parentGlobalVisible = this.getParent<CanvasItem>()?.globalVisible
-    this._globalVisible = this.visible && (this._parentGlobalVisible ?? true)
+    this._globalVisible = (this._parentGlobalVisible ?? true)
+      && this.visible
+      && this.insideTimeRange
   }
 
   protected _updateGlobalOpacity(): void {
