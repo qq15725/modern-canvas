@@ -38,7 +38,6 @@ async function init(): Promise<void> {
     }, [
       new Animation({
         loop: true,
-        delay: 2000,
         keyframes: [
           { opacity: 0, rotate: 180 },
         ],
@@ -121,8 +120,11 @@ async function init(): Promise<void> {
       },
       src: '/example.mp4',
     }),
-    new LeftEraseTransition(),
+    new LeftEraseTransition({
+      delay: 2000,
+    }),
     new Image2D({
+      delay: 2000,
       style: {
         left: 200,
         top: 50,
