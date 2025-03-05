@@ -1,3 +1,14 @@
+## [0.4.9](https://github.com/qq15725/modern-canvas/compare/v0.4.8...v0.4.9) (2025-03-05)
+
+
+### Features
+
+* add time to RenderOptions ([41a19ae](https://github.com/qq15725/modern-canvas/commit/41a19ae237bed5a34dd56fcd15fb12a1cb0e85c3))
+* add waitAndRender to engine ([d4708e2](https://github.com/qq15725/modern-canvas/commit/d4708e24571c4b26aa9cbff22984626093089368))
+* rename SceneTree paused to processPaused ([493fce2](https://github.com/qq15725/modern-canvas/commit/493fce2a0df9ce3a50daed2c7d322399f2a974c9))
+
+
+
 ## [0.4.8](https://github.com/qq15725/modern-canvas/compare/v0.4.7...v0.4.8) (2025-03-05)
 
 
