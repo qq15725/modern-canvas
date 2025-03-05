@@ -1,19 +1,24 @@
 import { Engine } from './Engine'
 import { Node } from './scene'
 
-let engine: Engine | undefined
-let renderLoop: Promise<void> | undefined
-const queue: (() => Promise<void>)[] = []
-
 export interface RenderOptions {
   data: Record<string, any> | Node | (Node | Record<string, any>)[]
   width: number
   height: number
+  time?: number
   onBeforeRender?: (engine: Engine) => void | Promise<void>
 }
 
-async function startRenderLoop(sleep = 100): Promise<void> {
-  while (true) {
+let engine: Engine | undefined
+const queue: (() => Promise<void>)[] = []
+let starting = false
+
+async function start(sleep = 100): Promise<void> {
+  if (starting) {
+    return
+  }
+  starting = true
+  while (queue.length) {
     const cb = queue.shift()
     if (cb) {
       try {
@@ -27,21 +32,22 @@ async function startRenderLoop(sleep = 100): Promise<void> {
       await new Promise(r => setTimeout(r, sleep))
     }
   }
+  starting = false
 }
 
 async function performRender(options: RenderOptions): Promise<HTMLCanvasElement> {
-  engine ??= new Engine({ width: 1, height: 1 })
-  const root = engine.root
-  root.removeChildren()
+  const { data, width, height, time = 0 } = options
 
-  const { data, width, height } = options
+  engine ??= new Engine({ width: 1, height: 1 })
+  engine.root.removeChildren()
+  engine.timeline.currentTime = time
   engine.resize(width, height)
   ;(Array.isArray(data) ? data : [data]).forEach((v) => {
     if (v instanceof Node) {
-      root.appendChild(v)
+      engine!.root.appendChild(v)
     }
     else {
-      root.appendChild(Node.parse(v) as unknown as Node)
+      engine!.root.appendChild(Node.parse(v) as unknown as Node)
     }
   })
   await engine.waitUntilLoad()
@@ -50,7 +56,7 @@ async function performRender(options: RenderOptions): Promise<HTMLCanvasElement>
 }
 
 export async function render(options: RenderOptions): Promise<HTMLCanvasElement> {
-  renderLoop ??= startRenderLoop()
+  start()
   return new Promise((r) => {
     queue.push(async () => r(await performRender(options)))
   })

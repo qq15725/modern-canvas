@@ -10,36 +10,21 @@ async function init(): Promise<void> {
         {
           tag: 'Image2D',
           props: {
-            style: {
-              left: 0,
-              top: 0,
-              width: 100,
-              height: 100,
-            },
+            style: { left: 0, top: 0, width: 100, height: 100 },
             src: '/example.jpg',
           },
         },
         {
           tag: 'Image2D',
           props: {
-            style: {
-              left: 100,
-              top: 100,
-              width: 100,
-              height: 100,
-            },
+            style: { left: 100, top: 100, width: 100, height: 100 },
             src: '/example.jpg',
           },
         },
         {
           tag: 'Text2D',
           props: {
-            style: {
-              left: 200,
-              top: 200,
-              width: 100,
-              height: 100,
-            },
+            style: { left: 200, top: 200, width: 100, height: 100 },
             content: '/example.jpg',
           },
         },
