@@ -202,9 +202,9 @@ export class Node extends CoreObject {
       case 'inherit':
         return this._parent?.canProcess() ?? true
       case 'pausable':
-        return !this._tree.paused
+        return !this._tree.processPaused
       case 'when_paused':
-        return this._tree.paused
+        return this._tree.processPaused
       case 'always':
         return true
       case 'disabled':
