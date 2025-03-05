@@ -71,7 +71,7 @@ export class SceneTree extends MainLoop {
   }
 
   protected _process(delta = 0): void {
-    this.timeline.addTime(delta)
+    this.timeline.emit('process', delta)
     this.emit('processing')
     this.root.emit('process', delta)
     this.emit('processed')
