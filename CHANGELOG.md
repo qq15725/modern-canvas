@@ -1,3 +1,12 @@
+## [0.4.8](https://github.com/qq15725/modern-canvas/compare/v0.4.7...v0.4.8) (2025-03-05)
+
+
+### Features
+
+* add append prepend before after insertBefore method to Node ([6c0c2f0](https://github.com/qq15725/modern-canvas/commit/6c0c2f00ed54a73d90fc07315c35711488d56ddb))
+
+
+
 ## [0.4.7](https://github.com/qq15725/modern-canvas/compare/v0.4.6...v0.4.7) (2025-03-05)
 
 
