@@ -164,6 +164,17 @@ export class CanvasItem extends TimelineNode {
     })
   }
 
+  protected override _process(delta: number): void {
+    super._process(delta)
+    const parent = this.getParent<CanvasItem>()
+    if (this._parentGlobalVisible !== parent?.globalVisible) {
+      this.requestUpdate()
+    }
+    if (this._parentGlobalOpacity !== parent?.globalOpacity) {
+      this.requestUpdate()
+    }
+  }
+
   protected override _update(): void {
     const parent = this.getParent<CanvasItem>()
 

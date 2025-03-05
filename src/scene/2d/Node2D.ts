@@ -86,10 +86,10 @@ export class Node2D extends CanvasItem {
   }
 
   protected override _process(delta: number): void {
+    super._process(delta)
     const parent = this.getParent<Node2D>()
     if (this._parentTransformDirtyId !== parent?.globalTransform?.dirtyId) {
       this.requestRelayout()
     }
-    super._process(delta)
   }
 }

@@ -354,8 +354,23 @@ export class Node extends CoreObject {
     return this
   }
 
-  append(nodes: Node[]): void
-  append(...nodes: Node[]): void
+  prepend<T extends Node>(nodes: T[]): void
+  prepend<T extends Node>(...nodes: T[]): void
+  prepend(...nodes: any[]): void {
+    let _nodes
+    if (Array.isArray(nodes[0])) {
+      _nodes = nodes[0]
+    }
+    else {
+      _nodes = nodes
+    }
+    _nodes.forEach((node) => {
+      this.moveChild(node, 0)
+    })
+  }
+
+  append<T extends Node>(nodes: T[]): void
+  append<T extends Node>(...nodes: T[]): void
   append(...nodes: any[]): void {
     let _nodes
     if (Array.isArray(nodes[0])) {
@@ -367,6 +382,44 @@ export class Node extends CoreObject {
     _nodes.forEach((node) => {
       this.appendChild(node)
     })
+  }
+
+  before<T extends Node>(nodes: T[]): void
+  before<T extends Node>(...nodes: T[]): void
+  before(...nodes: any[]): void {
+    let _nodes
+    if (Array.isArray(nodes[0])) {
+      _nodes = nodes[0]
+    }
+    else {
+      _nodes = nodes
+    }
+    _nodes.forEach((node) => {
+      this._parent?.moveChild(node, this.getIndex(true))
+    })
+  }
+
+  after<T extends Node>(nodes: T[]): void
+  after<T extends Node>(...nodes: T[]): void
+  after(...nodes: any[]): void {
+    let _nodes
+    if (Array.isArray(nodes[0])) {
+      _nodes = nodes[0]
+    }
+    else {
+      _nodes = nodes
+    }
+    _nodes.forEach((node) => {
+      this._parent?.moveChild(node, this.getIndex(true) + 1)
+    })
+  }
+
+  insertBefore<T extends Node>(node: T, child: Node): T {
+    if (!child.hasParent() || !this.is(child.parent)) {
+      return node
+    }
+    this.moveChild(node, child.getIndex(true))
+    return node
   }
 
   appendChild<T extends Node>(node: T, internalMode = node.internalMode): T {
