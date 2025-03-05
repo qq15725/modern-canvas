@@ -35,7 +35,7 @@ async function start(sleep = 100): Promise<void> {
   starting = false
 }
 
-async function performRender(options: RenderOptions): Promise<HTMLCanvasElement> {
+async function task(options: RenderOptions): Promise<HTMLCanvasElement> {
   const { data, width, height, time = 0 } = options
 
   engine ??= new Engine({ width: 1, height: 1 })
@@ -50,14 +50,14 @@ async function performRender(options: RenderOptions): Promise<HTMLCanvasElement>
       engine!.root.appendChild(Node.parse(v) as unknown as Node)
     }
   })
-  await engine.waitUntilLoad()
   await options.onBeforeRender?.(engine)
+  await engine.waitAndRender()
   return engine.toCanvas2D()
 }
 
 export async function render(options: RenderOptions): Promise<HTMLCanvasElement> {
-  start()
   return new Promise((r) => {
-    queue.push(async () => r(await performRender(options)))
+    queue.push(async () => r(await task(options)))
+    start()
   })
 }

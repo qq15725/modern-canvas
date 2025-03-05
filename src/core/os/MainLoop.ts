@@ -33,22 +33,20 @@ export class MainLoop extends CoreObject {
     this._onNextTick = this._onNextTick.bind(this)
   }
 
-  start(process: (delta: number) => void): this {
+  start(process: (delta: number) => void): void {
     if (!this._starting) {
       this._starting = true
       this.off('process')
       this.on('process', process)
       Ticker.on(this._onNextTick, { sort: 0 })
     }
-    return this
   }
 
-  stop(): this {
+  stop(): void {
     if (this._starting) {
       this._starting = false
       Ticker.off(this._onNextTick, { sort: 0 })
     }
-    return this
   }
 
   protected _onNextTick(): void {

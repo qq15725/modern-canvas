@@ -180,14 +180,22 @@ export class Engine extends SceneTree {
     await this.nextTick()
   }
 
-  render(delta = 0): this {
-    return this._render(this.renderer, delta)
+  async waitAndRender(delta = 0): Promise<void> {
+    this._process(delta)
+    await this.waitUntilLoad()
+    this._render(this.renderer)
   }
 
-  override start(): this {
-    this.render()
-    return super.start((delta) => {
-      this.render(delta)
+  render(delta = 0): void {
+    this._process(delta)
+    this._render(this.renderer)
+  }
+
+  override async start(): Promise<void> {
+    await this.waitAndRender()
+    super.start((delta) => {
+      this._process(delta)
+      this._render(this.renderer)
     })
   }
 
@@ -198,7 +206,6 @@ export class Engine extends SceneTree {
   }
 
   toPixels(): Uint8ClampedArray {
-    this.render()
     return this.renderer.toPixels()
   }
 

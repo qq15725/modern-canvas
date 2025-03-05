@@ -3,7 +3,9 @@ import type {
   EventListenerOptions,
   EventListenerValue,
   MainLoopEventMap,
-  PropertyDeclaration, WebGLRenderer } from '../../core'
+  PropertyDeclaration,
+  WebGLRenderer,
+} from '../../core'
 import type { Node } from './Node'
 import { Color, Input, MainLoop, property, protectedProperty,
 } from '../../core'
@@ -68,15 +70,17 @@ export class SceneTree extends MainLoop {
     }
   }
 
-  protected _render(renderer: WebGLRenderer, delta = 0): this {
+  protected _process(delta = 0): void {
     this.timeline.addTime(delta)
     this.emit('processing')
     this.root.emit('process', delta)
     this.emit('processed')
+  }
+
+  protected _render(renderer: WebGLRenderer): void {
     renderer.program.uniforms.projectionMatrix = this.root.toProjectionArray(true)
     this.renderStack.render(renderer)
     this._renderScreen(renderer)
-    return this
   }
 
   protected _renderScreen(renderer: WebGLRenderer): void {
