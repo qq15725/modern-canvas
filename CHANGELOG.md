@@ -1,3 +1,13 @@
+## [0.4.7](https://github.com/qq15725/modern-canvas/compare/v0.4.6...v0.4.7) (2025-03-05)
+
+
+### Bug Fixes
+
+* relayout ([1e97102](https://github.com/qq15725/modern-canvas/commit/1e97102c9a3c67d413ce3e34ca861728e37ca682))
+* repaint ([2521c02](https://github.com/qq15725/modern-canvas/commit/2521c0206c85f5201dab7808d51ac66796d9ba7f))
+
+
+
 ## [0.4.6](https://github.com/qq15725/modern-canvas/compare/v0.4.5...v0.4.6) (2025-03-04)
 
 
