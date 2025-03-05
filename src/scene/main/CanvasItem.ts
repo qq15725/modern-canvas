@@ -138,9 +138,19 @@ export class CanvasItem extends TimelineNode {
     }
   }
 
+  protected _draw(): void {
+    this.emit('draw')
+  }
+
+  protected _redraw(): CanvasBatchable[] {
+    this._tree?.log(this.name, 'redrawing')
+    this._draw()
+    return this.context.toBatchables()
+  }
+
   protected _relayout(batchables: CanvasBatchable[]): CanvasBatchable[] {
     this._tree?.log(this.name, 'relayouting')
-    return this._repaint(batchables)
+    return batchables
   }
 
   protected _repaint(batchables: CanvasBatchable[]): CanvasBatchable[] {
@@ -152,10 +162,6 @@ export class CanvasItem extends TimelineNode {
         blendMode: this.blendMode,
       }
     })
-  }
-
-  protected _draw(): void {
-    this._tree?.log(this.name, 'redrawing')
   }
 
   protected override _update(): void {
@@ -175,20 +181,16 @@ export class CanvasItem extends TimelineNode {
 
     let batchables: CanvasBatchable[] | undefined
     if (redrawing) {
-      this.emit('draw')
-      this._draw()
-      this._originalBatchables = this.context.toBatchables()
+      this._originalBatchables = this._redraw()
       relayouting = true
     }
 
     if (relayouting) {
-      if (this._originalBatchables.length) {
-        this._layoutedBatchables = this._relayout(this._originalBatchables)
-      }
+      this._layoutedBatchables = this._relayout(this._originalBatchables)
       repainting = true
     }
 
-    if (repainting && this._layoutedBatchables.length) {
+    if (repainting) {
       batchables = this._repaint(this._layoutedBatchables)
     }
 

@@ -116,7 +116,7 @@ void main(void) {
   protected _texture: Texture2D
   protected _sizes: Float32Array
   protected _offsets: Float32Array
-  protected _redraw = false
+  protected _needsRedraw = false
 
   @property() slices = 10
   @property() sampleSize = 512
@@ -159,8 +159,8 @@ void main(void) {
   }
 
   override apply(renderer: WebGLRenderer, source: Viewport): void {
-    if (!this._redraw) {
-      this._redraw = true
+    if (!this._needsRedraw) {
+      this._needsRedraw = true
       this.redraw()
     }
 

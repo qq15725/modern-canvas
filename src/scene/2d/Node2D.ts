@@ -77,14 +77,12 @@ export class Node2D extends CanvasItem {
   protected override _relayout(batchables: CanvasBatchable[]): CanvasBatchable[] {
     this._updateTransform()
     this._updateGlobalTransform()
-    return super._relayout(
-      batchables.map((batchable) => {
-        return {
-          ...batchable,
-          vertices: this._transformVertices(batchable.vertices),
-        }
-      }),
-    )
+    return super._relayout(batchables).map((batchable) => {
+      return {
+        ...batchable,
+        vertices: this._transformVertices(batchable.vertices),
+      }
+    })
   }
 
   protected override _process(delta: number): void {
