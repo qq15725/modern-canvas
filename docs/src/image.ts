@@ -7,6 +7,7 @@ import {
 } from '../../src'
 
 const engine = new Engine({
+  debug: true,
   autoStart: true,
   autoResize: true,
   backgroundColor: '#F6F7F9',
@@ -82,6 +83,8 @@ async function init(): Promise<void> {
     new Element2D({
       style: {
         top: 100,
+        width: 1000,
+        height: 100,
       },
     }, [
       ...createTestcase(),

@@ -139,25 +139,23 @@ export class CanvasItem extends TimelineNode {
   }
 
   protected _relayout(batchables: CanvasBatchable[]): CanvasBatchable[] {
+    this._tree?.log(this.name, 'relayouting')
     return this._repaint(batchables)
   }
 
   protected _repaint(batchables: CanvasBatchable[]): CanvasBatchable[] {
-    // const colorMatrix = this.style.getComputedFilterColorMatrix()
+    this._tree?.log(this.name, 'repainting')
     return batchables.map((batchable) => {
       return {
         ...batchable,
         modulate: this._modulate.toArgb(this.globalOpacity, true),
-        // backgroundColor: this.style.getComputedBackgroundColor().abgr,
-        // colorMatrix: colorMatrix.toMatrix4().toArray(true),
-        // colorMatrixOffset: colorMatrix.toVector4().toArray(),
         blendMode: this.blendMode,
       }
     })
   }
 
   protected _draw(): void {
-    //
+    this._tree?.log(this.name, 'redrawing')
   }
 
   protected override _update(): void {
@@ -171,22 +169,33 @@ export class CanvasItem extends TimelineNode {
       this._updateGlobalOpacity()
     }
 
+    const redrawing = this._redrawing
+    let relayouting = this._relayouting
+    let repainting = this._repainting
+
     let batchables: CanvasBatchable[] | undefined
-    if (this._redrawing) {
+    if (redrawing) {
       this.emit('draw')
       this._draw()
       this._originalBatchables = this.context.toBatchables()
-      batchables = this._relayout(this._originalBatchables)
+      relayouting = true
+    }
+
+    if (relayouting) {
+      if (this._originalBatchables.length) {
+        this._layoutedBatchables = this._relayout(this._originalBatchables)
+      }
+      repainting = true
+    }
+
+    if (repainting && this._layoutedBatchables.length) {
+      batchables = this._repaint(this._layoutedBatchables)
+    }
+
+    if (redrawing) {
       if (this._resetContext) {
         this.context.reset()
       }
-    }
-    else if (this._relayouting) {
-      this._layoutedBatchables = this._relayout(this._originalBatchables)
-      batchables = this._layoutedBatchables
-    }
-    else if (this._repainting) {
-      batchables = this._repaint(this._layoutedBatchables)
     }
 
     if (batchables) {

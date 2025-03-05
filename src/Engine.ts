@@ -16,6 +16,7 @@ import {
 import { SceneTree } from './scene'
 
 export interface EngineOptions extends WebGLContextAttributes {
+  debug?: boolean
   view?: HTMLCanvasElement | WebGLRenderingContext | WebGL2RenderingContext
   width?: number
   height?: number
@@ -85,6 +86,7 @@ export class Engine extends SceneTree {
 
   constructor(options: EngineOptions = {}) {
     const {
+      debug = false,
       view,
       width,
       height,
@@ -97,6 +99,8 @@ export class Engine extends SceneTree {
     } = options
 
     super(timeline)
+
+    this.debug = debug
 
     this.renderer = new WebGLRenderer(view, {
       ...defaultOptions,

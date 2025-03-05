@@ -5,7 +5,7 @@ import type {
   MainLoopEventMap,
   PropertyDeclaration, WebGLRenderer } from '../../core'
 import type { Node } from './Node'
-import { Color, Input, MainLoop, property,
+import { Color, Input, MainLoop, property, protectedProperty,
 } from '../../core'
 import { QuadUvGeometry } from '../resources'
 import { RenderStack } from './RenderStack'
@@ -33,6 +33,7 @@ export interface SceneTree {
 export class SceneTree extends MainLoop {
   @property({ default: false }) declare paused: boolean
   @property() declare backgroundColor?: ColorValue
+  @protectedProperty({ default: false }) declare debug: boolean
 
   readonly input = new Input()
   readonly renderStack = new RenderStack()
@@ -57,6 +58,13 @@ export class SceneTree extends MainLoop {
       case 'backgroundColor':
         this._backgroundColor.value = value
         break
+    }
+  }
+
+  log(...args: any[]): void {
+    if (this.debug) {
+      // eslint-disable-next-line no-console
+      console.log(`[modern-canvas]`, ...args)
     }
   }
 

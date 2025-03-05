@@ -267,6 +267,7 @@ export class BaseElement2D extends Node2D implements Rectangulable {
   }
 
   protected _draw(): void {
+    super._draw()
     this._drawBackground()
     this._drawContent()
     this._drawBorder()
@@ -331,14 +332,12 @@ export class BaseElement2D extends Node2D implements Rectangulable {
 
   protected _repaint(batchables: CanvasBatchable[]): CanvasBatchable[] {
     const colorMatrix = parseCSSFilter(this.style.filter)
-    return batchables.map((batchable) => {
+    return super._repaint(batchables).map((batchable) => {
       return {
         ...batchable,
         backgroundColor: this.style.getComputedBackgroundColor().abgr,
-        modulate: this._modulate.toArgb(this.globalOpacity, true),
         colorMatrix: colorMatrix.toMatrix4().toArray(true),
         colorMatrixOffset: colorMatrix.toVector4().toArray(),
-        blendMode: this.blendMode,
       }
     })
   }
