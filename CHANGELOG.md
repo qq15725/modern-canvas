@@ -1,3 +1,12 @@
+## [0.4.10](https://github.com/qq15725/modern-canvas/compare/v0.4.9...v0.4.10) (2025-03-05)
+
+
+### Bug Fixes
+
+* timeline ([6467ed9](https://github.com/qq15725/modern-canvas/commit/6467ed9e78371a41d4af0898f56456a16994f63e))
+
+
+
 ## [0.4.9](https://github.com/qq15725/modern-canvas/compare/v0.4.8...v0.4.9) (2025-03-05)
 
 
