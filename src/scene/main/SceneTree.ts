@@ -17,6 +17,8 @@ import { Viewport } from './Viewport'
 export interface SceneTreeEventMap extends MainLoopEventMap {
   processing: () => void
   processed: () => void
+  rendering: () => void
+  rendered: () => void
   nodeProcessing: (node: Node) => void
   nodeProcessed: (node: Node) => void
 }
@@ -78,9 +80,11 @@ export class SceneTree extends MainLoop {
   }
 
   protected _render(renderer: WebGLRenderer): void {
+    this.emit('rendering')
     renderer.program.uniforms.projectionMatrix = this.root.toProjectionArray(true)
     this.renderStack.render(renderer)
     this._renderScreen(renderer)
+    this.emit('rendered')
   }
 
   protected _renderScreen(renderer: WebGLRenderer): void {
