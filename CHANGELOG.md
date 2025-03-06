@@ -1,3 +1,12 @@
+## [0.4.11](https://github.com/qq15725/modern-canvas/compare/v0.4.10...v0.4.11) (2025-03-06)
+
+
+### Features
+
+* add rendering rendered event ([9421d1a](https://github.com/qq15725/modern-canvas/commit/9421d1a32e9ece81f884b2043de16a911ee63b6c))
+
+
+
 ## [0.4.10](https://github.com/qq15725/modern-canvas/compare/v0.4.9...v0.4.10) (2025-03-05)
 
 
