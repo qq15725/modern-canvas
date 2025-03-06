@@ -5,6 +5,7 @@ export interface RenderOptions {
   data: Record<string, any> | Node | (Node | Record<string, any>)[]
   width: number
   height: number
+  debug?: boolean
   time?: number
   onBeforeRender?: (engine: Engine) => void | Promise<void>
 }
@@ -36,12 +37,16 @@ async function start(sleep = 100): Promise<void> {
 }
 
 async function task(options: RenderOptions): Promise<HTMLCanvasElement> {
-  const { data, width, height, time = 0 } = options
-
-  engine ??= new Engine({ width: 1, height: 1 })
+  const { data, width, height, debug = false, time = 0 } = options
+  engine ??= new Engine({
+    width: 1,
+    height: 1,
+    preserveDrawingBuffer: true,
+  })
+  engine.debug = debug
   engine.root.removeChildren()
   engine.timeline.currentTime = time
-  engine.resize(width, height)
+  engine.resize(width, height, true)
   ;(Array.isArray(data) ? data : [data]).forEach((v) => {
     if (v instanceof Node) {
       engine!.root.appendChild(v)

@@ -6,7 +6,9 @@ import type {
   InputEventKey,
   InputEventMap,
   Maskable,
-  WebGLRenderer } from '../../core'
+  PropertyDeclaration,
+  WebGLRenderer,
+} from '../../core'
 import type { SceneTree } from './SceneTree'
 import type { Viewport } from './Viewport'
 import { clamp,
@@ -225,6 +227,16 @@ export class Node extends CoreObject {
       default:
         return false
     }
+  }
+
+  protected override _update(changed: Map<PropertyKey, any>): void {
+    this._tree?.log(this.name, 'updating')
+    super._update(changed)
+  }
+
+  protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+    this._tree?.log(this.name, `updating [${String(key)}]`)
+    super._updateProperty(key, value, oldValue, declaration)
   }
 
   protected _onTreeEnter(tree: SceneTree): void {

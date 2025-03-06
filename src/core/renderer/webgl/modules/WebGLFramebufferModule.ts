@@ -301,8 +301,8 @@ export class WebGLFramebufferModule extends WebGLModule {
       this._renderer.viewport.bind({
         x: 0,
         y: 0,
-        width: this._renderer.screen.width,
-        height: this._renderer.screen.height,
+        width: this._renderer.screen.width * this._renderer.pixelRatio,
+        height: this._renderer.screen.height * this._renderer.pixelRatio,
       })
     }
   }

@@ -129,8 +129,8 @@ export class Viewport extends Node implements Rectangulable {
     if (this.valid) {
       renderer.flush()
       this._tree?.setCurrentViewport(this)
-      renderer.framebuffer.bind(this._glFramebuffer(renderer))
       this.upload(renderer)
+      renderer.framebuffer.bind(this._glFramebuffer(renderer))
       return true
     }
     return false

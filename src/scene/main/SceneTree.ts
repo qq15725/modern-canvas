@@ -89,14 +89,12 @@ export class SceneTree extends MainLoop {
 
   protected _renderScreen(renderer: WebGLRenderer): void {
     renderer.state.reset()
-    const { pixelRatio } = renderer
-    const { width, height } = this.root
     renderer.framebuffer.bind(null)
     renderer.viewport.bind({
       x: 0,
       y: 0,
-      width: width * pixelRatio,
-      height: height * pixelRatio,
+      width: this.root.width * renderer.pixelRatio,
+      height: this.root.height * renderer.pixelRatio,
     })
     if (this.backgroundColor) {
       renderer.gl.clearColor(...this._backgroundColor.toArray())
