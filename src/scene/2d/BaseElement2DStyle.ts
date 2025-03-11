@@ -1,7 +1,7 @@
-import type { ElementStyleDeclaration, TextStyleDeclaration } from 'modern-idoc'
+import type { ElementStyleDeclaration, StyleDeclaration } from 'modern-idoc'
 import type { ColorValue, PropertyDeclaration } from '../../core'
 import type { Texture2D } from '../resources'
-import { getDefaultTextStyle, getDefaultTransformStyle } from 'modern-idoc'
+import { getDefaultStyle } from 'modern-idoc'
 import { assets } from '../../asset'
 import {
   Color,
@@ -9,16 +9,14 @@ import {
   Resource,
 } from '../../core'
 
-export interface BaseElement2DStyleProperties extends
-  TextStyleDeclaration,
-  Omit<ElementStyleDeclaration, 'left' | 'top' | 'width' | 'height' | 'backgroundColor' | 'borderColor'> {
+export interface BaseElement2DStyleProperties extends Omit<StyleDeclaration, 'left' | 'top' | 'width' | 'height' | 'backgroundColor' | 'borderColor' | 'outlineColor'> {
+  left: number
+  top: number
+  width: number
+  height: number
   backgroundColor: 'none' | ColorValue
-  maskImage: 'none' | string
   borderColor: 'none' | ColorValue
-  outlineWidth: number
-  outlineOffset: number
   outlineColor: 'none' | ColorValue
-  outlineStyle: string
 }
 
 export interface BaseElement2DStyle extends BaseElement2DStyleProperties {
@@ -50,39 +48,23 @@ export class BaseElement2DStyle extends Resource {
   }
 
   async loadBackgroundImage(): Promise<Texture2D<ImageBitmap> | undefined> {
-    if (this.backgroundImage !== 'none') {
+    if (this.backgroundImage && this.backgroundImage !== 'none') {
       return await assets.texture.load(this.backgroundImage)
     }
   }
 }
 
-const defaultStyles: Record<string, any> = {
-  ...getDefaultTransformStyle(),
-  ...getDefaultTextStyle(),
-  backgroundColor: 'none',
-  backgroundImage: 'none',
-  filter: 'none',
-  boxShadow: 'none',
-  maskImage: 'none',
-  opacity: 1,
-  borderWidth: 0,
-  borderRadius: 0,
-  borderColor: '#000000',
-  borderStyle: 'none',
-  outlineWidth: 0,
-  outlineOffset: 0,
-  outlineColor: '#000000',
-  outlineStyle: 'none',
-  visibility: 'visible',
-  overflow: 'visible',
-  pointerEvents: 'auto',
-}
+const defaultStyles: ElementStyleDeclaration = getDefaultStyle()
 
+// @ts-expect-error del
 delete defaultStyles.top
+// @ts-expect-error del
 delete defaultStyles.left
 delete defaultStyles.width
 delete defaultStyles.height
 
 for (const key in defaultStyles) {
-  defineProperty(BaseElement2DStyle, key, { default: defaultStyles[key] })
+  defineProperty(BaseElement2DStyle, key, {
+    default: defaultStyles[key as keyof typeof defaultStyles],
+  })
 }

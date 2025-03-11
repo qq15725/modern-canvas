@@ -1,4 +1,4 @@
-import type { ImageRect } from 'modern-idoc'
+import type { ImageSource, ImageSourceRect } from 'modern-idoc'
 import type { PropertyDeclaration } from '../../core'
 import type { CanvasBatchable, Node } from '../main'
 import type { ImageFrame, Texture2D } from '../resources'
@@ -9,15 +9,15 @@ import { AnimatedTexture } from '../resources'
 import { Element2D } from './Element2D'
 
 export interface Image2DProperties extends Element2DProperties {
-  src: string
-  srcRect: ImageRect
+  src: ImageSource
+  srcRect: ImageSourceRect
   gif: boolean
 }
 
 @customNode('Image2D')
 export class Image2D extends Element2D {
   @protectedProperty() texture?: AnimatedTexture
-  @property() declare srcRect: ImageRect
+  @property() declare srcRect: ImageSourceRect
   @property({ default: '' }) declare src: string
   @property({ default: false }) declare gif: boolean
 

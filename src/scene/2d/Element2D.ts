@@ -57,19 +57,19 @@ export class Element2D extends BaseElement2D {
 
     switch (key) {
       case 'left':
-        this.position.x = this.style.left
+        this.position.x = Number(value)
         this.requestRelayout()
         break
       case 'top':
-        this.position.y = this.style.top
+        this.position.y = Number(value)
         this.requestRelayout()
         break
       case 'width':
-        this.size.width = this.style.width
+        this.size.width = Number(value)
         this.requestRelayout()
         break
       case 'height':
-        this.size.height = this.style.height
+        this.size.height = Number(value)
         this.requestRelayout()
         break
     }

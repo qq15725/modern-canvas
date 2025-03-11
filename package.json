@@ -70,26 +70,26 @@
     "colord": "^2.9.3",
     "earcut": "^3.0.1",
     "modern-font": "^0.4.0",
-    "modern-idoc": "^0.2.8",
+    "modern-idoc": "^0.2.12",
     "modern-path2d": "^1.2.10",
-    "modern-text": "^1.2.3",
+    "modern-text": "^1.3.1",
     "yoga-layout": "^3.2.1"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^4.3.0",
+    "@antfu/eslint-config": "^4.8.1",
     "@types/earcut": "^3.0.0",
-    "@types/node": "^22.13.5",
+    "@types/node": "^22.13.10",
     "bumpp": "^10.0.3",
     "conventional-changelog-cli": "^5.0.0",
-    "eslint": "^9.21.0",
+    "eslint": "^9.22.0",
     "lint-staged": "^15.4.3",
     "lottie-web": "^5.12.2",
     "modern-gif": "^2.0.4",
     "simple-git-hooks": "^2.11.1",
-    "typescript": "^5.7.3",
+    "typescript": "^5.8.2",
     "unbuild": "^3.5.0",
-    "vite": "^6.2.0",
-    "vitest": "^3.0.7"
+    "vite": "^6.2.1",
+    "vitest": "^3.0.8"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm lint-staged"

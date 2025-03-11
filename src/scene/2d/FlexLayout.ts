@@ -19,7 +19,7 @@ import {
   Wrap,
 } from 'yoga-layout/load'
 
-const alignMap: Record<string, any> = {
+const alignMap = {
   'auto': Align.Auto,
   'flex-start': Align.FlexStart,
   'center': Align.Center,
@@ -31,32 +31,32 @@ const alignMap: Record<string, any> = {
   'space-evenly': Align.SpaceEvenly,
 }
 
-const displayMap: Record<string, any> = {
+const displayMap = {
   none: Display.None,
   flex: Display.Flex,
   contents: Display.Contents,
 }
 
-const directionMap: Record<string, any> = {
+const directionMap = {
   inherit: Direction.Inherit,
   ltr: Direction.LTR,
   rtl: Direction.RTL,
 }
 
-const flexDirectionMap: Record<string, any> = {
+const flexDirectionMap = {
   'column': FlexDirection.Column,
   'column-reverse': FlexDirection.ColumnReverse,
   'row': FlexDirection.Row,
   'row-reverse': FlexDirection.RowReverse,
 }
 
-const flexWrapMap: Record<string, any> = {
+const flexWrapMap = {
   'no-wrap': Wrap.NoWrap,
   'wrap': Wrap.Wrap,
   'Wrap-reverse': Wrap.WrapReverse,
 }
 
-const justifyMap: Record<string, any> = {
+const justifyMap = {
   'flex-start': Justify.FlexStart,
   'center': Justify.Center,
   'flex-end': Justify.FlexEnd,
@@ -65,19 +65,19 @@ const justifyMap: Record<string, any> = {
   'space-evenly': Justify.SpaceEvenly,
 }
 
-const overflowMap: Record<string, any> = {
+const overflowMap = {
   visible: Overflow.Visible,
   hidden: Overflow.Hidden,
   scroll: Overflow.Scroll,
 }
 
-const positionTypeMap: Record<string, any> = {
+const positionTypeMap = {
   static: PositionType.Static,
   relative: PositionType.Relative,
   absolute: PositionType.Absolute,
 }
 
-const boxSizingMap: Record<string, any> = {
+const boxSizingMap = {
   'border-box': BoxSizing.BorderBox,
   'content-box': BoxSizing.ContentBox,
 }
@@ -137,13 +137,25 @@ export class FlexLayout {
   updateStyleProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     switch (key) {
       case 'alignContent':
-        this._node.setAlignContent(alignMap[this._style.alignContent])
+        this._node.setAlignContent(
+          value
+            ? alignMap[value as keyof typeof alignMap]
+            : alignMap['flex-start'],
+        )
         break
       case 'alignItems':
-        this._node.setAlignItems(alignMap[this._style.alignItems])
+        this._node.setAlignItems(
+          value
+            ? alignMap[value as keyof typeof alignMap]
+            : alignMap['flex-start'],
+        )
         break
       case 'alignSelf':
-        this._node.setAlignSelf(alignMap[this._style.alignSelf])
+        this._node.setAlignSelf(
+          value
+            ? alignMap[value as keyof typeof alignMap]
+            : alignMap['flex-start'],
+        )
         break
       case 'aspectRatio':
         // this._node.setIsReferenceBaseline(this._style.isReferenceBaseline)
@@ -165,10 +177,18 @@ export class FlexLayout {
         this._node.setBorder(Edge.All, this._style.borderWidth)
         break
       case 'direction':
-        this._node.setDirection(directionMap[this._style.direction])
+        this._node.setDirection(
+          value
+            ? directionMap[value as keyof typeof directionMap]
+            : directionMap.inherit,
+        )
         break
       case 'display':
-        this._node.setDisplay(displayMap[this._style.display])
+        this._node.setDisplay(
+          value
+            ? displayMap[value as keyof typeof displayMap]
+            : displayMap.flex,
+        )
         break
       case 'flex':
         this._node.setFlex(this._style.flex)
@@ -177,7 +197,11 @@ export class FlexLayout {
         this._node.setFlexBasis(this._style.flexBasis)
         break
       case 'flexDirection':
-        this._node.setFlexDirection(flexDirectionMap[this._style.flexDirection])
+        this._node.setFlexDirection(
+          value
+            ? flexDirectionMap[value as keyof typeof flexDirectionMap]
+            : flexDirectionMap.row,
+        )
         break
       case 'flexGrow':
         this._node.setFlexGrow(this._style.flexGrow)
@@ -186,37 +210,45 @@ export class FlexLayout {
         this._node.setFlexShrink(this._style.flexShrink)
         break
       case 'flexWrap':
-        this._node.setFlexWrap(flexWrapMap[this._style.flexWrap])
+        this._node.setFlexWrap(
+          value
+            ? flexWrapMap[value as keyof typeof flexWrapMap]
+            : flexWrapMap.wrap,
+        )
         break
       case 'height':
         this._node.setHeight(this._style.height)
         break
       case 'justifyContent':
-        this._node.setJustifyContent(justifyMap[this._style.justifyContent])
+        this._node.setJustifyContent(
+          value
+            ? justifyMap[value as keyof typeof justifyMap]
+            : justifyMap['flex-start'],
+        )
         break
       case 'gap':
-        this._node.setGap(Gutter.All, this._style.gap)
+        value !== undefined && this._node.setGap(Gutter.All, value)
         break
       case 'marginTop':
-        this._node.setMargin(Edge.Top, this._style.marginTop)
+        this._node.setMargin(Edge.Top, value)
         break
       case 'marginBottom':
-        this._node.setMargin(Edge.Top, this._style.marginBottom)
+        this._node.setMargin(Edge.Top, value)
         break
       case 'marginLeft':
-        this._node.setMargin(Edge.Left, this._style.marginLeft)
+        this._node.setMargin(Edge.Left, value)
         break
       case 'marginRight':
-        this._node.setMargin(Edge.Top, this._style.marginRight)
+        this._node.setMargin(Edge.Top, value)
         break
       case 'margin':
-        this._node.setMargin(Edge.All, this._style.margin)
+        this._node.setMargin(Edge.All, value)
         break
       case 'maxHeight':
-        this._node.setMaxHeight(this._style.maxHeight)
+        this._node.setMaxHeight(value)
         break
       case 'maxWidth':
-        this._node.setMaxWidth(this._style.maxWidth)
+        this._node.setMaxWidth(value)
         break
       //   setDirtiedFunc(dirtiedFunc: DirtiedFunction | null): void;
       //   setMeasureFunc(measureFunc: MeasureFunction | null): void;
@@ -227,7 +259,11 @@ export class FlexLayout {
         this._node.setMinWidth(this._style.minWidth)
         break
       case 'overflow':
-        this._node.setOverflow(overflowMap[this._style.overflow])
+        this._node.setOverflow(
+          value
+            ? overflowMap[value as keyof typeof overflowMap]
+            : overflowMap.visible,
+        )
         break
       case 'paddingTop':
         this._node.setPadding(Edge.Top, this._style.paddingTop)
@@ -257,10 +293,18 @@ export class FlexLayout {
         this._node.setPosition(Edge.Right, this._style.right)
         break
       case 'position':
-        this._node.setPositionType(positionTypeMap[this._style.position])
+        this._node.setPositionType(
+          value
+            ? positionTypeMap[value as keyof typeof positionTypeMap]
+            : positionTypeMap.static,
+        )
         break
       case 'boxSizing':
-        this._node.setBoxSizing(boxSizingMap[this._style.boxSizing])
+        this._node.setBoxSizing(
+          value
+            ? boxSizingMap[value as keyof typeof boxSizingMap]
+            : boxSizingMap['content-box'],
+        )
         break
       case 'width':
         this._node.setWidth(this._style.width)
