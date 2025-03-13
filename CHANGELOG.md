@@ -1,3 +1,12 @@
+## [0.4.14](https://github.com/qq15725/modern-canvas/compare/v0.4.13...v0.4.14) (2025-03-13)
+
+
+### Bug Fixes
+
+* animation ([aea6486](https://github.com/qq15725/modern-canvas/commit/aea6486835e0eeb80ea085be4b158979d8d3a884))
+
+
+
 ## [0.4.13](https://github.com/qq15725/modern-canvas/compare/v0.4.12...v0.4.13) (2025-03-11)
 
 
