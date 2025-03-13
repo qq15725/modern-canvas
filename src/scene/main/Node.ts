@@ -50,12 +50,14 @@ export interface Node {
 }
 
 export type ProcessMode = 'inherit' | 'pausable' | 'when_paused' | 'always' | 'disabled'
+export type ProcessSortMode = 'default' | 'parent_before'
 export type RenderMode = 'inherit' | 'always' | 'disabled'
 export type InternalMode = 'default' | 'front' | 'back'
 
 export interface NodeProperties {
   name: string
   processMode: ProcessMode
+  processSortMode: ProcessSortMode
   renderMode: RenderMode
   internalMode: InternalMode
   mask: Maskable
@@ -77,6 +79,7 @@ export class Node extends CoreObject {
   @protectedProperty() declare name: string
   @property() declare mask?: Maskable
   @property({ default: 'inherit' }) declare processMode: ProcessMode
+  @property({ default: 'default' }) declare processSortMode: ProcessSortMode
   @property({ default: 'inherit' }) declare renderMode: RenderMode
   @property({ default: 'default' }) declare internalMode: InternalMode
 
@@ -267,6 +270,24 @@ export class Node extends CoreObject {
     const canRender = this.canRender()
     const canProcess = this.canProcess()
 
+    const childrenInBefore = []
+    const childrenInAfter = []
+    for (let len = this._children.length, i = 0; i < len; i++) {
+      const child = this._children[i]
+      switch (child.processSortMode) {
+        case 'default':
+          childrenInAfter.push(child)
+          break
+        case 'parent_before':
+          childrenInBefore.push(child)
+          break
+      }
+    }
+
+    childrenInBefore.forEach((child) => {
+      child.emit('process', delta)
+    })
+
     if (canProcess) {
       tree?.emit('nodeProcessing', this)
       this.emit('processing', delta)
@@ -294,9 +315,9 @@ export class Node extends CoreObject {
       }
     }
 
-    for (let len = this._children.length, i = 0; i < len; i++) {
-      this._children[i].emit('process', delta)
-    }
+    childrenInAfter.forEach((child) => {
+      child.emit('process', delta)
+    })
 
     if (canRender) {
       tree!.renderStack.currentCall = oldRenderCall

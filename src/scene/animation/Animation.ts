@@ -112,6 +112,7 @@ export interface AnimationProperties extends Omit<TimelineNodeProperties, 'rende
 @customNode<TimelineNodeProperties>('Animation', {
   renderMode: 'disabled',
   processMode: 'pausable',
+  processSortMode: 'parent_before',
   duration: 2000,
 })
 export class Animation extends TimelineNode {
@@ -127,25 +128,18 @@ export class Animation extends TimelineNode {
 
   constructor(properties?: Partial<AnimationProperties>, children: Node[] = []) {
     super()
-    this._process = this._process.bind(this)
 
     this
       .setProperties(properties)
       .append(children)
   }
 
-  protected override _treeEnter(tree: SceneTree): void {
-    tree.timeline.on('updateCurrentTime', this._process)
+  protected override _treeEnter(_tree: SceneTree): void {
     this._updateCachedProps()
   }
 
-  protected override _treeExit(oldTree: SceneTree): void {
-    oldTree.timeline.on('updateCurrentTime', this._process)
+  protected override _treeExit(_oldTree: SceneTree): void {
     this.cancel()
-  }
-
-  protected override _onProcess(): void {
-    // disabled
   }
 
   protected _process(): void {
