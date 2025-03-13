@@ -344,6 +344,13 @@ export class Animation extends TimelineNode {
   ): any {
     let from: CssFunctionArg | CssFunction[]
     let to: CssFunctionArg | CssFunction[]
+
+    if (previous === 'none')
+      previous = undefined
+
+    if (current === 'none')
+      current = undefined
+
     if (previous === undefined || current === undefined) {
       if (previous !== undefined) {
         from = parseCssProperty(name, String(previous), context)

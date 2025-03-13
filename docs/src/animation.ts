@@ -34,6 +34,24 @@ async function init(): Promise<void> {
         ],
       }),
     ]),
+
+    new Element2D({
+      style: {
+        left: 200,
+        top: 200,
+        width: 100,
+        height: 100,
+        backgroundColor: '#00FF00',
+      },
+    }, [
+      new Animation({
+        loop: true,
+        keyframes: [
+          { opacity: 0, transform: 'translate3d(0, -100%, 0)' },
+          { opacity: 1 },
+        ],
+      }),
+    ]),
   ])
 }
 
