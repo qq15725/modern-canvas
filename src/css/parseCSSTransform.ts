@@ -1,6 +1,5 @@
 import { parseCssFunctions, PI_2, Transform2D } from '../core'
 
-const _temp = new Transform2D()
 export function parseCSSTransform(
   transform: string,
   width: number,
@@ -11,7 +10,7 @@ export function parseCSSTransform(
   parseCssFunctions(transform, { width, height })
     .forEach(({ name, args }) => {
       const values = args.map(arg => arg.normalizedIntValue)
-      _temp.identity()
+      const _temp = new Transform2D()
       switch (name) {
         case 'translate':
           _temp.translate((values[0]) * width, (values[1] ?? values[0]) * height)
