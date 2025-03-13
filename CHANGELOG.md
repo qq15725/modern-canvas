@@ -1,3 +1,12 @@
+## [0.4.16](https://github.com/qq15725/modern-canvas/compare/v0.4.15...v0.4.16) (2025-03-13)
+
+
+### Features
+
+* add processSortMode ([3128e53](https://github.com/qq15725/modern-canvas/commit/3128e53ca9576dd0e62df50cfe7935608a1a641c))
+
+
+
 ## [0.4.15](https://github.com/qq15725/modern-canvas/compare/v0.4.14...v0.4.15) (2025-03-13)
 
 
