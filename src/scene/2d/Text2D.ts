@@ -1,6 +1,6 @@
 import type { MeasureResult, TextOptions } from 'modern-text'
 import type { PropertyDeclaration } from '../../core'
-import type { Node } from '../main'
+import type { CanvasBatchable, Node } from '../main'
 import type { TextureRect2DProperties } from './TextureRect2D'
 import { Text, textDefaultStyle } from 'modern-text'
 import { customNode, property, protectedProperty } from '../../core'
@@ -34,6 +34,7 @@ export class Text2D extends TextureRect2D<CanvasTexture> {
   override texture = new CanvasTexture()
 
   text = new Text()
+  measureResult?: MeasureResult
   protected _subTextsCount = 0
 
   constructor(properties?: Partial<Text2DProperties>, children: Node[] = []) {
@@ -73,7 +74,17 @@ export class Text2D extends TextureRect2D<CanvasTexture> {
   }
 
   protected override _updateStyleProperty(key: PropertyKey, value: any, oldValue: any): void {
-    super._updateStyleProperty(key, value, oldValue)
+    switch (key) {
+      case 'left':
+      case 'top':
+      case 'width':
+      case 'height':
+        this.requestRedraw()
+        break
+      default:
+        super._updateStyleProperty(key, value, oldValue)
+        break
+    }
 
     switch (key) {
       case 'width':
@@ -100,10 +111,9 @@ export class Text2D extends TextureRect2D<CanvasTexture> {
 
   protected _updateSubTexts(): void {
     const subTexts = this._getSubTexts()
-    const result = this.measure()
     let i = 0
     if (this.split) {
-      result.paragraphs.forEach((p) => {
+      this.updateMeasure().measureResult?.paragraphs.forEach((p) => {
         p.fragments.forEach((f) => {
           f.characters.forEach((c) => {
             const child = subTexts[i]
@@ -120,12 +130,20 @@ export class Text2D extends TextureRect2D<CanvasTexture> {
 
   measure(): MeasureResult {
     this._updateText()
-    const result = this.text.measure()
-    if (!this.style.width)
-      this.style.width = result.boundingBox.width
-    if (!this.style.height)
-      this.style.height = result.boundingBox.height
-    return result
+    return this.text.measure()
+  }
+
+  updateMeasure(): this {
+    this.measureResult = this.measure()
+    const textWidth = this.measureResult.boundingBox.width
+    const textHeight = this.measureResult.boundingBox.height
+    const { left, top, width, height = textHeight } = this.style
+    this.position.x = left + Math.min(0, ((width || textWidth) - textWidth) / 2)
+    // this.position.x = left
+    this.position.y = top + Math.min(0, ((height || textHeight) - textHeight) / 2)
+    this.size.width = textWidth
+    this.size.height = textHeight
+    return this
   }
 
   protected _updateSplit(): void {
@@ -134,10 +152,8 @@ export class Text2D extends TextureRect2D<CanvasTexture> {
       this._subTextsCount = 0
     }
 
-    const result = this.measure()
-
     if (this.split) {
-      result.paragraphs.forEach((p) => {
+      this.measureResult?.paragraphs.forEach((p) => {
         p.fragments.forEach((f) => {
           f.characters.forEach((c) => {
             this.appendChild(
@@ -161,6 +177,11 @@ export class Text2D extends TextureRect2D<CanvasTexture> {
     }
   }
 
+  protected override _redraw(): CanvasBatchable[] {
+    this.updateMeasure()
+    return super._redraw()
+  }
+
   protected override _drawContent(): void {
     if (!this.split) {
       const onText2DRender = (this.getChildren()?.find(child => 'onText2DRender' in child) as any)?.onText2DRender
@@ -168,7 +189,6 @@ export class Text2D extends TextureRect2D<CanvasTexture> {
         onText2DRender()
       }
       else {
-        this._updateText()
         this.text.render({
           pixelRatio: this.texture.pixelRatio,
           view: this.texture.source,
