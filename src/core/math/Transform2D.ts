@@ -19,147 +19,60 @@ export interface Transform2DObject {
  * | 0 | 0 | 1 |
  */
 export class Transform2D extends Matrix3 {
-  protected _cx = 1
-  protected _sx = 0
-  protected _cy = 0
-  protected _sy = 1
-  protected _translateX = 0
-  protected _translateY = 0
-  protected _translateZ = 1
-  protected _scaleX = 1
-  protected _scaleY = 1
-  protected _skewX = 0
-  protected _skewY = 0
-  protected _rotate = 0
+  private static _t2d = /* @__PURE__ */ new Transform2D()
 
-  dirtyId = 0
-  protected _needsUpdateArray = false
-  protected _needsUpdateFields = false
-
-  constructor(
-    public autoUpdate = true,
-  ) {
-    super()
+  premultiply(t2d: Transform2D): this {
+    return t2d.multiply(this, this)
   }
 
-  protected override _onUpdate(array: number[]): void {
-    super._onUpdate(array)
-    this._requestUpdateFields()
-  }
-
-  protected _updateSkew(): void {
-    this._cx = Math.cos(this._rotate + this._skewY)
-    this._sx = Math.sin(this._rotate + this._skewY)
-    this._cy = -Math.sin(this._rotate - this._skewX) // cos, added PI/2
-    this._sy = Math.cos(this._rotate - this._skewX) // sin, added PI/2
-  }
-
-  protected _requestUpdateArray(): void {
-    if (this.autoUpdate) {
-      this._performUpdateArray()
-    }
-    else {
-      this._needsUpdateArray = true
-    }
-  }
-
-  protected _requestUpdateFields(): void {
-    if (this.autoUpdate) {
-      this._performUpdateFields()
-    }
-    else {
-      this._needsUpdateFields = true
-    }
-  }
-
-  protected _performUpdateArray(): void {
-    const a = this._cx * this._scaleX
-    const b = this._sx * this._scaleX
-    const c = this._cy * this._scaleY
-    const d = this._sy * this._scaleY
-    const tx = this._translateX
-    const ty = this._translateY
-    const tz = this._translateZ
-    const array = this._array
-    this._array = [
-      a, c, tx,
-      b, d, ty,
-      array[6], array[7], tz,
-    ]
-    this.dirtyId++
-  }
-
-  protected _performUpdateFields(): void {
-    const {
-      a, c, tx,
-      b, d, ty,
-      tz,
-    } = this.toObject()
-    const skewX = -Math.atan2(-c, d)
-    const skewY = Math.atan2(b, a)
-    const delta = Math.abs(skewX + skewY)
-    if (delta < 0.00001 || Math.abs(PI_2 - delta) < 0.00001) {
-      this._rotate = skewY
-      this._skewX = this._skewY = 0
-    }
-    else {
-      this._rotate = 0
-      this._skewX = skewX
-      this._skewY = skewY
-    }
-    this._scaleX = Math.sqrt((a * a) + (b * b))
-    this._scaleY = Math.sqrt((c * c) + (d * d))
-    this._translateX = tx
-    this._translateY = ty
-    this._translateZ = tz
-    this.dirtyId++
-  }
-
-  skew(x: number, y: number): this {
-    this._skewX = x
-    this._skewY = y
-    this._updateSkew()
-    this._requestUpdateArray()
+  skewX(x: number): this { return this.skew(x, 1) }
+  skewY(y: number): this { return this.skew(1, y) }
+  skew(x: number, y: number): this { return this.premultiply(Transform2D._t2d.makeSkew(x, y)) }
+  makeSkew(x: number, y: number): this {
+    const cx = Math.cos(y)
+    const sx = Math.sin(y)
+    const cy = -Math.sin(-x)
+    const sy = Math.cos(-x)
+    this.set([
+      cx, cy, 0,
+      sx, sy, 0,
+      0, 0, 1,
+    ])
     return this
   }
 
-  skewX(x: number): this { return this.skew(x, this._skewY) }
-  skewY(y: number): this { return this.skew(this._skewX, y) }
-
-  translate(x: number, y: number, z = 1): this {
-    this._translateX = x
-    this._translateY = y
-    this._translateZ = z
-    this._requestUpdateArray()
-    return this
-  }
-
-  translateX(x: number): this { return this.translate(x, this._translateY) }
-  translateY(y: number): this { return this.translate(this._translateX, y) }
-  translateZ(z: number): this { return this.translate(this._translateX, this._translateY, z) }
+  translateX(x: number): this { return this.translate(x, 0) }
+  translateY(y: number): this { return this.translate(0, y) }
+  translateZ(z: number): this { return this.translate(0, 0, z) }
   translate3d(x: number, y: number, z: number): this { return this.translate(x, y, z) }
-
-  scale(x: number, y: number, _z = 1): this {
-    this._scaleX = x
-    this._scaleY = y
-    this._requestUpdateArray()
+  translate(x: number, y: number, z = 0): this { return this.premultiply(Transform2D._t2d.makeTranslation(x, y, z)) }
+  makeTranslation(x: number, y: number, _z = 0): this {
+    // TODO tz
+    this.set([
+      1, 0, x,
+      0, 1, y,
+      0, 0, 1,
+    ])
     return this
   }
 
-  scaleX(x: number): this { return this.scale(x, this._scaleY) }
-  scaleY(y: number): this { return this.scale(this._scaleX, y) }
-  scale3d(x: number, y: number, z: number): this { return this.scale(x, y, z) }
-
-  rotate(rad: number): this {
-    this._rotate = rad
-    this._updateSkew()
-    this._requestUpdateArray()
+  scaleX(x: number): this { return this.scale(x, 1) }
+  scaleY(y: number): this { return this.scale(1, y) }
+  scale3d(x: number, y: number, z = 1): this { return this.scale(x, y, z) }
+  scale(x: number, y: number, z = 1): this { return this.premultiply(Transform2D._t2d.makeScale(x, y, z)) }
+  makeScale(x: number, y: number, z = 1): this {
+    this.set([
+      x, 0, 0,
+      0, y, 0,
+      0, 0, z,
+    ])
     return this
   }
 
   rotateX(x: number): this { return this.scaleY(this._rotateToScale(x)) }
   rotateY(y: number): this { return this.scaleX(this._rotateToScale(y)) }
   rotateZ(z: number): this { return this.rotate(z) }
+  rotate(rad: number): this { return this.premultiply(Transform2D._t2d.makeRotation(rad)) }
   rotate3d(x: number, y: number, z: number, rad: number): this {
     const [rx, ry, rz] = this._rotate3d(x, y, z, rad)
     rx && (this.rotateX(rx))
@@ -201,6 +114,17 @@ export class Transform2D extends Matrix3 {
     }
   }
 
+  makeRotation(theta: number): this {
+    const c = Math.cos(theta)
+    const s = Math.sin(theta)
+    this.set([
+      c, -s, 0,
+      s, c, 0,
+      0, 0, 1,
+    ])
+    return this
+  }
+
   applyToPoint(x: number, y: number): number[] {
     const { a, c, tx, b, d, ty } = this.toObject()
     return [
@@ -211,24 +135,6 @@ export class Transform2D extends Matrix3 {
 
   inverse(): this {
     return this.clone().invert()
-  }
-
-  update(): boolean {
-    let updated = false
-
-    if (this._needsUpdateArray) {
-      this._needsUpdateArray = false
-      this._performUpdateArray()
-      updated = true
-    }
-
-    if (this._needsUpdateFields) {
-      this._needsUpdateFields = false
-      this._performUpdateFields()
-      updated = true
-    }
-
-    return updated
   }
 
   isIdentity(): boolean {

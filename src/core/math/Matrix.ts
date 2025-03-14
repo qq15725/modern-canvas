@@ -7,6 +7,8 @@ export type MatrixOperateOutput = number[] | Matrix | Vector
 export abstract class Matrix extends EventEmitter {
   protected _array: number[] = []
 
+  dirtyId = 0
+
   get length(): number { return this.cols * this.rows }
 
   constructor(
@@ -148,7 +150,9 @@ export abstract class Matrix extends EventEmitter {
     return this._operate('*', value, output)
   }
 
-  protected _onUpdate(_array: number[]): void { /** override */ }
+  protected _onUpdate(_array: number[]): void {
+    this.dirtyId++
+  }
 
   toArray(transpose = false): number[] {
     const { cols, rows, _array: array } = this

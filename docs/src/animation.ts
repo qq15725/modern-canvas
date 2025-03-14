@@ -41,13 +41,17 @@ async function init(): Promise<void> {
     ], 100, 100),
 
     testAnimation([
-      { opacity: 0, transform: 'translate3d(0, -100%, 0)' },
-      { opacity: 1 },
+      { opacity: 0, transform: 'rotate(-200deg)' },
     ], 200, 100),
 
     testAnimation([
-      { opacity: 0, transform: 'translate3d(100%, 0, 0) rotate3d(0, 0, 1, -120deg)' },
+      { opacity: 0, transform: 'translate3d(0, -100%, 0)' },
+      { opacity: 1 },
     ], 300, 100),
+
+    testAnimation([
+      { opacity: 0, transform: 'translate3d(100%, 0, 0) rotate3d(0, 0, 1, -120deg)' },
+    ], 400, 100),
   ])
 }
 

@@ -12,7 +12,7 @@ export class Node2D extends CanvasItem {
   rotation = 0
   scale = new Vector2(1, 1)
   skew = new Vector2()
-  transform = new Transform2D(false)
+  transform = new Transform2D()
   globalPosition = new Vector2()
   globalRotation = 0
   globalScale = new Vector2()
@@ -34,9 +34,8 @@ export class Node2D extends CanvasItem {
       .identity()
       .scale(this.scale.x, this.scale.y)
       .skew(this.skew.x, this.skew.y)
-      .translate(this.position.x, this.position.y)
       .rotate(this.rotation)
-      .update()
+      .translate(this.position.x, this.position.y)
   }
 
   protected _updateGlobalTransform(): void {

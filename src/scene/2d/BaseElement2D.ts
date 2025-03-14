@@ -200,17 +200,18 @@ export class BaseElement2D extends Node2D implements Rectangulable {
   }
 
   protected override _updateTransform(): void {
-    super._updateTransform()
     const { width, height } = this.size
-    const cssTransform = parseCSSTransform(this.style.transform, width, height)
-    cssTransform.multiply(this.transform, this.transform)
-    const t3dT2dArr = this.transform.toArray()
     const [originX, originY] = parseCSSTransformOrigin(this.style.transformOrigin)
     const offsetX = originX * width
     const offsetY = originY * height
-    t3dT2dArr[2] += (t3dT2dArr[0] * -offsetX) + (t3dT2dArr[1] * -offsetY) + offsetX
-    t3dT2dArr[5] += (t3dT2dArr[3] * -offsetX) + (t3dT2dArr[4] * -offsetY) + offsetY
-    this.transform.set(t3dT2dArr)
+    this.transform
+      .identity()
+      .translate(-offsetX, -offsetY)
+      .scale(this.scale.x, this.scale.y)
+      .skew(this.skew.x, this.skew.y)
+      .rotate(this.rotation)
+    parseCSSTransform(this.style.transform, width, height, this.transform)
+    this.transform.translate(offsetX + this.position.x, offsetY + this.position.y)
   }
 
   protected override _updateGlobalTransform(): void {
