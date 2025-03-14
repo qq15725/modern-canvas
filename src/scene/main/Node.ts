@@ -166,14 +166,14 @@ export class Node extends CoreObject {
   setParent<T extends Node = Node>(parent: T | undefined): this {
     if (!this._parent?.is(parent)) {
       const oldParent = this._parent
+      if (oldParent) {
+        this.emit('unparented', oldParent)
+      }
       this._parent = parent
-      this.setTree(parent?._tree)
       if (parent) {
         this.emit('parented', parent)
       }
-      else if (oldParent) {
-        this.emit('unparented', oldParent)
-      }
+      this.setTree(parent?._tree)
     }
     return this
   }

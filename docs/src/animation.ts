@@ -18,7 +18,7 @@ const engine = new Engine({
 document.body.append(engine.view!)
 
 function testAnimation(keyframes: Keyframe[], left = 100, top = 100): Element2D {
-  return new Element2D({
+  const el = new Element2D({
     style: {
       left,
       top,
@@ -32,6 +32,18 @@ function testAnimation(keyframes: Keyframe[], left = 100, top = 100): Element2D 
       keyframes,
     }),
   ])
+
+  setTimeout(() => {
+    el.removeChildren()
+    el.append(
+      new Animation({
+        loop: true,
+        keyframes,
+      }),
+    )
+  }, 1000)
+
+  return el
 }
 
 async function init(): Promise<void> {

@@ -1,5 +1,5 @@
 import type { CssFunction, CssFunctionArg, PropertyDeclaration } from '../../core'
-import type { Node, SceneTree, TimelineNodeProperties } from '../main'
+import type { Node, TimelineNodeProperties } from '../main'
 import { clamp, customNode, getDefaultCssPropertyValue, lerp, parseCssProperty, property, RawWeakMap } from '../../core'
 import { CanvasItem, TimelineNode } from '../main'
 
@@ -134,11 +134,13 @@ export class Animation extends TimelineNode {
       .append(children)
   }
 
-  protected override _treeEnter(_tree: SceneTree): void {
+  protected override _parented(parent: Node): void {
+    super._parented(parent)
     this._updateCachedProps()
   }
 
-  protected override _treeExit(_oldTree: SceneTree): void {
+  protected override _unparented(oldParent: Node): void {
+    super._unparented(oldParent)
     this.cancel()
   }
 
