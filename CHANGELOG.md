@@ -1,3 +1,12 @@
+## [0.4.17](https://github.com/qq15725/modern-canvas/compare/v0.4.16...v0.4.17) (2025-03-14)
+
+
+### Bug Fixes
+
+* Transform2D ([ae976d3](https://github.com/qq15725/modern-canvas/commit/ae976d3aef0af281d47c5c49b222a982fc385992))
+
+
+
 ## [0.4.16](https://github.com/qq15725/modern-canvas/compare/v0.4.15...v0.4.16) (2025-03-13)
 
 
