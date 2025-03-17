@@ -1,3 +1,12 @@
+## [0.4.20](https://github.com/qq15725/modern-canvas/compare/v0.4.19...v0.4.20) (2025-03-17)
+
+
+### Bug Fixes
+
+* engine.pixelRatio ([649605e](https://github.com/qq15725/modern-canvas/commit/649605e5483d216f88c34e259a7528c471c8f16b))
+
+
+
 ## [0.4.19](https://github.com/qq15725/modern-canvas/compare/v0.4.18...v0.4.19) (2025-03-14)
 
 
