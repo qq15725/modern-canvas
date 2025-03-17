@@ -167,7 +167,8 @@ export class Engine extends SceneTree {
     this.renderer.resize(width, height, updateCss)
     this.root.width = width
     this.root.height = height
-    this.renderer.program.uniforms.projectionMatrix = this.root.toProjectionArray(true)
+    this.root.requestUpload()
+    this.render()
     return this
   }
 

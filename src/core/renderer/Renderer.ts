@@ -19,19 +19,15 @@ export abstract class Renderer {
   }
 
   resize(width: number, height: number, updateStyle = true): void {
-    const viewWidth = Math.floor(width * this.pixelRatio)
-    const viewHeight = Math.floor(height * this.pixelRatio)
-    const screenWidth = viewWidth / this.pixelRatio
-    const screenHeight = viewHeight / this.pixelRatio
     if (this.view) {
-      this.view.width = viewWidth
-      this.view.height = viewHeight
+      this.view.width = Math.floor(width * this.pixelRatio)
+      this.view.height = Math.floor(height * this.pixelRatio)
     }
-    this.screen.width = screenWidth
-    this.screen.height = screenHeight
+    this.screen.width = width
+    this.screen.height = height
     if (updateStyle && this.view) {
-      this.view.style.width = `${screenWidth}px`
-      this.view.style.height = `${screenHeight}px`
+      this.view.style.width = `${width}px`
+      this.view.style.height = `${height}px`
     }
   }
 }

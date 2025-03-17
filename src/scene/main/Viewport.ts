@@ -62,9 +62,9 @@ export class Viewport extends Node implements Rectangulable {
 
     this._framebuffers.forEach((framebuffer) => {
       const texture = framebuffer.texture
-      texture.pixelRatio = pixelRatio
       texture.width = width
       texture.height = height
+      texture.pixelRatio = pixelRatio
       texture.upload(renderer)
     })
 
