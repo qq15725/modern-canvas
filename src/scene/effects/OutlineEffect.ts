@@ -1,5 +1,5 @@
 import type { ColorValue, WebGLRenderer } from '../../core'
-import type { EffectProperties, Viewport } from '../main'
+import type { EffectProperties, Node, Viewport } from '../main'
 import { Color, customNode, property } from '../../core'
 import { Effect } from '../main'
 import { Material, QuadUvGeometry } from '../resources'
@@ -72,9 +72,12 @@ export class OutlineEffect extends Effect {
 
   protected _color = new Color()
 
-  constructor(properties?: Partial<OutlineEffectProperties>) {
+  constructor(properties?: Partial<OutlineEffectProperties>, children: Node[] = []) {
     super()
-    this.setProperties(properties)
+
+    this
+      .setProperties(properties)
+      .append(children)
 
     this.material = new Material({
       vert: `precision mediump float;

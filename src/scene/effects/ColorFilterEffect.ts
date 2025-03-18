@@ -1,5 +1,5 @@
 import type { WebGLRenderer } from '../../core'
-import type { Viewport } from '../main'
+import type { Node, Viewport } from '../main'
 import { ColorMatrix, customNode, parseCssFunctions, PI_2, property } from '../../core'
 import { Effect } from '../main/Effect'
 import { Material, QuadUvGeometry } from '../resources'
@@ -14,9 +14,12 @@ export class ColorFilterEffect extends Effect {
 
   protected _colorMatrix = new ColorMatrix()
 
-  constructor(properties?: Partial<ColorFilterEffectProperties>) {
+  constructor(properties?: Partial<ColorFilterEffectProperties>, children: Node[] = []) {
     super()
-    this.setProperties(properties)
+
+    this
+      .setProperties(properties)
+      .append(children)
   }
 
   override apply(renderer: WebGLRenderer, source: Viewport): void {
