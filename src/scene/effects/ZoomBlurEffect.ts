@@ -23,12 +23,12 @@ void main() {
 }`,
     frag: `varying vec2 vUv;
 uniform sampler2D sampler;
-uniform vec4 inputSize;
+uniform vec4 uInputSize;
 
-uniform vec2 center;
-uniform float strength;
-uniform float innerRadius;
-uniform float radius;
+uniform vec2 uCenter;
+uniform float uStrength;
+uniform float uInnerRadius;
+uniform float uRadius;
 
 const float MAX_KERNEL_SIZE = 32.0;
 
@@ -39,18 +39,18 @@ highp float rand(vec2 co, float seed) {
 }
 
 void main() {
-  float minGradient = innerRadius * 0.3;
-  float innerRadius1 = (innerRadius + minGradient * 0.5) / inputSize.x;
+  float minGradient = uInnerRadius * 0.3;
+  float innerRadius1 = (uInnerRadius + minGradient * 0.5) / uInputSize.x;
 
-  float gradient = radius * 0.3;
-  float radius1 = (radius - gradient * 0.5) / inputSize.x;
+  float gradient = uRadius * 0.3;
+  float radius1 = (uRadius - gradient * 0.5) / uInputSize.x;
 
   float countLimit = MAX_KERNEL_SIZE;
 
-  vec2 dir = vec2(center.xy / inputSize.xy - vUv);
-  float dist = length(vec2(dir.x, dir.y * inputSize.y / inputSize.x));
+  vec2 dir = vec2(uCenter.xy / uInputSize.xy - vUv);
+  float dist = length(vec2(dir.x, dir.y * uInputSize.y / uInputSize.x));
 
-  float strength1 = strength;
+  float strength1 = uStrength;
 
   float delta = 0.0;
   float gap;
@@ -63,7 +63,7 @@ void main() {
   }
 
   if (delta > 0.0) {
-    float normalCount = gap / inputSize.x;
+    float normalCount = gap / uInputSize.x;
     delta = (normalCount - delta) / normalCount;
     countLimit *= delta;
     strength1 *= delta;
@@ -115,11 +115,11 @@ void main() {
     source.redraw(renderer, () => {
       QuadUvGeometry.draw(renderer, ZoomBlurEffect.material, {
         sampler: 0,
-        center: this.center ?? [source.width / 2, source.height / 2],
-        innerRadius: this.innerRadius,
-        radius: this.radius,
-        strength: this.strength,
-        inputSize: [source.width, source.height, 1 / source.width, 1 / source.height],
+        uCenter: this.center ?? [source.width / 2, source.height / 2],
+        uInnerRadius: this.innerRadius,
+        uRadius: this.radius,
+        uStrength: this.strength,
+        uInputSize: [source.width, source.height, 1 / source.width, 1 / source.height],
       })
     })
   }

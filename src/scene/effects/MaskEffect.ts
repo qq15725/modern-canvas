@@ -13,52 +13,6 @@ export interface MaskEffectProperties extends EffectProperties {
 
 @customNode('MaskEffect')
 export class MaskEffect extends Effect {
-  @protectedProperty() texture?: Texture2D<ImageBitmap>
-  @property({ default: '' }) declare src: string
-
-  constructor(properties?: Partial<MaskEffectProperties>, children: Node[] = []) {
-    super()
-
-    this
-      .setProperties(properties)
-      .append(children)
-  }
-
-  async load(): Promise<void> {
-    this.texture = undefined
-    if (this.src) {
-      this.texture = await assets.texture.load(this.src)
-    }
-  }
-
-  protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    super._updateProperty(key, value, oldValue, declaration)
-
-    switch (key) {
-      case 'src':
-        this.load()
-        break
-      case 'texture':
-        oldValue?.free?.()
-        break
-    }
-  }
-
-  override apply(renderer: WebGLRenderer, source: Viewport, context: EffectContext): void {
-    if (this.texture && context.targetArea) {
-      source.redraw(renderer, () => {
-        this.texture!.activate(renderer, 1)
-        QuadUvGeometry.draw(renderer, MaskEffect.material, {
-          sampler: 0,
-          mask: 1,
-          area: context.targetArea,
-          rotation: (context.target as Node2D)?.globalRotation ?? 0,
-        })
-        renderer.texture.unbind(1)
-      })
-    }
-  }
-
   static material = new Material({
     vert: `precision mediump float;
 attribute vec2 position;
@@ -106,4 +60,50 @@ void main(void) {
   }
 }`,
   })
+
+  @protectedProperty() texture?: Texture2D<ImageBitmap>
+  @property({ default: '' }) declare src: string
+
+  constructor(properties?: Partial<MaskEffectProperties>, children: Node[] = []) {
+    super()
+
+    this
+      .setProperties(properties)
+      .append(children)
+  }
+
+  async load(): Promise<void> {
+    this.texture = undefined
+    if (this.src) {
+      this.texture = await assets.texture.load(this.src)
+    }
+  }
+
+  protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+    super._updateProperty(key, value, oldValue, declaration)
+
+    switch (key) {
+      case 'src':
+        this.load()
+        break
+      case 'texture':
+        oldValue?.free?.()
+        break
+    }
+  }
+
+  override apply(renderer: WebGLRenderer, source: Viewport, context: EffectContext): void {
+    if (this.texture && context.targetArea) {
+      source.redraw(renderer, () => {
+        this.texture!.activate(renderer, 1)
+        QuadUvGeometry.draw(renderer, MaskEffect.material, {
+          sampler: 0,
+          mask: 1,
+          area: context.targetArea,
+          rotation: (context.target as Node2D)?.globalRotation ?? 0,
+        })
+        renderer.texture.unbind(1)
+      })
+    }
+  }
 }

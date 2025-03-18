@@ -20,19 +20,19 @@ void main() {
   vUv = uv;
 }`,
     frag: `varying vec2 vUv;
-uniform vec2 size;
 uniform sampler2D sampler;
-uniform vec4 filterArea;
+uniform vec2 uSize;
+uniform vec4 uInputSize;
 
 vec2 mapCoord(vec2 coord) {
-  coord *= filterArea.xy;
-  coord += filterArea.zw;
+  coord *= uInputSize.xy;
+  coord += uInputSize.zw;
   return coord;
 }
 
 vec2 unmapCoord(vec2 coord) {
-  coord -= filterArea.zw;
-  coord /= filterArea.xy;
+  coord -= uInputSize.zw;
+  coord /= uInputSize.xy;
   return coord;
 }
 
@@ -42,7 +42,7 @@ vec2 pixelate(vec2 coord, vec2 size) {
 
 void main(void) {
   vec2 coord = mapCoord(vUv);
-  coord = pixelate(coord, size);
+  coord = pixelate(coord, uSize);
   coord = unmapCoord(coord);
   gl_FragColor = texture2D(sampler, coord);
 }`,
@@ -62,8 +62,8 @@ void main(void) {
     source.redraw(renderer, () => {
       QuadUvGeometry.draw(renderer, PixelateEffect.material, {
         sampler: 0,
-        size: [this.strength, this.strength],
-        filterArea: [source.width, source.height, 0, 0],
+        uSize: [this.strength, this.strength],
+        uInputSize: [source.width, source.height, 1 / source.width, 1 / source.height],
       })
     })
   }

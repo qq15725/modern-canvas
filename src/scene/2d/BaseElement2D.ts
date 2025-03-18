@@ -18,7 +18,7 @@ import {
   Vector2,
 } from '../../core'
 import { parseCSSFilter, parseCSSTransform, parseCSSTransformOrigin } from '../../css'
-import { MaskEffect, ShadowEffect } from '../effects'
+import { DropShadowEffect, MaskEffect } from '../effects'
 import { BaseElement2DStyle } from './BaseElement2DStyle'
 import { Node2D } from './Node2D'
 
@@ -148,12 +148,12 @@ export class BaseElement2D extends Node2D implements Rectangulable {
   protected _updateBoxShadow(): void {
     const nodePath = '__$style.shadow'
     if (this.style.boxShadow !== 'none') {
-      const node = this.getNode<ShadowEffect>(nodePath)
+      const node = this.getNode<DropShadowEffect>(nodePath)
       if (node) {
         // TODO
       }
       else {
-        this.appendChild(new ShadowEffect({ name: nodePath }), 'back')
+        this.appendChild(new DropShadowEffect({ name: nodePath }), 'back')
       }
     }
     else {

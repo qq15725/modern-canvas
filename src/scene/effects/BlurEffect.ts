@@ -45,6 +45,9 @@ void main(void) {
   }
 }`
 
+/**
+ * Gaussian blur
+ */
 @customNode('BlurEffect')
 export class BlurEffect extends Effect {
   static materialX = new Material({
