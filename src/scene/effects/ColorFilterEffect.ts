@@ -10,7 +10,35 @@ export interface ColorFilterEffectProperties {
 
 @customNode('ColorFilterEffect')
 export class ColorFilterEffect extends Effect {
-  @property({ default: '' }) declare filter: string
+  static material = new Material({
+    vert: `precision mediump float;
+attribute vec2 position;
+attribute vec2 uv;
+varying vec2 vUv;
+void main() {
+  gl_Position = vec4(position, 0.0, 1.0);
+  vUv = uv;
+}`,
+    frag: `precision highp float;
+varying vec2 vUv;
+uniform sampler2D sampler;
+uniform float m[20];
+
+void main(void) {
+  vec4 c = texture2D(sampler, vUv);
+  if (c.a > 0.0) {
+    c.rgb /= c.a;
+  }
+  gl_FragColor = vec4(
+    m[0]  * c.r + m[1]  * c.g + m[2]  * c.b + m[3]  * c.a + m[4] / 255.0,
+    m[5]  * c.r + m[6]  * c.g + m[7]  * c.b + m[8]  * c.a + m[9] / 255.0,
+    m[10] * c.r + m[11] * c.g + m[12] * c.b + m[13] * c.a + m[14] / 255.0,
+    m[15] * c.r + m[16] * c.g + m[17] * c.b + m[18] * c.a + m[19] / 255.0
+  );
+}`,
+  })
+
+  @property() declare filter?: string
 
   protected _colorMatrix = new ColorMatrix()
 
@@ -66,32 +94,4 @@ export class ColorFilterEffect extends Effect {
       })
     })
   }
-
-  static material = new Material({
-    vert: `precision mediump float;
-attribute vec2 position;
-attribute vec2 uv;
-varying vec2 vUv;
-void main() {
-  gl_Position = vec4(position, 0.0, 1.0);
-  vUv = uv;
-}`,
-    frag: `precision highp float;
-varying vec2 vUv;
-uniform sampler2D sampler;
-uniform float m[20];
-
-void main(void) {
-  vec4 c = texture2D(sampler, vUv);
-  if (c.a > 0.0) {
-    c.rgb /= c.a;
-  }
-  gl_FragColor = vec4(
-    m[0]  * c.r + m[1]  * c.g + m[2]  * c.b + m[3]  * c.a + m[4] / 255.0,
-    m[5]  * c.r + m[6]  * c.g + m[7]  * c.b + m[8]  * c.a + m[9] / 255.0,
-    m[10] * c.r + m[11] * c.g + m[12] * c.b + m[13] * c.a + m[14] / 255.0,
-    m[15] * c.r + m[16] * c.g + m[17] * c.b + m[18] * c.a + m[19] / 255.0
-  );
-}`,
-  })
 }

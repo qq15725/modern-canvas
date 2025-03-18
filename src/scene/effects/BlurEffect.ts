@@ -5,8 +5,8 @@ import { Effect } from '../main/Effect'
 import { Material, QuadUvGeometry } from '../resources'
 
 export interface BlurEffectProperties extends EffectProperties {
-  strength?: number
-  quality?: number
+  strength: number
+  quality: number
 }
 
 const frag = `varying vec2 vUv[9];

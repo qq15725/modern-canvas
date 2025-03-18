@@ -1,15 +1,15 @@
 import type { ColorValue, WebGLRenderer } from '../../core'
 import type { EffectProperties, Node, Viewport } from '../main'
 import { Color, customNode, property } from '../../core'
-import { Effect } from '../main'
+import { Effect } from '../main/Effect'
 import { Material, QuadUvGeometry } from '../resources'
 
 export interface OutlineEffectProperties extends EffectProperties {
-  thickness?: number
-  color?: ColorValue
-  alpha?: number
-  quality?: number
-  knockout?: boolean
+  thickness: number
+  color: ColorValue
+  alpha: number
+  quality: number
+  knockout: boolean
 }
 
 const frag = `precision highp float;

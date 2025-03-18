@@ -1,10 +1,15 @@
 import type { ColorValue, WebGLRenderer } from '../../core'
-import type { Viewport } from '../main'
+import type { EffectProperties, Node, Viewport } from '../main'
 import { Color, customNode, property } from '../../core'
 import { Effect } from '../main/Effect'
 import { Material, QuadUvGeometry } from '../resources'
 
 const MAX_COLORS = 50
+
+export interface ColorReplaceEffectProperties extends EffectProperties {
+  colors: ColorValue[]
+  epsilon: number
+}
 
 @customNode('ColorReplaceEffect')
 export class ColorReplaceEffect extends Effect {
@@ -49,10 +54,18 @@ void main(void) {
 }`,
   })
 
-  @property() colors: ColorValue[][] = []
-  @property() epsilon = 0.05
+  @property({ default: [] }) declare colors: ColorValue[][]
+  @property({ default: 0.05 }) declare epsilon: number
 
   protected _color = new Color()
+
+  constructor(properties?: Partial<ColorReplaceEffectProperties>, children: Node[] = []) {
+    super()
+
+    this
+      .setProperties(properties)
+      .append(children)
+  }
 
   override apply(renderer: WebGLRenderer, source: Viewport): void {
     const colors = this.colors.map((val) => {

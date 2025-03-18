@@ -1,8 +1,12 @@
 import type { WebGLRenderer } from '../../core'
-import type { Viewport } from '../main'
+import type { EffectProperties, Node, Viewport } from '../main'
 import { customNode, property } from '../../core'
 import { Effect } from '../main/Effect'
 import { Material, QuadUvGeometry } from '../resources'
+
+export interface PixelateEffectProperties extends EffectProperties {
+  strength: number
+}
 
 @customNode('PixelateEffect')
 export class PixelateEffect extends Effect {
@@ -44,20 +48,21 @@ void main(void) {
 }`,
   })
 
-  @property() size!: number
+  @property({ default: 10 }) declare strength: number
 
-  constructor(
-    size = 10,
-  ) {
+  constructor(properties?: Partial<PixelateEffectProperties>, children: Node[] = []) {
     super()
-    this.size = size
+
+    this
+      .setProperties(properties)
+      .append(children)
   }
 
   override apply(renderer: WebGLRenderer, source: Viewport): void {
     source.redraw(renderer, () => {
       QuadUvGeometry.draw(renderer, PixelateEffect.material, {
         sampler: 0,
-        size: [this.size, this.size],
+        size: [this.strength, this.strength],
         filterArea: [source.width, source.height, 0, 0],
       })
     })

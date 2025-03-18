@@ -1,14 +1,14 @@
 import type { PropertyDeclaration, WebGLRenderer } from '../../core'
 import type { EffectProperties, Node, Viewport } from '../main'
 import { customNode, property } from '../../core'
-import { Effect } from '../main'
+import { Effect } from '../main/Effect'
 import { Material, QuadUvGeometry } from '../resources'
 
-export interface KawaseBlurFilterProperties extends EffectProperties {
-  strength?: number
-  quality?: number
-  pixelSize?: [number, number]
-  clamp?: boolean
+export interface KawaseBlurEffectProperties extends EffectProperties {
+  strength: number
+  quality: number
+  pixelSize: [number, number]
+  clamp: boolean
 }
 
 export const frag = `varying vec2 vUv;
@@ -49,7 +49,7 @@ export class KawaseBlurEffect extends Effect {
 
   protected _kernels: number[] = [0]
 
-  constructor(properties?: Partial<KawaseBlurFilterProperties>, children: Node[] = []) {
+  constructor(properties?: Partial<KawaseBlurEffectProperties>, children: Node[] = []) {
     super()
 
     this.material = new Material({

@@ -1,8 +1,13 @@
 import type { ColorValue, WebGLRenderer } from '../../core'
-import type { Viewport } from '../main'
+import type { EffectProperties, Node, Viewport } from '../main'
 import { Color, customNode, property } from '../../core'
 import { Effect } from '../main/Effect'
 import { Material, QuadUvGeometry } from '../resources'
+
+export interface ColorRemoveEffectProperties extends EffectProperties {
+  colors: ColorValue[]
+  epsilon: number
+}
 
 @customNode('ColorRemoveEffect')
 export class ColorRemoveEffect extends Effect {
@@ -40,10 +45,18 @@ void main(void) {
 }`,
   })
 
-  @property() colors: ColorValue[] = []
-  @property() epsilon = 0.5
+  @property({ default: [] }) declare colors: ColorValue[]
+  @property({ default: 0.5 }) declare epsilon: number
 
   protected _color = new Color()
+
+  constructor(properties?: Partial<ColorRemoveEffectProperties>, children: Node[] = []) {
+    super()
+
+    this
+      .setProperties(properties)
+      .append(children)
+  }
 
   override apply(renderer: WebGLRenderer, source: Viewport): void {
     const maxColors = 50

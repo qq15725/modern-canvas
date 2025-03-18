@@ -1,8 +1,19 @@
 import type { WebGLRenderer } from '../../core'
-import type { Viewport } from '../main'
+import type { EffectProperties, Node, Viewport } from '../main'
 import { customNode, property } from '../../core'
 import { Effect } from '../main/Effect'
 import { Material, QuadUvGeometry } from '../resources'
+
+export interface ColorAdjustEffectProperties extends EffectProperties {
+  saturation: number
+  contrast: number
+  brightness: number
+  red: number
+  green: number
+  blue: number
+  alpha: number
+  gamma: number
+}
 
 @customNode('ColorAdjustEffect')
 export class ColorAdjustEffect extends Effect {
@@ -42,14 +53,22 @@ void main(void) {
 }`,
   })
 
-  @property() saturation = 1
-  @property() contrast = 1
-  @property() brightness = 1
-  @property() red = 1
-  @property() green = 1
-  @property() blue = 1
-  @property() alpha = 1
-  @property() gamma = 1
+  @property({ default: 1 }) declare saturation: number
+  @property({ default: 1 }) declare contrast: number
+  @property({ default: 1 }) declare brightness: number
+  @property({ default: 1 }) declare red: number
+  @property({ default: 1 }) declare green: number
+  @property({ default: 1 }) declare blue: number
+  @property({ default: 1 }) declare alpha: number
+  @property({ default: 1 }) declare gamma: number
+
+  constructor(properties?: Partial<ColorAdjustEffectProperties>, children: Node[] = []) {
+    super()
+
+    this
+      .setProperties(properties)
+      .append(children)
+  }
 
   override apply(renderer: WebGLRenderer, source: Viewport): void {
     source.redraw(renderer, () => {

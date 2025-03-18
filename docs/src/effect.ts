@@ -1,10 +1,17 @@
 import {
   BlurEffect,
+  EmbossEffect,
   Engine,
+  GlitchEffect,
+  GodrayEffect,
   Image2D,
   KawaseBlurEffect,
   Node,
-  OutlineEffect, Timeline,
+  OutlineEffect,
+  PixelateEffect,
+  ShadowEffect,
+  Timeline,
+  ZoomBlurEffect,
 } from '../../src'
 
 const engine = new Engine({
@@ -18,37 +25,23 @@ const engine = new Engine({
 
 document.body.append(engine.view!)
 
-function testEffect(top: number, effect: Node): Node[] {
+function testEffect(left: number, top: number, effect: Node): Node[] {
+  const size = 100
   return [
     new Image2D({
-      style: {
-        left: 100,
-        top,
-        width: 100,
-        height: 100,
-      },
+      style: { left, top, width: size, height: size },
       src: '/example.jpg',
     }, [
       effect.clone(),
     ]),
     new Image2D({
-      style: {
-        left: 200,
-        top,
-        width: 100,
-        height: 100,
-      },
+      style: { left: left + 100, top, width: size, height: size },
       src: '/example.png',
     }, [
       effect.clone(),
     ]),
     new Image2D({
-      style: {
-        left: 300,
-        top,
-        width: 100,
-        height: 100,
-      },
+      style: { left: left + 200, top, width: size, height: size },
       src: '/mask1.png',
     }, [
       effect.clone(),
@@ -58,10 +51,18 @@ function testEffect(top: number, effect: Node): Node[] {
 
 async function init(): Promise<void> {
   engine.root.append([
-    ...testEffect(10, new Node()),
-    ...testEffect(120, new BlurEffect()),
-    ...testEffect(230, new KawaseBlurEffect()),
-    ...testEffect(340, new OutlineEffect()),
+    ...testEffect(100, 10, new Node()),
+
+    ...testEffect(100, 120, new BlurEffect()),
+    ...testEffect(100, 230, new KawaseBlurEffect()),
+    ...testEffect(100, 340, new ZoomBlurEffect()),
+    ...testEffect(100, 450, new ShadowEffect()),
+    ...testEffect(100, 560, new OutlineEffect()),
+
+    ...testEffect(500, 120, new EmbossEffect()),
+    ...testEffect(500, 230, new PixelateEffect()),
+    ...testEffect(500, 340, new GlitchEffect()),
+    ...testEffect(500, 450, new GodrayEffect()),
   ])
 }
 

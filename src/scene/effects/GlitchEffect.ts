@@ -1,8 +1,20 @@
 import type { WebGLRenderer } from '../../core'
-import type { Viewport } from '../main'
+import type { EffectProperties, Node, Viewport } from '../main'
 import { customNode, property } from '../../core'
 import { Effect } from '../main/Effect'
 import { Material, QuadUvGeometry, Texture2D } from '../resources'
+
+export interface GlitchEffectProperties extends EffectProperties {
+  slices: number
+  sampleSize: number
+  offset: number
+  direction: number
+  fillMode: number
+  seed: number
+  red: [number, number]
+  green: [number, number]
+  blue: [number, number]
+}
 
 @customNode('GlitchEffect')
 export class GlitchEffect extends Effect {
@@ -118,18 +130,22 @@ void main(void) {
   protected _offsets: Float32Array
   protected _needsRedraw = false
 
-  @property() slices = 10
-  @property() sampleSize = 512
-  @property() offset = 100
-  @property() direction = 0
-  @property() fillMode = 2
-  @property() seed = 0
-  @property() red = [2, 2]
-  @property() green = [-10, 4]
-  @property() blue = [10, -4]
+  @property({ default: 10 }) declare slices: number
+  @property({ default: 512 }) declare sampleSize: number
+  @property({ default: 100 }) declare offset: number
+  @property({ default: 0 }) declare direction: number
+  @property({ default: 2 }) declare fillMode: number
+  @property({ default: 0 }) declare seed: number
+  @property({ default: [2, 2] }) declare red: [number, number]
+  @property({ default: [-10, 4] }) declare green: [number, number]
+  @property({ default: [10, -4] }) declare blue: [number, number]
 
-  constructor() {
+  constructor(properties?: Partial<GlitchEffectProperties>, children: Node[] = []) {
     super()
+
+    this
+      .setProperties(properties)
+      .append(children)
 
     this._canvas = document.createElement('canvas')
     this._canvas.width = 4

@@ -1,8 +1,17 @@
 import type { WebGLRenderer } from '../../core'
-import type { Viewport } from '../main'
+import type { EffectProperties, Node, Viewport } from '../main'
 import { customNode, property } from '../../core'
 import { Effect } from '../main/Effect'
 import { Material, QuadUvGeometry } from '../resources'
+
+export interface GodrayEffectProperties extends EffectProperties {
+  angle: number
+  gain: number
+  lacunarity: number
+  parallel: boolean
+  center: [number, number]
+  alpha: number
+}
 
 @customNode('GodrayEffect')
 export class GodrayEffect extends Effect {
@@ -141,12 +150,20 @@ void main(void) {
 }`,
   })
 
-  @property() angle = 30
-  @property() gain = 0.5
-  @property() lacunarity = 2.5
-  @property() parallel = true
-  @property() center: number[] = [0, 0]
-  @property() alpha = 1
+  @property({ default: 30 }) declare angle: number
+  @property({ default: 0.5 }) declare gain: number
+  @property({ default: 2.5 }) declare lacunarity: number
+  @property({ default: true }) declare parallel: boolean
+  @property({ default: [0, 0] }) declare center: [number, number]
+  @property({ default: 1 }) declare alpha: number
+
+  constructor(properties?: Partial<GodrayEffectProperties>, children: Node[] = []) {
+    super()
+
+    this
+      .setProperties(properties)
+      .append(children)
+  }
 
   override apply(renderer: WebGLRenderer, source: Viewport): void {
     const radians = this.angle * (Math.PI / 180)

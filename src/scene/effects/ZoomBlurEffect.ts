@@ -1,16 +1,18 @@
 import type { WebGLRenderer } from '../../core'
-import type { Viewport } from '../main'
+import type { EffectProperties, Node, Viewport } from '../main'
 import { customNode, property } from '../../core'
 import { Effect } from '../main/Effect'
 import { Material, QuadUvGeometry } from '../resources'
 
+export interface ZoomBlurEffectProperties extends EffectProperties {
+  center?: number[]
+  innerRadius: number
+  radius: number
+  strength: number
+}
+
 @customNode('ZoomBlurEffect')
 export class ZoomBlurEffect extends Effect {
-  @property() center?: number[]
-  @property() innerRadius = 20
-  @property() radius = -1
-  @property() strength = 0.1
-
   static material = new Material({
     vert: `attribute vec2 position;
 attribute vec2 uv;
@@ -95,6 +97,19 @@ void main() {
   gl_FragColor = color;
 }`,
   })
+
+  @property() declare center?: number[]
+  @property({ default: 20 }) declare innerRadius: number
+  @property({ default: -1 }) declare radius: number
+  @property({ default: 0.1 }) declare strength: number
+
+  constructor(properties?: Partial<ZoomBlurEffectProperties>, children: Node[] = []) {
+    super()
+
+    this
+      .setProperties(properties)
+      .append(children)
+  }
 
   override apply(renderer: WebGLRenderer, source: Viewport): void {
     source.redraw(renderer, () => {

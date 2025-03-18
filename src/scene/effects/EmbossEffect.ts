@@ -1,31 +1,15 @@
 import type { WebGLRenderer } from '../../core'
-import type { Viewport } from '../main'
+import type { EffectProperties, Node, Viewport } from '../main'
 import { customNode, property } from '../../core'
 import { Effect } from '../main/Effect'
 import { Material, QuadUvGeometry } from '../resources'
 
+export interface EmbossEffectProperties extends EffectProperties {
+  strength: number
+}
+
 @customNode('EmbossEffect')
 export class EmbossEffect extends Effect {
-  @property() strength!: number
-
-  constructor(
-    strength = 5,
-  ) {
-    super()
-
-    this.strength = strength
-  }
-
-  override apply(renderer: WebGLRenderer, source: Viewport): void {
-    source.redraw(renderer, () => {
-      QuadUvGeometry.draw(renderer, EmbossEffect.material, {
-        sampler: 0,
-        strength: this.strength,
-        inputSize: [source.width, source.height, 1 / source.width, 1 / source.height],
-      })
-    })
-  }
-
   static material = new Material({
     vert: `precision mediump float;
 attribute vec2 position;
@@ -52,4 +36,24 @@ void main(void) {
     gl_FragColor = vec4(color.rgb * alpha, alpha);
 }`,
   })
+
+  @property({ default: 5 }) declare strength: number
+
+  constructor(properties?: Partial<EmbossEffectProperties>, children: Node[] = []) {
+    super()
+
+    this
+      .setProperties(properties)
+      .append(children)
+  }
+
+  override apply(renderer: WebGLRenderer, source: Viewport): void {
+    source.redraw(renderer, () => {
+      QuadUvGeometry.draw(renderer, EmbossEffect.material, {
+        sampler: 0,
+        strength: this.strength,
+        inputSize: [source.width, source.height, 1 / source.width, 1 / source.height],
+      })
+    })
+  }
 }

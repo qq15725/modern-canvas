@@ -1,8 +1,13 @@
 import type { ColorValue, WebGLRenderer } from '../../core'
-import type { Viewport } from '../main'
+import type { EffectProperties, Node, Viewport } from '../main'
 import { Color, customNode, property } from '../../core'
 import { Effect } from '../main/Effect'
 import { Material, QuadUvGeometry } from '../resources'
+
+export interface ColorOverlayEffectProperties extends EffectProperties {
+  colors: ColorValue[]
+  alpha: number
+}
 
 const MAX_COLORS = 50
 
@@ -56,10 +61,18 @@ void main(void) {
 }`,
   })
 
-  @property() colors: ColorValue[] = []
-  @property() alpha = 0.5
+  @property({ default: [] }) declare colors: ColorValue[]
+  @property({ default: 0.5 }) declare alpha: number
 
   protected _color = new Color()
+
+  constructor(properties?: Partial<ColorOverlayEffectProperties>, children: Node[] = []) {
+    super()
+
+    this
+      .setProperties(properties)
+      .append(children)
+  }
 
   override apply(renderer: WebGLRenderer, source: Viewport): void {
     source.redraw(renderer, () => {
