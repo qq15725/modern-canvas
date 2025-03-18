@@ -1,3 +1,19 @@
+## [0.4.21](https://github.com/qq15725/modern-canvas/compare/v0.4.20...v0.4.21) (2025-03-18)
+
+
+### Bug Fixes
+
+* effect type ([8f5afed](https://github.com/qq15725/modern-canvas/commit/8f5afedac6c07b63ae3918df461b24ef51d86053))
+
+
+### Features
+
+* add DropShadowEffect ([ba1d366](https://github.com/qq15725/modern-canvas/commit/ba1d36663b27bcdf61a6b187600ba5432a57f631))
+* add KawaseBlurEffect ([7730c6b](https://github.com/qq15725/modern-canvas/commit/7730c6bfec603da09e8d3996d92172088afd1cce))
+* add OutlineEffect ([cdb06a5](https://github.com/qq15725/modern-canvas/commit/cdb06a5d356b80ab25a8e52180ce3f4fe23acd23))
+
+
+
 ## [0.4.20](https://github.com/qq15725/modern-canvas/compare/v0.4.19...v0.4.20) (2025-03-17)
 
 
