@@ -1,3 +1,19 @@
+## [0.4.22](https://github.com/qq15725/modern-canvas/compare/v0.4.21...v0.4.22) (2025-03-19)
+
+
+### Bug Fixes
+
+* ZoomBlurEffect ([9ee9a9c](https://github.com/qq15725/modern-canvas/commit/9ee9a9cd24651e70710802747a0246be0da31118))
+
+
+### Features
+
+* BaseElement2D support outline ([f8a1ce8](https://github.com/qq15725/modern-canvas/commit/f8a1ce8a76795ed7956ebe0c1fd76b7d1840bc65))
+* BaseElement2D support shadow ([62af23e](https://github.com/qq15725/modern-canvas/commit/62af23e56128da24156460a6ba418c53a7127bea))
+* opz DropShadowEffect ([dfdb29e](https://github.com/qq15725/modern-canvas/commit/dfdb29e837a51d165b8318f88e0d0fbae9113f3c))
+
+
+
 ## [0.4.21](https://github.com/qq15725/modern-canvas/compare/v0.4.20...v0.4.21) (2025-03-18)
 
 
