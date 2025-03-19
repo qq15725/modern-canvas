@@ -1,10 +1,12 @@
+import type { ShadowDeclaration } from 'modern-idoc'
 import type {
   ColorValue,
   EventListenerOptions,
   EventListenerValue,
   InputEvent,
   InputEventKey,
-  PointerInputEvent, PropertyDeclaration,
+  PointerInputEvent,
+  PropertyDeclaration,
   WebGLBlendMode,
 } from '../../core'
 import type { CanvasBatchable, CanvasItemEventMap, Node, Rectangulable } from '../main'
@@ -18,7 +20,8 @@ import {
   Vector2,
 } from '../../core'
 import { parseCSSFilter, parseCSSTransform, parseCSSTransformOrigin } from '../../css'
-import { DropShadowEffect, MaskEffect } from '../effects'
+import { MaskEffect } from '../effects'
+import { BaseElement2DShadow } from './BaseElement2DShadow'
 import { BaseElement2DStyle } from './BaseElement2DStyle'
 import { Node2D } from './Node2D'
 
@@ -39,6 +42,7 @@ export interface BaseElement2D {
 
 export interface BaseElement2DProperties extends Node2DProperties {
   style: Partial<BaseElement2DStyleProperties>
+  shadow: Partial<ShadowDeclaration>
   modulate: ColorValue
   blendMode: WebGLBlendMode
 }
@@ -59,13 +63,12 @@ export class BaseElement2D extends Node2D implements Rectangulable {
     this._style = style
   }
 
+  readonly shadow = new BaseElement2DShadow(this)
+
   constructor(properties?: Partial<BaseElement2DProperties>, nodes: Node[] = []) {
     super()
-
     this._updateStyleProperty = this._updateStyleProperty.bind(this)
-
     this.style = new BaseElement2DStyle()
-
     this
       .setProperties(properties)
       .append(nodes)
@@ -73,8 +76,9 @@ export class BaseElement2D extends Node2D implements Rectangulable {
 
   override setProperties(properties?: Record<PropertyKey, any>): this {
     if (properties) {
-      const { style, ...restProperties } = properties
+      const { style, shadow, ...restProperties } = properties
       style && this.style.setProperties(style)
+      shadow && this.shadow.setProperties(shadow)
       super.setProperties(restProperties)
     }
     return this
@@ -133,34 +137,12 @@ export class BaseElement2D extends Node2D implements Rectangulable {
       case 'filter':
         this.requestRepaint()
         break
-      case 'boxShadow':
-        this._updateBoxShadow()
-        break
       case 'maskImage':
         this._updateMaskImage()
         break
       case 'borderRadius':
         this.requestRedraw()
         break
-    }
-  }
-
-  protected _updateBoxShadow(): void {
-    const nodePath = '__$style.shadow'
-    if (this.style.boxShadow !== 'none') {
-      const node = this.getNode<DropShadowEffect>(nodePath)
-      if (node) {
-        // TODO
-      }
-      else {
-        this.appendChild(new DropShadowEffect({ name: nodePath }), 'back')
-      }
-    }
-    else {
-      const node = this.getNode(nodePath)
-      if (node) {
-        this.removeChild(node)
-      }
     }
   }
 
@@ -404,6 +386,7 @@ export class BaseElement2D extends Node2D implements Rectangulable {
       ...json,
       props: {
         style: this.style.toJSON(),
+        shadow: this.shadow.toJSON(),
         ...json.props,
       },
     }

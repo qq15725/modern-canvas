@@ -11,7 +11,6 @@ export interface DropShadowEffectProperties extends EffectProperties {
   blur: number
   offsetX: number
   offsetY: number
-  alpha: number
   shadowOnly: boolean
 }
 
@@ -46,7 +45,6 @@ void main(void) {
   @property({ default: 4 }) declare blur: number
   @property({ default: 4 }) declare offsetX: number
   @property({ default: 4 }) declare offsetY: number
-  @property({ default: 1 }) declare alpha: number
   @property({ default: false }) declare shadowOnly: boolean
 
   blurEffect = new GaussianBlurEffect()
@@ -69,7 +67,7 @@ void main(void) {
       this._color.value = this.color
       QuadUvGeometry.draw(renderer, DropShadowEffect.material, {
         sampler: 0,
-        uAlpha: this.alpha,
+        uAlpha: this._color.a,
         uColor: this._color.toArray().slice(0, 3),
         uOffset: [-this.offsetX, this.offsetY],
         uInputSize: [source.width, source.height, 1 / source.width, 1 / source.height],
