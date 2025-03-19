@@ -101,9 +101,8 @@ void main() {
   override apply(renderer: WebGLRenderer, source: Viewport): void {
     const uvX = this.pixelSize[0] / source.width
     const uvY = this.pixelSize[1] / source.height
-    let offset: number
-    if (this.quality === 1 || this.strength === 0) {
-      offset = this._kernels[0] + 0.5
+    this._kernels.forEach((kernel) => {
+      const offset = kernel + 0.5
       source.redraw(renderer, () => {
         QuadUvGeometry.draw(renderer, this.material, {
           sampler: 0,
@@ -114,31 +113,6 @@ void main() {
           uInputClamp: [0, 0, 1, 1],
         })
       })
-    }
-    else {
-      const last = this.quality - 1
-      for (let i = 0; i < last; i++) {
-        offset = this._kernels[i] + 0.5
-        source.redraw(renderer, () => {
-          QuadUvGeometry.draw(renderer, this.material, {
-            sampler: 0,
-            uOffset: [
-              offset * uvX,
-              offset * uvY,
-            ],
-            uInputClamp: [0, 0, 1, 1],
-          })
-        })
-      }
-      offset = this._kernels[last] + 0.5
-      QuadUvGeometry.draw(renderer, this.material, {
-        sampler: 0,
-        uOffset: [
-          offset * uvX,
-          offset * uvY,
-        ],
-        uInputClamp: [0, 0, 1, 1],
-      })
-    }
+    })
   }
 }

@@ -1,5 +1,5 @@
 import type { WebGLRenderer } from '../../core'
-import type { EffectProperties, Node, Viewport } from '../main'
+import type { EffectContext, EffectProperties, Node, Viewport } from '../main'
 import { customNode, property } from '../../core'
 import { Effect } from '../main/Effect'
 import { Material, QuadUvGeometry } from '../resources'
@@ -111,11 +111,18 @@ void main() {
       .append(children)
   }
 
-  override apply(renderer: WebGLRenderer, source: Viewport): void {
+  override apply(renderer: WebGLRenderer, source: Viewport, context: EffectContext): void {
+    let center = this.center
+    if (context.targetArea) {
+      center = [
+        (context.targetArea[0] + context.targetArea[2] / 2) * source.width,
+        (context.targetArea[1] + context.targetArea[3] / 2) * source.height,
+      ]
+    }
     source.redraw(renderer, () => {
       QuadUvGeometry.draw(renderer, ZoomBlurEffect.material, {
         sampler: 0,
-        uCenter: this.center ?? [source.width / 2, source.height / 2],
+        uCenter: center ?? [source.width / 2, source.height / 2],
         uInnerRadius: this.innerRadius,
         uRadius: this.radius,
         uStrength: this.strength,
