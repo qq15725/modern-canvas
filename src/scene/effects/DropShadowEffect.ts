@@ -4,16 +4,15 @@ import { Color, customNode, property } from '../../core'
 import { Viewport } from '../main'
 import { Effect } from '../main/Effect'
 import { Material, QuadUvGeometry, UvMaterial } from '../resources'
-import { KawaseBlurEffect } from './KawaseBlurEffect'
+import { GaussianBlurEffect } from './GaussianBlurEffect'
 
 export interface DropShadowEffectProperties extends EffectProperties {
-  offset: [number, number]
   color: ColorValue
+  blur: number
+  offsetX: number
+  offsetY: number
   alpha: number
   shadowOnly: boolean
-  blur: number
-  quality: number
-  pixelSize: [number, number]
 }
 
 @customNode('DropShadowEffect')
@@ -43,15 +42,14 @@ void main(void) {
 }`,
   })
 
-  @property({ default: [4, 4] }) declare offset: [number, number]
   @property({ default: 0x000000 }) declare color: ColorValue
+  @property({ default: 4 }) declare blur: number
+  @property({ default: 4 }) declare offsetX: number
+  @property({ default: 4 }) declare offsetY: number
   @property({ default: 1 }) declare alpha: number
   @property({ default: false }) declare shadowOnly: boolean
-  @property({ default: 2 }) declare blur: number
-  @property({ default: 4 }) declare quality: number
-  @property({ default: [1, 1] }) declare pixelSize: [number, number]
 
-  kawaseBlurEffect = new KawaseBlurEffect()
+  blurEffect = new GaussianBlurEffect()
   viewport3 = new Viewport()
 
   protected _color = new Color()
@@ -73,15 +71,13 @@ void main(void) {
         sampler: 0,
         uAlpha: this.alpha,
         uColor: this._color.toArray().slice(0, 3),
-        uOffset: [-this.offset[0], this.offset[1]],
+        uOffset: [-this.offsetX, this.offsetY],
         uInputSize: [source.width, source.height, 1 / source.width, 1 / source.height],
       })
     })
 
-    this.kawaseBlurEffect.strength = this.blur
-    this.kawaseBlurEffect.quality = this.quality
-    this.kawaseBlurEffect.pixelSize = this.pixelSize
-    this.kawaseBlurEffect.apply(renderer, this.viewport3)
+    this.blurEffect.strength = this.blur
+    this.blurEffect.apply(renderer, this.viewport3)
 
     source.redraw(renderer, () => {
       this.viewport3.texture.activate(renderer, 1)

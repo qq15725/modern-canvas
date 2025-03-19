@@ -4,7 +4,7 @@ import { customNode, property } from '../../core'
 import { Effect } from '../main/Effect'
 import { Material, QuadUvGeometry } from '../resources'
 
-export interface BlurEffectProperties extends EffectProperties {
+export interface GaussianBlurEffectProperties extends EffectProperties {
   strength: number
   quality: number
 }
@@ -45,28 +45,25 @@ void main(void) {
   }
 }`
 
-/**
- * Gaussian blur
- */
-@customNode('BlurEffect')
-export class BlurEffect extends Effect {
+@customNode('GaussianBlurEffect')
+export class GaussianBlurEffect extends Effect {
   static materialX = new Material({
     vert: `attribute vec2 position;
 attribute vec2 uv;
+uniform float uStrength;
 varying vec2 vUv[9];
-uniform float strength;
 
 void main(void) {
   gl_Position = vec4(position, 0, 1);
-  vUv[0] = uv + vec2(-4.0 * strength, 0.0);
-  vUv[1] = uv + vec2(-3.0 * strength, 0.0);
-  vUv[2] = uv + vec2(-2.0 * strength, 0.0);
-  vUv[3] = uv + vec2(-1.0 * strength, 0.0);
-  vUv[4] = uv + vec2(0.0 * strength, 0.0);
-  vUv[5] = uv + vec2(1.0 * strength, 0.0);
-  vUv[6] = uv + vec2(2.0 * strength, 0.0);
-  vUv[7] = uv + vec2(3.0 * strength, 0.0);
-  vUv[8] = uv + vec2(4.0 * strength, 0.0);
+  vUv[0] = uv + vec2(-4.0 * uStrength, 0.0);
+  vUv[1] = uv + vec2(-3.0 * uStrength, 0.0);
+  vUv[2] = uv + vec2(-2.0 * uStrength, 0.0);
+  vUv[3] = uv + vec2(-1.0 * uStrength, 0.0);
+  vUv[4] = uv + vec2(0.0 * uStrength, 0.0);
+  vUv[5] = uv + vec2(1.0 * uStrength, 0.0);
+  vUv[6] = uv + vec2(2.0 * uStrength, 0.0);
+  vUv[7] = uv + vec2(3.0 * uStrength, 0.0);
+  vUv[8] = uv + vec2(4.0 * uStrength, 0.0);
 }`,
     frag,
   })
@@ -74,20 +71,20 @@ void main(void) {
   static materialY = new Material({
     vert: `attribute vec2 position;
 attribute vec2 uv;
-uniform float strength;
+uniform float uStrength;
 varying vec2 vUv[9];
 
 void main(void) {
   gl_Position = vec4(position, 0, 1);
-  vUv[0] = uv + vec2(0.0, -4.0 * strength);
-  vUv[1] = uv + vec2(0.0, -3.0 * strength);
-  vUv[2] = uv + vec2(0.0, -2.0 * strength);
-  vUv[3] = uv + vec2(0.0, -1.0 * strength);
-  vUv[4] = uv + vec2(0.0, 0.0 * strength);
-  vUv[5] = uv + vec2(0.0, 1.0 * strength);
-  vUv[6] = uv + vec2(0.0, 2.0 * strength);
-  vUv[7] = uv + vec2(0.0, 3.0 * strength);
-  vUv[8] = uv + vec2(0.0, 4.0 * strength);
+  vUv[0] = uv + vec2(0.0, -4.0 * uStrength);
+  vUv[1] = uv + vec2(0.0, -3.0 * uStrength);
+  vUv[2] = uv + vec2(0.0, -2.0 * uStrength);
+  vUv[3] = uv + vec2(0.0, -1.0 * uStrength);
+  vUv[4] = uv + vec2(0.0, 0.0 * uStrength);
+  vUv[5] = uv + vec2(0.0, 1.0 * uStrength);
+  vUv[6] = uv + vec2(0.0, 2.0 * uStrength);
+  vUv[7] = uv + vec2(0.0, 3.0 * uStrength);
+  vUv[8] = uv + vec2(0.0, 4.0 * uStrength);
 }`,
     frag,
   })
@@ -95,7 +92,7 @@ void main(void) {
   @property({ default: 4 }) declare strength: number
   @property({ default: 3 }) declare quality: number
 
-  constructor(properties?: Partial<BlurEffectProperties>, children: Node[] = []) {
+  constructor(properties?: Partial<GaussianBlurEffectProperties>, children: Node[] = []) {
     super()
 
     this
@@ -104,18 +101,26 @@ void main(void) {
   }
 
   override apply(renderer: WebGLRenderer, source: Viewport): void {
-    source.redraw(renderer, () => {
-      QuadUvGeometry.draw(renderer, BlurEffect.materialX, {
-        sampler: 0,
-        strength: (1 / source.width) * this.strength / this.quality,
-      })
-    })
+    const sx = (1 / source.width)
+    const sy = (1 / source.height)
+    const quality = Math.max(this.quality, 1)
 
-    source.redraw(renderer, () => {
-      QuadUvGeometry.draw(renderer, BlurEffect.materialY, {
-        sampler: 0,
-        strength: (1 / source.height) * this.strength / this.quality,
+    for (let i = 0; i < quality; i++) {
+      source.redraw(renderer, () => {
+        QuadUvGeometry.draw(renderer, GaussianBlurEffect.materialX, {
+          sampler: 0,
+          uStrength: sx * (this.strength / quality),
+        })
       })
-    })
+    }
+
+    for (let i = 0; i < quality; i++) {
+      source.redraw(renderer, () => {
+        QuadUvGeometry.draw(renderer, GaussianBlurEffect.materialY, {
+          sampler: 0,
+          uStrength: sy * (this.strength / quality),
+        })
+      })
+    }
   }
 }

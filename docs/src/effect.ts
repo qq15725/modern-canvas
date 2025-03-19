@@ -1,15 +1,16 @@
 import {
-  BlurEffect,
   DropShadowEffect,
   EmbossEffect,
   Engine,
+  GaussianBlurEffect,
   GlitchEffect,
   Image2D,
   KawaseBlurEffect,
   Node,
   OutlineEffect,
   PixelateEffect,
-  Timeline, ZoomBlurEffect,
+  Timeline,
+  ZoomBlurEffect,
 } from '../../src'
 
 const engine = new Engine({
@@ -51,7 +52,7 @@ async function init(): Promise<void> {
   engine.root.append([
     ...testEffect(100, 10, new Node()),
 
-    ...testEffect(100, 120, new BlurEffect()),
+    ...testEffect(100, 120, new GaussianBlurEffect()),
     ...testEffect(100, 230, new KawaseBlurEffect()),
     ...testEffect(100, 340, new ZoomBlurEffect()),
     ...testEffect(100, 450, new DropShadowEffect()),
