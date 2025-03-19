@@ -1,4 +1,4 @@
-import type { ShadowDeclaration } from 'modern-idoc'
+import type { OutlineDeclaration, ShadowDeclaration } from 'modern-idoc'
 import type {
   ColorValue,
   EventListenerOptions,
@@ -21,6 +21,7 @@ import {
 } from '../../core'
 import { parseCSSFilter, parseCSSTransform, parseCSSTransformOrigin } from '../../css'
 import { MaskEffect } from '../effects'
+import { BaseElement2DOutline } from './BaseElement2DOutline'
 import { BaseElement2DShadow } from './BaseElement2DShadow'
 import { BaseElement2DStyle } from './BaseElement2DStyle'
 import { Node2D } from './Node2D'
@@ -43,6 +44,7 @@ export interface BaseElement2D {
 export interface BaseElement2DProperties extends Node2DProperties {
   style: Partial<BaseElement2DStyleProperties>
   shadow: Partial<ShadowDeclaration>
+  outline: Partial<OutlineDeclaration>
   modulate: ColorValue
   blendMode: WebGLBlendMode
 }
@@ -64,6 +66,7 @@ export class BaseElement2D extends Node2D implements Rectangulable {
   }
 
   readonly shadow = new BaseElement2DShadow(this)
+  readonly outline = new BaseElement2DOutline(this)
 
   constructor(properties?: Partial<BaseElement2DProperties>, nodes: Node[] = []) {
     super()
@@ -76,9 +79,10 @@ export class BaseElement2D extends Node2D implements Rectangulable {
 
   override setProperties(properties?: Record<PropertyKey, any>): this {
     if (properties) {
-      const { style, shadow, ...restProperties } = properties
+      const { style, shadow, outline, ...restProperties } = properties
       style && this.style.setProperties(style)
       shadow && this.shadow.setProperties(shadow)
+      outline && this.outline.setProperties(outline)
       super.setProperties(restProperties)
     }
     return this
@@ -387,6 +391,7 @@ export class BaseElement2D extends Node2D implements Rectangulable {
       props: {
         style: this.style.toJSON(),
         shadow: this.shadow.toJSON(),
+        outline: this.outline.toJSON(),
         ...json.props,
       },
     }

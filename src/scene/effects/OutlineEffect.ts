@@ -5,9 +5,11 @@ import { Effect } from '../main/Effect'
 import { Material, QuadUvGeometry } from '../resources'
 
 export interface OutlineEffectProperties extends EffectProperties {
-  thickness: number
   color: ColorValue
-  alpha: number
+  width: number
+  style: 'dashed' | 'solid' | string // TODO
+  image?: string // TODO
+  opacity: number
   quality: number
   knockout: boolean
 }
@@ -64,9 +66,11 @@ export class OutlineEffect extends Effect {
     )
   }
 
-  @property({ default: 1 }) declare thickness: number
   @property({ default: 0x000000 }) declare color: ColorValue
-  @property({ default: 1 }) declare alpha: number
+  @property({ default: 1 }) declare width: number
+  @property({ default: 'solid' }) declare style: 'dashed' | 'solid' | string // TODO
+  @property() declare image?: string // TODO
+  @property({ default: 1 }) declare opacity: number
   @property({ default: 0.1 }) declare quality: number
   @property({ default: false }) declare knockout: boolean
 
@@ -102,11 +106,11 @@ void main() {
       QuadUvGeometry.draw(renderer, this.material, {
         sampler: 0,
         uThickness: [
-          this.thickness / source.width,
-          this.thickness / source.height,
+          this.width / source.width,
+          this.width / source.height,
         ],
         uColor: this._color.toArray().slice(0, 3),
-        uAlpha: this.alpha,
+        uAlpha: this.opacity !== 1 ? this.opacity : this._color.a,
         uAngleStep: OutlineEffect.getAngleStep(this.quality),
         uKnockout: this.knockout ? 1 : 0,
         uInputClamp: [0, 0, 1, 1],

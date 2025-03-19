@@ -1,13 +1,14 @@
 import type { PropertyDeclaration } from '../../core'
 import type { BaseElement2D } from './BaseElement2D'
 import { CoreObject, property } from '../../core'
-import { DropShadowEffect } from '../effects'
+import { OutlineEffect } from '../effects'
 
-export class BaseElement2DShadow extends CoreObject {
+export class BaseElement2DOutline extends CoreObject {
   @property({ default: '#000000' }) declare color: string
-  @property({ default: 0 }) declare blur: number
-  @property({ default: 0 }) declare offsetY: number
-  @property({ default: 0 }) declare offsetX: number
+  @property({ default: 0 }) declare width: number
+  @property({ default: 'solid' }) declare style: 'dashed' | 'solid' | string
+  @property() declare image?: string
+  @property({ default: 1 }) declare opacity: number
 
   constructor(
     public parent: BaseElement2D,
@@ -20,24 +21,21 @@ export class BaseElement2DShadow extends CoreObject {
 
     switch (key) {
       case 'color':
-      case 'blur':
-      case 'offsetX':
-      case 'offsetY':
+      case 'width':
+      case 'style':
+      case 'image':
+      case 'opacity':
         this.updateEffect()
         break
     }
   }
 
   updateEffect(): void {
-    const name = '__$shadow'
-    let effect = this.parent.getNode<DropShadowEffect>(name)
-    if (
-      this.blur
-      || this.offsetX
-      || this.offsetY
-    ) {
+    const name = '__$outline'
+    let effect = this.parent.getNode<OutlineEffect>(name)
+    if (this.width) {
       if (!effect) {
-        effect = new DropShadowEffect({ name })
+        effect = new OutlineEffect({ name })
         this.parent.appendChild(effect, 'back')
       }
       effect.setProperties(this.getProperties())
