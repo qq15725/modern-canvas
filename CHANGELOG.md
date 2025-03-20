@@ -1,3 +1,12 @@
+## [0.4.23](https://github.com/qq15725/modern-canvas/compare/v0.4.22...v0.4.23) (2025-03-20)
+
+
+### Features
+
+* BaseElement2D supports geometry、fill、outline、text features ([ed7d71a](https://github.com/qq15725/modern-canvas/commit/ed7d71a9c55d0c371876105e29edc59ce5023a5f))
+
+
+
 ## [0.4.22](https://github.com/qq15725/modern-canvas/compare/v0.4.21...v0.4.22) (2025-03-19)
 
 
