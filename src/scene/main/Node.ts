@@ -233,12 +233,10 @@ export class Node extends CoreObject {
   }
 
   protected override _update(changed: Map<PropertyKey, any>): void {
-    this._tree?.log(this.name, 'updating')
     super._update(changed)
   }
 
   protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    this._tree?.log(this.name, `updating [${String(key)}]`)
     super._updateProperty(key, value, oldValue, declaration)
   }
 

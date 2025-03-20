@@ -33,7 +33,7 @@ export class Text2D extends TextureRect2D<CanvasTexture> {
 
   override texture = new CanvasTexture()
 
-  text = new Text()
+  protected _baseText = new Text()
   measureResult?: MeasureResult
   protected _subTextsCount = 0
 
@@ -65,12 +65,12 @@ export class Text2D extends TextureRect2D<CanvasTexture> {
   }
 
   protected _updateText(): void {
-    this.text.style = this.style.toJSON() as any
-    this.text.content = this.content ?? ''
-    this.text.effects = this.effects
-    this.text.fonts = this.fonts
-    this.text.measureDom = this.measureDom
-    this.text.requestUpdate()
+    this._baseText.style = this.style.toJSON() as any
+    this._baseText.content = this.content ?? ''
+    this._baseText.effects = this.effects
+    this._baseText.fonts = this.fonts
+    this._baseText.measureDom = this.measureDom
+    this._baseText.requestUpdate()
   }
 
   protected override _updateStyleProperty(key: PropertyKey, value: any, oldValue: any): void {
@@ -130,7 +130,7 @@ export class Text2D extends TextureRect2D<CanvasTexture> {
 
   measure(): MeasureResult {
     this._updateText()
-    return this.text.measure()
+    return this._baseText.measure()
   }
 
   updateMeasure(): this {
@@ -139,7 +139,6 @@ export class Text2D extends TextureRect2D<CanvasTexture> {
     const textHeight = this.measureResult.boundingBox.height
     const { left, top, width, height = textHeight } = this.style
     this.position.x = left + Math.min(0, ((width || textWidth) - textWidth) / 2)
-    // this.position.x = left
     this.position.y = top + Math.min(0, ((height || textHeight) - textHeight) / 2)
     this.size.width = textWidth
     this.size.height = textHeight
@@ -189,7 +188,7 @@ export class Text2D extends TextureRect2D<CanvasTexture> {
         onText2DRender()
       }
       else {
-        this.text.render({
+        this._baseText.render({
           pixelRatio: this.texture.pixelRatio,
           view: this.texture.source,
         })

@@ -1,4 +1,3 @@
-import type { OutlineDeclaration, ShadowDeclaration } from 'modern-idoc'
 import type {
   ColorValue,
   EventListenerOptions,
@@ -10,7 +9,12 @@ import type {
   WebGLBlendMode,
 } from '../../core'
 import type { CanvasBatchable, CanvasItemEventMap, Node, Rectangulable } from '../main'
+import type { BaseElement2DFillProperties } from './BaseElement2DFill'
+import type { BaseElement2DGeometryProperties } from './BaseElement2DGeometry'
+import type { BaseElement2DOutlineProperties } from './BaseElement2DOutline'
+import type { BaseElement2DShadowProperties } from './BaseElement2DShadow'
 import type { BaseElement2DStyleProperties } from './BaseElement2DStyle'
+import type { BaseElement2DTextProperties } from './BaseElement2DText'
 import type { Node2DProperties } from './Node2D'
 import {
   customNode,
@@ -21,9 +25,12 @@ import {
 } from '../../core'
 import { parseCSSFilter, parseCSSTransform, parseCSSTransformOrigin } from '../../css'
 import { MaskEffect } from '../effects'
+import { BaseElement2DFill } from './BaseElement2DFill'
+import { BaseElement2DGeometry } from './BaseElement2DGeometry'
 import { BaseElement2DOutline } from './BaseElement2DOutline'
 import { BaseElement2DShadow } from './BaseElement2DShadow'
 import { BaseElement2DStyle } from './BaseElement2DStyle'
+import { BaseElement2DText } from './BaseElement2DText'
 import { Node2D } from './Node2D'
 
 export interface BaseElement2DEventMap extends CanvasItemEventMap {
@@ -42,11 +49,14 @@ export interface BaseElement2D {
 }
 
 export interface BaseElement2DProperties extends Node2DProperties {
-  style: Partial<BaseElement2DStyleProperties>
-  shadow: Partial<ShadowDeclaration>
-  outline: Partial<OutlineDeclaration>
   modulate: ColorValue
   blendMode: WebGLBlendMode
+  style: Partial<BaseElement2DStyleProperties>
+  text: Partial<BaseElement2DTextProperties>
+  geometry: Partial<BaseElement2DGeometryProperties>
+  fill: Partial<BaseElement2DFillProperties>
+  shadow: Partial<BaseElement2DShadowProperties>
+  outline: Partial<BaseElement2DOutlineProperties>
 }
 
 @customNode('BaseElement2D')
@@ -65,8 +75,25 @@ export class BaseElement2D extends Node2D implements Rectangulable {
     this._style = style
   }
 
-  readonly shadow = new BaseElement2DShadow(this)
-  readonly outline = new BaseElement2DOutline(this)
+  protected _text = new BaseElement2DText(this)
+  get text(): BaseElement2DText { return this._text }
+  set text(value: Partial<BaseElement2DTextProperties>) { this._text.setProperties(value) }
+
+  protected _geometry = new BaseElement2DGeometry(this)
+  get geometry(): BaseElement2DGeometry { return this._geometry }
+  set geometry(value: Partial<BaseElement2DGeometryProperties>) { this._geometry.setProperties(value) }
+
+  protected _fill = new BaseElement2DFill(this)
+  get fill(): BaseElement2DFill { return this._fill }
+  set fill(value: Partial<BaseElement2DFillProperties>) { this._fill.setProperties(value) }
+
+  protected _outline = new BaseElement2DOutline(this)
+  get outline(): BaseElement2DOutline { return this._outline }
+  set outline(value: Partial<BaseElement2DOutlineProperties>) { this._outline.setProperties(value) }
+
+  protected _shadow = new BaseElement2DShadow(this)
+  get shadow(): BaseElement2DShadow { return this._shadow }
+  set shadow(value: Partial<BaseElement2DShadowProperties>) { this._shadow.setProperties(value) }
 
   constructor(properties?: Partial<BaseElement2DProperties>, nodes: Node[] = []) {
     super()
@@ -79,10 +106,21 @@ export class BaseElement2D extends Node2D implements Rectangulable {
 
   override setProperties(properties?: Record<PropertyKey, any>): this {
     if (properties) {
-      const { style, shadow, outline, ...restProperties } = properties
+      const {
+        style,
+        text,
+        geometry,
+        fill,
+        outline,
+        shadow,
+        ...restProperties
+      } = properties
       style && this.style.setProperties(style)
-      shadow && this.shadow.setProperties(shadow)
+      text && this.text.setProperties(text)
+      geometry && this.geometry.setProperties(geometry)
+      fill && this.fill.setProperties(fill)
       outline && this.outline.setProperties(outline)
+      shadow && this.shadow.setProperties(shadow)
       super.setProperties(restProperties)
     }
     return this
@@ -203,7 +241,6 @@ export class BaseElement2D extends Node2D implements Rectangulable {
   protected override _updateGlobalTransform(): void {
     super._updateGlobalTransform()
     this._updateOverflow()
-    // this.requestRedraw()
   }
 
   getRect(): Rect2 {
@@ -255,10 +292,39 @@ export class BaseElement2D extends Node2D implements Rectangulable {
 
   protected _draw(): void {
     super._draw()
-    this._drawBackground()
-    this._drawContent()
-    this._drawBorder()
-    this._drawOutline()
+
+    let flag = false
+    if (this.text.canDraw()) {
+      this.text.updateMeasure()
+    }
+
+    if (this.fill.canDraw()) {
+      this._tree?.log(this.name, 'draw fill')
+      this.geometry.draw()
+      this.fill.draw()
+      flag = true
+    }
+
+    if (this.outline.canDraw()) {
+      this._tree?.log(this.name, 'draw outline')
+      this.geometry.draw()
+      this.outline.draw()
+      flag = true
+    }
+
+    if (this.text.canDraw()) {
+      this._tree?.log(this.name, 'draw text')
+      this._drawBoundingRect()
+      this.text.draw()
+      flag = true
+    }
+
+    if (!flag) {
+      this._drawBackground()
+      this._drawContent()
+      this._drawBorder()
+      this._drawOutline()
+    }
   }
 
   protected _drawBackground(): void {
@@ -342,17 +408,6 @@ export class BaseElement2D extends Node2D implements Rectangulable {
     }
   }
 
-  protected _pointerEntering = false
-  protected _pointerEntered(): void {
-    this._pointerEntering = true
-  }
-
-  protected _pointerExited(): void {
-    if (this._pointerEntering) {
-      //
-    }
-  }
-
   // eslint-disable-next-line unused-imports/no-unused-vars
   protected _pointerInput(point: { x: number, y: number }, key: InputEventKey): boolean {
     const { width, height } = this.size
@@ -390,8 +445,11 @@ export class BaseElement2D extends Node2D implements Rectangulable {
       ...json,
       props: {
         style: this.style.toJSON(),
-        shadow: this.shadow.toJSON(),
+        text: this.text.toJSON(),
+        geometry: this.geometry.toJSON(),
+        fill: this.fill.toJSON(),
         outline: this.outline.toJSON(),
+        shadow: this.shadow.toJSON(),
         ...json.props,
       },
     }

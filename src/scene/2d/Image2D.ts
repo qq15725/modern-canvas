@@ -17,8 +17,8 @@ export interface Image2DProperties extends Element2DProperties {
 @customNode('Image2D')
 export class Image2D extends Element2D {
   @protectedProperty() texture?: AnimatedTexture
-  @property() declare srcRect: ImageSourceRect
   @property({ default: '' }) declare src: string
+  @property() declare srcRect: ImageSourceRect
   @property({ default: false }) declare gif: boolean
 
   get currentFrameTexture(): Texture2D | undefined { return this.texture?.frames[this._frameIndex]?.texture }

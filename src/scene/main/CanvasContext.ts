@@ -190,6 +190,7 @@ export class CanvasContext extends Path2D {
         && !oldTexture?.is(draw.texture)
       ) {
         push(draw.type)
+        texture = draw.texture
       }
       const start = vertices.length
       if (draw.type === 'fill') {

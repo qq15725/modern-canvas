@@ -1,7 +1,10 @@
+import type { ShadowDeclaration } from 'modern-idoc'
 import type { PropertyDeclaration } from '../../core'
 import type { BaseElement2D } from './BaseElement2D'
 import { CoreObject, property } from '../../core'
 import { DropShadowEffect } from '../effects'
+
+export type BaseElement2DShadowProperties = ShadowDeclaration
 
 export class BaseElement2DShadow extends CoreObject {
   @property({ default: '#000000' }) declare color: string
@@ -11,8 +14,10 @@ export class BaseElement2DShadow extends CoreObject {
 
   constructor(
     public parent: BaseElement2D,
+    properties?: Partial<BaseElement2DShadowProperties>,
   ) {
     super()
+    this.setProperties(properties)
   }
 
   protected _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
