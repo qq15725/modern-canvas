@@ -27,7 +27,8 @@ export class TextureRect2D<T extends Texture2D = Texture2D> extends Element2D {
         1 / width,
         1 / height,
       )
-      super._drawContent()
+      this.geometry.drawRect()
+      this.context.fill()
     }
   }
 }

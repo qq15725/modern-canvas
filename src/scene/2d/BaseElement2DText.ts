@@ -23,7 +23,7 @@ export class BaseElement2DText extends CoreObject {
   }
 
   texture = new CanvasTexture()
-  text = new Text()
+  baseText = new Text()
   measureResult?: MeasureResult
 
   protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
@@ -41,17 +41,22 @@ export class BaseElement2DText extends CoreObject {
   }
 
   protected _updateText(): void {
-    this.text.style = this.parent.style.toJSON() as any
-    this.text.content = this.content ?? ''
-    this.text.effects = this.effects
-    this.text.fonts = this.fonts
-    this.text.measureDom = this.measureDom
-    this.text.requestUpdate()
+    this.baseText.style = {
+      justifyContent: 'center',
+      alignItems: 'center',
+      textAlign: 'center',
+      ...this.parent.style.toJSON() as any,
+    }
+    this.baseText.content = this.content ?? ''
+    this.baseText.effects = this.effects
+    this.baseText.fonts = this.fonts
+    this.baseText.measureDom = this.measureDom
+    this.baseText.requestUpdate()
   }
 
   measure(): MeasureResult {
     this._updateText()
-    return this.text.measure()
+    return this.baseText.measure()
   }
 
   updateMeasure(): this {
@@ -74,7 +79,7 @@ export class BaseElement2DText extends CoreObject {
 
   draw(): void {
     const ctx = this.parent.context
-    this.text.render({
+    this.baseText.render({
       pixelRatio: this.texture.pixelRatio,
       view: this.texture.source,
     })

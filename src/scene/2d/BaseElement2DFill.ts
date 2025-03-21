@@ -1,4 +1,4 @@
-import type { FillDeclaration, ImageFillSource, ImageFillTile } from 'modern-idoc'
+import type { FillDeclaration, ImageFillSource, ImageFillStretch, ImageFillTile } from 'modern-idoc'
 import type { ColorValue, PropertyDeclaration } from '../../core'
 import type { Texture2D } from '../resources'
 import type { BaseElement2D } from './BaseElement2D'
@@ -13,6 +13,7 @@ export class BaseElement2DFill extends CoreObject {
   @property() declare dpi?: number
   @property() declare rotateWithShape?: boolean
   @property() declare tile?: ImageFillTile
+  @property() declare stretch?: ImageFillStretch
 
   protected _image?: Texture2D<ImageBitmap>
 
@@ -61,6 +62,7 @@ export class BaseElement2DFill extends CoreObject {
     const ctx = this.parent.context
     if (this._image) {
       // TODO Tile
+      // TODO stretch
       const { width, height } = this.parent.size
       ctx.textureTransform = new Transform2D().scale(1 / width, 1 / height)
       ctx.fillStyle = this._image

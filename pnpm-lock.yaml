@@ -18,11 +18,11 @@ importers:
         specifier: ^0.4.0
         version: 0.4.0
       modern-idoc:
-        specifier: ^0.2.12
-        version: 0.2.12
+        specifier: ^0.2.13
+        version: 0.2.13
       modern-path2d:
-        specifier: ^1.2.11
-        version: 1.2.11
+        specifier: ^1.2.15
+        version: 1.2.15
       modern-text:
         specifier: ^1.3.1
         version: 1.3.1
@@ -2055,14 +2055,14 @@ packages:
   modern-gif@2.0.4:
     resolution: {integrity: sha512-q3Nf6X3kpnGwiKLzTzOjsbvM16/kPcfy0JrrC79TmuKLCWiOkwb0ztuVhZnqGCizSr4o84gFOaBeGDVaE/Bcgw==}
 
-  modern-idoc@0.2.12:
-    resolution: {integrity: sha512-YZMmBSO2neqxmFNMLW5BZzB6xiWKewFvlCPxDW4Xf/u4SUzBUgkg9g4GIQYsJFroRMaKN+L/p1vMV7O6eDL8iA==}
+  modern-idoc@0.2.13:
+    resolution: {integrity: sha512-E3nCTU+4M2Ee8lgavGmJQXY1ZBB5C7L0HHiUfU1ll2wsNIMBqqoyZh47tZ5uCvSZgOf4mldI7oTGBw0Zv3T11Q==}
 
   modern-palette@2.0.0:
     resolution: {integrity: sha512-wKZcom2QzK6sS6h5RLYHEkd3V3maQLzgkI+ekDCimlk7dfXa63aekZcy+7KS+8JEqIDeY/yV1CAvA7l+7u6QHA==}
 
-  modern-path2d@1.2.11:
-    resolution: {integrity: sha512-GAfKIrK8BSMFBaUUesuO48Yvb5WXzAwgHHj2NAmIGhh/e6Hch6iOytm6/w3qn4DyLryF2CWb0mpEPFWD/Iz6tg==}
+  modern-path2d@1.2.15:
+    resolution: {integrity: sha512-UcGofDYtdX9b/p/5Y+bkiKmtlrfRhLxhQ5qft0Je+YtOIziBV6o0UX7fTddo8aM6JMZmkxYIAIJdW2yvpsvBRg==}
 
   modern-text@1.3.1:
     resolution: {integrity: sha512-Y5Jth46pP9w8Ecf/ViQjx+dVIUEZ+tN7Rr0RJwRqVxTQk5GptyOA24VkvfCIHyj127544J18EqqsoC+LPRmEDw==}
@@ -4996,19 +4996,19 @@ snapshots:
     dependencies:
       modern-palette: 2.0.0
 
-  modern-idoc@0.2.12: {}
+  modern-idoc@0.2.13: {}
 
   modern-palette@2.0.0: {}
 
-  modern-path2d@1.2.11:
+  modern-path2d@1.2.15:
     dependencies:
       earcut: 3.0.1
 
   modern-text@1.3.1:
     dependencies:
       modern-font: 0.4.0
-      modern-idoc: 0.2.12
-      modern-path2d: 1.2.11
+      modern-idoc: 0.2.13
+      modern-path2d: 1.2.15
 
   ms@2.1.3: {}
 

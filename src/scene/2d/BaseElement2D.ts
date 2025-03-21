@@ -20,7 +20,6 @@ import {
   customNode,
   DEG_TO_RAD,
   Rect2,
-  Transform2D,
   Vector2,
 } from '../../core'
 import { parseCSSFilter, parseCSSTransform, parseCSSTransformOrigin } from '../../css'
@@ -164,12 +163,6 @@ export class BaseElement2D extends Node2D implements Rectangulable {
         this.requestRelayout()
         break
       /** draw */
-      case 'backgroundColor':
-        this._updateBackgroundColor()
-        break
-      case 'backgroundImage':
-        this._updateBackgroundImage()
-        break
       case 'opacity':
         this.opacity = this.style.opacity
         break
@@ -184,6 +177,24 @@ export class BaseElement2D extends Node2D implements Rectangulable {
         break
       case 'borderRadius':
         this.requestRedraw()
+        break
+      case 'backgroundColor':
+        this.fill.color = this.style.backgroundColor
+        break
+      case 'backgroundImage':
+        this.fill.image = this.style.backgroundImage
+        break
+      case 'borderStyle':
+      case 'outlineStyle':
+        this.outline.style = value
+        break
+      case 'borderWidth':
+      case 'outlineWidth':
+        this.outline.width = value
+        break
+      case 'borderColor':
+      case 'outlineColor':
+        this.outline.color = value
         break
     }
   }
@@ -206,21 +217,6 @@ export class BaseElement2D extends Node2D implements Rectangulable {
         this.removeChild(node)
       }
     }
-  }
-
-  protected _updateBackgroundColor(): void {
-    const backgroundColor = this.style.getComputedBackgroundColor()
-    if (this._originalBatchables.length) {
-      this.requestRepaint()
-    }
-    else if (backgroundColor.a > 0) {
-      this.requestRedraw()
-    }
-  }
-
-  protected async _updateBackgroundImage(): Promise<void> {
-    this._backgroundImage = await this.style.loadBackgroundImage()
-    this.requestRedraw()
   }
 
   protected override _updateTransform(): void {
@@ -293,7 +289,6 @@ export class BaseElement2D extends Node2D implements Rectangulable {
   protected _draw(): void {
     super._draw()
 
-    let flag = false
     if (this.text.canDraw()) {
       this.text.updateMeasure()
     }
@@ -302,85 +297,25 @@ export class BaseElement2D extends Node2D implements Rectangulable {
       this._tree?.log(this.name, 'draw fill')
       this.geometry.draw()
       this.fill.draw()
-      flag = true
     }
 
     if (this.outline.canDraw()) {
       this._tree?.log(this.name, 'draw outline')
       this.geometry.draw()
       this.outline.draw()
-      flag = true
     }
 
     if (this.text.canDraw()) {
       this._tree?.log(this.name, 'draw text')
-      this._drawBoundingRect()
+      this.geometry.drawRect()
       this.text.draw()
-      flag = true
     }
 
-    if (!flag) {
-      this._drawBackground()
-      this._drawContent()
-      this._drawBorder()
-      this._drawOutline()
-    }
-  }
-
-  protected _drawBackground(): void {
-    const texture = this._backgroundImage
-    if (texture?.valid) {
-      const { width, height } = this.size
-      this.context.fillStyle = texture
-      this.context.textureTransform = new Transform2D().scale(
-        1 / width,
-        1 / height,
-      )
-      this._fillBoundingRect()
-    }
+    this._drawContent()
   }
 
   protected _drawContent(): void {
-    this._fillBoundingRect()
-  }
-
-  protected _drawBorder(): void {
-    if (this.style.borderWidth && this.style.borderStyle !== 'none') {
-      this.context.lineWidth = this.style.borderWidth
-      this.context.strokeStyle = this.style.borderColor
-      this._strokeBoundingRect()
-    }
-  }
-
-  protected _drawOutline(): void {
-    if (this.style.outlineWidth && this.style.outlineColor !== 'none') {
-      this.context.lineWidth = this.style.outlineWidth
-      this.context.strokeStyle = this.style.outlineColor
-      this._strokeBoundingRect()
-    }
-  }
-
-  protected _drawBoundingRect(): void {
-    const { borderRadius } = this.style
-    const { width, height } = this.size
-    if (width && height) {
-      if (borderRadius) {
-        this.context.roundRect(0, 0, width, height, borderRadius)
-      }
-      else {
-        this.context.rect(0, 0, width, height)
-      }
-    }
-  }
-
-  protected _fillBoundingRect(): void {
-    this._drawBoundingRect()
-    this.context.fill()
-  }
-
-  protected _strokeBoundingRect(): void {
-    this._drawBoundingRect()
-    this.context.stroke()
+    //
   }
 
   protected _repaint(batchables: CanvasBatchable[]): CanvasBatchable[] {
@@ -388,7 +323,6 @@ export class BaseElement2D extends Node2D implements Rectangulable {
     return super._repaint(batchables).map((batchable) => {
       return {
         ...batchable,
-        backgroundColor: this.style.getComputedBackgroundColor().abgr,
         colorMatrix: colorMatrix.toMatrix4().toArray(true),
         colorMatrixOffset: colorMatrix.toVector4().toArray(),
       }

@@ -5,7 +5,6 @@ import type {
   PropertyDeclaration,
   WebGLBlendMode,
   WebGLRenderer } from '../../core'
-import type { Texture2D } from '../resources'
 import type { CanvasBatchable } from './CanvasContext'
 import type { Node } from './Node'
 import type { TimelineNodeEventMap, TimelineNodeProperties } from './TimelineNode'
@@ -49,7 +48,6 @@ export class CanvasItem extends TimelineNode {
   get globalOpacity(): number { return this._globalOpacity ?? 1 }
 
   protected _modulate = new Color(0xFFFFFFFF)
-  protected _backgroundImage?: Texture2D
 
   // Batch render
   context = new CanvasContext()

@@ -1,27 +1,22 @@
-import type { Path2DDeclaration } from 'modern-idoc'
+import type { GeometryDeclaration, Path2DDeclaration } from 'modern-idoc'
 import type { PropertyDeclaration } from '../../core'
 import type { BaseElement2D } from './BaseElement2D'
 import {
   Matrix3,
   Path2D,
   Path2DSet,
-  svgPathCommandsAddToPath2D,
-  svgToDOM, svgToPath2DSet,
+  svgToDOM,
+  svgToPath2DSet,
 } from 'modern-path2d'
 import { CoreObject, property } from '../../core'
 
-export interface BaseElement2DGeometryProperties {
-  name?: string
-  svg?: string
-  viewBox?: number[]
-  data?: Path2DDeclaration[]
-}
+export type BaseElement2DGeometryProperties = GeometryDeclaration
 
 export class BaseElement2DGeometry extends CoreObject {
   @property() declare name?: string
   @property() declare svg?: string
   @property({ default: [0, 0, 1, 1] }) declare viewBox: number[]
-  @property({ default: [{ data: 'M0,0L0,1L1,1L1,0Z' }] }) declare data: Path2DDeclaration[]
+  @property({ default: [] }) declare data: Path2DDeclaration[]
 
   protected _path2DSet: Path2DSet = new Path2DSet()
 
@@ -72,14 +67,29 @@ export class BaseElement2DGeometry extends CoreObject {
   }
 
   draw(): void {
+    if (this._path2DSet.paths.length) {
+      const ctx = this.parent.context
+      const { width, height } = this.parent.size
+      this._path2DSet.paths.forEach((path) => {
+        ctx.addPath(path.clone().applyTransform(new Matrix3().scale(width, height)))
+      })
+    }
+    else {
+      this.drawRect()
+    }
+  }
+
+  drawRect(): void {
     const ctx = this.parent.context
     const { width, height } = this.parent.size
-
-    this._path2DSet.paths.forEach((path) => {
-      svgPathCommandsAddToPath2D(
-        path.clone().applyTransform(new Matrix3().scale(width, height)).toCommands(),
-        ctx,
-      )
-    })
+    const { borderRadius } = this.parent.style
+    if (width && height) {
+      if (borderRadius) {
+        ctx.roundRect(0, 0, width, height, borderRadius)
+      }
+      else {
+        ctx.rect(0, 0, width, height)
+      }
+    }
   }
 }
