@@ -1,3 +1,17 @@
+## [0.4.24](https://github.com/qq15725/modern-canvas/compare/v0.4.23...v0.4.24) (2025-03-22)
+
+
+### Bug Fixes
+
+* geometry ([fb0a78e](https://github.com/qq15725/modern-canvas/commit/fb0a78e84f567de64e8759eca07bf05086870d78))
+
+
+### Features
+
+* supports tile and stretch options in image fill ([147d772](https://github.com/qq15725/modern-canvas/commit/147d7720cd0c7fb856bd9e952d1d9761d998e5ae))
+
+
+
 ## [0.4.23](https://github.com/qq15725/modern-canvas/compare/v0.4.22...v0.4.23) (2025-03-20)
 
 
