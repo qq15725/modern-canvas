@@ -61,15 +61,48 @@ export class BaseElement2DFill extends CoreObject {
   draw(): void {
     const ctx = this.parent.context
     if (this._image) {
-      // TODO Tile
-      // TODO stretch
+      const { width: imageWidth, height: imageHeight } = this._image
       const { width, height } = this.parent.size
-      ctx.textureTransform = new Transform2D().scale(1 / width, 1 / height)
+      const transform = new Transform2D()
+      if (this.tile) {
+        const {
+          translateX = 0,
+          translateY = 0,
+          scaleX = 1,
+          scaleY = 1,
+          // flip, TODO
+          // alignment, TODO
+        } = this.tile
+        transform
+          .scale(1 / imageWidth, 1 / imageHeight)
+          .scale(1 / scaleX, 1 / scaleY)
+          .translate(-translateX / imageWidth, -translateY / imageHeight)
+      }
+      else if (this.stretch) {
+        const { left = 0, top = 0, right = 0, bottom = 0 } = this.stretch.rect ?? {}
+        const w = Math.abs(1 + (-left + -right)) * width
+        const h = Math.abs(1 + (-top + -bottom)) * height
+        const scaleX = 1 / w
+        const scaleY = 1 / h
+        const translateX = (-left * width) * scaleX
+        const translateY = (-top * height) * scaleY
+        transform
+          .scale(scaleX, scaleY)
+          .translate(translateX, translateY)
+      }
+      else {
+        transform
+          .scale(1 / width, 1 / height)
+      }
+      ctx.textureTransform = transform
       ctx.fillStyle = this._image
+      ctx.fill({
+        disableWrapMode: true,
+      })
     }
     else {
       ctx.fillStyle = this.color
+      ctx.fill()
     }
-    ctx.fill()
   }
 }

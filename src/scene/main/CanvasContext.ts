@@ -3,12 +3,12 @@ import type { Batchable2D, ColorValue, Transform2D } from '../../core'
 import { Path2D } from 'modern-path2d'
 import { ColorTexture, Texture2D } from '../resources'
 
-export interface CanvasBatchable extends Batchable2D {
+export interface CanvasBatchable extends Partial<Batchable2D> {
   type: 'stroke' | 'fill'
   texture?: Texture2D
 }
 
-export interface StrokeDraw {
+export interface StrokeDraw extends Partial<CanvasBatchable> {
   type: 'stroke'
   path: Path2D
   texture?: Texture2D
@@ -16,7 +16,7 @@ export interface StrokeDraw {
   style: LineStyle
 }
 
-export interface FillDraw {
+export interface FillDraw extends CanvasBatchable {
   type: 'fill'
   path: Path2D
   texture?: Texture2D
@@ -36,7 +36,7 @@ export class CanvasContext extends Path2D {
   _defaultStyle = Texture2D.EMPTY
   _draws: (StrokeDraw | FillDraw)[] = []
 
-  stroke(): void {
+  stroke(options?: Partial<StrokeDraw>): void {
     let texture: Texture2D = this._defaultStyle
     if (this.strokeStyle) {
       if (this.strokeStyle instanceof Texture2D) {
@@ -49,6 +49,7 @@ export class CanvasContext extends Path2D {
 
     if (this.curves.length) {
       this._draws.push({
+        ...options,
         type: 'stroke',
         path: new Path2D(this),
         texture,
@@ -77,7 +78,7 @@ export class CanvasContext extends Path2D {
       .stroke()
   }
 
-  fill(): void {
+  fill(options?: Partial<FillDraw>): void {
     let texture: Texture2D = this._defaultStyle
     if (this.fillStyle) {
       if (this.fillStyle instanceof Texture2D) {
@@ -88,6 +89,7 @@ export class CanvasContext extends Path2D {
       }
     }
     this._draws.push({
+      ...options,
       type: 'fill',
       path: new Path2D(this),
       texture,
@@ -160,13 +162,14 @@ export class CanvasContext extends Path2D {
     let uvs: number[] = []
     let texture: Texture2D | undefined
 
-    const push = (type: CanvasBatchable['type']): void => {
+    const push = (draw: FillDraw | StrokeDraw): void => {
       batchables.push({
-        type,
         vertices,
         indices,
         uvs,
         texture,
+        type: draw.type,
+        disableWrapMode: draw.disableWrapMode,
       })
       vertices = []
       indices = []
@@ -178,7 +181,7 @@ export class CanvasContext extends Path2D {
       const draw = this._draws[i]
       const prev = this._draws[i - 1]
       if (vertices.length && prev && prev?.type !== draw.type) {
-        push(prev.type)
+        push(prev)
       }
       const oldTexture = texture
       if (!oldTexture) {
@@ -189,7 +192,7 @@ export class CanvasContext extends Path2D {
         && oldTexture !== draw.texture
         && !oldTexture?.is(draw.texture)
       ) {
-        push(draw.type)
+        push(draw)
         texture = draw.texture
       }
       const start = vertices.length
@@ -214,7 +217,7 @@ export class CanvasContext extends Path2D {
 
     const last = this._draws[this._draws.length - 1]
     if (last && vertices.length) {
-      push(last.type)
+      push(last)
     }
 
     return batchables
