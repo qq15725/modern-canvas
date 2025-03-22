@@ -66,11 +66,11 @@ export class Element2D extends BaseElement2D {
         break
       case 'width':
         this.size.width = Number(value)
-        this.requestRelayout()
+        this.requestRedraw()
         break
       case 'height':
         this.size.height = Number(value)
-        this.requestRelayout()
+        this.requestRedraw()
         break
     }
   }
