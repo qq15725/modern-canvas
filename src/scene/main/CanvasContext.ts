@@ -3,7 +3,7 @@ import type { Batchable2D, ColorValue, Transform2D } from '../../core'
 import { Path2D } from 'modern-path2d'
 import { ColorTexture, Texture2D } from '../resources'
 
-export interface CanvasBatchable extends Partial<Batchable2D> {
+export interface CanvasBatchable extends Batchable2D {
   type: 'stroke' | 'fill'
   texture?: Texture2D
 }
@@ -16,7 +16,7 @@ export interface StrokeDraw extends Partial<CanvasBatchable> {
   style: LineStyle
 }
 
-export interface FillDraw extends CanvasBatchable {
+export interface FillDraw extends Partial<CanvasBatchable> {
   type: 'fill'
   path: Path2D
   texture?: Texture2D

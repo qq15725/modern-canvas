@@ -48,12 +48,7 @@ async function init(): Promise<void> {
       outline: { color: '#00FF00', width: 1 },
       fill: {
         image: '/example.jpg',
-        tile: {
-          scaleX: 0.25,
-          scaleY: 0.25,
-          translateX: 100,
-          translateY: 100,
-        },
+        tile: { scaleX: 0.25, scaleY: 0.25, translateX: 100, translateY: 100 },
       },
     }),
     new Element2D({
@@ -64,12 +59,7 @@ async function init(): Promise<void> {
       outline: { color: '#00FF00', width: 1 },
       fill: {
         image: '/example.jpg',
-        tile: {
-          scaleX: 0.25,
-          scaleY: 0.25,
-          translateX: 100,
-          translateY: 100,
-        },
+        tile: { scaleX: 0.25, scaleY: 0.25, translateX: 100, translateY: 100 },
       },
     }),
     new Element2D({
@@ -77,9 +67,7 @@ async function init(): Promise<void> {
       outline: { color: '#00FF00', width: 1 },
       fill: {
         image: '/example.jpg',
-        stretch: {
-          rect: { left: 0.5, top: 0.5 },
-        },
+        stretch: { rect: { left: 0.5, top: 0.5 } },
       },
     }),
   ])
