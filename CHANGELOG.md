@@ -1,3 +1,13 @@
+## [0.4.26](https://github.com/qq15725/modern-canvas/compare/v0.4.25...v0.4.26) (2025-03-27)
+
+
+### Bug Fixes
+
+* borderRadius ([d1fe5e9](https://github.com/qq15725/modern-canvas/commit/d1fe5e999129723de944c95a68154989bdb0dc46))
+* process interruption caused by abnormal color values ([256844b](https://github.com/qq15725/modern-canvas/commit/256844b64d339aba767a7f3c4e3af56e2a0e837b))
+
+
+
 ## [0.4.25](https://github.com/qq15725/modern-canvas/compare/v0.4.24...v0.4.25) (2025-03-22)
 
 
