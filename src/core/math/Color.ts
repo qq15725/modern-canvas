@@ -32,6 +32,7 @@ export class Color {
       this._colord = parsed
     }
     else {
+      this._colord = colord('#000000')
       console.warn(`Unable to convert color ${value}`)
     }
   }
