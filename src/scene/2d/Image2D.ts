@@ -147,7 +147,7 @@ export class Image2D extends Element2D {
       this.context.textureTransform = new Transform2D()
         .scale(sx, sy)
         .translate(tx, ty)
-      this.geometry.drawRect()
+      this.geometry.draw()
       this.context.fill()
     }
   }

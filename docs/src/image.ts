@@ -25,6 +25,7 @@ function createTestcase(style: Partial<Element2DStyleProperties> = {}): any {
         top: 0,
         width: 100,
         height: 100,
+        borderRadius: 10,
         ...style,
       },
       src: '/example.jpg',
