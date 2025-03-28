@@ -1,3 +1,13 @@
+## [0.4.27](https://github.com/qq15725/modern-canvas/compare/v0.4.26...v0.4.27) (2025-03-28)
+
+
+### Bug Fixes
+
+* GIF redraw ([2be0ad0](https://github.com/qq15725/modern-canvas/commit/2be0ad0bc66bd2572a5bc66c3f902e27f494adc7))
+* Lottie2D redraw ([6ebfa6f](https://github.com/qq15725/modern-canvas/commit/6ebfa6f073078ef1c5e8a8473f2bdef3573a04d6))
+
+
+
 ## [0.4.26](https://github.com/qq15725/modern-canvas/compare/v0.4.25...v0.4.26) (2025-03-27)
 
 
