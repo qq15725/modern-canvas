@@ -28,7 +28,7 @@ function createTestcase(style: Partial<Element2DStyleProperties> = {}): any {
         borderRadius: 10,
         ...style,
       },
-      src: '/example.jpg',
+      src: '/example.gif',
     }),
 
     // crop
@@ -40,7 +40,7 @@ function createTestcase(style: Partial<Element2DStyleProperties> = {}): any {
         height: 100,
         ...style,
       },
-      src: '/example.jpg',
+      src: '/example.gif',
       srcRect: {
         left: 0.5,
         right: 0.5,
@@ -59,7 +59,7 @@ function createTestcase(style: Partial<Element2DStyleProperties> = {}): any {
         maskImage: '/mask1.png',
         ...style,
       },
-      src: '/example.jpg',
+      src: '/example.gif',
     }),
 
     // filter
@@ -72,7 +72,7 @@ function createTestcase(style: Partial<Element2DStyleProperties> = {}): any {
         filter: 'brightness(52%) contrast(90%) saturate(128%) sepia(18%)',
         ...style,
       },
-      src: '/example.jpg',
+      src: '/example.gif',
     }),
   ]
 }

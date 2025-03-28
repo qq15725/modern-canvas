@@ -76,7 +76,7 @@ export class Image2D extends Element2D {
     if (src) {
       try {
         this.setResource(
-          this.gif
+          this.gif || src?.includes('.gif')
             ? await assets.gif.load(src)
             : await assets.texture.load(src),
         )
@@ -122,7 +122,7 @@ export class Image2D extends Element2D {
     }
     if (this._frameIndex !== index) {
       this._frameIndex = index
-      this.requestRepaint()
+      this.requestRedraw()
     }
     return this
   }
