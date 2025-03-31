@@ -1,3 +1,12 @@
+## [0.4.28](https://github.com/qq15725/modern-canvas/compare/v0.4.27...v0.4.28) (2025-03-31)
+
+
+### Bug Fixes
+
+* Text2D bbox ([e4ff588](https://github.com/qq15725/modern-canvas/commit/e4ff588e79266efa1be7415566333ef58cf5ad7f))
+
+
+
 ## [0.4.27](https://github.com/qq15725/modern-canvas/compare/v0.4.26...v0.4.27) (2025-03-28)
 
 
