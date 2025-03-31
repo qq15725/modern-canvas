@@ -17,7 +17,7 @@ const engine = new Engine({
 document.body.append(engine.view!)
 
 async function init(): Promise<void> {
-  fonts.fallbackFont = await fonts.load({ family: 'fallbackFont', src: '/fonts/AaHouDiHei.woff' })
+  await fonts.loadFallbackFont({ family: 'fallbackFont', src: '/fonts/AaHouDiHei.woff' })
 
   engine.root.append([
     new Image2D({

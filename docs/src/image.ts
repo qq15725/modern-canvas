@@ -78,7 +78,7 @@ function createTestcase(style: Partial<Element2DStyleProperties> = {}): any {
 }
 
 async function init(): Promise<void> {
-  fonts.fallbackFont = await fonts.load({ family: 'fallbackFont', src: '/fonts/AaHouDiHei.woff' })
+  await fonts.loadFallbackFont({ family: 'fallbackFont', src: '/fonts/AaHouDiHei.woff' })
 
   engine.root.append([
     new Element2D({

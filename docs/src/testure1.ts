@@ -23,7 +23,7 @@ engine.root.append(editor)
 document.body.append(engine.view!)
 
 async function init(): Promise<void> {
-  fonts.fallbackFont = await fonts.load({ family: 'fallbackFont', src: '/fonts/AaHouDiHei.woff' })
+  await fonts.loadFallbackFont({ family: 'fallbackFont', src: '/fonts/AaHouDiHei.woff' })
 
   editor.drawboard.append([
     new Element2D({

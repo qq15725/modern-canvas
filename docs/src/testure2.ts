@@ -18,7 +18,7 @@ document.body.append(engine.view!)
 async function init(): Promise<void> {
   await FlexLayout.load()
 
-  fonts.fallbackFont = await fonts.load({ family: 'fallbackFont', src: '/fonts/AaHouDiHei.woff' })
+  await fonts.loadFallbackFont({ family: 'fallbackFont', src: '/fonts/AaHouDiHei.woff' })
 
   engine.root.appendChild(
     new FlexElement2D({

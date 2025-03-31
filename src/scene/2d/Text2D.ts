@@ -135,13 +135,12 @@ export class Text2D extends TextureRect2D<CanvasTexture> {
 
   updateMeasure(): this {
     this.measureResult = this.measure()
-    const textWidth = this.measureResult.boundingBox.width
-    const textHeight = this.measureResult.boundingBox.height
-    const { left, top, width, height = textHeight } = this.style
-    this.position.x = left + Math.min(0, ((width || textWidth) - textWidth) / 2)
-    this.position.y = top + Math.min(0, ((height || textHeight) - textHeight) / 2)
-    this.size.width = textWidth
-    this.size.height = textHeight
+    const { boundingBox } = this.measureResult
+    const { left, top } = this.style
+    this.position.x = left + Math.min(0, boundingBox.left)
+    this.position.y = top + Math.min(0, boundingBox.top)
+    this.size.width = boundingBox.width
+    this.size.height = boundingBox.height
     return this
   }
 
