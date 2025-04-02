@@ -12,7 +12,7 @@ export interface Text2DEventMap extends Element2DEventMap {
   updateBase: (base: Text) => void
 }
 
-export interface Element2D {
+export interface Text2D {
   on: (<K extends keyof Text2DEventMap>(type: K, listener: Text2DEventMap[K], options?: EventListenerOptions) => this)
     & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
   once: (<K extends keyof Text2DEventMap>(type: K, listener: Text2DEventMap[K], options?: EventListenerOptions) => this)
