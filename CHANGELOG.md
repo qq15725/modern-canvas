@@ -1,3 +1,13 @@
+## [0.4.29](https://github.com/qq15725/modern-canvas/compare/v0.4.28...v0.4.29) (2025-04-02)
+
+
+### Features
+
+* expose text2D base ([8e84d4a](https://github.com/qq15725/modern-canvas/commit/8e84d4adc8bed9ce445db4e7599ec84615aa5549))
+* expose text2D base ([937802d](https://github.com/qq15725/modern-canvas/commit/937802d49923bece1662f3402383a6e7ff5ce446))
+
+
+
 ## [0.4.28](https://github.com/qq15725/modern-canvas/compare/v0.4.27...v0.4.28) (2025-03-31)
 
 
