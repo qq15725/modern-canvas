@@ -1,11 +1,27 @@
 import type { MeasureResult, TextOptions } from 'modern-text'
-import type { PropertyDeclaration } from '../../core'
+import type { EventListenerOptions, EventListenerValue, PropertyDeclaration } from '../../core'
 import type { CanvasBatchable, Node } from '../main'
+import type { Element2DEventMap } from './Element2D'
 import type { TextureRect2DProperties } from './TextureRect2D'
 import { Text, textDefaultStyle } from 'modern-text'
 import { customNode, property, protectedProperty } from '../../core'
 import { CanvasTexture } from '../resources'
 import { TextureRect2D } from './TextureRect2D'
+
+export interface Text2DEventMap extends Element2DEventMap {
+  updateBase: (base: Text) => void
+}
+
+export interface Element2D {
+  on: (<K extends keyof Text2DEventMap>(type: K, listener: Text2DEventMap[K], options?: EventListenerOptions) => this)
+    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
+  once: (<K extends keyof Text2DEventMap>(type: K, listener: Text2DEventMap[K], options?: EventListenerOptions) => this)
+    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
+  off: (<K extends keyof Text2DEventMap>(type: K, listener?: Text2DEventMap[K], options?: EventListenerOptions) => this)
+    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
+  emit: (<K extends keyof Text2DEventMap>(type: K, ...args: Parameters<Text2DEventMap[K]>) => boolean)
+    & ((type: string, ...args: any[]) => boolean)
+}
 
 export interface Text2DProperties extends TextureRect2DProperties, Omit<TextOptions, 'style'> {
   split: boolean
@@ -33,7 +49,7 @@ export class Text2D extends TextureRect2D<CanvasTexture> {
 
   override texture = new CanvasTexture()
 
-  protected _baseText = new Text()
+  base = new Text()
   measureResult?: MeasureResult
   protected _subTextsCount = 0
 
@@ -41,6 +57,11 @@ export class Text2D extends TextureRect2D<CanvasTexture> {
     super()
     this.setProperties(properties)
     this.append(children)
+    if (properties?.plugins) {
+      properties.plugins.forEach((plugin) => {
+        this.base.use(plugin)
+      })
+    }
   }
 
   protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
@@ -64,13 +85,14 @@ export class Text2D extends TextureRect2D<CanvasTexture> {
     }
   }
 
-  protected _updateText(): void {
-    this._baseText.style = this.style.toJSON() as any
-    this._baseText.content = this.content ?? ''
-    this._baseText.effects = this.effects
-    this._baseText.fonts = this.fonts
-    this._baseText.measureDom = this.measureDom
-    this._baseText.requestUpdate()
+  protected _updateBase(): void {
+    this.base.style = this.style.toJSON() as any
+    this.base.content = this.content ?? ''
+    this.base.effects = this.effects
+    this.base.fonts = this.fonts
+    this.base.measureDom = this.measureDom
+    this.emit('updateBase', this.base)
+    this.base.requestUpdate()
   }
 
   protected override _updateStyleProperty(key: PropertyKey, value: any, oldValue: any): void {
@@ -129,8 +151,8 @@ export class Text2D extends TextureRect2D<CanvasTexture> {
   }
 
   measure(): MeasureResult {
-    this._updateText()
-    return this._baseText.measure()
+    this._updateBase()
+    return this.base.measure()
   }
 
   updateMeasure(): this {
@@ -187,7 +209,7 @@ export class Text2D extends TextureRect2D<CanvasTexture> {
         onText2DRender()
       }
       else {
-        this._baseText.render({
+        this.base.render({
           pixelRatio: this.texture.pixelRatio,
           view: this.texture.source,
         })
