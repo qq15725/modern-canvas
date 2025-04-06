@@ -1,4 +1,5 @@
 export * from './BaseElement2D'
+export * from './BaseElement2DBackground'
 export * from './BaseElement2DFill'
 export * from './BaseElement2DGeometry'
 export * from './BaseElement2DOutline'
