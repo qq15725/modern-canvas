@@ -1,6 +1,7 @@
 import type {
   EventListenerOptions,
-  EventListenerValue, PropertyDeclaration,
+  EventListenerValue,
+  PropertyDeclaration,
 } from '../../core'
 import type { Node } from '../main'
 import type { BaseElement2DEventMap, BaseElement2DProperties } from './BaseElement2D'

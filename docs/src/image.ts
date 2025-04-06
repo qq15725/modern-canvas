@@ -10,7 +10,7 @@ const engine = new Engine({
   debug: true,
   autoStart: true,
   autoResize: true,
-  backgroundColor: '#F6F7F9',
+  backgroundColor: '#101217',
   timeline: Timeline.from([0, 5000], true),
 })
 ;(window as any).engine = engine

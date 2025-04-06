@@ -1,23 +1,23 @@
-import type { FillDeclaration, FillProperty } from 'modern-idoc'
+import type { BackgroundDeclaration, BackgroundProperty } from 'modern-idoc'
 import type { PropertyDeclaration } from '../../core'
 import type { Texture2D } from '../resources'
 import type { BaseElement2D } from './BaseElement2D'
-import { normalizeFill } from 'modern-idoc'
+import { normalizeBackground } from 'modern-idoc'
 import { assets } from '../../asset'
 import { CoreObject, property, Transform2D } from '../../core'
 
-export interface BaseElement2DFill extends FillDeclaration {
+export interface BaseElement2DBackground extends BackgroundDeclaration {
   //
 }
 
-export class BaseElement2DFill extends CoreObject {
-  @property() declare color?: FillDeclaration['color']
-  @property() declare src?: FillDeclaration['src']
-  @property() declare dpi?: FillDeclaration['dpi']
-  @property() declare rotateWithShape?: FillDeclaration['rotateWithShape']
-  @property() declare tile?: FillDeclaration['tile']
-  @property() declare stretch?: FillDeclaration['stretch']
-  @property() declare opacity?: FillDeclaration['opacity']
+export class BaseElement2DBackground extends CoreObject {
+  @property() declare color?: BackgroundDeclaration['color']
+  @property() declare src?: BackgroundDeclaration['src']
+  @property() declare dpi?: BackgroundDeclaration['dpi']
+  @property() declare rotateWithShape?: BackgroundDeclaration['rotateWithShape']
+  @property() declare tile?: BackgroundDeclaration['tile']
+  @property() declare stretch?: BackgroundDeclaration['stretch']
+  @property() declare opacity?: BackgroundDeclaration['opacity']
 
   protected _src?: Texture2D<ImageBitmap>
 
@@ -27,8 +27,8 @@ export class BaseElement2DFill extends CoreObject {
     super()
   }
 
-  override setProperties(properties?: FillProperty): this {
-    return super.setProperties(normalizeFill(properties))
+  override setProperties(properties?: BackgroundProperty): this {
+    return super.setProperties(normalizeBackground(properties))
   }
 
   protected _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {

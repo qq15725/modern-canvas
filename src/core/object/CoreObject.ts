@@ -107,8 +107,8 @@ export class CoreObject extends EventEmitter {
     return properties
   }
 
-  setProperties(properties?: Record<PropertyKey, any>): this {
-    if (properties) {
+  setProperties(properties?: any): this {
+    if (properties && typeof properties === 'object') {
       for (const [name] of this.getPropertyDeclarations()) {
         if (name in properties) {
           this.setProperty(name, properties[name])

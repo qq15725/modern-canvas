@@ -1,6 +1,7 @@
-import type { GeometryDeclaration, Path2DDeclaration } from 'modern-idoc'
+import type { GeometryPathDeclaration, GeometryProperty } from 'modern-idoc'
 import type { PropertyDeclaration } from '../../core'
 import type { BaseElement2D } from './BaseElement2D'
+import { normalizeGeometry } from 'modern-idoc'
 import {
   Matrix3,
   Path2D,
@@ -10,24 +11,24 @@ import {
 } from 'modern-path2d'
 import { CoreObject, property } from '../../core'
 
-export type BaseElement2DGeometryProperties = GeometryDeclaration
-
 export class BaseElement2DGeometry extends CoreObject {
   @property() declare name?: string
   @property() declare svg?: string
   @property({ default: [0, 0, 1, 1] }) declare viewBox: number[]
-  @property({ default: [] }) declare data: Path2DDeclaration[]
+  @property({ default: [] }) declare data: GeometryPathDeclaration[]
 
   protected _path2DSet: Path2DSet = new Path2DSet()
 
   constructor(
     public parent: BaseElement2D,
-    properties?: Partial<BaseElement2DGeometryProperties>,
   ) {
     super()
 
-    this.setProperties(properties)
     this._updatePath2DSet()
+  }
+
+  override setProperties(properties?: GeometryProperty): this {
+    return super.setProperties(normalizeGeometry(properties))
   }
 
   protected _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
@@ -55,7 +56,7 @@ export class BaseElement2DGeometry extends CoreObject {
       this.data.forEach((path, i) => {
         const { data, ...style } = path
         const path2D = new Path2D()
-        path2D.style = style
+        path2D.style = style as any
         path2D.addData(data)
         this._path2DSet.paths[i] = path2D
       })

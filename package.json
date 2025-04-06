@@ -70,7 +70,7 @@
     "colord": "^2.9.3",
     "earcut": "^3.0.1",
     "modern-font": "^0.4.1",
-    "modern-idoc": "^0.2.13",
+    "modern-idoc": "^0.3.4",
     "modern-path2d": "^1.2.18",
     "modern-text": "^1.3.4",
     "yoga-layout": "^3.2.1"
@@ -78,7 +78,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^4.11.0",
     "@types/earcut": "^3.0.0",
-    "@types/node": "^22.13.17",
+    "@types/node": "^22.14.0",
     "bumpp": "^10.1.0",
     "conventional-changelog-cli": "^5.0.0",
     "eslint": "^9.23.0",
@@ -88,7 +88,7 @@
     "simple-git-hooks": "^2.12.1",
     "typescript": "^5.8.2",
     "unbuild": "^3.5.0",
-    "vite": "^6.2.4",
+    "vite": "^6.2.5",
     "vitest": "^3.1.1"
   },
   "simple-git-hooks": {

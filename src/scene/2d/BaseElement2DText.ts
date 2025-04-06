@@ -1,11 +1,11 @@
+import type { TextProperty } from 'modern-idoc'
 import type { MeasureResult, TextOptions } from 'modern-text'
 import type { PropertyDeclaration } from '../../core'
 import type { BaseElement2D } from './BaseElement2D'
+import { normalizeText } from 'modern-idoc'
 import { Text } from 'modern-text'
 import { CoreObject, property, protectedProperty, Transform2D } from '../../core'
 import { CanvasTexture } from '../resources'
-
-export type BaseElement2DTextProperties = TextOptions
 
 export class BaseElement2DText extends CoreObject {
   @property({ default: '' }) declare content: TextOptions['content']
@@ -15,16 +15,17 @@ export class BaseElement2DText extends CoreObject {
 
   constructor(
     public parent: BaseElement2D,
-    properties?: Partial<BaseElement2DTextProperties>,
   ) {
     super()
-
-    this.setProperties(properties)
   }
 
   texture = new CanvasTexture()
   baseText = new Text()
   measureResult?: MeasureResult
+
+  override setProperties(properties?: TextProperty): this {
+    return super.setProperties(normalizeText(properties))
+  }
 
   protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     super._updateProperty(key, value, oldValue, declaration)

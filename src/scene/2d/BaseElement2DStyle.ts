@@ -1,19 +1,15 @@
 import type { ElementStyleDeclaration, StyleDeclaration } from 'modern-idoc'
-import type { ColorValue } from '../../core'
 import { getDefaultStyle } from 'modern-idoc'
 import {
   defineProperty,
   Resource,
 } from '../../core'
 
-export interface BaseElement2DStyleProperties extends Omit<StyleDeclaration, 'left' | 'top' | 'width' | 'height' | 'backgroundColor' | 'borderColor' | 'outlineColor'> {
+export interface BaseElement2DStyleProperties extends Omit<StyleDeclaration, 'left' | 'top' | 'width' | 'height'> {
   left: number
   top: number
   width: number
   height: number
-  backgroundColor: 'none' | ColorValue
-  borderColor: 'none' | ColorValue
-  outlineColor: 'none' | ColorValue
 }
 
 export interface BaseElement2DStyle extends BaseElement2DStyleProperties {

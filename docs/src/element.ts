@@ -21,20 +21,21 @@ async function init(): Promise<void> {
     new Element2D({
       style: { top: 100, left: 100, width: 100, height: 100 },
       outline: { width: 10, color: '#0000FF' },
-      text: { content: 'TEXT' },
+      text: 'TEXT',
     }),
     new Element2D({
       geometry: {
         svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2.5 -2.5 607.5 607.5"><path d="M 0 450 L 150 300 L 150 375 L 225 375 L 225 150 L 150 150 L 300 0 L 450 150 L 375 150 L 375 375 L 450 375 L 450 300 L 600 450 L 450 600 L 450 525 L 150 525 L 150 600 Z"></path></svg>',
       },
       style: { top: 100, left: 300, fontSize: 100 },
-      fill: { color: 'linear-gradient(blue, pink)', image: '/example.jpg' },
+      background: { color: '#00FFFF' },
+      fill: { color: 'linear-gradient(blue, pink)', src: '/example.jpg' },
       outline: { width: 10, color: '#0000FF' },
-      text: { content: 'TEXT' },
+      text: 'TEXT',
     }),
     new Element2D({
       style: { top: 300, left: 100, fontSize: 100, borderWidth: 4, borderColor: '#FF00FF' },
-      text: { content: 'TEXT' },
+      text: 'TEXT',
     }),
     new Element2D({
       style: { left: 500, top: 300, width: 200, height: 200 },
@@ -47,7 +48,7 @@ async function init(): Promise<void> {
       style: { left: 700, top: 100, width: 222, height: 222 },
       outline: { color: '#00FF00', width: 1 },
       fill: {
-        image: '/example.jpg',
+        src: '/example.jpg',
         tile: { scaleX: 0.25, scaleY: 0.25, translateX: 100, translateY: 100 },
       },
     }),
@@ -58,7 +59,7 @@ async function init(): Promise<void> {
       },
       outline: { color: '#00FF00', width: 1 },
       fill: {
-        image: '/example.jpg',
+        src: '/example.jpg',
         tile: { scaleX: 0.25, scaleY: 0.25, translateX: 100, translateY: 100 },
       },
     }),
@@ -66,7 +67,7 @@ async function init(): Promise<void> {
       style: { left: 800, top: 350, width: 500, height: 200 },
       outline: { color: '#00FF00', width: 1 },
       fill: {
-        image: '/example.jpg',
+        src: '/example.jpg',
         stretch: { rect: { left: 0.5, top: 0.5 } },
       },
     }),
