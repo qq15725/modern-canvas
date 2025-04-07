@@ -71,6 +71,24 @@ export class BaseElement2DFill extends CoreObject {
       const { width, height } = this.parent.size
       const transform = new Transform2D()
       let disableWrapMode = false
+      if (this.srcRect) {
+        const {
+          left = 0,
+          top = 0,
+          right = 0,
+          bottom = 0,
+        } = this.srcRect
+        const w = Math.abs(1 + (left + right)) * width
+        const h = Math.abs(1 + (top + bottom)) * height
+        const sx = 1 / w
+        const sy = 1 / h
+        const tx = (left * width) * sx
+        const ty = (top * height) * sy
+        transform
+          .scale(sx, sy)
+          .translate(tx, ty)
+        // TODO
+      }
       if (this.tile) {
         const {
           translateX = 0,

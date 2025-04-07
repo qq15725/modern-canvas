@@ -1,11 +1,11 @@
 import type {
   BackgroundProperty,
   FillProperty,
+  ForegroundProperty,
   GeometryProperty,
   OutlineProperty,
   ShadowProperty,
-  StyleProperty,
-  TextProperty,
+  StyleProperty, TextProperty,
 } from 'modern-idoc'
 import type {
   ColorValue,
@@ -29,6 +29,7 @@ import { parseCSSFilter, parseCSSTransform, parseCSSTransformOrigin } from '../.
 import { MaskEffect } from '../effects'
 import { BaseElement2DBackground } from './BaseElement2DBackground'
 import { BaseElement2DFill } from './BaseElement2DFill'
+import { BaseElement2DForeground } from './BaseElement2DForeground'
 import { BaseElement2DGeometry } from './BaseElement2DGeometry'
 import { BaseElement2DOutline } from './BaseElement2DOutline'
 import { BaseElement2DShadow } from './BaseElement2DShadow'
@@ -55,11 +56,12 @@ export interface BaseElement2DProperties extends Node2DProperties {
   modulate: ColorValue
   blendMode: WebGLBlendMode
   style: StyleProperty
-  text: TextProperty
+  background: BackgroundProperty
   geometry: GeometryProperty
   fill: FillProperty
   outline: OutlineProperty
-  background: BackgroundProperty
+  foreground: ForegroundProperty
+  text: TextProperty
   shadow: ShadowProperty
 }
 
@@ -79,17 +81,13 @@ export class BaseElement2D extends Node2D implements Rectangulable {
     this._style = style
   }
 
-  protected _text = new BaseElement2DText(this)
-  get text(): BaseElement2DText { return this._text }
-  set text(value: TextProperty) { this._text.setProperties(value) }
+  protected _background = new BaseElement2DBackground(this)
+  get background(): BaseElement2DBackground { return this._background }
+  set background(value: BackgroundProperty) { this._background.setProperties(value) }
 
   protected _geometry = new BaseElement2DGeometry(this)
   get geometry(): BaseElement2DGeometry { return this._geometry }
   set geometry(value: GeometryProperty) { this._geometry.setProperties(value) }
-
-  protected _background = new BaseElement2DBackground(this)
-  get background(): BaseElement2DBackground { return this._background }
-  set background(value: BackgroundProperty) { this._background.setProperties(value) }
 
   protected _fill = new BaseElement2DFill(this)
   get fill(): BaseElement2DFill { return this._fill }
@@ -98,6 +96,14 @@ export class BaseElement2D extends Node2D implements Rectangulable {
   protected _outline = new BaseElement2DOutline(this)
   get outline(): BaseElement2DOutline { return this._outline }
   set outline(value: OutlineProperty) { this._outline.setProperties(value) }
+
+  protected _foreground = new BaseElement2DForeground(this)
+  get foreground(): BaseElement2DForeground { return this._foreground }
+  set foreground(value: ForegroundProperty) { this._foreground.setProperties(value) }
+
+  protected _text = new BaseElement2DText(this)
+  get text(): BaseElement2DText { return this._text }
+  set text(value: TextProperty) { this._text.setProperties(value) }
 
   protected _shadow = new BaseElement2DShadow(this)
   get shadow(): BaseElement2DShadow { return this._shadow }
@@ -121,15 +127,17 @@ export class BaseElement2D extends Node2D implements Rectangulable {
         background,
         fill,
         outline,
+        foreground,
         shadow,
         ...restProperties
       } = properties
       style && this.style.setProperties(style)
-      text && this.text.setProperties(text)
-      geometry && this.geometry.setProperties(geometry)
       background && this.background.setProperties(background)
+      geometry && this.geometry.setProperties(geometry)
       fill && this.fill.setProperties(fill)
       outline && this.outline.setProperties(outline)
+      text && this.text.setProperties(text)
+      foreground && this.foreground.setProperties(foreground)
       shadow && this.shadow.setProperties(shadow)
       super.setProperties(restProperties)
     }
@@ -320,6 +328,12 @@ export class BaseElement2D extends Node2D implements Rectangulable {
       this._tree?.log(this.name, 'draw outline')
       this.geometry.draw()
       this.outline.draw()
+    }
+
+    if (this.foreground.canDraw()) {
+      this._tree?.log(this.name, 'draw foreground')
+      this.geometry.drawRect()
+      this.foreground.draw()
     }
 
     if (this.text.canDraw()) {
