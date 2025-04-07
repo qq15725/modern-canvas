@@ -1,3 +1,14 @@
+## [0.4.30](https://github.com/qq15725/modern-canvas/compare/v0.4.29...v0.4.30) (2025-04-07)
+
+
+### Features
+
+* add background prop ([406f676](https://github.com/qq15725/modern-canvas/commit/406f676e1094bc535fb5b98cec43aa48e1df5142))
+* export BaseElement2DBackground ([982a8c1](https://github.com/qq15725/modern-canvas/commit/982a8c14247010831a01eeb0c83f91e95c1c204a))
+* foreground ([1f81aad](https://github.com/qq15725/modern-canvas/commit/1f81aad33cfa8e452a42b99f075bdba13c9fc740))
+
+
+
 ## [0.4.29](https://github.com/qq15725/modern-canvas/compare/v0.4.28...v0.4.29) (2025-04-02)
 
 
