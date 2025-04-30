@@ -112,6 +112,11 @@ export class CanvasItem extends TimelineNode {
   requestRelayout(): void {
     this._relayouting = true
     this.requestUpdate()
+    this.forEachDescendant((node) => {
+      if (node instanceof CanvasItem) {
+        node.requestRelayout()
+      }
+    })
   }
 
   requestRepaint(): void {

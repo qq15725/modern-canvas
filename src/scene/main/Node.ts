@@ -552,15 +552,15 @@ export class Node extends CoreObject {
     this._parent?.removeChild(this)
   }
 
-  forEach(fn: (child: Node) => void): this {
-    this.getChildren().forEach(fn)
+  forEachChild(callbackfn: (value: Node, index: number, array: Node[]) => void): this {
+    this.getChildren().forEach(callbackfn)
     return this
   }
 
-  deepForEach(fn: (descendant: Node) => void): this {
+  forEachDescendant(callbackfn: (descendant: Node) => void): this {
     this.getChildren().forEach((child) => {
-      fn(child)
-      child.deepForEach(fn)
+      callbackfn(child)
+      child.forEachDescendant(callbackfn)
     })
     return this
   }
