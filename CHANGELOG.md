@@ -1,3 +1,17 @@
+## [0.4.32](https://github.com/qq15725/modern-canvas/compare/v0.4.31...v0.4.32) (2025-04-30)
+
+
+### Bug Fixes
+
+* `CanvasItem.requestRelayout` ([bc49ebe](https://github.com/qq15725/modern-canvas/commit/bc49ebe3fb30dff12ad48697e59c06dbd7da9f65))
+
+
+### Features
+
+* `node.forEach` rename to `node.forEachChild`, `node.deepForEach` rename to `node.forEachDescendant`, ([ac5e812](https://github.com/qq15725/modern-canvas/commit/ac5e8120175de85bb967672312d90016b939e75d))
+
+
+
 ## [0.4.31](https://github.com/qq15725/modern-canvas/compare/v0.4.30...v0.4.31) (2025-04-10)
 
 
