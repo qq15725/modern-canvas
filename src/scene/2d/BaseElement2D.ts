@@ -411,10 +411,12 @@ export class BaseElement2D extends Node2D implements Rectangulable {
       props: {
         ...json.props,
         style: this.style.toJSON(),
-        text: this.text.toJSON(),
+        background: this.background.toJSON(),
         geometry: this.geometry.toJSON(),
         fill: this.fill.toJSON(),
         outline: this.outline.toJSON(),
+        text: this.text.toJSON(),
+        foreground: this.foreground.toJSON(),
         shadow: this.shadow.toJSON(),
       },
     }
