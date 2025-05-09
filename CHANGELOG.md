@@ -1,3 +1,12 @@
+## [0.4.34](https://github.com/qq15725/modern-canvas/compare/v0.4.33...v0.4.34) (2025-05-09)
+
+
+### Bug Fixes
+
+* toJSON ([706c1a4](https://github.com/qq15725/modern-canvas/commit/706c1a496a8ed9709864b2c72473a286d4ad372f))
+
+
+
 ## [0.4.33](https://github.com/qq15725/modern-canvas/compare/v0.4.32...v0.4.33) (2025-05-09)
 
 
