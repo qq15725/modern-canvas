@@ -28,16 +28,19 @@ export class ColorMatrix extends Matrix {
       lumB + cos * (-lumB) + sin * (1 - lumB),
       0,
       0,
+
       lumR + cos * (-lumR) + sin * (0.143),
       lumG + cos * (1 - lumG) + sin * (0.140),
       lumB + cos * (-lumB) + sin * (-0.283),
       0,
       0,
+
       lumR + cos * (-lumR) + sin * (-(1 - lumR)),
       lumG + cos * (-lumG) + sin * (lumG),
       lumB + cos * (1 - lumB) + sin * (lumB),
       0,
       0,
+
       0,
       0,
       0,

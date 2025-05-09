@@ -8,8 +8,6 @@ export class BaseElement2DOutline extends CoreObject {
   @property({ default: 0x00000000 }) declare color: OutlineDeclaration['color']
   @property({ default: 0 }) declare width: OutlineDeclaration['width']
   @property({ default: 'solid' }) declare style: OutlineDeclaration['style']
-  @property() declare src?: OutlineDeclaration['src']
-  @property({ default: 1 }) declare opacity: OutlineDeclaration['opacity']
 
   constructor(
     public parent: BaseElement2D,

@@ -120,6 +120,7 @@ export class CoreObject extends EventEmitter {
 
   requestUpdate(key?: PropertyKey, oldValue?: unknown, declaration?: PropertyDeclaration): void {
     if (key !== undefined) {
+      // @see defineProperty
       const newValue = this[key as keyof this]
       if (!Object.is(newValue, oldValue)) {
         this._updatedProperties.set(key, oldValue)
@@ -138,7 +139,23 @@ export class CoreObject extends EventEmitter {
   }
 
   toJSON(): Record<string, any> {
-    return this.getProperties(Array.from(this._changedProperties))
+    const json: Record<string, any> = {}
+    const properties = this.getProperties(Array.from(this._changedProperties))
+    for (const key in properties) {
+      const value = properties[key]
+      if (
+        value
+        && typeof value === 'object'
+        && 'toJSON' in value
+        && typeof value.toJSON === 'function'
+      ) {
+        json[key] = value.toJSON()
+      }
+      else {
+        json[key] = value
+      }
+    }
+    return json
   }
 
   clone(): this {

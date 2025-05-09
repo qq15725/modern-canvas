@@ -1,10 +1,12 @@
-import type { AnyColor, Colord } from 'colord'
-import { colord, extend } from 'colord'
+import type { Colord } from 'colord'
+import type { Color as ColorValue } from 'modern-idoc'
+import { extend } from 'colord'
 import namesPlugin from 'colord/plugins/names'
+import { parseColor } from 'modern-idoc'
 
 extend([namesPlugin])
 
-export type ColorValue = number | AnyColor
+export { ColorValue }
 
 export class Color {
   protected declare _colord: Colord
@@ -12,29 +14,7 @@ export class Color {
 
   get value(): ColorValue { return this._value }
   set value(value: ColorValue | undefined) {
-    if (value === undefined || this._value === value)
-      return
-    this._value = value
-    let input
-    if (typeof value === 'number') {
-      input = {
-        r: (value >> 24) & 0xFF,
-        g: (value >> 16) & 0xFF,
-        b: (value >> 8) & 0xFF,
-        a: (value & 0xFF) / 255,
-      }
-    }
-    else {
-      input = value
-    }
-    const parsed = colord(input)
-    if (parsed.isValid()) {
-      this._colord = parsed
-    }
-    else {
-      this._colord = colord('#000000')
-      console.warn(`Unable to convert color ${value}`)
-    }
+    this._colord = parseColor(value ?? 'none')
   }
 
   get r8(): number { return this._colord.rgba.r }

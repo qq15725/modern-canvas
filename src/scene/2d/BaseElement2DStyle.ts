@@ -25,9 +25,7 @@ export class BaseElement2DStyle extends Resource {
 
 const defaultStyles: ElementStyleDeclaration = getDefaultStyle()
 
-// @ts-expect-error del
 delete defaultStyles.top
-// @ts-expect-error del
 delete defaultStyles.left
 delete defaultStyles.width
 delete defaultStyles.height

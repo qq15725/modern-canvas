@@ -20,13 +20,12 @@ async function init(): Promise<void> {
   engine.root.append([
     new Element2D({
       style: {
-        transformOrigin: 'top left',
-        transform: 'scale(0.5)',
+        //
       },
     }, [
       new Element2D({
         style: { top: 100, left: 100, width: 100, height: 100 },
-        outline: { width: 10, color: 'linear-gradient(blue, pink)' },
+        outline: { width: 10, color: '#0000FF' },
         text: 'TEXT',
       }),
       new Element2D({
@@ -35,7 +34,7 @@ async function init(): Promise<void> {
         },
         style: { top: 100, left: 300, fontSize: 100 },
         background: { color: '#00FFFF' },
-        fill: { src: '/example.jpg' },
+        fill: { color: 'linear-gradient(blue, pink)', src: '/example.jpg' },
         outline: { width: 10, color: '#0000FF' },
         text: 'TEXT',
       }),
