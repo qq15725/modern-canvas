@@ -10,6 +10,12 @@ export class GradientTexture extends Texture2D {
   }
 
   constructor(value: string, width: number, height: number) {
+    if (width === Infinity)
+      width = 0
+
+    if (height === Infinity)
+      height = 0
+
     super(
       LinearGradient.from(value)
         .parse(width, height),
