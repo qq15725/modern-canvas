@@ -110,6 +110,24 @@ export class Node extends CoreObject {
       .on('process', this._onProcess)
   }
 
+  override setProperties(properties?: Record<PropertyKey, any>): this {
+    if (properties) {
+      const {
+        meta,
+        ...restProperties
+      } = properties
+
+      if (meta) {
+        for (const key in meta) {
+          this.setMeta(key, meta[key])
+        }
+      }
+
+      super.setProperties(restProperties)
+    }
+    return this
+  }
+
   /** Name */
   getName(): string { return this.name }
   setName(value: string): this {

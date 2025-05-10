@@ -1,6 +1,7 @@
 export * from './AnimatedTexture'
 export * from './CanvasTexture'
 export * from './ColorTexture'
+export * from './GradientTexture'
 export * from './ImageTexture'
 export * from './PixelsTexture'
 export * from './Texture2D'

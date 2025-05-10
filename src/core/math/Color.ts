@@ -1,4 +1,4 @@
-import type { Colord } from 'colord'
+import type { Colord, HslaColor, HsvaColor, RgbaColor } from 'colord'
 import type { Color as ColorValue } from 'modern-idoc'
 import { extend } from 'colord'
 import namesPlugin from 'colord/plugins/names'
@@ -33,6 +33,13 @@ export class Color {
     this.value = value
   }
 
+  toHex(): string { return this._colord.toHex() }
+  toRgb(): RgbaColor { return this._colord.toRgb() }
+  toRgbString(): string { return this._colord.toRgbString() }
+  toHsl(): HslaColor { return this._colord.toHsl() }
+  toHslString(): string { return this._colord.toHslString() }
+  toHsv(): HsvaColor { return this._colord.toHsv() }
+
   toArgb(alpha = this.a, applyToRGB = true): number {
     if (alpha === 1.0) {
       return (0xFF << 24) + this.rgb
@@ -54,8 +61,6 @@ export class Color {
 
     return (alpha * 255 << 24) + (r << 16) + (g << 8) + b
   }
-
-  toHex(): string { return this._colord.toHex() }
 
   toArray(): [number, number, number, number] {
     return [this.r, this.g, this.b, this.a]

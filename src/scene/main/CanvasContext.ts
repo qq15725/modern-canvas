@@ -1,7 +1,7 @@
 import type { LineCap, LineJoin, LineStyle } from 'modern-path2d'
 import type { Batchable2D, ColorValue, Transform2D } from '../../core'
 import { Path2D } from 'modern-path2d'
-import { ColorTexture, Texture2D } from '../resources'
+import { ColorTexture, GradientTexture, Texture2D } from '../resources'
 
 export interface CanvasBatchable extends Batchable2D {
   type: 'stroke' | 'fill'
@@ -36,22 +36,32 @@ export class CanvasContext extends Path2D {
   _defaultStyle = Texture2D.EMPTY
   _draws: (StrokeDraw | FillDraw)[] = []
 
+  protected _colorToTexture(color: ColorValue | Texture2D, width: number, height: number): Texture2D {
+    if (color instanceof Texture2D) {
+      return color
+    }
+    else if (typeof color === 'string' && GradientTexture.test(color)) {
+      return new GradientTexture(color, width, height)
+    }
+    else {
+      return new ColorTexture(color)
+    }
+  }
+
   stroke(options?: Partial<StrokeDraw>): void {
+    const path = new Path2D(this)
+
     let texture: Texture2D = this._defaultStyle
     if (this.strokeStyle) {
-      if (this.strokeStyle instanceof Texture2D) {
-        texture = this.strokeStyle
-      }
-      else {
-        texture = new ColorTexture(this.strokeStyle)
-      }
+      const { width, height } = path.getBoundingBox()
+      texture = this._colorToTexture(this.strokeStyle, width, height)
     }
 
     if (this.curves.length) {
       this._draws.push({
         ...options,
         type: 'stroke',
-        path: new Path2D(this),
+        path,
         texture,
         textureTransform: this.textureTransform,
         style: {
@@ -79,19 +89,18 @@ export class CanvasContext extends Path2D {
   }
 
   fill(options?: Partial<FillDraw>): void {
+    const path = new Path2D(this)
+
     let texture: Texture2D = this._defaultStyle
     if (this.fillStyle) {
-      if (this.fillStyle instanceof Texture2D) {
-        texture = this.fillStyle
-      }
-      else {
-        texture = new ColorTexture(this.fillStyle)
-      }
+      const { width, height } = path.getBoundingBox()
+      texture = this._colorToTexture(this.fillStyle, width, height)
     }
+
     this._draws.push({
       ...options,
       type: 'fill',
-      path: new Path2D(this),
+      path,
       texture,
       textureTransform: this.textureTransform,
     })
