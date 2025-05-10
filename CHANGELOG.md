@@ -1,3 +1,12 @@
+## [0.4.35](https://github.com/qq15725/modern-canvas/compare/v0.4.34...v0.4.35) (2025-05-10)
+
+
+### Features
+
+* color support linear gradient ([1186900](https://github.com/qq15725/modern-canvas/commit/118690070caacf93e39f1f317960812bc2978a0b))
+
+
+
 ## [0.4.34](https://github.com/qq15725/modern-canvas/compare/v0.4.33...v0.4.34) (2025-05-09)
 
 
