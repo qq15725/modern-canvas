@@ -1,3 +1,12 @@
+## [0.4.36](https://github.com/qq15725/modern-canvas/compare/v0.4.35...v0.4.36) (2025-05-10)
+
+
+### Bug Fixes
+
+* Infinity width by GradientTexture ([458d0f1](https://github.com/qq15725/modern-canvas/commit/458d0f1c1abd478da3168dae2fe8df02cd92de95))
+
+
+
 ## [0.4.35](https://github.com/qq15725/modern-canvas/compare/v0.4.34...v0.4.35) (2025-05-10)
 
 
