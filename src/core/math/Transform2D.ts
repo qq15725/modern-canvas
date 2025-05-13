@@ -60,11 +60,12 @@ export class Transform2D extends Matrix3 {
   scaleY(y: number): this { return this.scale(1, y) }
   scale3d(x: number, y: number, z = 1): this { return this.scale(x, y, z) }
   scale(x: number, y: number, z = 1): this { return this.premultiply(Transform2D._t2d.makeScale(x, y, z)) }
-  makeScale(x: number, y: number, z = 1): this {
+  makeScale(x: number, y: number, _z = 1): this {
+    // TODO z
     this.set([
       x, 0, 0,
       0, y, 0,
-      0, 0, z,
+      0, 0, 1,
     ])
     return this
   }

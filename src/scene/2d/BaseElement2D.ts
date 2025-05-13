@@ -250,7 +250,9 @@ export class BaseElement2D extends Node2D implements Rectangulable {
       .skew(this.skew.x, this.skew.y)
       .rotate(this.rotation)
     parseCSSTransform(this.style.transform, width, height, this.transform)
-    this.transform.translate(offsetX + this.position.x, offsetY + this.position.y)
+    this.transform
+      .translate(this.position.x, this.position.y)
+      .translate(offsetX, offsetY)
   }
 
   protected override _updateGlobalTransform(): void {
