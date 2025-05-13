@@ -1,3 +1,12 @@
+## [0.4.38](https://github.com/qq15725/modern-canvas/compare/v0.4.37...v0.4.38) (2025-05-13)
+
+
+### Bug Fixes
+
+* scale3d transform ([85bca8f](https://github.com/qq15725/modern-canvas/commit/85bca8fe1643ee9a65c350424e35f7e91b23bc75))
+
+
+
 ## [0.4.37](https://github.com/qq15725/modern-canvas/compare/v0.4.36...v0.4.37) (2025-05-12)
 
 
