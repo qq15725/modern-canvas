@@ -475,24 +475,42 @@ export class Node extends CoreObject {
     if (this.is(node) || node.hasParent()) {
       return node
     }
+    let index = -1
     switch (internalMode) {
       case 'default':
-      case 'front': {
-        const targetMode = internalMode === 'default'
-          ? 'back'
-          : 'front'
-        const index = this._children.findIndex(node => node.internalMode === targetMode)
+        index = this._children.findLastIndex(node => node.internalMode === 'default')
         if (index > -1) {
-          this._children.splice(index, 0, node)
+          index += 1
         }
         else {
-          this._children.push(node)
+          index = this._children.findIndex(node => node.internalMode === 'back')
+        }
+        break
+      case 'front': {
+        index = this._children.findLastIndex(node => node.internalMode === 'front')
+        if (index > -1) {
+          index += 1
+        }
+        else {
+          index = this._children.findIndex(node => node.internalMode === 'default')
+        }
+        if (index > -1) {
+          index += 1
+        }
+        else {
+          index = this._children.findIndex(node => node.internalMode === 'back')
         }
         break
       }
       case 'back':
         this._children.push(node)
         break
+    }
+    if (index > -1) {
+      this._children.splice(index, 0, node)
+    }
+    else {
+      this._children.push(node)
     }
     node.internalMode = internalMode
     node.setParent(this)

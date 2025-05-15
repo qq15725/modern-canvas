@@ -173,22 +173,23 @@ export class Text2D extends TextureRect2D<CanvasTexture> {
     }
 
     if (this.split) {
-      this.measureResult?.paragraphs.forEach((p) => {
+      this.measure().paragraphs.forEach((p) => {
         p.fragments.forEach((f) => {
           f.characters.forEach((c) => {
-            this.appendChild(
+            this.append(
               new Text2D({
-                content: c.content,
+                internalMode: 'front',
                 style: {
                   ...c.computedStyle as any,
                   left: c.inlineBox.x,
                   top: c.inlineBox.y,
                   width: 0,
                   height: 0,
-                  effects: this.effects,
                 },
+                content: c.content,
+                effects: this.effects,
+                fonts: this.fonts,
               }),
-              'front',
             )
             this._subTextsCount++
           })
