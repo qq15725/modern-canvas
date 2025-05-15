@@ -1,3 +1,13 @@
+## [0.4.39](https://github.com/qq15725/modern-canvas/compare/v0.4.38...v0.4.39) (2025-05-15)
+
+
+### Bug Fixes
+
+* makeSkew ([983d875](https://github.com/qq15725/modern-canvas/commit/983d875446f6ebafc83957a5f6d403283509aada))
+* text split ([fb3efe3](https://github.com/qq15725/modern-canvas/commit/fb3efe36e35628f73effc69c0e01541088266031))
+
+
+
 ## [0.4.38](https://github.com/qq15725/modern-canvas/compare/v0.4.37...v0.4.38) (2025-05-13)
 
 
