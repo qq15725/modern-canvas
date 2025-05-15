@@ -43,9 +43,9 @@ const textStyles = new Set(Object.keys(textDefaultStyle))
 export class Text2D extends TextureRect2D<CanvasTexture> {
   @property({ default: false }) declare split: boolean
   @property({ default: '' }) declare content: TextOptions['content']
-  @property() effects?: TextOptions['effects']
-  @protectedProperty() measureDom?: TextOptions['measureDom']
-  @protectedProperty() fonts?: TextOptions['fonts']
+  @property() declare effects?: TextOptions['effects']
+  @protectedProperty() declare measureDom?: TextOptions['measureDom']
+  @protectedProperty() declare fonts?: TextOptions['fonts']
 
   override texture = new CanvasTexture()
 
