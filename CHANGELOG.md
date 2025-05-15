@@ -1,3 +1,12 @@
+## [0.4.40](https://github.com/qq15725/modern-canvas/compare/v0.4.39...v0.4.40) (2025-05-15)
+
+
+### Bug Fixes
+
+* Text2D ([b4518ee](https://github.com/qq15725/modern-canvas/commit/b4518ee0a73f6be037984afc858f16426cac7b31))
+
+
+
 ## [0.4.39](https://github.com/qq15725/modern-canvas/compare/v0.4.38...v0.4.39) (2025-05-15)
 
 
