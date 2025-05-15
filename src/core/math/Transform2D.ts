@@ -25,17 +25,15 @@ export class Transform2D extends Matrix3 {
     return t2d.multiply(this, this)
   }
 
-  skewX(x: number): this { return this.skew(x, 1) }
-  skewY(y: number): this { return this.skew(1, y) }
+  skewX(x: number): this { return this.skew(x, 0) }
+  skewY(y: number): this { return this.skew(0, y) }
   skew(x: number, y: number): this { return this.premultiply(Transform2D._t2d.makeSkew(x, y)) }
   makeSkew(x: number, y: number): this {
-    const cx = Math.cos(y)
-    const sx = Math.sin(y)
-    const cy = -Math.sin(-x)
-    const sy = Math.cos(-x)
+    const tanX = Math.tan(x)
+    const tanY = Math.tan(y)
     this.set([
-      cx, cy, 0,
-      sx, sy, 0,
+      1, tanY, 0,
+      tanX, 1, 0,
       0, 0, 1,
     ])
     return this
