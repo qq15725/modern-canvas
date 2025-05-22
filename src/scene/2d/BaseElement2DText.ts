@@ -1,8 +1,8 @@
-import type { TextProperty } from 'modern-idoc'
+import type { Text as TextProperties } from 'modern-idoc'
 import type { MeasureResult, TextOptions } from 'modern-text'
 import type { PropertyDeclaration } from '../../core'
 import type { BaseElement2D } from './BaseElement2D'
-import { normalizeText } from 'modern-idoc'
+import { isNone, normalizeText } from 'modern-idoc'
 import { Text } from 'modern-text'
 import { CoreObject, property, protectedProperty, Transform2D } from '../../core'
 import { CanvasTexture } from '../resources'
@@ -23,8 +23,8 @@ export class BaseElement2DText extends CoreObject {
   baseText = new Text()
   measureResult?: MeasureResult
 
-  override setProperties(properties?: TextProperty): this {
-    return super.setProperties(normalizeText(properties))
+  override setProperties(properties?: TextProperties): this {
+    return super.setProperties(isNone(properties) ? undefined : normalizeText(properties))
   }
 
   protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {

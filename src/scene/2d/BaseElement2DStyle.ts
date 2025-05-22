@@ -1,11 +1,11 @@
-import type { ElementStyleDeclaration, StyleDeclaration } from 'modern-idoc'
+import type { NormalizedElementStyle, NormalizedStyle } from 'modern-idoc'
 import { getDefaultStyle } from 'modern-idoc'
 import {
   defineProperty,
   Resource,
 } from '../../core'
 
-export interface BaseElement2DStyleProperties extends Omit<StyleDeclaration, 'left' | 'top' | 'width' | 'height'> {
+export interface BaseElement2DStyleProperties extends Omit<NormalizedStyle, 'left' | 'top' | 'width' | 'height'> {
   left: number
   top: number
   width: number
@@ -23,7 +23,7 @@ export class BaseElement2DStyle extends Resource {
   }
 }
 
-const defaultStyles: ElementStyleDeclaration = getDefaultStyle()
+const defaultStyles: NormalizedElementStyle = getDefaultStyle()
 
 delete defaultStyles.top
 delete defaultStyles.left

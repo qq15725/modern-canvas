@@ -1,22 +1,23 @@
-import type { ForegroundDeclaration, ForegroundProperty } from 'modern-idoc'
-import { normalizeForeground } from 'modern-idoc'
+import type { Foreground, NormalizedForeground } from 'modern-idoc'
+import { isNone, normalizeForeground } from 'modern-idoc'
 import { property } from '../../core'
 import { BaseElement2DFill } from './BaseElement2DFill'
 
-export interface BaseElement2DForeground extends ForegroundDeclaration {
+export interface BaseElement2DForeground extends NormalizedForeground {
   //
 }
 
 export class BaseElement2DForeground extends BaseElement2DFill {
-  @property() declare color?: ForegroundDeclaration['color']
-  @property() declare src?: ForegroundDeclaration['src']
-  @property() declare dpi?: ForegroundDeclaration['dpi']
-  @property() declare rotateWithShape?: ForegroundDeclaration['rotateWithShape']
-  @property() declare tile?: ForegroundDeclaration['tile']
-  @property() declare stretch?: ForegroundDeclaration['stretch']
-  @property() declare opacity?: ForegroundDeclaration['opacity']
+  @property() declare color?: NormalizedForeground['color']
+  @property() declare image?: NormalizedForeground['image']
+  @property() declare cropRect?: NormalizedForeground['cropRect']
+  @property() declare stretchRect?: NormalizedForeground['stretchRect']
+  @property() declare dpi?: NormalizedForeground['dpi']
+  @property() declare rotateWithShape?: NormalizedForeground['rotateWithShape']
+  @property() declare tile?: NormalizedForeground['tile']
+  @property() declare opacity?: NormalizedForeground['opacity']
 
-  override setProperties(properties?: ForegroundProperty): this {
-    return super.setProperties(normalizeForeground(properties))
+  override setProperties(properties?: Foreground): this {
+    return super.setProperties(isNone(properties) ? undefined : normalizeForeground(properties))
   }
 }

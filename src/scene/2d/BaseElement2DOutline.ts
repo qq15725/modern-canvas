@@ -1,13 +1,13 @@
-import type { OutlineDeclaration, OutlineProperty } from 'modern-idoc'
+import type { NormalizedOutline, Outline } from 'modern-idoc'
 import type { PropertyDeclaration } from '../../core'
 import type { BaseElement2D } from './BaseElement2D'
-import { normalizeOutline } from 'modern-idoc'
+import { isNone, normalizeOutline } from 'modern-idoc'
 import { CoreObject, property } from '../../core'
 
 export class BaseElement2DOutline extends CoreObject {
-  @property({ default: 0x00000000 }) declare color: OutlineDeclaration['color']
-  @property({ default: 0 }) declare width: OutlineDeclaration['width']
-  @property({ default: 'solid' }) declare style: OutlineDeclaration['style']
+  @property({ default: 0x00000000 }) declare color: NormalizedOutline['color']
+  @property({ default: 0 }) declare width: NormalizedOutline['width']
+  @property({ default: 'solid' }) declare style: NormalizedOutline['style']
 
   constructor(
     public parent: BaseElement2D,
@@ -15,8 +15,8 @@ export class BaseElement2DOutline extends CoreObject {
     super()
   }
 
-  override setProperties(properties?: OutlineProperty): this {
-    return super.setProperties(normalizeOutline(properties))
+  override setProperties(properties?: Outline): this {
+    return super.setProperties(isNone(properties) ? undefined : normalizeOutline(properties))
   }
 
   protected _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {

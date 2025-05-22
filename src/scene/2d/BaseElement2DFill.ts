@@ -1,23 +1,24 @@
-import type { FillDeclaration, FillProperty } from 'modern-idoc'
+import type { Fill, NormalizedFill } from 'modern-idoc'
 import type { PropertyDeclaration } from '../../core'
 import type { Texture2D } from '../resources'
 import type { BaseElement2D } from './BaseElement2D'
-import { normalizeFill } from 'modern-idoc'
+import { isNone, normalizeFill } from 'modern-idoc'
 import { assets } from '../../asset'
 import { CoreObject, property, Transform2D } from '../../core'
 
-export interface BaseElement2DFill extends FillDeclaration {
+export interface BaseElement2DFill extends NormalizedFill {
   //
 }
 
 export class BaseElement2DFill extends CoreObject {
-  @property() declare color?: FillDeclaration['color']
-  @property() declare src?: FillDeclaration['src']
-  @property() declare dpi?: FillDeclaration['dpi']
-  @property() declare rotateWithShape?: FillDeclaration['rotateWithShape']
-  @property() declare tile?: FillDeclaration['tile']
-  @property() declare stretch?: FillDeclaration['stretch']
-  @property() declare opacity?: FillDeclaration['opacity']
+  @property() declare color?: NormalizedFill['color']
+  @property() declare image?: NormalizedFill['image']
+  @property() declare cropRect?: NormalizedFill['cropRect']
+  @property() declare stretchRect?: NormalizedFill['stretchRect']
+  @property() declare dpi?: NormalizedFill['dpi']
+  @property() declare rotateWithShape?: NormalizedFill['rotateWithShape']
+  @property() declare tile?: NormalizedFill['tile']
+  @property() declare opacity?: NormalizedFill['opacity']
 
   protected _src?: Texture2D<ImageBitmap>
 
@@ -27,8 +28,8 @@ export class BaseElement2DFill extends CoreObject {
     super()
   }
 
-  override setProperties(properties?: FillProperty): this {
-    return super.setProperties(normalizeFill(properties))
+  override setProperties(properties?: Fill): this {
+    return super.setProperties(isNone(properties) ? undefined : normalizeFill(properties))
   }
 
   protected _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
@@ -41,15 +42,15 @@ export class BaseElement2DFill extends CoreObject {
       case 'tile':
         this.parent.requestRedraw()
         break
-      case 'src':
+      case 'image':
         this._updateSource()
         break
     }
   }
 
   async loadSource(): Promise<Texture2D<ImageBitmap> | undefined> {
-    if (this.src && this.src !== 'none') {
-      return await assets.texture.load(this.src)
+    if (this.image && this.image !== 'none') {
+      return await assets.texture.load(this.image)
     }
   }
 
@@ -71,13 +72,13 @@ export class BaseElement2DFill extends CoreObject {
       const { width, height } = this.parent.size
       const transform = new Transform2D()
       let disableWrapMode = false
-      if (this.srcRect) {
+      if (this.cropRect) {
         const {
           left = 0,
           top = 0,
           right = 0,
           bottom = 0,
-        } = this.srcRect
+        } = this.cropRect
         const w = Math.abs(1 + (left + right)) * width
         const h = Math.abs(1 + (top + bottom)) * height
         const sx = 1 / w
@@ -104,8 +105,8 @@ export class BaseElement2DFill extends CoreObject {
           .translate(-translateX / imageWidth, -translateY / imageHeight)
         disableWrapMode = true
       }
-      else if (this.stretch) {
-        const { left = 0, top = 0, right = 0, bottom = 0 } = this.stretch.rect ?? {}
+      else if (this.stretchRect) {
+        const { left = 0, top = 0, right = 0, bottom = 0 } = this.stretchRect
         const w = Math.abs(1 + (-left + -right)) * width
         const h = Math.abs(1 + (-top + -bottom)) * height
         const scaleX = 1 / w

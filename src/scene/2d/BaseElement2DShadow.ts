@@ -1,15 +1,15 @@
-import type { ShadowDeclaration, ShadowProperty } from 'modern-idoc'
+import type { NormalizedShadow, Shadow } from 'modern-idoc'
 import type { PropertyDeclaration } from '../../core'
 import type { BaseElement2D } from './BaseElement2D'
-import { normalizeShadow } from 'modern-idoc'
+import { isNone, normalizeShadow } from 'modern-idoc'
 import { CoreObject, property } from '../../core'
 import { DropShadowEffect } from '../effects'
 
 export class BaseElement2DShadow extends CoreObject {
-  @property({ default: '#000000' }) declare color: ShadowDeclaration['color']
-  @property({ default: 0 }) declare blur: ShadowDeclaration['blur']
-  @property({ default: 0 }) declare offsetY: ShadowDeclaration['offsetX']
-  @property({ default: 0 }) declare offsetX: ShadowDeclaration['offsetY']
+  @property({ default: '#000000' }) declare color: NormalizedShadow['color']
+  @property({ default: 0 }) declare blur: NormalizedShadow['blur']
+  @property({ default: 0 }) declare offsetY: NormalizedShadow['offsetX']
+  @property({ default: 0 }) declare offsetX: NormalizedShadow['offsetY']
 
   constructor(
     public parent: BaseElement2D,
@@ -17,8 +17,8 @@ export class BaseElement2DShadow extends CoreObject {
     super()
   }
 
-  override setProperties(properties?: ShadowProperty): this {
-    return super.setProperties(normalizeShadow(properties))
+  override setProperties(properties?: Shadow): this {
+    return super.setProperties(isNone(properties) ? undefined : normalizeShadow(properties))
   }
 
   protected _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {

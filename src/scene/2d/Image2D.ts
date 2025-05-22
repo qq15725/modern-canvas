@@ -1,4 +1,4 @@
-import type { TextureFillSourceRect } from 'modern-idoc'
+import type { ImageFillCropRect } from 'modern-idoc'
 import type { PropertyDeclaration } from '../../core'
 import type { CanvasBatchable, Node } from '../main'
 import type { ImageFrame, Texture2D } from '../resources'
@@ -10,7 +10,7 @@ import { Element2D } from './Element2D'
 
 export interface Image2DProperties extends Element2DProperties {
   src: string
-  srcRect: TextureFillSourceRect
+  srcRect: ImageFillCropRect
   gif: boolean
 }
 
@@ -18,7 +18,7 @@ export interface Image2DProperties extends Element2DProperties {
 export class Image2D extends Element2D {
   @protectedProperty() texture?: AnimatedTexture
   @property({ default: '' }) declare src: string
-  @property() declare srcRect: TextureFillSourceRect
+  @property() declare srcRect: ImageFillCropRect
   @property({ default: false }) declare gif: boolean
 
   get currentFrameTexture(): Texture2D | undefined { return this.texture?.frames[this._frameIndex]?.texture }
