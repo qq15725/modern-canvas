@@ -58,7 +58,7 @@ export interface BaseElement2DProperties extends Node2DProperties {
   blendMode: WebGLBlendMode
   style: Style
   background: Background
-  geometry: Shape
+  shape: Shape
   fill: Fill
   outline: Outline
   foreground: Foreground
@@ -86,9 +86,9 @@ export class BaseElement2D extends Node2D implements Rectangulable {
   get background(): BaseElement2DBackground { return this._background }
   set background(value: Background) { this._background.setProperties(value) }
 
-  protected _geometry = new BaseElement2DShape(this)
-  get geometry(): BaseElement2DShape { return this._geometry }
-  set geometry(value: Shape) { this._geometry.setProperties(value) }
+  protected _shape = new BaseElement2DShape(this)
+  get shape(): BaseElement2DShape { return this._shape }
+  set shape(value: Shape) { this._shape.setProperties(value) }
 
   protected _fill = new BaseElement2DFill(this)
   get fill(): BaseElement2DFill { return this._fill }
@@ -124,7 +124,7 @@ export class BaseElement2D extends Node2D implements Rectangulable {
       const {
         style,
         text,
-        geometry,
+        shape,
         background,
         fill,
         outline,
@@ -134,7 +134,7 @@ export class BaseElement2D extends Node2D implements Rectangulable {
       } = properties
       style && this.style.setProperties(style)
       background && this.background.setProperties(background)
-      geometry && this.geometry.setProperties(geometry)
+      shape && this.shape.setProperties(shape)
       fill && this.fill.setProperties(fill)
       outline && this.outline.setProperties(outline)
       text && this.text.setProperties(text)
@@ -199,10 +199,10 @@ export class BaseElement2D extends Node2D implements Rectangulable {
         this.requestRedraw()
         break
       case 'backgroundColor':
-        this.background.color = this.style.backgroundColor ?? undefined
+        this.background.color = this.style.backgroundColor
         break
       case 'backgroundImage':
-        this.background.image = this.style.backgroundImage ?? undefined
+        this.background.image = this.style.backgroundImage
         break
       case 'borderStyle':
       case 'outlineStyle':
@@ -311,38 +311,38 @@ export class BaseElement2D extends Node2D implements Rectangulable {
   protected _draw(): void {
     super._draw()
 
-    if (this.text.canDraw()) {
-      this.text.updateMeasure()
+    if (this._text.canDraw()) {
+      this._text.updateMeasure()
     }
 
-    if (this.background.canDraw()) {
+    if (this._background.canDraw()) {
       this._tree?.log(this.name, 'draw background')
-      this.geometry.drawRect()
-      this.background.draw()
+      this._shape.drawRect()
+      this._background.draw()
     }
 
-    if (this.fill.canDraw()) {
+    if (this._fill.canDraw()) {
       this._tree?.log(this.name, 'draw fill')
-      this.geometry.draw()
-      this.fill.draw()
+      this._shape.draw()
+      this._fill.draw()
     }
 
-    if (this.outline.canDraw()) {
+    if (this._outline.canDraw()) {
       this._tree?.log(this.name, 'draw outline')
-      this.geometry.draw()
-      this.outline.draw()
+      this._shape.draw()
+      this._outline.draw()
     }
 
-    if (this.foreground.canDraw()) {
+    if (this._foreground.canDraw()) {
       this._tree?.log(this.name, 'draw foreground')
-      this.geometry.drawRect()
-      this.foreground.draw()
+      this._shape.drawRect()
+      this._foreground.draw()
     }
 
-    if (this.text.canDraw()) {
+    if (this._text.canDraw()) {
       this._tree?.log(this.name, 'draw text')
-      this.geometry.drawRect()
-      this.text.draw()
+      this._shape.drawRect()
+      this._text.draw()
     }
 
     this._drawContent()
@@ -415,7 +415,7 @@ export class BaseElement2D extends Node2D implements Rectangulable {
         ...json.props,
         style: this.style.toJSON(),
         background: this.background.toJSON(),
-        geometry: this.geometry.toJSON(),
+        shape: this.shape.toJSON(),
         fill: this.fill.toJSON(),
         outline: this.outline.toJSON(),
         text: this.text.toJSON(),

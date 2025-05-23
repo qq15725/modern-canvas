@@ -12,10 +12,10 @@ import {
 import { CoreObject, property } from '../../core'
 
 export class BaseElement2DShape extends CoreObject {
-  @property() declare name?: string
-  @property() declare svg?: string
-  @property({ default: [0, 0, 1, 1] }) declare viewBox: NormalizedShape['viewBox']
-  @property({ default: [] }) declare data: NormalizedShape['paths']
+  @property() declare preset?: Required<NormalizedShape>['preset']
+  @property() declare svg?: Required<NormalizedShape>['svg']
+  @property({ default: [0, 0, 1, 1] }) declare viewBox: Required<NormalizedShape>['viewBox']
+  @property({ default: [] }) declare data: Required<NormalizedShape>['paths']
 
   protected _path2DSet: Path2DSet = new Path2DSet()
 
@@ -49,10 +49,10 @@ export class BaseElement2DShape extends CoreObject {
     if (this.svg) {
       const dom = svgToDOM(this.svg)
       this._path2DSet = svgToPath2DSet(dom)
-      viewBox = this._path2DSet.viewBox ?? this.viewBox ?? []
+      viewBox = this._path2DSet.viewBox ?? this.viewBox
     }
     else {
-      viewBox = this.viewBox ?? []
+      viewBox = this.viewBox
       this.data?.forEach((path, i) => {
         const { data, ...style } = path
         const path2D = new Path2D()

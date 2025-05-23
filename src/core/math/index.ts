@@ -1,6 +1,5 @@
 export * from './Color'
 export * from './ColorMatrix'
-export * from './LinearGradient'
 export * from './Matrix'
 export * from './Matrix2'
 export * from './Matrix3'

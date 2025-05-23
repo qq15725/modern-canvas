@@ -5,6 +5,7 @@ import type { BaseElement2D } from './BaseElement2D'
 import { isNone, normalizeFill } from 'modern-idoc'
 import { assets } from '../../asset'
 import { CoreObject, property, Transform2D } from '../../core'
+import { GradientTexture } from '../resources'
 
 export interface BaseElement2DFill extends NormalizedFill {
   //
@@ -13,6 +14,8 @@ export interface BaseElement2DFill extends NormalizedFill {
 export class BaseElement2DFill extends CoreObject {
   @property() declare color?: NormalizedFill['color']
   @property() declare image?: NormalizedFill['image']
+  @property() declare linearGradient?: NormalizedFill['linearGradient']
+  @property() declare radialGradient?: NormalizedFill['radialGradient']
   @property() declare cropRect?: NormalizedFill['cropRect']
   @property() declare stretchRect?: NormalizedFill['stretchRect']
   @property() declare dpi?: NormalizedFill['dpi']
@@ -20,7 +23,7 @@ export class BaseElement2DFill extends CoreObject {
   @property() declare tile?: NormalizedFill['tile']
   @property() declare opacity?: NormalizedFill['opacity']
 
-  protected _src?: Texture2D<ImageBitmap>
+  protected _texture?: Texture2D
 
   constructor(
     public parent: BaseElement2D,
@@ -28,8 +31,12 @@ export class BaseElement2DFill extends CoreObject {
     super()
   }
 
+  protected _setProperties(properties?: Fill): this {
+    return super.setProperties(properties)
+  }
+
   override setProperties(properties?: Fill): this {
-    return super.setProperties(isNone(properties) ? undefined : normalizeFill(properties))
+    return this._setProperties(isNone(properties) ? undefined : normalizeFill(properties))
   }
 
   protected _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
@@ -37,41 +44,57 @@ export class BaseElement2DFill extends CoreObject {
 
     switch (key) {
       case 'color':
+      case 'cropRect':
+      case 'stretchRect':
       case 'dpi':
       case 'rotateWithShape':
       case 'tile':
+      case 'opacity':
         this.parent.requestRedraw()
         break
       case 'image':
-        this._updateSource()
+      case 'linearGradient':
+      case 'radialGradient':
+        this._updateTexture()
         break
     }
   }
 
-  async loadSource(): Promise<Texture2D<ImageBitmap> | undefined> {
-    if (this.image && this.image !== 'none') {
+  async loadTexture(): Promise<Texture2D | undefined> {
+    if (this.linearGradient || this.radialGradient) {
+      return new GradientTexture(
+        (this.linearGradient ?? this.radialGradient)!,
+        this.parent.size.width,
+        this.parent.size.height,
+      )
+    }
+    else if (!isNone(this.image)) {
       return await assets.texture.load(this.image)
+    }
+    else {
+      return undefined
     }
   }
 
-  protected async _updateSource(): Promise<void> {
-    this._src = await this.loadSource()
+  protected async _updateTexture(): Promise<void> {
+    this._texture = await this.loadTexture()
     this.parent.requestRedraw()
   }
 
   canDraw(): boolean {
     return Boolean(
-      this._src || this.color,
+      this._texture
+      || this.color,
     )
   }
 
-  draw(): void {
-    const ctx = this.parent.context
-    if (this._src) {
-      const { width: imageWidth, height: imageHeight } = this._src
+  protected _getDrawOptions(): { disableWrapMode: boolean, textureTransform?: Transform2D } {
+    let textureTransform: Transform2D | undefined
+    let disableWrapMode = false
+    if (this._texture && this._texture.source instanceof ImageBitmap) {
+      textureTransform = new Transform2D()
+      const { width: imageWidth, height: imageHeight } = this._texture
       const { width, height } = this.parent.size
-      const transform = new Transform2D()
-      let disableWrapMode = false
       if (this.cropRect) {
         const {
           left = 0,
@@ -85,7 +108,7 @@ export class BaseElement2DFill extends CoreObject {
         const sy = 1 / h
         const tx = (left * width) * sx
         const ty = (top * height) * sy
-        transform
+        textureTransform
           .scale(sx, sy)
           .translate(tx, ty)
         // TODO
@@ -99,7 +122,7 @@ export class BaseElement2DFill extends CoreObject {
           // flip, TODO
           // alignment, TODO
         } = this.tile
-        transform
+        textureTransform
           .scale(1 / imageWidth, 1 / imageHeight)
           .scale(1 / scaleX, 1 / scaleY)
           .translate(-translateX / imageWidth, -translateY / imageHeight)
@@ -113,24 +136,24 @@ export class BaseElement2DFill extends CoreObject {
         const scaleY = 1 / h
         const translateX = (-left * width) * scaleX
         const translateY = (-top * height) * scaleY
-        transform
+        textureTransform
           .scale(scaleX, scaleY)
           .translate(translateX, translateY)
         disableWrapMode = true
       }
       else {
-        transform
+        textureTransform
           .scale(1 / width, 1 / height)
       }
-      ctx.textureTransform = transform
-      ctx.fillStyle = this._src
-      ctx.fill({
-        disableWrapMode,
-      })
     }
-    else {
-      ctx.fillStyle = this.color
-      ctx.fill()
-    }
+    return { disableWrapMode, textureTransform }
+  }
+
+  draw(): void {
+    const ctx = this.parent.context
+    const { textureTransform, disableWrapMode } = this._getDrawOptions()
+    ctx.textureTransform = textureTransform
+    ctx.fillStyle = this._texture ?? this.color
+    ctx.fill({ disableWrapMode })
   }
 }

@@ -1,33 +1,24 @@
 import type { NormalizedOutline, Outline } from 'modern-idoc'
 import type { PropertyDeclaration } from '../../core'
-import type { BaseElement2D } from './BaseElement2D'
 import { isNone, normalizeOutline } from 'modern-idoc'
-import { CoreObject, property } from '../../core'
+import { property } from '../../core'
+import { BaseElement2DFill } from './BaseElement2DFill'
 
-export class BaseElement2DOutline extends CoreObject {
+export class BaseElement2DOutline extends BaseElement2DFill {
   @property({ default: 0x00000000 }) declare color: NormalizedOutline['color']
   @property({ default: 0 }) declare width: NormalizedOutline['width']
   @property({ default: 'solid' }) declare style: NormalizedOutline['style']
 
-  constructor(
-    public parent: BaseElement2D,
-  ) {
-    super()
-  }
-
   override setProperties(properties?: Outline): this {
-    return super.setProperties(isNone(properties) ? undefined : normalizeOutline(properties))
+    return super._setProperties(isNone(properties) ? undefined : normalizeOutline(properties))
   }
 
   protected _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     super._updateProperty(key, value, oldValue, declaration)
 
     switch (key) {
-      case 'color':
       case 'width':
       case 'style':
-      case 'src':
-      case 'opacity':
         this.parent.requestRedraw()
         break
     }
@@ -36,14 +27,16 @@ export class BaseElement2DOutline extends CoreObject {
   canDraw(): boolean {
     return Boolean(
       this.width
-      || this.color,
+      || super.canDraw(),
     )
   }
 
   draw(): void {
     const ctx = this.parent.context
+    const { textureTransform, disableWrapMode } = this._getDrawOptions()
     ctx.lineWidth = this.width
-    ctx.strokeStyle = this.color
-    ctx.stroke()
+    ctx.textureTransform = textureTransform
+    ctx.strokeStyle = this._texture ?? this.color
+    ctx.stroke({ disableWrapMode })
   }
 }

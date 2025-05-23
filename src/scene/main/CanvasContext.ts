@@ -1,7 +1,7 @@
 import type { LineCap, LineJoin, LineStyle } from 'modern-path2d'
 import type { Batchable2D, ColorValue, Transform2D } from '../../core'
 import { Path2D } from 'modern-path2d'
-import { ColorTexture, GradientTexture, Texture2D } from '../resources'
+import { ColorTexture, Texture2D } from '../resources'
 
 export interface CanvasBatchable extends Batchable2D {
   type: 'stroke' | 'fill'
@@ -36,15 +36,12 @@ export class CanvasContext extends Path2D {
   _defaultStyle = Texture2D.EMPTY
   _draws: (StrokeDraw | FillDraw)[] = []
 
-  protected _colorToTexture(color: ColorValue | Texture2D, width: number, height: number): Texture2D {
-    if (color instanceof Texture2D) {
-      return color
-    }
-    else if (typeof color === 'string' && GradientTexture.test(color)) {
-      return new GradientTexture(color, width, height)
+  protected _toTexture(source: ColorValue | Texture2D): Texture2D {
+    if (source instanceof Texture2D) {
+      return source
     }
     else {
-      return new ColorTexture(color)
+      return new ColorTexture(source)
     }
   }
 
@@ -53,8 +50,7 @@ export class CanvasContext extends Path2D {
 
     let texture: Texture2D = this._defaultStyle
     if (this.strokeStyle) {
-      const { width, height } = path.getBoundingBox()
-      texture = this._colorToTexture(this.strokeStyle, width, height)
+      texture = this._toTexture(this.strokeStyle)
     }
 
     if (this.curves.length) {
@@ -93,8 +89,7 @@ export class CanvasContext extends Path2D {
 
     let texture: Texture2D = this._defaultStyle
     if (this.fillStyle) {
-      const { width, height } = path.getBoundingBox()
-      texture = this._colorToTexture(this.fillStyle, width, height)
+      texture = this._toTexture(this.fillStyle)
     }
 
     this._draws.push({
