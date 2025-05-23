@@ -88,64 +88,55 @@ export class BaseElement2DFill extends CoreObject {
     )
   }
 
-  protected _getDrawOptions(): { disableWrapMode: boolean, textureTransform?: Transform2D } {
-    let textureTransform: Transform2D | undefined
+  protected _getDrawOptions(): { disableWrapMode: boolean, textureTransform: Transform2D } {
     let disableWrapMode = false
-    if (this._texture && this._texture.source instanceof ImageBitmap) {
-      textureTransform = new Transform2D()
-      const { width: imageWidth, height: imageHeight } = this._texture
-      const { width, height } = this.parent.size
-      if (this.cropRect) {
-        const {
-          left = 0,
-          top = 0,
-          right = 0,
-          bottom = 0,
-        } = this.cropRect
-        const w = Math.abs(1 + (left + right)) * width
-        const h = Math.abs(1 + (top + bottom)) * height
-        const sx = 1 / w
-        const sy = 1 / h
-        const tx = (left * width) * sx
-        const ty = (top * height) * sy
-        textureTransform
-          .scale(sx, sy)
-          .translate(tx, ty)
-        // TODO
-      }
-      if (this.tile) {
-        const {
-          translateX = 0,
-          translateY = 0,
-          scaleX = 1,
-          scaleY = 1,
-          // flip, TODO
-          // alignment, TODO
-        } = this.tile
-        textureTransform
-          .scale(1 / imageWidth, 1 / imageHeight)
-          .scale(1 / scaleX, 1 / scaleY)
-          .translate(-translateX / imageWidth, -translateY / imageHeight)
-        disableWrapMode = true
-      }
-      else if (this.stretchRect) {
-        const { left = 0, top = 0, right = 0, bottom = 0 } = this.stretchRect
-        const w = Math.abs(1 + (-left + -right)) * width
-        const h = Math.abs(1 + (-top + -bottom)) * height
-        const scaleX = 1 / w
-        const scaleY = 1 / h
-        const translateX = (-left * width) * scaleX
-        const translateY = (-top * height) * scaleY
-        textureTransform
-          .scale(scaleX, scaleY)
-          .translate(translateX, translateY)
-        disableWrapMode = true
-      }
-      else {
-        textureTransform
-          .scale(1 / width, 1 / height)
-      }
+
+    const { width, height } = this.parent.size
+
+    const textureTransform = new Transform2D()
+      .scale(1 / width, 1 / height)
+
+    if (this.cropRect) {
+      const {
+        left = 0,
+        top = 0,
+        right = 0,
+        bottom = 0,
+      } = this.cropRect
+      textureTransform
+        .scale(
+          Math.abs(1 - (left + right)),
+          Math.abs(1 - (top + bottom)),
+        )
+        .translate(left, top)
+      disableWrapMode = true
     }
+
+    if (this.tile) {
+      const {
+        translateX = 0,
+        translateY = 0,
+        scaleX = 1,
+        scaleY = 1,
+        // flip, TODO
+        // alignment, TODO
+      } = this.tile
+      textureTransform
+        .translate(-translateX / width, -translateY / height)
+        .scale(1 / scaleX, 1 / scaleY)
+      disableWrapMode = true
+    }
+    else if (this.stretchRect) {
+      const { left = 0, top = 0, right = 0, bottom = 0 } = this.stretchRect
+      textureTransform
+        .scale(
+          Math.abs(1 - (-left + -right)),
+          Math.abs(1 - (-top + -bottom)),
+        )
+        .translate(-left, -top)
+      disableWrapMode = true
+    }
+
     return { disableWrapMode, textureTransform }
   }
 
