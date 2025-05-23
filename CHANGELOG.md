@@ -1,3 +1,12 @@
+## [0.4.43](https://github.com/qq15725/modern-canvas/compare/v0.4.42...v0.4.43) (2025-05-23)
+
+
+### Bug Fixes
+
+* fill transform ([e4f3724](https://github.com/qq15725/modern-canvas/commit/e4f3724700a66709359256ebdd5fbc3a0028c416))
+
+
+
 ## [0.4.42](https://github.com/qq15725/modern-canvas/compare/v0.4.41...v0.4.42) (2025-05-23)
 
 
