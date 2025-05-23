@@ -1,3 +1,13 @@
+## [0.4.41](https://github.com/qq15725/modern-canvas/compare/v0.4.40...v0.4.41) (2025-05-23)
+
+
+### Features
+
+* up idoc ([c258b3a](https://github.com/qq15725/modern-canvas/commit/c258b3ac822bc7e7508d49bb34bee8f90f1f0c88))
+* up idoc ([dfb3dc2](https://github.com/qq15725/modern-canvas/commit/dfb3dc2dd2fce35b544fcc565c0eb28721dca61e))
+
+
+
 ## [0.4.40](https://github.com/qq15725/modern-canvas/compare/v0.4.39...v0.4.40) (2025-05-15)
 
 
