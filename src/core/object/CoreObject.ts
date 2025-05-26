@@ -146,10 +146,16 @@ export class CoreObject extends EventEmitter {
       if (
         value
         && typeof value === 'object'
-        && 'toJSON' in value
-        && typeof value.toJSON === 'function'
       ) {
-        json[key] = value.toJSON()
+        if (
+          'toJSON' in value
+          && typeof value.toJSON === 'function'
+        ) {
+          json[key] = value.toJSON()
+        }
+        else {
+          json[key] = { ...value }
+        }
       }
       else {
         json[key] = value

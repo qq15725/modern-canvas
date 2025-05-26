@@ -15,7 +15,7 @@ import {
   CoreObject,
   customNode,
   customNodes,
-  property, protectedProperty,
+  property,
 } from '../../core'
 import { Children } from './Children'
 
@@ -57,11 +57,12 @@ export type InternalMode = 'default' | 'front' | 'back'
 
 export interface NodeProperties {
   name: string
+  mask: Maskable
   processMode: ProcessMode
   processSortMode: ProcessSortMode
   renderMode: RenderMode
   internalMode: InternalMode
-  mask: Maskable
+  meta: Record<string, any>
 }
 
 const tagUidMap: Record<string, number> = {}
@@ -77,12 +78,13 @@ function getTagUid(tag: any): number {
 export class Node extends CoreObject {
   readonly declare tag: string
 
-  @protectedProperty() declare name: string
+  @property() declare name: string
   @property() declare mask?: Maskable
   @property({ default: 'inherit' }) declare processMode: ProcessMode
   @property({ default: 'default' }) declare processSortMode: ProcessSortMode
   @property({ default: 'inherit' }) declare renderMode: RenderMode
   @property({ default: 'default' }) declare internalMode: InternalMode
+  @property({ default: {} }) declare meta: Record<string, any>
 
   protected _readyed = false
 
@@ -120,7 +122,7 @@ export class Node extends CoreObject {
 
       if (meta) {
         for (const key in meta) {
-          this.setMeta(key, meta[key])
+          this.meta[key] = meta[key]
         }
       }
 
@@ -157,7 +159,7 @@ export class Node extends CoreObject {
         this.emit('treeEnter', tree)
       }
 
-      const children = this.children.internal
+      const children = this._children.internal
       for (let len = children.length, i = 0; i < len; i++) {
         const node = children[i]
         !tree && this.emit('childExitingTree', node)
@@ -211,16 +213,6 @@ export class Node extends CoreObject {
     const children = this._parent?.children
     return children ? children[children.length - 1] : undefined
   }
-
-  /** Meta */
-  protected _meta = new Map<string, unknown>()
-  hasMeta(name: string): boolean { return this._meta.has(name) }
-  getMeta<T = any>(name: string): T | undefined
-  getMeta<T = any>(name: string, defaultVal: T): T
-  getMeta(name: string, defaultVal?: any): any { return this._meta.get(name) ?? defaultVal }
-  setMeta(name: string, value: any): void { this._meta.set(name, value) }
-  deleteMeta(name: string): void { this._meta.delete(name) }
-  clearMeta(): void { this._meta.clear() }
 
   canProcess(): boolean {
     if (!this._tree)
@@ -292,7 +284,7 @@ export class Node extends CoreObject {
 
     const childrenInBefore: Node[] = []
     const childrenInAfter: Node[] = []
-    this.children.internal.forEach((child) => {
+    this._children.internal.forEach((child) => {
       switch (child.processSortMode) {
         case 'default':
           childrenInAfter.push(child)
@@ -367,7 +359,7 @@ export class Node extends CoreObject {
   }
 
   input(event: InputEvent, key: InputEventKey): void {
-    this.children.internal.forEach(child => child.input(event, key))
+    this._children.internal.forEach(child => child.input(event, key))
     this._input(event, key)
   }
 
@@ -376,7 +368,7 @@ export class Node extends CoreObject {
   }
 
   getNode<T extends Node>(path: string): T | undefined {
-    return this.children.internal.find(child => child.name === path) as T | undefined
+    return this._children.internal.find(child => child.name === path) as T | undefined
   }
 
   removeNode(path: string): void {
@@ -466,13 +458,13 @@ export class Node extends CoreObject {
     }
     switch (internalMode) {
       case 'front':
-        this.children.front.push(node)
+        this._children.front.push(node)
         break
       case 'default':
-        this.children.push(node)
+        this._children.push(node)
         break
       case 'back':
-        this.children.back.push(node)
+        this._children.back.push(node)
         break
     }
     node.internalMode = internalMode
@@ -486,9 +478,9 @@ export class Node extends CoreObject {
       return this
     }
 
-    const fromArray = this.children.getInternal(node.internalMode)
+    const fromArray = this._children.getInternal(node.internalMode)
     const fromIndex = fromArray.indexOf(node)
-    const toArray = this.children.getInternal(internalMode)
+    const toArray = this._children.getInternal(internalMode)
 
     if (node.internalMode !== internalMode || toIndex !== fromIndex) {
       if (fromIndex > -1) {
@@ -520,7 +512,7 @@ export class Node extends CoreObject {
   removeChild<T extends Node>(child: T): T {
     const index = child.getIndex()
     if (this.is(child.parent) && index > -1) {
-      this.children.internal.splice(index, 1)
+      this._children.internal.splice(index, 1)
       child.setParent(undefined)
       this.emit('removeChild', child, index)
     }
@@ -528,7 +520,7 @@ export class Node extends CoreObject {
   }
 
   removeChildren(): void {
-    this.children.forEach(child => this.removeChild(child))
+    this._children.forEach(child => this.removeChild(child))
   }
 
   remove(): void {
@@ -536,12 +528,12 @@ export class Node extends CoreObject {
   }
 
   forEachChild(callbackfn: (value: Node, index: number, array: Node[]) => void): this {
-    this.children.forEach(callbackfn)
+    this._children.forEach(callbackfn)
     return this
   }
 
   forEachDescendant(callbackfn: (descendant: Node) => void): this {
-    this.children.forEach((child) => {
+    this._children.forEach((child) => {
       callbackfn(child)
       child.forEachDescendant(callbackfn)
     })
@@ -568,19 +560,15 @@ export class Node extends CoreObject {
   clone(): this {
     return new (this.constructor as any)(
       this.toJSON().props,
-      this.children.internal,
+      this._children.internal,
     )
   }
 
   override toJSON(): Record<string, any> {
     return {
       tag: this.tag,
-      props: {
-        name: this.name,
-        ...super.toJSON(),
-      },
-      meta: Object.fromEntries(this._meta.entries()),
-      children: [...this.children.map(child => child.toJSON())],
+      props: super.toJSON(),
+      children: [...this._children.map(child => child.toJSON())],
     }
   }
 
