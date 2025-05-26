@@ -199,7 +199,9 @@ export class Node extends CoreObject {
   }
 
   /** Children */
-  children = new Children<Node>()
+  protected _children = new Children()
+  get children(): Children { return this._children }
+  set children(value: Node[] | Children) { value instanceof Children ? (this._children = value) : this._children.set(value) }
   get siblingIndex(): number { return this.getIndex() }
   set siblingIndex(toIndex) { this._parent?.moveChild(this, toIndex) }
   get previousSibling(): Node | undefined { return this._parent?.children[this.getIndex() - 1] }
@@ -578,7 +580,7 @@ export class Node extends CoreObject {
         ...super.toJSON(),
       },
       meta: Object.fromEntries(this._meta.entries()),
-      children: this.children.map(child => child.toJSON()),
+      children: [...this.children.map(child => child.toJSON())],
     }
   }
 
