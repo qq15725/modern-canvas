@@ -23,6 +23,9 @@ async function init(): Promise<void> {
         transformOrigin: 'top left',
         transform: 'scale(0.5)',
       },
+      meta: {
+        a: 'b',
+      },
     }, [
       new Element2D({
         style: { top: 100, left: 100, width: 100, height: 100 },

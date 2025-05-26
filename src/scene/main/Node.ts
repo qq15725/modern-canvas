@@ -512,7 +512,7 @@ export class Node extends CoreObject {
   removeChild<T extends Node>(child: T): T {
     const index = child.getIndex()
     if (this.is(child.parent) && index > -1) {
-      this._children.internal.splice(index, 1)
+      this._children.getInternal(child.internalMode).splice(index, 1)
       child.setParent(undefined)
       this.emit('removeChild', child, index)
     }
