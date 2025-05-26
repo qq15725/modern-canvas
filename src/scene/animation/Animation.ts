@@ -165,7 +165,7 @@ export class Animation extends TimelineNode {
     let targets
     switch (this.effectMode) {
       case 'sibling':
-        targets = this.getParent()?.children.internalArray.filter(val => val instanceof CanvasItem) ?? []
+        targets = this.getParent()?.children.internal.filter(val => val instanceof CanvasItem) ?? []
         break
       case 'parent':
       default:
