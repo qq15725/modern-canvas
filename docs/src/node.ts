@@ -30,7 +30,7 @@ async function init(): Promise<void> {
   root.prepend(node8)
 
   // ['Node:8', 'Node:1', 'Node:3', 'Node:2', 'Node:6', 'Node:5', 'Node:7', 'Node:4']
-  console.warn(engine.root.getChildren().map(v => v.name))
+  console.warn(engine.root.children.map(v => v.name))
 }
 
 init()

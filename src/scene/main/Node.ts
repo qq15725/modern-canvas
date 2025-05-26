@@ -11,12 +11,13 @@ import type {
 } from '../../core'
 import type { SceneTree } from './SceneTree'
 import type { Viewport } from './Viewport'
-import { clamp,
+import {
   CoreObject,
   customNode,
   customNodes,
   property, protectedProperty,
 } from '../../core'
+import { Children } from './Children'
 
 export interface NodeEventMap extends CoreObjectEventMap, InputEventMap {
   treeEnter: (tree: SceneTree) => void
@@ -156,8 +157,9 @@ export class Node extends CoreObject {
         this.emit('treeEnter', tree)
       }
 
-      for (let len = this._children.length, i = 0; i < len; i++) {
-        const node = this._children[i]
+      const children = this.children.internal
+      for (let len = children.length, i = 0; i < len; i++) {
+        const node = children[i]
         !tree && this.emit('childExitingTree', node)
         node.setTree(tree)
         tree && this.emit('childEnteredTree', node)
@@ -179,7 +181,7 @@ export class Node extends CoreObject {
   protected _parent?: Node
   get parent(): Node | undefined { return this._parent }
   set parent(parent: Node | undefined) { this.setParent(parent) }
-  hasParent(): boolean { return !!this._parent }
+  hasParent(): boolean { return Boolean(this._parent) }
   getParent<T extends Node = Node>(): T | undefined { return this._parent as T }
   setParent<T extends Node = Node>(parent: T | undefined): this {
     if (!this._parent?.is(parent)) {
@@ -197,14 +199,14 @@ export class Node extends CoreObject {
   }
 
   /** Children */
-  protected _children: Node[] = []
+  children = new Children<Node>()
   get siblingIndex(): number { return this.getIndex() }
   set siblingIndex(toIndex) { this._parent?.moveChild(this, toIndex) }
-  get previousSibling(): Node | undefined { return this._parent?.getChildren()[this.getIndex() - 1] }
-  get nextSibling(): Node | undefined { return this._parent?.getChildren()[this.getIndex() + 1] }
-  get firstSibling(): Node | undefined { return this._parent?.getChildren()[0] }
+  get previousSibling(): Node | undefined { return this._parent?.children[this.getIndex() - 1] }
+  get nextSibling(): Node | undefined { return this._parent?.children[this.getIndex() + 1] }
+  get firstSibling(): Node | undefined { return this._parent?.children[0] }
   get lastSibling(): Node | undefined {
-    const children = this._parent?.getChildren()
+    const children = this._parent?.children
     return children ? children[children.length - 1] : undefined
   }
 
@@ -286,10 +288,9 @@ export class Node extends CoreObject {
     const canRender = this.canRender()
     const canProcess = this.canProcess()
 
-    const childrenInBefore = []
-    const childrenInAfter = []
-    for (let len = this._children.length, i = 0; i < len; i++) {
-      const child = this._children[i]
+    const childrenInBefore: Node[] = []
+    const childrenInAfter: Node[] = []
+    this.children.internal.forEach((child) => {
       switch (child.processSortMode) {
         case 'default':
           childrenInAfter.push(child)
@@ -298,7 +299,7 @@ export class Node extends CoreObject {
           childrenInBefore.push(child)
           break
       }
-    }
+    })
 
     childrenInBefore.forEach((child) => {
       child.emit('process', delta)
@@ -364,30 +365,16 @@ export class Node extends CoreObject {
   }
 
   input(event: InputEvent, key: InputEventKey): void {
-    for (let i = this._children.length - 1; i >= 0; i--) {
-      this._children[i].input(event, key)
-    }
+    this.children.internal.forEach(child => child.input(event, key))
     this._input(event, key)
   }
 
-  /** Children */
-  getChildren(includeInternal: boolean | InternalMode = false): Node[] {
-    switch (includeInternal) {
-      case true:
-        return this._children
-      case false:
-        return this._children.filter(child => child.internalMode === 'default')
-      default:
-        return this._children.filter(child => child.internalMode === includeInternal)
-    }
-  }
-
-  getIndex(includeInternal: boolean | InternalMode = false): number {
-    return this._parent?.getChildren(includeInternal).indexOf(this) ?? 0
+  getIndex(): number {
+    return this._parent?.children.getInternal(this.internalMode).indexOf(this) ?? 0
   }
 
   getNode<T extends Node>(path: string): T | undefined {
-    return this._children.find(child => child.name === path) as T | undefined
+    return this.children.internal.find(child => child.name === path) as T | undefined
   }
 
   removeNode(path: string): void {
@@ -399,7 +386,7 @@ export class Node extends CoreObject {
       return this
     }
     sibling.internalMode = this.internalMode
-    this._parent!.moveChild(sibling, this.getIndex(true) + 1)
+    this._parent!.moveChild(sibling, this.getIndex() + 1)
     return this
   }
 
@@ -444,7 +431,7 @@ export class Node extends CoreObject {
       _nodes = nodes
     }
     _nodes.forEach((node) => {
-      this._parent?.moveChild(node, this.getIndex(true))
+      this._parent?.moveChild(node, this.getIndex())
     })
   }
 
@@ -459,7 +446,7 @@ export class Node extends CoreObject {
       _nodes = nodes
     }
     _nodes.forEach((node) => {
-      this._parent?.moveChild(node, this.getIndex(true) + 1)
+      this._parent?.moveChild(node, this.getIndex() + 1)
     })
   }
 
@@ -467,7 +454,7 @@ export class Node extends CoreObject {
     if (!child.hasParent() || !this.is(child.parent)) {
       return node
     }
-    this.moveChild(node, child.getIndex(true))
+    this.moveChild(node, child.getIndex())
     return node
   }
 
@@ -475,42 +462,16 @@ export class Node extends CoreObject {
     if (this.is(node) || node.hasParent()) {
       return node
     }
-    let index = -1
     switch (internalMode) {
+      case 'front':
+        this.children.front.push(node)
+        break
       case 'default':
-        index = this._children.findLastIndex(node => node.internalMode === 'default')
-        if (index > -1) {
-          index += 1
-        }
-        else {
-          index = this._children.findIndex(node => node.internalMode === 'back')
-        }
+        this.children.push(node)
         break
-      case 'front': {
-        index = this._children.findLastIndex(node => node.internalMode === 'front')
-        if (index > -1) {
-          index += 1
-        }
-        else {
-          index = this._children.findIndex(node => node.internalMode === 'default')
-        }
-        if (index > -1) {
-          index += 1
-        }
-        else {
-          index = this._children.findIndex(node => node.internalMode === 'back')
-        }
-        break
-      }
       case 'back':
-        this._children.push(node)
+        this.children.back.push(node)
         break
-    }
-    if (index > -1) {
-      this._children.splice(index, 0, node)
-    }
-    else {
-      this._children.push(node)
     }
     node.internalMode = internalMode
     node.setParent(this)
@@ -518,62 +479,46 @@ export class Node extends CoreObject {
     return node
   }
 
-  moveChild(child: Node, toIndex: number, internalMode = child.internalMode): this {
-    if (this.is(child) || (child.hasParent() && !this.is(child.parent))) {
+  moveChild(node: Node, toIndex: number, internalMode = node.internalMode): this {
+    if (this.is(node) || (node.hasParent() && !this.is(node.parent))) {
       return this
     }
-    child.internalMode = internalMode
-    const oldIndex = this._children.indexOf(child)
-    let minIndex = this._children.findIndex((_child) => {
-      switch (internalMode) {
-        case 'default':
-          return _child.internalMode !== 'front'
-        case 'back':
-          return _child.internalMode === 'back'
-        case 'front':
-        default:
-          return true
+
+    const fromArray = this.children.getInternal(node.internalMode)
+    const fromIndex = fromArray.indexOf(node)
+    const toArray = this.children.getInternal(internalMode)
+
+    if (node.internalMode !== internalMode || toIndex !== fromIndex) {
+      if (fromIndex > -1) {
+        fromArray.splice(fromIndex, 1)
       }
-    })
-    minIndex = minIndex > -1 ? minIndex : Math.max(0, this._children.length - 1)
-    let maxIndex = this._children.slice(minIndex).findIndex((_child) => {
-      switch (internalMode) {
-        case 'front':
-          return _child.internalMode !== 'front'
-        case 'default':
-          return _child.internalMode === 'back'
-        case 'back':
-        default:
-          return false
-      }
-    })
-    maxIndex = maxIndex > -1 ? (minIndex + maxIndex) : Math.max(0, this._children.length)
-    const newIndex = clamp(minIndex, toIndex > -1 ? toIndex : maxIndex, maxIndex)
-    if (newIndex !== oldIndex) {
-      if (oldIndex > -1) {
-        this._children.splice(oldIndex, 1)
-      }
-      child.setParent(this)
-      if (newIndex > -1 && newIndex < this._children.length) {
-        this._children.splice(newIndex, 0, child)
+
+      node.setParent(this)
+
+      if (toIndex > -1 && toIndex < toArray.length) {
+        toArray.splice(toIndex, 0, node)
       }
       else {
-        this._children.push(child)
+        toArray.push(node)
       }
-      if (oldIndex > -1) {
-        this.emit('moveChild', child, newIndex, oldIndex)
+
+      if (fromIndex > -1) {
+        this.emit('moveChild', node, toIndex, fromIndex)
       }
       else {
-        this.emit('appendChild', child)
+        this.emit('appendChild', node)
       }
     }
+
+    node.internalMode = internalMode
+
     return this
   }
 
   removeChild<T extends Node>(child: T): T {
-    const index = child.getIndex(true)
+    const index = child.getIndex()
     if (this.is(child.parent) && index > -1) {
-      this._children.splice(index, 1)
+      this.children.internal.splice(index, 1)
       child.setParent(undefined)
       this.emit('removeChild', child, index)
     }
@@ -581,7 +526,7 @@ export class Node extends CoreObject {
   }
 
   removeChildren(): void {
-    this.getChildren().forEach(child => this.removeChild(child))
+    this.children.forEach(child => this.removeChild(child))
   }
 
   remove(): void {
@@ -589,12 +534,12 @@ export class Node extends CoreObject {
   }
 
   forEachChild(callbackfn: (value: Node, index: number, array: Node[]) => void): this {
-    this.getChildren().forEach(callbackfn)
+    this.children.forEach(callbackfn)
     return this
   }
 
   forEachDescendant(callbackfn: (descendant: Node) => void): this {
-    this.getChildren().forEach((child) => {
+    this.children.forEach((child) => {
       callbackfn(child)
       child.forEachDescendant(callbackfn)
     })
@@ -621,7 +566,7 @@ export class Node extends CoreObject {
   clone(): this {
     return new (this.constructor as any)(
       this.toJSON().props,
-      this.getChildren(true),
+      this.children.internal,
     )
   }
 
@@ -633,7 +578,7 @@ export class Node extends CoreObject {
         ...super.toJSON(),
       },
       meta: Object.fromEntries(this._meta.entries()),
-      children: this.getChildren().map(child => child.toJSON()),
+      children: this.children.map(child => child.toJSON()),
     }
   }
 

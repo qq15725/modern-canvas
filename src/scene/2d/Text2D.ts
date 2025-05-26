@@ -127,7 +127,7 @@ export class Text2D extends TextureRect2D<CanvasTexture> {
   }
 
   protected _getSubTexts(): Text2D[] {
-    return this.getChildren('front')
+    return this.children.front
       .filter(node => node instanceof Text2D) as Text2D[]
   }
 
@@ -168,7 +168,7 @@ export class Text2D extends TextureRect2D<CanvasTexture> {
 
   protected _updateSplit(): void {
     if (this._subTextsCount) {
-      this.getChildren('front').forEach(child => this.removeChild(child))
+      this.children.front.forEach(child => this.removeChild(child))
       this._subTextsCount = 0
     }
 
@@ -205,7 +205,7 @@ export class Text2D extends TextureRect2D<CanvasTexture> {
 
   protected override _drawContent(): void {
     if (!this.split) {
-      const onText2DRender = (this.getChildren()?.find(child => 'onText2DRender' in child) as any)?.onText2DRender
+      const onText2DRender = (this.children?.find(child => 'onText2DRender' in child) as any)?.onText2DRender
       if (onText2DRender) {
         onText2DRender()
       }

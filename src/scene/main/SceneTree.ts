@@ -111,7 +111,7 @@ export class SceneTree extends MainLoop {
 
   override free(): void {
     super.free()
-    this.root.getChildren(true)
+    this.root.children.internalArray
       .forEach(node => this.root.removeChild(node))
     this.input.removeEventListeners()
   }
