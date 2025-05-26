@@ -1,3 +1,21 @@
+## [0.4.44](https://github.com/qq15725/modern-canvas/compare/v0.4.43...v0.4.44) (2025-05-26)
+
+
+### Bug Fixes
+
+* linearGradient angle ([f50f074](https://github.com/qq15725/modern-canvas/commit/f50f07417eba56cc094d85b598410421b512ffba))
+
+
+### Features
+
+* support children object ([c95c2ae](https://github.com/qq15725/modern-canvas/commit/c95c2ae428a2977810029beabd4c678b1578b508))
+* support children object ([25586e6](https://github.com/qq15725/modern-canvas/commit/25586e60f846cf1fbdd20399abc6d802e997f581))
+* support children object ([152d11f](https://github.com/qq15725/modern-canvas/commit/152d11f360edf32f80922c700a9bb851f9c7ea61))
+* support meta prop ([0c2cc75](https://github.com/qq15725/modern-canvas/commit/0c2cc751e4de215606cbbd2e919f8e292ac18791))
+* support resetProperties ([2919a2a](https://github.com/qq15725/modern-canvas/commit/2919a2a33cf6e1122f103397b8dfc03f21379f14))
+
+
+
 ## [0.4.43](https://github.com/qq15725/modern-canvas/compare/v0.4.42...v0.4.43) (2025-05-23)
 
 
