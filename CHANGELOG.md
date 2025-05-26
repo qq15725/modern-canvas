@@ -1,3 +1,12 @@
+## [0.4.46](https://github.com/qq15725/modern-canvas/compare/v0.4.45...v0.4.46) (2025-05-26)
+
+
+### Bug Fixes
+
+* removeChild ([8baef2e](https://github.com/qq15725/modern-canvas/commit/8baef2eb48a1dbc47d721195043d4fe0d6087452))
+
+
+
 ## [0.4.45](https://github.com/qq15725/modern-canvas/compare/v0.4.44...v0.4.45) (2025-05-26)
 
 
