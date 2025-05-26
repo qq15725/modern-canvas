@@ -36,7 +36,11 @@ export class BaseElement2DFill extends CoreObject {
   }
 
   override setProperties(properties?: Fill): this {
-    return this._setProperties(isNone(properties) ? undefined : normalizeFill(properties))
+    return this._setProperties(
+      isNone(properties)
+        ? undefined
+        : normalizeFill(properties),
+    )
   }
 
   protected _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
