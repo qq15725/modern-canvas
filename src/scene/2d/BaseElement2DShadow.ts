@@ -18,7 +18,11 @@ export class BaseElement2DShadow extends CoreObject {
   }
 
   override setProperties(properties?: Shadow): this {
-    return super.setProperties(isNone(properties) ? undefined : normalizeShadow(properties))
+    return super.setProperties(
+      isNone(properties)
+        ? undefined
+        : normalizeShadow(properties),
+    )
   }
 
   protected _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {

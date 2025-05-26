@@ -84,31 +84,31 @@ export class BaseElement2D extends Node2D implements Rectangulable {
 
   protected _background = new BaseElement2DBackground(this)
   get background(): BaseElement2DBackground { return this._background }
-  set background(value: Background) { this._background.setProperties(value) }
+  set background(value: Background) { this._background.resetProperties().setProperties(value) }
 
   protected _shape = new BaseElement2DShape(this)
   get shape(): BaseElement2DShape { return this._shape }
-  set shape(value: Shape) { this._shape.setProperties(value) }
+  set shape(value: Shape) { this._shape.resetProperties().setProperties(value) }
 
   protected _fill = new BaseElement2DFill(this)
   get fill(): BaseElement2DFill { return this._fill }
-  set fill(value: Fill) { this._fill.setProperties(value) }
+  set fill(value: Fill) { this._fill.resetProperties().setProperties(value) }
 
   protected _outline = new BaseElement2DOutline(this)
   get outline(): BaseElement2DOutline { return this._outline }
-  set outline(value: Outline) { this._outline.setProperties(value) }
+  set outline(value: Outline) { this._outline.resetProperties().setProperties(value) }
 
   protected _foreground = new BaseElement2DForeground(this)
   get foreground(): BaseElement2DForeground { return this._foreground }
-  set foreground(value: Foreground) { this._foreground.setProperties(value) }
+  set foreground(value: Foreground) { this._foreground.resetProperties().setProperties(value) }
 
   protected _text = new BaseElement2DText(this)
   get text(): BaseElement2DText { return this._text }
-  set text(value: Text) { this._text.setProperties(value) }
+  set text(value: Text) { this._text.resetProperties().setProperties(value) }
 
   protected _shadow = new BaseElement2DShadow(this)
   get shadow(): BaseElement2DShadow { return this._shadow }
-  set shadow(value: Shadow) { this._shadow.setProperties(value) }
+  set shadow(value: Shadow) { this._shadow.resetProperties().setProperties(value) }
 
   constructor(properties?: Partial<BaseElement2DProperties>, nodes: Node[] = []) {
     super()

@@ -11,6 +11,10 @@ export class BaseElement2DForeground extends BaseElement2DFill {
   @property() declare fillWithShape?: NormalizedForeground['fillWithShape']
 
   override setProperties(properties?: Foreground): this {
-    return super._setProperties(isNone(properties) ? undefined : normalizeForeground(properties))
+    return super._setProperties(
+      isNone(properties)
+        ? undefined
+        : normalizeForeground(properties),
+    )
   }
 }

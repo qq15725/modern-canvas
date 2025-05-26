@@ -24,7 +24,11 @@ export class BaseElement2DText extends CoreObject {
   measureResult?: MeasureResult
 
   override setProperties(properties?: TextProperties): this {
-    return super.setProperties(isNone(properties) ? undefined : normalizeText(properties))
+    return super.setProperties(
+      isNone(properties)
+        ? undefined
+        : normalizeText(properties),
+    )
   }
 
   protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {

@@ -107,6 +107,13 @@ export class CoreObject extends EventEmitter {
     return properties
   }
 
+  resetProperties(): this {
+    for (const [name, property] of this.getPropertyDeclarations()) {
+      this.setProperty(name, property.default)
+    }
+    return this
+  }
+
   setProperties(properties?: any): this {
     if (properties && typeof properties === 'object') {
       for (const [name] of this.getPropertyDeclarations()) {

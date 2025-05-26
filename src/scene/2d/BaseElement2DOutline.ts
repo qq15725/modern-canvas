@@ -10,7 +10,11 @@ export class BaseElement2DOutline extends BaseElement2DFill {
   @property({ default: 'solid' }) declare style: NormalizedOutline['style']
 
   override setProperties(properties?: Outline): this {
-    return super._setProperties(isNone(properties) ? undefined : normalizeOutline(properties))
+    return super._setProperties(
+      isNone(properties)
+        ? undefined
+        : normalizeOutline(properties),
+    )
   }
 
   protected _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {

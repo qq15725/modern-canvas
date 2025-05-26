@@ -28,7 +28,11 @@ export class BaseElement2DShape extends CoreObject {
   }
 
   override setProperties(properties?: Shape): this {
-    return super.setProperties(isNone(properties) ? undefined : normalizeShape(properties))
+    return super.setProperties(
+      isNone(properties)
+        ? undefined
+        : normalizeShape(properties),
+    )
   }
 
   protected _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
