@@ -1,3 +1,12 @@
+## [0.4.45](https://github.com/qq15725/modern-canvas/compare/v0.4.44...v0.4.45) (2025-05-26)
+
+
+### Bug Fixes
+
+* meta ([507e937](https://github.com/qq15725/modern-canvas/commit/507e937f7f66970df9d183d4f83b98167497a7a1))
+
+
+
 ## [0.4.44](https://github.com/qq15725/modern-canvas/compare/v0.4.43...v0.4.44) (2025-05-26)
 
 
