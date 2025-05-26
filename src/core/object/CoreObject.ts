@@ -81,7 +81,9 @@ export class CoreObject extends EventEmitter {
       this._defaultProperties = {}
       for (const [name, property] of this.getPropertyDeclarations()) {
         if (!property.protected && !property.alias) {
-          this._defaultProperties[name] = property.default
+          this._defaultProperties[name] = typeof property.default === 'function'
+            ? property.default()
+            : property.default
         }
       }
     }

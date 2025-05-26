@@ -1,7 +1,7 @@
 import { RawWeakMap } from '../shared'
 
 export interface PropertyDeclaration {
-  readonly default?: any
+  readonly default?: any | (() => any)
   readonly protected?: boolean
   readonly alias?: string
 }
@@ -37,10 +37,14 @@ export function defineProperty(constructor: any, name: PropertyKey, declaration:
     }
   }
 
+  const getDefaultValue = (): any => typeof defaultValue === 'function'
+    ? defaultValue()
+    : defaultValue
+
   Object.defineProperty(constructor.prototype, name, {
-    get(this: any) { return descriptor!.get?.call(this) ?? defaultValue },
+    get(this: any) { return descriptor!.get?.call(this) ?? getDefaultValue() },
     set(this: any, value: unknown) {
-      const oldValue = descriptor!.get?.call(this) ?? defaultValue
+      const oldValue = descriptor!.get?.call(this) ?? getDefaultValue()
       descriptor!.set?.call(this, value)
       this.requestUpdate?.(name, oldValue, declaration)
     },

@@ -84,7 +84,7 @@ export class Node extends CoreObject {
   @property({ default: 'default' }) declare processSortMode: ProcessSortMode
   @property({ default: 'inherit' }) declare renderMode: RenderMode
   @property({ default: 'default' }) declare internalMode: InternalMode
-  @property({ default: {} }) declare meta: Record<string, any>
+  @property({ default: () => ({}) }) declare meta: Record<string, any>
 
   protected _readyed = false
 

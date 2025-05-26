@@ -16,7 +16,7 @@ export class GradientTexture extends Texture2D {
     if (!ctx) {
       throw new Error('Failed to parse linear gradient, get canvas context is null.')
     }
-    let { angle, stops } = linearGradient
+    let { angle = 0, stops } = linearGradient
     angle -= Math.PI / 2
     const halfWidth = width / 2
     const halfHeight = height / 2

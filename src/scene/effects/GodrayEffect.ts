@@ -171,7 +171,7 @@ void main(void) {
   @property({ default: 0.5 }) declare gain: number
   @property({ default: 2.5 }) declare lacunarity: number
   @property({ default: true }) declare parallel: boolean
-  @property({ default: [0, 0] }) declare center: [number, number]
+  @property({ default: () => [0, 0] }) declare center: [number, number]
   @property({ default: 1 }) declare alpha: number
 
   constructor(properties?: Partial<GodrayEffectProperties>, children: Node[] = []) {

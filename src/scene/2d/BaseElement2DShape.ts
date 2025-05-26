@@ -14,8 +14,8 @@ import { CoreObject, property } from '../../core'
 export class BaseElement2DShape extends CoreObject {
   @property() declare preset?: Required<NormalizedShape>['preset']
   @property() declare svg?: Required<NormalizedShape>['svg']
-  @property({ default: [0, 0, 1, 1] }) declare viewBox: Required<NormalizedShape>['viewBox']
-  @property({ default: [] }) declare data: Required<NormalizedShape>['paths']
+  @property({ default: () => [0, 0, 1, 1] }) declare viewBox: Required<NormalizedShape>['viewBox']
+  @property({ default: () => [] }) declare data: Required<NormalizedShape>['paths']
 
   protected _path2DSet: Path2DSet = new Path2DSet()
 
