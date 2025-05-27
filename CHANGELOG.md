@@ -1,3 +1,12 @@
+## [0.4.48](https://github.com/qq15725/modern-canvas/compare/v0.4.47...v0.4.48) (2025-05-27)
+
+
+### Bug Fixes
+
+* shape paths ([742eded](https://github.com/qq15725/modern-canvas/commit/742eded000c03c78065c962e37a70f1fcb43647c))
+
+
+
 ## [0.4.47](https://github.com/qq15725/modern-canvas/compare/v0.4.46...v0.4.47) (2025-05-26)
 
 
