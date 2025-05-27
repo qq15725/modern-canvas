@@ -15,7 +15,7 @@ export class BaseElement2DShape extends CoreObject {
   @property() declare preset?: Required<NormalizedShape>['preset']
   @property() declare svg?: Required<NormalizedShape>['svg']
   @property({ default: () => [0, 0, 1, 1] }) declare viewBox: Required<NormalizedShape>['viewBox']
-  @property({ default: () => [] }) declare data: Required<NormalizedShape>['paths']
+  @property({ default: () => [] }) declare paths: Required<NormalizedShape>['paths']
 
   protected _path2DSet: Path2DSet = new Path2DSet()
 
@@ -23,7 +23,6 @@ export class BaseElement2DShape extends CoreObject {
     public parent: BaseElement2D,
   ) {
     super()
-
     this._updatePath2DSet()
   }
 
@@ -40,7 +39,7 @@ export class BaseElement2DShape extends CoreObject {
 
     switch (key) {
       case 'svg':
-      case 'data':
+      case 'paths':
       case 'viewBox':
         this._updatePath2DSet()
         this.parent.requestRedraw()
@@ -57,7 +56,7 @@ export class BaseElement2DShape extends CoreObject {
     }
     else {
       viewBox = this.viewBox
-      this.data?.forEach((path, i) => {
+      this.paths?.forEach((path, i) => {
         const { data, ...style } = path
         const path2D = new Path2D()
         path2D.style = style as any
