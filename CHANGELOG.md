@@ -1,3 +1,12 @@
+## [0.4.49](https://github.com/qq15725/modern-canvas/compare/v0.4.48...v0.4.49) (2025-05-28)
+
+
+### Bug Fixes
+
+* shape render ([7627e5e](https://github.com/qq15725/modern-canvas/commit/7627e5eef4a058c2e754241a4349c844b38307cb))
+
+
+
 ## [0.4.48](https://github.com/qq15725/modern-canvas/compare/v0.4.47...v0.4.48) (2025-05-27)
 
 
