@@ -14,7 +14,7 @@ import { CoreObject, property } from '../../core'
 export class BaseElement2DShape extends CoreObject {
   @property() declare preset?: Required<NormalizedShape>['preset']
   @property() declare svg?: Required<NormalizedShape>['svg']
-  @property({ default: () => [0, 0, 1, 1] }) declare viewBox: Required<NormalizedShape>['viewBox']
+  @property() declare viewBox?: Required<NormalizedShape>['viewBox']
   @property({ default: () => [] }) declare paths: Required<NormalizedShape>['paths']
 
   protected _path2DSet: Path2DSet = new Path2DSet()
@@ -48,14 +48,13 @@ export class BaseElement2DShape extends CoreObject {
   }
 
   protected _updatePath2DSet(): void {
-    let viewBox: number[]
+    let viewBox: number[] | undefined
     if (this.svg) {
       const dom = svgToDOM(this.svg)
       this._path2DSet = svgToPath2DSet(dom)
-      viewBox = this._path2DSet.viewBox ?? this.viewBox
+      viewBox = this._path2DSet.viewBox
     }
     else {
-      viewBox = this.viewBox
       this.paths?.forEach((path, i) => {
         const { data, ...style } = path
         const path2D = new Path2D()
@@ -63,6 +62,12 @@ export class BaseElement2DShape extends CoreObject {
         path2D.addData(data)
         this._path2DSet.paths[i] = path2D
       })
+    }
+    if (!viewBox) {
+      const bbox = this._path2DSet.getBoundingBox()
+      viewBox = bbox
+        ? [bbox.x, bbox.y, bbox.width, bbox.height]
+        : [0, 0, 1, 1]
     }
     const [x, y, w, h] = viewBox
     this._path2DSet.paths.forEach((path) => {
