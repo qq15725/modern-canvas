@@ -1,3 +1,12 @@
+## [0.4.50](https://github.com/qq15725/modern-canvas/compare/v0.4.49...v0.4.50) (2025-05-28)
+
+
+### Bug Fixes
+
+* shape viewBox ([70e86ea](https://github.com/qq15725/modern-canvas/commit/70e86ea3d9c9b69dd104a52c7c12eb34466aed04))
+
+
+
 ## [0.4.49](https://github.com/qq15725/modern-canvas/compare/v0.4.48...v0.4.49) (2025-05-28)
 
 
