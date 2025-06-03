@@ -31,6 +31,7 @@ export class BaseElement2DOutline extends BaseElement2DFill {
   canDraw(): boolean {
     return Boolean(
       this.width
+      || this.color
       || super.canDraw(),
     )
   }

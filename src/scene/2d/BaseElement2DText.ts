@@ -66,19 +66,13 @@ export class BaseElement2DText extends CoreObject {
 
   updateMeasure(): this {
     this.measureResult = this.measure()
-    const textWidth = this.measureResult.boundingBox.width
-    const textHeight = this.measureResult.boundingBox.height
-    const { left, top, width, height = textHeight } = this.parent.style
-    this.parent.position.x = left + Math.min(0, ((width || textWidth) - textWidth) / 2)
-    this.parent.position.y = top + Math.min(0, ((height || textHeight) - textHeight) / 2)
-    this.parent.size.width = textWidth
-    this.parent.size.height = textHeight
     return this
   }
 
   canDraw(): boolean {
     return Boolean(
-      this.content && this.texture?.valid,
+      this.content
+      && this.texture?.valid,
     )
   }
 
@@ -89,9 +83,13 @@ export class BaseElement2DText extends CoreObject {
       view: this.texture.source,
     })
     this.texture.requestUpload()
-    const { width, height } = this.parent.size
+    const textWidth = this.measureResult?.boundingBox.width
+      ?? this.parent.size.width
+    const textHeight = this.measureResult?.boundingBox.height
+      ?? this.parent.size.height
     ctx.fillStyle = this.texture
-    ctx.textureTransform = new Transform2D().scale(1 / width, 1 / height)
+    ctx.textureTransform = new Transform2D()
+      .scale(1 / textWidth, 1 / textHeight)
     ctx.fill()
   }
 }
