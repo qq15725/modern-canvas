@@ -193,7 +193,7 @@ export class Ruler extends Control {
     const texture = this.texture
     if (texture?.valid) {
       this.context.fillStyle = texture
-      this.context.textureTransform = new Transform2D().scale(
+      this.context.uvTransform = new Transform2D().scale(
         1 / this.size.width,
         1 / this.size.height,
       )

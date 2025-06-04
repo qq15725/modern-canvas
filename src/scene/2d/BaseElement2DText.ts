@@ -77,7 +77,6 @@ export class BaseElement2DText extends CoreObject {
   }
 
   draw(): void {
-    const ctx = this.parent.context
     this.baseText.render({
       pixelRatio: this.texture.pixelRatio,
       view: this.texture.source,
@@ -87,9 +86,20 @@ export class BaseElement2DText extends CoreObject {
       ?? this.parent.size.width
     const textHeight = this.measureResult?.boundingBox.height
       ?? this.parent.size.height
+    const ctx = this.parent.context
     ctx.fillStyle = this.texture
-    ctx.textureTransform = new Transform2D()
-      .scale(1 / textWidth, 1 / textHeight)
+    ctx.uvTransform = new Transform2D().scale(1 / textWidth, 1 / textHeight)
+    ctx.vertTransform = () => {
+      const parent = this.parent
+      const origin = parent.getTransformOrigin()
+      return new Transform2D()
+        .translate(-origin.x, -origin.y)
+        .scale(
+          parent.globalScale.x > 0 ? 1 : -1,
+          parent.globalScale.y > 0 ? 1 : -1,
+        )
+        .translate(origin.x, origin.y)
+    }
     ctx.fill()
   }
 }

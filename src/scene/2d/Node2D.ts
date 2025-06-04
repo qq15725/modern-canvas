@@ -1,4 +1,4 @@
-import type { CanvasBatchable, CanvasItemProperties, Node } from '../main'
+import type { CanvasBatchable, CanvasItemProperties, Node, VertTransform } from '../main'
 import { customNode, Transform2D, Vector2 } from '../../core'
 import { CanvasItem } from '../main'
 
@@ -29,13 +29,32 @@ export class Node2D extends CanvasItem {
       .append(nodes)
   }
 
-  protected _updateTransform(): void {
-    this.transform
-      .identity()
+  getTransformOrigin(): Vector2 {
+    return new Vector2(0, 0)
+  }
+
+  getTransform(cb?: (transform: Transform2D) => void): Transform2D {
+    const origin = this.getTransformOrigin()
+
+    const transform = new Transform2D()
+
+    transform
+      .translate(-origin.x, -origin.y)
       .scale(this.scale.x, this.scale.y)
       .skew(this.skew.x, this.skew.y)
       .rotate(this.rotation)
+
+    cb?.(transform)
+
+    transform
       .translate(this.position.x, this.position.y)
+      .translate(origin.x, origin.y)
+
+    return transform
+  }
+
+  protected _updateTransform(): void {
+    this.transform.copy(this.getTransform())
   }
 
   protected _updateGlobalTransform(): void {
@@ -61,8 +80,20 @@ export class Node2D extends CanvasItem {
     this.requestRelayout()
   }
 
-  protected _transformVertices(vertices: number[]): number[] {
-    const [a, c, tx, b, d, ty] = this.globalTransform.toArray()
+  protected _transformVertices(vertices: number[], vertTransform?: VertTransform): number[] {
+    let a, c, tx, b, d, ty
+    if (vertTransform) {
+      const globalTransform = this.globalTransform.clone()
+      globalTransform.multiply(
+        typeof vertTransform === 'function'
+          ? vertTransform?.()
+          : vertTransform,
+      )
+      ;([a, c, tx, b, d, ty] = globalTransform.toArray())
+    }
+    else {
+      ;([a, c, tx, b, d, ty] = this.globalTransform.toArray())
+    }
     const newVertices = vertices.slice()
     for (let len = vertices.length, i = 0; i < len; i += 2) {
       const x = vertices[i]
@@ -79,7 +110,7 @@ export class Node2D extends CanvasItem {
     return super._relayout(batchables).map((batchable) => {
       return {
         ...batchable,
-        vertices: this._transformVertices(batchable.vertices),
+        vertices: this._transformVertices(batchable.vertices, batchable.vertTransform),
       }
     })
   }

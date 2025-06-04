@@ -144,7 +144,7 @@ export class Image2D extends Element2D {
       const sy = 1 / h
       const tx = (left * width) * sx
       const ty = (top * height) * sy
-      this.context.textureTransform = new Transform2D()
+      this.context.uvTransform = new Transform2D()
         .scale(sx, sy)
         .translate(tx, ty)
       this.shape.draw()

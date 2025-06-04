@@ -16,6 +16,7 @@ import type {
   InputEventKey,
   PointerInputEvent,
   PropertyDeclaration,
+  Transform2D,
   WebGLBlendMode,
 } from '../../core'
 import type { CanvasBatchable, CanvasItemEventMap, Node, Rectangulable } from '../main'
@@ -239,21 +240,20 @@ export class BaseElement2D extends Node2D implements Rectangulable {
     }
   }
 
-  protected override _updateTransform(): void {
+  override getTransformOrigin(): Vector2 {
     const { width, height } = this.size
     const [originX, originY] = parseCSSTransformOrigin(this.style.transformOrigin)
-    const offsetX = originX * width
-    const offsetY = originY * height
-    this.transform
-      .identity()
-      .translate(-offsetX, -offsetY)
-      .scale(this.scale.x, this.scale.y)
-      .skew(this.skew.x, this.skew.y)
-      .rotate(this.rotation)
-    parseCSSTransform(this.style.transform ?? '', width, height, this.transform)
-    this.transform
-      .translate(this.position.x, this.position.y)
-      .translate(offsetX, offsetY)
+    return new Vector2(originX * width, originY * height)
+  }
+
+  override getTransform(cb?: (transform: Transform2D) => void): Transform2D {
+    const { width, height } = this.size
+
+    return super.getTransform((transform) => {
+      parseCSSTransform(this.style.transform ?? '', width, height, transform)
+
+      cb?.(transform)
+    })
   }
 
   protected override _updateGlobalTransform(): void {

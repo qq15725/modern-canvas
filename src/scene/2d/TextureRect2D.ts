@@ -23,7 +23,7 @@ export class TextureRect2D<T extends Texture2D = Texture2D> extends Element2D {
     if (this.texture?.valid) {
       const { width, height } = this.size
       this.context.fillStyle = this.texture
-      this.context.textureTransform = new Transform2D().scale(
+      this.context.uvTransform = new Transform2D().scale(
         1 / width,
         1 / height,
       )

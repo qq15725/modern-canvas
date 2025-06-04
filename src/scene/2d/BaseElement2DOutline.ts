@@ -38,9 +38,9 @@ export class BaseElement2DOutline extends BaseElement2DFill {
 
   draw(): void {
     const ctx = this.parent.context
-    const { textureTransform, disableWrapMode } = this._getDrawOptions()
+    const { uvTransform, disableWrapMode } = this._getDrawOptions()
     ctx.lineWidth = this.width || 1
-    ctx.textureTransform = textureTransform
+    ctx.uvTransform = uvTransform
     ctx.strokeStyle = this._texture ?? this.color
     ctx.stroke({ disableWrapMode })
   }

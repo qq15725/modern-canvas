@@ -92,12 +92,12 @@ export class BaseElement2DFill extends CoreObject {
     )
   }
 
-  protected _getDrawOptions(): { disableWrapMode: boolean, textureTransform: Transform2D } {
+  protected _getDrawOptions(): { disableWrapMode: boolean, uvTransform: Transform2D } {
     let disableWrapMode = false
 
     const { width, height } = this.parent.size
 
-    const textureTransform = new Transform2D()
+    const uvTransform = new Transform2D()
       .scale(1 / width, 1 / height)
 
     if (this.cropRect) {
@@ -107,7 +107,7 @@ export class BaseElement2DFill extends CoreObject {
         right = 0,
         bottom = 0,
       } = this.cropRect
-      textureTransform
+      uvTransform
         .scale(
           Math.abs(1 - (left + right)),
           Math.abs(1 - (top + bottom)),
@@ -125,14 +125,14 @@ export class BaseElement2DFill extends CoreObject {
         // flip, TODO
         // alignment, TODO
       } = this.tile
-      textureTransform
+      uvTransform
         .translate(-translateX / width, -translateY / height)
         .scale(1 / scaleX, 1 / scaleY)
       disableWrapMode = true
     }
     else if (this.stretchRect) {
       const { left = 0, top = 0, right = 0, bottom = 0 } = this.stretchRect
-      textureTransform
+      uvTransform
         .scale(
           Math.abs(1 - (-left + -right)),
           Math.abs(1 - (-top + -bottom)),
@@ -141,14 +141,16 @@ export class BaseElement2DFill extends CoreObject {
       disableWrapMode = true
     }
 
-    return { disableWrapMode, textureTransform }
+    return { disableWrapMode, uvTransform }
   }
 
   draw(): void {
     const ctx = this.parent.context
-    const { textureTransform, disableWrapMode } = this._getDrawOptions()
-    ctx.textureTransform = textureTransform
+    const { uvTransform, disableWrapMode } = this._getDrawOptions()
+    ctx.uvTransform = uvTransform
     ctx.fillStyle = this._texture ?? this.color
-    ctx.fill({ disableWrapMode })
+    ctx.fill({
+      disableWrapMode,
+    })
   }
 }

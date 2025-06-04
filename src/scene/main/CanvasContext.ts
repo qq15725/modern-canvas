@@ -3,29 +3,29 @@ import type { Batchable2D, ColorValue, Transform2D } from '../../core'
 import { Path2D } from 'modern-path2d'
 import { ColorTexture, Texture2D } from '../resources'
 
+export type UVTransform = Transform2D | ((x: number, y: number) => [number, number])
+export type VertTransform = Transform2D | (() => Transform2D)
+
 export interface CanvasBatchable extends Batchable2D {
   type: 'stroke' | 'fill'
   texture?: Texture2D
+  vertTransform?: VertTransform
 }
 
 export interface StrokeDraw extends Partial<CanvasBatchable> {
   type: 'stroke'
   path: Path2D
-  texture?: Texture2D
-  textureTransform?: Transform2D
   style: LineStyle
+  uvTransform?: UVTransform
 }
 
 export interface FillDraw extends Partial<CanvasBatchable> {
   type: 'fill'
   path: Path2D
-  texture?: Texture2D
-  textureTransform?: Transform2D
+  uvTransform?: UVTransform
 }
 
 export class CanvasContext extends Path2D {
-  textureTransform?: Transform2D
-
   fillStyle?: ColorValue | Texture2D
   strokeStyle?: ColorValue | Texture2D
   lineCap?: LineCap
@@ -33,8 +33,12 @@ export class CanvasContext extends Path2D {
   lineWidth?: number
   miterLimit?: number
 
-  _defaultStyle = Texture2D.EMPTY
-  _draws: (StrokeDraw | FillDraw)[] = []
+  // custom
+  uvTransform?: UVTransform
+  vertTransform?: VertTransform
+
+  protected _defaultStyle = Texture2D.EMPTY
+  protected _draws: (StrokeDraw | FillDraw)[] = []
 
   protected _toTexture(source: ColorValue | Texture2D): Texture2D {
     if (source instanceof Texture2D) {
@@ -59,7 +63,8 @@ export class CanvasContext extends Path2D {
         type: 'stroke',
         path,
         texture,
-        textureTransform: this.textureTransform,
+        uvTransform: this.uvTransform,
+        vertTransform: this.vertTransform,
         style: {
           alignment: 0.5,
           cap: this.lineCap ?? 'butt',
@@ -97,8 +102,10 @@ export class CanvasContext extends Path2D {
       type: 'fill',
       path,
       texture,
-      textureTransform: this.textureTransform,
+      uvTransform: this.uvTransform,
+      vertTransform: this.vertTransform,
     })
+
     super.reset()
   }
 
@@ -106,7 +113,8 @@ export class CanvasContext extends Path2D {
     super.copy(source)
     this.strokeStyle = source.strokeStyle
     this.fillStyle = source.fillStyle
-    this.textureTransform = source.textureTransform
+    this.uvTransform = source.uvTransform
+    this.vertTransform = source.vertTransform
     this.lineCap = source.lineCap
     this.lineJoin = source.lineJoin
     this.lineWidth = source.lineWidth
@@ -119,7 +127,8 @@ export class CanvasContext extends Path2D {
     super.reset()
     this.strokeStyle = undefined
     this.fillStyle = undefined
-    this.textureTransform = undefined
+    this.uvTransform = undefined
+    this.vertTransform = undefined
     this.lineCap = undefined
     this.lineJoin = undefined
     this.lineWidth = undefined
@@ -133,9 +142,15 @@ export class CanvasContext extends Path2D {
     vertices: number[],
     uvs: number[],
     texture?: Texture2D,
-    textureTransform?: Transform2D,
+    uvTransform?: UVTransform,
   ): void {
     if (texture) {
+      const _uvTransform = uvTransform
+        ? typeof uvTransform === 'function'
+          ? uvTransform
+          : (x: number, y: number) => uvTransform.applyToPoint(x, y)
+        : uvTransform
+
       const w = texture.width
       const h = texture.height
       for (let len = vertices.length, i = start; i < len; i += 2) {
@@ -143,8 +158,8 @@ export class CanvasContext extends Path2D {
         const y = vertices[i + 1]
         let uvX
         let uvY
-        if (textureTransform) {
-          [uvX, uvY] = textureTransform?.applyToPoint(x, y)
+        if (_uvTransform) {
+          [uvX, uvY] = _uvTransform(x, y)
         }
         else {
           [uvX, uvY] = [x / w, y / h]
@@ -161,67 +176,40 @@ export class CanvasContext extends Path2D {
 
   toBatchables(): CanvasBatchable[] {
     const batchables: CanvasBatchable[] = []
-    let vertices: number[] = []
-    let indices: number[] = []
-    let uvs: number[] = []
-    let texture: Texture2D | undefined
 
-    const push = (draw: FillDraw | StrokeDraw): void => {
+    for (let len = this._draws.length, i = 0; i < len; i++) {
+      const current = this._draws[i]
+      const vertices: number[] = []
+      const indices: number[] = []
+      const uvs: number[] = []
+
+      if (current.type === 'fill') {
+        current.path.fillTriangulate({
+          vertices,
+          indices,
+        })
+      }
+      else {
+        current.path.strokeTriangulate({
+          vertices,
+          indices,
+          lineStyle: current.style,
+          flipAlignment: false,
+          closed: true,
+        })
+      }
+
+      this.buildUvs(0, vertices, uvs, current.texture, current.uvTransform)
+
       batchables.push({
         vertices,
         indices,
         uvs,
-        texture,
-        type: draw.type,
-        disableWrapMode: draw.disableWrapMode,
+        texture: current.texture,
+        type: current.type,
+        disableWrapMode: current.disableWrapMode,
+        vertTransform: current.vertTransform,
       })
-      vertices = []
-      indices = []
-      uvs = []
-      texture = undefined
-    }
-
-    for (let len = this._draws.length, i = 0; i < len; i++) {
-      const draw = this._draws[i]
-      const prev = this._draws[i - 1]
-      if (vertices.length && prev && prev?.type !== draw.type) {
-        push(prev)
-      }
-      const oldTexture = texture
-      if (!oldTexture) {
-        texture = draw.texture
-      }
-      if (
-        vertices.length
-        && oldTexture !== draw.texture
-        && !oldTexture?.is(draw.texture)
-      ) {
-        push(draw)
-        texture = draw.texture
-      }
-      const start = vertices.length
-      if (draw.type === 'fill') {
-        draw.path.fillTriangulate({
-          vertices,
-          indices,
-        })
-        this.buildUvs(start, vertices, uvs, draw.texture, draw.textureTransform)
-      }
-      else {
-        draw.path.strokeTriangulate({
-          vertices,
-          indices,
-          lineStyle: draw.style,
-          flipAlignment: false,
-          closed: true,
-        })
-        this.buildUvs(start, vertices, uvs, draw.texture, draw.textureTransform)
-      }
-    }
-
-    const last = this._draws[this._draws.length - 1]
-    if (last && vertices.length) {
-      push(last)
     }
 
     return batchables
