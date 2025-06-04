@@ -1,3 +1,12 @@
+## [0.4.52](https://github.com/qq15725/modern-canvas/compare/v0.4.51...v0.4.52) (2025-06-04)
+
+
+### Bug Fixes
+
+* requestRelayout / text vertTransform ([614a4ec](https://github.com/qq15725/modern-canvas/commit/614a4ec5eba5dc40ff869ea329d0f6184390ee07))
+
+
+
 ## [0.4.51](https://github.com/qq15725/modern-canvas/compare/v0.4.50...v0.4.51) (2025-06-03)
 
 
