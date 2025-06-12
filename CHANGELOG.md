@@ -1,3 +1,12 @@
+## [0.4.53](https://github.com/qq15725/modern-canvas/compare/v0.4.52...v0.4.53) (2025-06-12)
+
+
+### Features
+
+* updep ([f50807b](https://github.com/qq15725/modern-canvas/commit/f50807bac0fdbb06d230002b28179f562d67ec76))
+
+
+
 ## [0.4.52](https://github.com/qq15725/modern-canvas/compare/v0.4.51...v0.4.52) (2025-06-04)
 
 
