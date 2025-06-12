@@ -1,7 +1,7 @@
+import type { PropertyDeclaration } from 'modern-idoc'
 import type {
   EventListenerOptions,
   EventListenerValue,
-  PropertyDeclaration,
 } from '../../core'
 import type { Node, Rectangulable } from '../main'
 import type { BaseElement2DEventMap, BaseElement2DProperties } from './BaseElement2D'

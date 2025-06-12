@@ -1,3 +1,4 @@
+import type { PropertyDeclaration } from 'modern-idoc'
 import type {
   CoreObjectEventMap,
   EventListenerOptions,
@@ -6,16 +7,15 @@ import type {
   InputEventKey,
   InputEventMap,
   Maskable,
-  PropertyDeclaration,
   WebGLRenderer,
 } from '../../core'
 import type { SceneTree } from './SceneTree'
 import type { Viewport } from './Viewport'
+import { property } from 'modern-idoc'
 import {
   CoreObject,
   customNode,
   customNodes,
-  property,
 } from '../../core'
 import { Children } from './Children'
 

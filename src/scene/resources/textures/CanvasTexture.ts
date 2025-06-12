@@ -1,5 +1,5 @@
-import type { PropertyDeclaration } from '../../../core'
-import { property } from '../../../core'
+import type { PropertyDeclaration } from 'modern-idoc'
+import { property } from 'modern-idoc'
 import { Texture2D } from './Texture2D'
 
 export class CanvasTexture extends Texture2D<HTMLCanvasElement> {

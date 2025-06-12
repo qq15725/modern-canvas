@@ -1,4 +1,4 @@
-import type { PropertyDeclaration } from '../../../core'
+import type { PropertyDeclaration } from 'modern-idoc'
 import { protectedProperty, Resource } from '../../../core'
 import { VertexBuffer } from './VertexBuffer'
 

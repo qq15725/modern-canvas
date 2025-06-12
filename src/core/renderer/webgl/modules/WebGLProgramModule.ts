@@ -1,6 +1,6 @@
 import type { WebGLProgramMeta, WebGLProgramOptions } from '../types'
 import type { WebGLRenderer } from '../WebGLRenderer'
-import { RawWeakMap } from '../../../shared'
+import { RawWeakMap } from 'modern-idoc'
 import { WebGLModule } from './WebGLModule'
 
 export class WebGLProgramModule extends WebGLModule {

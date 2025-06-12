@@ -1,11 +1,14 @@
+import type { PropertyDeclaration } from 'modern-idoc'
 import type {
   EventListenerOptions,
   EventListenerValue,
-  PropertyDeclaration, WebGLFramebufferOptions, WebGLRenderer,
+  WebGLFramebufferOptions,
+  WebGLRenderer,
 } from '../../core'
 import type { Rectangulable, RectangulableEventMap } from './interfaces'
 import type { NodeEventMap } from './Node'
-import { customNode, Projection2D, property, Rect2 } from '../../core'
+import { property } from 'modern-idoc'
+import { customNode, Projection2D, Rect2 } from '../../core'
 import { QuadUvGeometry, UvMaterial, ViewportTexture } from '../resources'
 import { Node } from './Node'
 

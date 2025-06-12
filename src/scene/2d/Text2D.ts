@@ -1,10 +1,12 @@
+import type { PropertyDeclaration } from 'modern-idoc'
 import type { MeasureResult, TextOptions } from 'modern-text'
-import type { EventListenerOptions, EventListenerValue, PropertyDeclaration } from '../../core'
+import type { EventListenerOptions, EventListenerValue } from '../../core'
 import type { CanvasBatchable, Node } from '../main'
 import type { Element2DEventMap } from './Element2D'
 import type { TextureRect2DProperties } from './TextureRect2D'
+import { property } from 'modern-idoc'
 import { Text, textDefaultStyle } from 'modern-text'
-import { customNode, property, protectedProperty } from '../../core'
+import { customNode, protectedProperty } from '../../core'
 import { CanvasTexture } from '../resources'
 import { TextureRect2D } from './TextureRect2D'
 
@@ -42,10 +44,10 @@ const textStyles = new Set(Object.keys(textDefaultStyle))
 @customNode('Text2D')
 export class Text2D extends TextureRect2D<CanvasTexture> {
   @property({ default: false }) declare split: boolean
-  @property({ default: '' }) declare content: TextOptions['content']
-  @property() declare effects?: TextOptions['effects']
-  @protectedProperty() declare measureDom?: TextOptions['measureDom']
-  @protectedProperty() declare fonts?: TextOptions['fonts']
+  @property({ alias: 'base.content' }) declare content: Text['content']
+  @property({ alias: 'base.effects' }) declare effects?: Text['effects']
+  @protectedProperty({ alias: 'base.measureDOM' }) declare measureDOM?: Text['measureDOM']
+  @protectedProperty({ alias: 'base.fonts' }) declare fonts?: Text['fonts']
 
   override texture = new CanvasTexture()
 
@@ -70,7 +72,7 @@ export class Text2D extends TextureRect2D<CanvasTexture> {
     switch (key) {
       case 'content':
       case 'effects':
-      case 'measureDom':
+      case 'measureDOM':
       case 'fonts':
       case 'split':
         this._updateSplit()
@@ -87,10 +89,6 @@ export class Text2D extends TextureRect2D<CanvasTexture> {
 
   protected _updateBase(): void {
     this.base.style = this.style.toJSON() as any
-    this.base.content = this.content ?? ''
-    this.base.effects = this.effects
-    this.base.fonts = this.fonts
-    this.base.measureDom = this.measureDom
     this.emit('updateBase', this.base)
     this.base.requestUpdate()
   }

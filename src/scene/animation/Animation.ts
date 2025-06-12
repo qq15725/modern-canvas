@@ -1,6 +1,8 @@
-import type { CssFunction, CssFunctionArg, PropertyDeclaration } from '../../core'
+import type { PropertyDeclaration } from 'modern-idoc'
+import type { CssFunction, CssFunctionArg } from '../../core'
 import type { Node, TimelineNodeProperties } from '../main'
-import { clamp, customNode, getDefaultCssPropertyValue, lerp, parseCssProperty, property, RawWeakMap } from '../../core'
+import { property, RawWeakMap } from 'modern-idoc'
+import { clamp, customNode, getDefaultCssPropertyValue, lerp, parseCssProperty } from '../../core'
 import { CanvasItem, TimelineNode } from '../main'
 
 export const linear = (amount: number): number => amount

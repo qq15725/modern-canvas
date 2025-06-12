@@ -1,12 +1,9 @@
-import type {
-  InputEventKey,
-  PropertyDeclaration } from '../../core'
+import type { PropertyDeclaration } from 'modern-idoc'
+import type { InputEventKey } from '../../core'
 import type { Node } from '../main'
 import type { RangeProperties } from './Range'
-import {
-  customNode,
-  property,
-} from '../../core'
+import { property } from 'modern-idoc'
+import { customNode } from '../../core'
 import { Range } from './Range'
 
 export interface ScrollBarProperties extends RangeProperties {

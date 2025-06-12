@@ -13,10 +13,10 @@ export interface MaskRect {
 
 export type MaskObject = Renderable
 
-export type Maskable =
-  | MaskColor
-  | MaskRect
-  | MaskObject
+export type Maskable
+  = | MaskColor
+    | MaskRect
+    | MaskObject
 
 export interface MaskData {
   source: Renderable

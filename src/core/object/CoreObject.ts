@@ -1,6 +1,6 @@
-import type { PropertyDeclaration } from '../decorator'
+import type { PropertyDeclaration } from 'modern-idoc'
 import type { EventListenerOptions, EventListenerValue } from './EventEmitter'
-import { getDeclarations } from '../decorator'
+import { getDeclarations } from 'modern-idoc'
 import { nextTick } from '../global'
 import { EventEmitter } from './EventEmitter'
 
@@ -127,10 +127,8 @@ export class CoreObject extends EventEmitter {
     return this
   }
 
-  requestUpdate(key?: PropertyKey, oldValue?: unknown, declaration?: PropertyDeclaration): void {
+  requestUpdate(key?: PropertyKey, newValue?: unknown, oldValue?: unknown, declaration?: PropertyDeclaration): void {
     if (key !== undefined) {
-      // @see defineProperty
-      const newValue = this[key as keyof this]
       if (!Object.is(newValue, oldValue)) {
         this._updatedProperties.set(key, oldValue)
         this._changedProperties.add(key)

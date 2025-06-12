@@ -3,6 +3,7 @@ import type {
   Fill,
   Foreground,
   Outline,
+  PropertyDeclaration,
   Shadow,
   Shape,
   Style,
@@ -15,7 +16,6 @@ import type {
   InputEvent,
   InputEventKey,
   PointerInputEvent,
-  PropertyDeclaration,
   Transform2D,
   WebGLBlendMode,
 } from '../../core'

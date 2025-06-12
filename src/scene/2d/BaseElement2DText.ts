@@ -1,17 +1,18 @@
 import type { Text as TextProperties } from 'modern-idoc'
-import type { MeasureResult, TextOptions } from 'modern-text'
-import type { PropertyDeclaration } from '../../core'
+import type { PropertyDeclaration } from 'modern-idoc'
+import type { MeasureResult } from 'modern-text'
 import type { BaseElement2D } from './BaseElement2D'
 import { isNone, normalizeText } from 'modern-idoc'
+import { property } from 'modern-idoc'
 import { Text } from 'modern-text'
-import { CoreObject, property, protectedProperty, Transform2D } from '../../core'
+import { CoreObject, protectedProperty, Transform2D } from '../../core'
 import { CanvasTexture } from '../resources'
 
 export class BaseElement2DText extends CoreObject {
-  @property({ default: '' }) declare content: TextOptions['content']
-  @property() effects?: TextOptions['effects']
-  @protectedProperty() measureDom?: TextOptions['measureDom']
-  @protectedProperty() fonts?: TextOptions['fonts']
+  @property({ alias: 'base.content' }) declare content: Text['content']
+  @property({ alias: 'base.effects' }) declare effects?: Text['effects']
+  @protectedProperty({ alias: 'base.measureDOM' }) declare measureDOM?: Text['measureDOM']
+  @protectedProperty({ alias: 'base.fonts' }) declare fonts?: Text['fonts']
 
   constructor(
     public parent: BaseElement2D,
@@ -19,8 +20,8 @@ export class BaseElement2DText extends CoreObject {
     super()
   }
 
+  base = new Text()
   texture = new CanvasTexture()
-  baseText = new Text()
   measureResult?: MeasureResult
 
   override setProperties(properties?: TextProperties): this {
@@ -37,7 +38,7 @@ export class BaseElement2DText extends CoreObject {
     switch (key) {
       case 'content':
       case 'effects':
-      case 'measureDom':
+      case 'measureDOM':
       case 'fonts':
       case 'split':
         this.parent.requestRedraw()
@@ -46,22 +47,18 @@ export class BaseElement2DText extends CoreObject {
   }
 
   protected _updateText(): void {
-    this.baseText.style = {
+    this.base.style = {
       justifyContent: 'center',
       alignItems: 'center',
       textAlign: 'center',
       ...this.parent.style.toJSON() as any,
     }
-    this.baseText.content = this.content ?? ''
-    this.baseText.effects = this.effects
-    this.baseText.fonts = this.fonts
-    this.baseText.measureDom = this.measureDom
-    this.baseText.requestUpdate()
+    this.base.requestUpdate()
   }
 
   measure(): MeasureResult {
     this._updateText()
-    return this.baseText.measure()
+    return this.base.measure()
   }
 
   updateMeasure(): this {
@@ -71,13 +68,13 @@ export class BaseElement2DText extends CoreObject {
 
   canDraw(): boolean {
     return Boolean(
-      this.content
+      !/^\s*$/.test(this.base.toString())
       && this.texture?.valid,
     )
   }
 
   draw(): void {
-    this.baseText.render({
+    this.base.render({
       pixelRatio: this.texture.pixelRatio,
       view: this.texture.source,
     })

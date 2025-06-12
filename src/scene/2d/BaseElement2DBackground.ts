@@ -1,6 +1,5 @@
 import type { Background, NormalizedBackground } from 'modern-idoc'
-import { isNone, normalizeBackground } from 'modern-idoc'
-import { property } from '../../core'
+import { isNone, normalizeBackground, property } from 'modern-idoc'
 import { BaseElement2DFill } from './BaseElement2DFill'
 
 export interface BaseElement2DBackground extends NormalizedBackground {

@@ -1,12 +1,12 @@
+import type { PropertyDeclaration } from 'modern-idoc'
 import type {
-  PropertyDeclaration,
   WebGLRenderer,
   WebGLTextureFilterMode,
-  WebGLTextureOptions, WebGLTextureWrapMode,
+  WebGLTextureOptions,
+  WebGLTextureWrapMode,
 } from '../../../core'
-import {
-  isPow2, property, protectedProperty, Resource, SUPPORTS_IMAGE_BITMAP,
-} from '../../../core'
+import { property } from 'modern-idoc'
+import { isPow2, protectedProperty, Resource, SUPPORTS_IMAGE_BITMAP } from '../../../core'
 
 export type Texture2DFilterMode = WebGLTextureFilterMode
 export type Texture2DWrapMode = WebGLTextureWrapMode

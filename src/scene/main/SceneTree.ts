@@ -1,14 +1,14 @@
+import type { PropertyDeclaration } from 'modern-idoc'
 import type {
   ColorValue,
   EventListenerOptions,
   EventListenerValue,
   MainLoopEventMap,
-  PropertyDeclaration,
   WebGLRenderer,
 } from '../../core'
 import type { Node } from './Node'
-import { Color, Input, MainLoop, property, protectedProperty,
-} from '../../core'
+import { property } from 'modern-idoc'
+import { Color, Input, MainLoop, protectedProperty } from '../../core'
 import { QuadUvGeometry } from '../resources'
 import { RenderStack } from './RenderStack'
 import { Timeline } from './Timeline'

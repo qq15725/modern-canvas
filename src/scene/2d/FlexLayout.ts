@@ -1,7 +1,7 @@
+import type { PropertyDeclaration } from 'modern-idoc'
 import type {
   Node as YogaNode,
 } from 'yoga-layout/load'
-import type { PropertyDeclaration } from '../../core'
 import type { FlexElement2D } from './FlexElement2D'
 import type { FlexElement2DStyle } from './FlexElement2DStyle'
 import {

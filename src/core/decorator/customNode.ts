@@ -1,4 +1,4 @@
-import { defineProperty } from './property'
+import { defineProperty } from 'modern-idoc'
 
 export const customNodes = new Map<string, any>()
 

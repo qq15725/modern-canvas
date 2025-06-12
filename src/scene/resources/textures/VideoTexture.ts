@@ -1,4 +1,4 @@
-import type { PropertyDeclaration } from '../../../core'
+import type { PropertyDeclaration } from 'modern-idoc'
 import { crossOrigin, isVideoElement, protectedProperty, Ticker } from '../../../core'
 import { Texture2D } from './Texture2D'
 

@@ -1,6 +1,7 @@
 import type { EventListenerOptions, EventListenerValue } from '../../core'
 import type { NodeEventMap, NodeProperties } from './Node'
-import { clamp, customNode, property } from '../../core'
+import { property } from 'modern-idoc'
+import { clamp, customNode } from '../../core'
 import { Node } from './Node'
 
 export interface TimelineEventMap extends NodeEventMap {

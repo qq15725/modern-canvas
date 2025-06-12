@@ -1,10 +1,10 @@
-import type { ImageFillCropRect } from 'modern-idoc'
-import type { PropertyDeclaration } from '../../core'
+import type { ImageFillCropRect, PropertyDeclaration } from 'modern-idoc'
 import type { CanvasBatchable, Node } from '../main'
 import type { ImageFrame, Texture2D } from '../resources'
 import type { Element2DProperties } from './Element2D'
+import { property } from 'modern-idoc'
 import { assets } from '../../asset'
-import { customNode, property, protectedProperty, Transform2D } from '../../core'
+import { customNode, protectedProperty, Transform2D } from '../../core'
 import { AnimatedTexture } from '../resources'
 import { Element2D } from './Element2D'
 

@@ -1,7 +1,7 @@
-import type { PropertyDeclaration } from '../../core'
+import type { PropertyDeclaration } from 'modern-idoc'
 import type { Node } from '../main'
 import type { BaseElement2DProperties } from './BaseElement2D'
-import { property } from '../../core'
+import { property } from 'modern-idoc'
 import { Texture2D } from '../resources'
 import { Element2D } from './Element2D'
 

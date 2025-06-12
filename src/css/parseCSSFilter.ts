@@ -1,14 +1,14 @@
 import { ColorMatrix, parseCssFunctions, PI_2 } from '../core'
 
-export type CSSFilterKey =
-  | 'hue-rotate'
-  | 'saturate'
-  | 'brightness'
-  | 'contrast'
-  | 'invert'
-  | 'sepia'
-  | 'opacity'
-  | 'grayscale'
+export type CSSFilterKey
+  = | 'hue-rotate'
+    | 'saturate'
+    | 'brightness'
+    | 'contrast'
+    | 'invert'
+    | 'sepia'
+    | 'opacity'
+    | 'grayscale'
 
 export type CSSFilters = Record<CSSFilterKey, number>
 

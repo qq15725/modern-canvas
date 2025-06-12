@@ -1,9 +1,10 @@
-import type { PropertyDeclaration } from '../../core'
+import type { PropertyDeclaration } from 'modern-idoc'
 import type { Node } from '../main'
 import type { VideoTexture } from '../resources'
 import type { TextureRect2DProperties } from './TextureRect2D'
+import { property } from 'modern-idoc'
 import { assets } from '../../asset'
-import { customNode, property } from '../../core'
+import { customNode } from '../../core'
 import { TextureRect2D } from './TextureRect2D'
 
 export interface Video2DProperties extends TextureRect2DProperties {

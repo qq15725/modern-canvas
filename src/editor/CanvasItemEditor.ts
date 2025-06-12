@@ -1,4 +1,5 @@
-import type { InputEvent, InputEventKey, PointerInputEvent, PropertyDeclaration } from '../core'
+import type { PropertyDeclaration } from 'modern-idoc'
+import type { InputEvent, InputEventKey, PointerInputEvent } from '../core'
 import type { Element2DStyle } from '../scene'
 import { Control, Element2D, Ruler, Scaler, TransformRect2D, XScrollBar, YScrollBar } from '../scene'
 
@@ -14,7 +15,7 @@ export class CanvasItemEditor extends Control {
     style: {
       visibility: 'hidden',
       outlineStyle: 'solid',
-      outlineColor: 0x00FF00FF,
+      outlineColor: '#00FF00FF',
       outlineWidth: 2,
       pointerEvents: 'none',
     },
@@ -56,7 +57,7 @@ export class CanvasItemEditor extends Control {
     style: {
       width: 500,
       height: 500,
-      backgroundColor: 0xFFFFFFFF,
+      backgroundColor: '#FFFFFFFF',
       overflow: 'hidden',
       pointerEvents: 'none',
       boxShadow: '2px 2px 2px 1px rgba(0, 0, 0, 0.2)',

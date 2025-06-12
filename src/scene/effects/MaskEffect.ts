@@ -1,9 +1,11 @@
+import type { PropertyDeclaration } from 'modern-idoc'
 import type { Node2D } from '../2d'
-import type { PropertyDeclaration, WebGLRenderer } from '../../core'
+import type { WebGLRenderer } from '../../core'
 import type { EffectContext, EffectProperties, Node, Viewport } from '../main'
 import type { Texture2D } from '../resources'
+import { property } from 'modern-idoc'
 import { assets } from '../../asset'
-import { customNode, property, protectedProperty } from '../../core'
+import { customNode, protectedProperty } from '../../core'
 import { Effect } from '../main/Effect'
 import { Material, QuadUvGeometry } from '../resources'
 

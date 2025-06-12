@@ -1,12 +1,15 @@
+import type { PropertyDeclaration } from 'modern-idoc'
 import type { Element2D } from '../2d'
 import type {
   EventListenerOptions,
   EventListenerValue,
   InputEvent,
-  InputEventKey, PropertyDeclaration, WheelInputEvent,
+  InputEventKey,
+  WheelInputEvent,
 } from '../../core'
 import type { NodeEventMap, NodeProperties } from '../main'
-import { clamp, customNode, property } from '../../core'
+import { property } from 'modern-idoc'
+import { clamp, customNode } from '../../core'
 import { Node } from '../main'
 
 export interface ScalerEventMap extends NodeEventMap {

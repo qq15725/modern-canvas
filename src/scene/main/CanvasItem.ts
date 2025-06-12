@@ -1,14 +1,16 @@
+import type { PropertyDeclaration } from 'modern-idoc'
 import type {
   ColorValue,
   EventListenerOptions,
   EventListenerValue,
-  PropertyDeclaration,
   WebGLBlendMode,
-  WebGLRenderer } from '../../core'
+  WebGLRenderer,
+} from '../../core'
 import type { CanvasBatchable } from './CanvasContext'
 import type { Node } from './Node'
 import type { TimelineNodeEventMap, TimelineNodeProperties } from './TimelineNode'
-import { clamp, Color, customNode, property, protectedProperty } from '../../core'
+import { property } from 'modern-idoc'
+import { clamp, Color, customNode, protectedProperty } from '../../core'
 import { CanvasContext } from './CanvasContext'
 import { TimelineNode } from './TimelineNode'
 
@@ -173,7 +175,9 @@ export class CanvasItem extends TimelineNode {
     }
   }
 
-  protected override _update(): void {
+  protected override _update(changed: Map<PropertyKey, any>): void {
+    super._update(changed)
+
     const parent = this.getParent<CanvasItem>()
 
     if (this._parentGlobalVisible !== parent?.globalVisible) {

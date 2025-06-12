@@ -1,7 +1,7 @@
-import type { NormalizedShape, Shape } from 'modern-idoc'
-import type { PropertyDeclaration } from '../../core'
+import type { NormalizedShape, PropertyDeclaration, Shape } from 'modern-idoc'
 import type { BaseElement2D } from './BaseElement2D'
 import { isNone, normalizeShape } from 'modern-idoc'
+import { property } from 'modern-idoc'
 import {
   Matrix3,
   Path2D,
@@ -9,7 +9,7 @@ import {
   svgToDOM,
   svgToPath2DSet,
 } from 'modern-path2d'
-import { CoreObject, property } from '../../core'
+import { CoreObject } from '../../core'
 
 export class BaseElement2DShape extends CoreObject {
   @property() declare preset?: Required<NormalizedShape>['preset']

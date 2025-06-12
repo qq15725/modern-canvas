@@ -1,6 +1,8 @@
-import type { PropertyDeclaration, WebGLRenderer } from '../../core'
+import type { PropertyDeclaration } from 'modern-idoc'
+import type { WebGLRenderer } from '../../core'
 import type { EffectProperties, Node, Viewport } from '../main'
-import { customNode, property } from '../../core'
+import { property } from 'modern-idoc'
+import { customNode } from '../../core'
 import { Effect } from '../main/Effect'
 import { Material, QuadUvGeometry } from '../resources'
 

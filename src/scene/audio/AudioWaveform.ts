@@ -1,7 +1,8 @@
+import type { PropertyDeclaration } from 'modern-idoc'
 import type { Element2DProperties } from '../2d'
-import type { PropertyDeclaration } from '../../core'
+import { property } from 'modern-idoc'
 import { Element2D } from '../2d'
-import { customNode, IN_BROWSER, property, Transform2D } from '../../core'
+import { customNode, IN_BROWSER, Transform2D } from '../../core'
 import { Texture2D } from '../resources'
 import { WebAudioContext } from './web'
 

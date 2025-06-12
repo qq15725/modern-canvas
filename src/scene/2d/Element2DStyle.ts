@@ -1,5 +1,5 @@
 import type { BaseElement2DStyleProperties } from './BaseElement2DStyle'
-import { defineProperty } from '../../core'
+import { defineProperty } from 'modern-idoc'
 import { BaseElement2DStyle } from './BaseElement2DStyle'
 
 export interface Element2DStyleProperties extends BaseElement2DStyleProperties {

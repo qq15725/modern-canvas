@@ -1,7 +1,8 @@
-import type { PropertyDeclaration } from '../../core'
+import type { PropertyDeclaration } from 'modern-idoc'
 import type { Node } from '../main'
 import type { ControlProperties } from './Control'
-import { customNode, property, Transform2D } from '../../core'
+import { property } from 'modern-idoc'
+import { customNode, Transform2D } from '../../core'
 import { CanvasTexture } from '../resources'
 import { Control } from './Control'
 

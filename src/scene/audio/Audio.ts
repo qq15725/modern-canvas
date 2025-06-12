@@ -1,4 +1,4 @@
-import type { PropertyDeclaration } from '../../core'
+import type { PropertyDeclaration } from 'modern-idoc'
 import type { HTMLSound } from './html'
 import type { IPlayOptions } from './interfaces'
 import type { WebSound } from './web'

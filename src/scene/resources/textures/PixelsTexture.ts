@@ -1,4 +1,4 @@
-import type { PropertyDeclaration } from '../../../core'
+import type { PropertyDeclaration } from 'modern-idoc'
 import type { Texture2DPixelsSource } from './Texture2D'
 import { Texture2D } from './Texture2D'
 

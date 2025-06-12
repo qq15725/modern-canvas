@@ -1,8 +1,8 @@
-import type { RawWeakMap } from '../../shared'
+import type { RawWeakMap } from 'modern-idoc'
 
-export type WebGLBufferTarget =
-  | 'array_buffer'
-  | 'element_array_buffer'
+export type WebGLBufferTarget
+  = | 'array_buffer'
+    | 'element_array_buffer'
 
 export interface WebGLBufferOptions {
   target?: WebGLBufferTarget
@@ -10,9 +10,9 @@ export interface WebGLBufferOptions {
   data: BufferSource | number[] | null
 }
 
-export type WebGLBufferUsage =
-  | 'static_draw'
-  | 'dynamic_draw'
+export type WebGLBufferUsage
+  = | 'static_draw'
+    | 'dynamic_draw'
 
 export interface WebGLBufferMeta {
   id: number
@@ -23,14 +23,14 @@ export interface WebGLBufferMeta {
   bytesPerElement: number
 }
 
-export type WebGLDrawMode =
-  | 'points'
-  | 'line_strip'
-  | 'line_loop'
-  | 'lines'
-  | 'triangle_strip'
-  | 'triangle_fan'
-  | 'triangles'
+export type WebGLDrawMode
+  = | 'points'
+    | 'line_strip'
+    | 'line_loop'
+    | 'lines'
+    | 'triangle_strip'
+    | 'triangle_fan'
+    | 'triangles'
 
 export interface WebGLDrawOptions {
   mode?: WebGLDrawMode
@@ -114,13 +114,13 @@ export interface WebGLProgramOptions {
   frag: string
 }
 
-export type WebGLTextureFilterMode =
-  | 'linear'
-  | 'nearest'
-  | 'nearest_mipmap_nearest'
-  | 'linear_mipmap_nearest'
-  | 'nearest_mipmap_linear'
-  | 'linear_mipmap_linear'
+export type WebGLTextureFilterMode
+  = | 'linear'
+    | 'nearest'
+    | 'nearest_mipmap_nearest'
+    | 'linear_mipmap_nearest'
+    | 'nearest_mipmap_linear'
+    | 'linear_mipmap_linear'
 
 export type WebGLTextureLocation = number
 
@@ -137,23 +137,23 @@ export interface WebGLTextureOptions {
   anisoLevel?: number
 }
 
-export type WebGLTextureSource =
-  | TexImageSource
-  | null
-  | {
-    width: number
-    height: number
-    pixels: ArrayBufferView | null
-  }
+export type WebGLTextureSource
+  = | TexImageSource
+    | null
+    | {
+      width: number
+      height: number
+      pixels: ArrayBufferView | null
+    }
 
-export type WebGLTextureTarget =
-  | 'texture_2d'
-  | 'texture_cube_map'
+export type WebGLTextureTarget
+  = | 'texture_2d'
+    | 'texture_cube_map'
 
-export type WebGLTextureWrapMode =
-  | 'repeat'
-  | 'clamp_to_edge'
-  | 'mirrored_repeat'
+export type WebGLTextureWrapMode
+  = | 'repeat'
+    | 'clamp_to_edge'
+    | 'mirrored_repeat'
 
 export interface WebGLVertexArrayObjectMeta {
   attributes: Record<string, WebGLVertexAttrib>
@@ -165,10 +165,10 @@ export interface WebGLVertexArrayObjectOptions {
   elementArrayBuffer?: WebGLBuffer | null
 }
 
-export type WebGLVertexAttribType =
-  | 'float'
-  | 'unsigned_byte'
-  | 'unsigned_short'
+export type WebGLVertexAttribType
+  = | 'float'
+    | 'unsigned_byte'
+    | 'unsigned_short'
 
 export interface WebGLVertexAttrib {
   buffer: WebGLBuffer

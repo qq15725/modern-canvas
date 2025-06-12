@@ -1,4 +1,5 @@
-import type { PropertyDeclaration, WebGLBufferOptions, WebGLRenderer } from '../../../core'
+import type { PropertyDeclaration } from 'modern-idoc'
+import type { WebGLBufferOptions, WebGLRenderer } from '../../../core'
 import { protectedProperty, Resource } from '../../../core'
 
 export interface VertexBufferOptions {

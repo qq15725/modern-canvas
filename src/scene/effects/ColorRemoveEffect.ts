@@ -1,6 +1,7 @@
 import type { ColorValue, WebGLRenderer } from '../../core'
 import type { EffectProperties, Node, Viewport } from '../main'
-import { Color, customNode, property } from '../../core'
+import { property } from 'modern-idoc'
+import { Color, customNode } from '../../core'
 import { Effect } from '../main/Effect'
 import { Material, QuadUvGeometry } from '../resources'
 

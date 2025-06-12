@@ -1,5 +1,5 @@
 import type { CoreObjectEventMap, EventListenerOptions, EventListenerValue } from '../object'
-import { property } from '../decorator'
+import { property } from 'modern-idoc'
 import { Ticker } from '../global'
 import { CoreObject } from '../object'
 

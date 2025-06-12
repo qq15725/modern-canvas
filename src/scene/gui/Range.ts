@@ -1,7 +1,8 @@
-import type { PropertyDeclaration } from '../../core'
+import type { PropertyDeclaration } from 'modern-idoc'
 import type { Node } from '../main'
 import type { ControlProperties } from './Control'
-import { customNode, property } from '../../core'
+import { property } from 'modern-idoc'
+import { customNode } from '../../core'
 import { Control } from './Control'
 
 export interface RangeProperties extends ControlProperties {

@@ -1,9 +1,10 @@
 import type { AnimationItem } from 'lottie-web'
-import type { PropertyDeclaration } from '../../core'
+import type { PropertyDeclaration } from 'modern-idoc'
 import type { Node } from '../main'
 import type { TextureRect2DProperties } from './TextureRect2D'
+import { property } from 'modern-idoc'
 import { assets } from '../../asset'
-import { customNode, property } from '../../core'
+import { customNode } from '../../core'
 import { CanvasTexture } from '../resources'
 import { TextureRect2D } from './TextureRect2D'
 

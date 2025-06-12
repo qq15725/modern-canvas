@@ -70,15 +70,15 @@
     "colord": "^2.9.3",
     "earcut": "^3.0.1",
     "modern-font": "^0.4.1",
-    "modern-idoc": "^0.6.9",
-    "modern-path2d": "^1.3.3",
-    "modern-text": "^1.4.2",
+    "modern-idoc": "^0.6.16",
+    "modern-path2d": "^1.3.4",
+    "modern-text": "^1.4.4",
     "yoga-layout": "^3.2.1"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^4.13.2",
+    "@antfu/eslint-config": "^4.14.1",
     "@types/earcut": "^3.0.0",
-    "@types/node": "^22.15.29",
+    "@types/node": "^24.0.1",
     "bumpp": "^10.1.1",
     "conventional-changelog-cli": "^5.0.0",
     "eslint": "^9.28.0",
@@ -89,7 +89,7 @@
     "typescript": "^5.8.3",
     "unbuild": "^3.5.0",
     "vite": "^6.3.5",
-    "vitest": "^3.2.0"
+    "vitest": "^3.2.3"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm lint-staged"
