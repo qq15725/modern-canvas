@@ -1,3 +1,17 @@
+## [0.4.54](https://github.com/qq15725/modern-canvas/compare/v0.4.53...v0.4.54) (2025-06-17)
+
+
+### Bug Fixes
+
+* svg load ([dbc5567](https://github.com/qq15725/modern-canvas/commit/dbc5567128cce8a54558fd6d60a748de34f73769))
+
+
+### Features
+
+* add enabled to Element2D object prop ([6211f60](https://github.com/qq15725/modern-canvas/commit/6211f60c8814238ac3bcaf47d5f2a62174c78479))
+
+
+
 ## [0.4.53](https://github.com/qq15725/modern-canvas/compare/v0.4.52...v0.4.53) (2025-06-12)
 
 
