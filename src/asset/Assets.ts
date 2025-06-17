@@ -61,9 +61,28 @@ export class Assets {
   }
 
   protected _fixSVG(dataURI: string): string {
-    const svg = new DOMParser().parseFromString(decodeURIComponent(dataURI.split(',')[1]), 'image/svg+xml').documentElement
-    svg.setAttribute('width', '512')
-    svg.setAttribute('height', '512')
+    let xml
+    if (dataURI.includes(';base64,')) {
+      xml = atob(dataURI.split(',')[1])
+    }
+    else {
+      // ;charset=utf-8,
+      xml = decodeURIComponent(dataURI.split(',')[1])
+    }
+    const svg = new DOMParser().parseFromString(xml, 'image/svg+xml').documentElement
+    const width = svg.getAttribute('width')
+    const height = svg.getAttribute('height')
+    const isValidWidth = width && /^[\d.]+$/.test(width)
+    const isValidHeight = height && /^[\d.]+$/.test(height)
+    if (!isValidWidth || !isValidHeight) {
+      const viewBox = svg.getAttribute('viewBox')?.split(' ').map(v => Number(v))
+      if (!isValidWidth) {
+        svg.setAttribute('width', String(viewBox ? viewBox[2] - viewBox[0] : 512))
+      }
+      if (!isValidHeight) {
+        svg.setAttribute('height', String(viewBox ? viewBox[3] - viewBox[1] : 512))
+      }
+    }
     return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg.outerHTML)}`
   }
 
@@ -85,7 +104,7 @@ export class Assets {
         })
     }
     else {
-      if (url.startsWith('data:image/svg+xml;charset=utf-8,')) {
+      if (url.startsWith('data:image/svg+xml;')) {
         url = this._fixSVG(url)
       }
       return new Promise<HTMLImageElement>((resolve) => {

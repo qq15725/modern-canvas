@@ -49,6 +49,7 @@ async function task(options: RenderOptions): Promise<HTMLCanvasElement> {
   engine.resize(width, height, true)
   ;(Array.isArray(data) ? data : [data]).forEach((v) => {
     if (v instanceof Node) {
+      v.parent = undefined
       engine!.root.appendChild(v)
     }
     else {
