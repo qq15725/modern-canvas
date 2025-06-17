@@ -1,3 +1,12 @@
+## [0.4.55](https://github.com/qq15725/modern-canvas/compare/v0.4.54...v0.4.55) (2025-06-17)
+
+
+### Bug Fixes
+
+* event ([b80235b](https://github.com/qq15725/modern-canvas/commit/b80235bad423b090fda6be5dec2c9e129028efde))
+
+
+
 ## [0.4.54](https://github.com/qq15725/modern-canvas/compare/v0.4.53...v0.4.54) (2025-06-17)
 
 
