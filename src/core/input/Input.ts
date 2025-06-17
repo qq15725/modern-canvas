@@ -76,15 +76,15 @@ export class Input extends EventEmitter {
       this.target.removeEventListener('pointerdown', this.onPointerDown)
       this.target.removeEventListener('pointerleave', this.onPointerOver)
       this.target.removeEventListener('pointerover', this.onPointerOver)
-      this.target.ownerDocument.removeEventListener('pointermove', this.onPointerMove)
-      this.target.ownerDocument.removeEventListener('pointerup', this.onPointerUp)
+      this.target.removeEventListener('pointermove', this.onPointerMove)
+      this.target.removeEventListener('pointerup', this.onPointerUp)
     }
     else {
       this.target.removeEventListener('mousedown', this.onPointerDown)
       this.target.removeEventListener('mouseout', this.onPointerOver)
       this.target.removeEventListener('mouseover', this.onPointerOver)
-      this.target.ownerDocument.removeEventListener('mousemove', this.onPointerMove)
-      this.target.ownerDocument.removeEventListener('mouseup', this.onPointerUp)
+      this.target.removeEventListener('mousemove', this.onPointerMove)
+      this.target.removeEventListener('mouseup', this.onPointerUp)
     }
     if (SUPPORTS_TOUCH_EVENTS) {
       this.target.removeEventListener('touchstart', this.onPointerDown)
@@ -114,15 +114,15 @@ export class Input extends EventEmitter {
       this.target.addEventListener('pointerdown', this.onPointerDown)
       this.target.addEventListener('pointerleave', this.onPointerOver)
       this.target.addEventListener('pointerover', this.onPointerOver)
-      this.target.ownerDocument.addEventListener('pointermove', this.onPointerMove)
-      this.target.ownerDocument.addEventListener('pointerup', this.onPointerUp)
+      this.target.addEventListener('pointermove', this.onPointerMove)
+      this.target.addEventListener('pointerup', this.onPointerUp)
     }
     else {
       this.target.addEventListener('mousedown', this.onPointerDown)
       this.target.addEventListener('mouseout', this.onPointerOver)
       this.target.addEventListener('mouseover', this.onPointerOver)
-      this.target.ownerDocument.addEventListener('mousemove', this.onPointerMove)
-      this.target.ownerDocument.addEventListener('mouseup', this.onPointerUp)
+      this.target.addEventListener('mousemove', this.onPointerMove)
+      this.target.addEventListener('mouseup', this.onPointerUp)
     }
     if (SUPPORTS_TOUCH_EVENTS) {
       this.target.addEventListener('touchstart', this.onPointerDown)
