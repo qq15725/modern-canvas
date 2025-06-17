@@ -4,6 +4,7 @@ import { property } from 'modern-idoc'
 import { BaseElement2DFill } from './BaseElement2DFill'
 
 export class BaseElement2DOutline extends BaseElement2DFill {
+  @property({ default: true }) declare enabled: boolean
   @property({ default: 0x00000000 }) declare color: NormalizedOutline['color']
   @property({ default: 0 }) declare width: NormalizedOutline['width']
   @property({ default: 'solid' }) declare style: NormalizedOutline['style']
@@ -22,6 +23,7 @@ export class BaseElement2DOutline extends BaseElement2DFill {
     switch (key) {
       case 'width':
       case 'style':
+      case 'enabled':
         this.parent.requestRedraw()
         break
     }
@@ -29,9 +31,11 @@ export class BaseElement2DOutline extends BaseElement2DFill {
 
   canDraw(): boolean {
     return Boolean(
-      this.width
-      || this.color
-      || super.canDraw(),
+      this.enabled && (
+        this.width
+        || this.color
+        || super.canDraw()
+      ),
     )
   }
 

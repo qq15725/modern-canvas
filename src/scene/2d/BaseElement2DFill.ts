@@ -12,6 +12,7 @@ export interface BaseElement2DFill extends NormalizedFill {
 }
 
 export class BaseElement2DFill extends CoreObject {
+  @property({ default: true }) declare enabled: boolean
   @property() declare color?: NormalizedFill['color']
   @property() declare image?: NormalizedFill['image']
   @property() declare linearGradient?: NormalizedFill['linearGradient']
@@ -54,6 +55,7 @@ export class BaseElement2DFill extends CoreObject {
       case 'rotateWithShape':
       case 'tile':
       case 'opacity':
+      case 'enabled':
         this.parent.requestRedraw()
         break
       case 'image':
@@ -87,8 +89,10 @@ export class BaseElement2DFill extends CoreObject {
 
   canDraw(): boolean {
     return Boolean(
-      this._texture
-      || this.color,
+      this.enabled && (
+        this._texture
+        || this.color
+      ),
     )
   }
 

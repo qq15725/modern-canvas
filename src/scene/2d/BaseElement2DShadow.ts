@@ -6,6 +6,7 @@ import { CoreObject } from '../../core'
 import { DropShadowEffect } from '../effects'
 
 export class BaseElement2DShadow extends CoreObject {
+  @property({ default: true }) declare enabled: boolean
   @property({ default: '#000000' }) declare color: NormalizedShadow['color']
   @property({ default: 0 }) declare blur: NormalizedShadow['blur']
   @property({ default: 0 }) declare offsetY: NormalizedShadow['offsetX']

@@ -12,6 +12,7 @@ import {
 import { CoreObject } from '../../core'
 
 export class BaseElement2DShape extends CoreObject {
+  @property({ default: true }) declare enabled: boolean
   @property() declare preset?: Required<NormalizedShape>['preset']
   @property() declare svg?: Required<NormalizedShape>['svg']
   @property() declare viewBox?: Required<NormalizedShape>['viewBox']
@@ -41,6 +42,7 @@ export class BaseElement2DShape extends CoreObject {
       case 'svg':
       case 'paths':
       case 'viewBox':
+      case 'enabled':
         this._updatePath2DSet()
         this.parent.requestRedraw()
         break
@@ -76,7 +78,7 @@ export class BaseElement2DShape extends CoreObject {
   }
 
   draw(): void {
-    if (this._path2DSet.paths.length) {
+    if (this.enabled && this._path2DSet.paths.length) {
       const ctx = this.parent.context
       const { width, height } = this.parent.size
       this._path2DSet.paths.forEach((path) => {

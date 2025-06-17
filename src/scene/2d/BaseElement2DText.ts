@@ -9,6 +9,7 @@ import { CoreObject, protectedProperty, Transform2D } from '../../core'
 import { CanvasTexture } from '../resources'
 
 export class BaseElement2DText extends CoreObject {
+  @property({ default: true }) declare enabled: boolean
   @property({ alias: 'base.content' }) declare content: Text['content']
   @property({ alias: 'base.effects' }) declare effects?: Text['effects']
   @protectedProperty({ alias: 'base.measureDOM' }) declare measureDOM?: Text['measureDOM']
@@ -41,6 +42,7 @@ export class BaseElement2DText extends CoreObject {
       case 'measureDOM':
       case 'fonts':
       case 'split':
+      case 'enabled':
         this.parent.requestRedraw()
         break
     }
@@ -68,7 +70,8 @@ export class BaseElement2DText extends CoreObject {
 
   canDraw(): boolean {
     return Boolean(
-      !/^\s*$/.test(this.base.toString())
+      this.enabled
+      && !/^\s*$/.test(this.base.toString())
       && this.texture?.valid,
     )
   }
