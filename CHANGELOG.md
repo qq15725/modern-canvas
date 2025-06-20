@@ -1,3 +1,12 @@
+## [0.4.56](https://github.com/qq15725/modern-canvas/compare/v0.4.55...v0.4.56) (2025-06-20)
+
+
+### Bug Fixes
+
+* updateGlobalTransform ([6e2fe5d](https://github.com/qq15725/modern-canvas/commit/6e2fe5df5c0e5ee425dbc59adb1989df26270a00))
+
+
+
 ## [0.4.55](https://github.com/qq15725/modern-canvas/compare/v0.4.54...v0.4.55) (2025-06-17)
 
 
