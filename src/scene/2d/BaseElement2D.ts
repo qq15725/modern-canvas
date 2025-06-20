@@ -69,7 +69,7 @@ export interface BaseElement2DProperties extends Node2DProperties {
 
 @customNode('BaseElement2D')
 export class BaseElement2D extends Node2D implements Rectangulable {
-  size = new Vector2()
+  readonly size = new Vector2().on('update', () => this.updateGlobalTransform())
 
   protected declare _style: BaseElement2DStyle
   get style(): BaseElement2DStyle { return this._style }
@@ -161,27 +161,22 @@ export class BaseElement2D extends Node2D implements Rectangulable {
     switch (key) {
       case 'rotate':
         this.rotation = this.style.rotate * DEG_TO_RAD
-        this.requestRelayout()
         break
       case 'scaleX':
         this.scale.x = this.style.scaleX
-        this.requestRelayout()
         break
       case 'scaleY':
         this.scale.y = this.style.scaleY
-        this.requestRelayout()
         break
       case 'skewX':
         this.skew.x = this.style.skewX
-        this.requestRelayout()
         break
       case 'skewY':
         this.skew.y = this.style.skewY
-        this.requestRelayout()
         break
       case 'transform':
       case 'transformOrigin':
-        this.requestRelayout()
+        this.updateGlobalTransform()
         break
       /** draw */
       case 'opacity':
@@ -256,8 +251,8 @@ export class BaseElement2D extends Node2D implements Rectangulable {
     })
   }
 
-  protected override _updateGlobalTransform(): void {
-    super._updateGlobalTransform()
+  override updateGlobalTransform(): void {
+    super.updateGlobalTransform()
     this._updateOverflow()
   }
 

@@ -102,14 +102,14 @@ export class FlexElement2D extends BaseElement2D implements Rectangulable {
     }
   }
 
-  protected override _updateTransform(): void {
+  override updateTransform(): void {
     this.calculateLayout(undefined, undefined, Direction.LTR)
     const { left, top, width, height } = this._layout.getComputedLayout()
     this.position.x = left
     this.position.y = top
     this.size.x = width
     this.size.y = height
-    super._updateTransform()
+    super.updateTransform()
   }
 
   calculateLayout(width?: number | 'auto', height?: number | 'auto', direction?: Direction): void {

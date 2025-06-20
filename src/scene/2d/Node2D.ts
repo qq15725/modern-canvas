@@ -1,5 +1,6 @@
+import type { PropertyDeclaration } from 'modern-idoc'
 import type { CanvasBatchable, CanvasItemProperties, Node, VertTransform } from '../main'
-import { customNode, Transform2D, Vector2 } from '../../core'
+import { customNode, protectedProperty, Transform2D, Vector2 } from '../../core'
 import { CanvasItem } from '../main'
 
 export interface Node2DProperties extends CanvasItemProperties {
@@ -8,16 +9,16 @@ export interface Node2DProperties extends CanvasItemProperties {
 
 @customNode('Node2D')
 export class Node2D extends CanvasItem {
-  position = new Vector2()
-  rotation = 0
-  scale = new Vector2(1, 1)
-  skew = new Vector2()
-  transform = new Transform2D()
-  globalPosition = new Vector2()
-  globalRotation = 0
-  globalScale = new Vector2()
-  globalSkew = new Vector2()
-  globalTransform = new Transform2D()
+  @protectedProperty({ default: 0 }) declare rotation: number
+  readonly position = new Vector2().on('update', () => this.updateGlobalTransform())
+  readonly scale = new Vector2(1, 1).on('update', () => this.updateGlobalTransform())
+  readonly skew = new Vector2().on('update', () => this.updateGlobalTransform())
+  readonly transform = new Transform2D()
+  readonly globalPosition = new Vector2()
+  @protectedProperty({ default: 0 }) declare globalRotation: number
+  readonly globalScale = new Vector2()
+  readonly globalSkew = new Vector2()
+  readonly globalTransform = new Transform2D()
 
   protected _parentTransformDirtyId?: number
 
@@ -27,6 +28,16 @@ export class Node2D extends CanvasItem {
     this
       .setProperties(properties)
       .append(nodes)
+  }
+
+  protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+    super._updateProperty(key, value, oldValue, declaration)
+
+    switch (key) {
+      case 'rotation':
+        this.updateGlobalTransform()
+        break
+    }
   }
 
   getTransformOrigin(): Vector2 {
@@ -53,11 +64,12 @@ export class Node2D extends CanvasItem {
     return transform
   }
 
-  protected _updateTransform(): void {
+  updateTransform(): void {
     this.transform.copy(this.getTransform())
   }
 
-  protected _updateGlobalTransform(): void {
+  updateGlobalTransform(): void {
+    this.updateTransform()
     const parent = this.getParent<Node2D>()
     if (parent?.globalTransform) {
       this._parentTransformDirtyId = parent.globalTransform.dirtyId
@@ -66,9 +78,9 @@ export class Node2D extends CanvasItem {
       parent.globalTransform.multiply(this.transform, this.globalTransform)
     }
     else {
-      this.globalScale = this.scale.clone()
+      this.globalScale.copy(this.scale)
       this.globalRotation = this.rotation
-      this.globalTransform = this.transform.clone()
+      this.globalTransform.copy(this.transform)
     }
     const [
       a, c, tx,
@@ -105,8 +117,7 @@ export class Node2D extends CanvasItem {
   }
 
   protected override _relayout(batchables: CanvasBatchable[]): CanvasBatchable[] {
-    this._updateTransform()
-    this._updateGlobalTransform()
+    this.updateGlobalTransform()
     return super._relayout(batchables).map((batchable) => {
       return {
         ...batchable,

@@ -204,6 +204,7 @@ export class Node extends CoreObject {
   protected _children = new Children()
   get children(): Children { return this._children }
   set children(value: Node[] | Children) { value instanceof Children ? (this._children = value) : this._children.set(value) }
+  getChild<T extends Node = Node>(index = 0): T | undefined { return this._children[index] as T }
   get siblingIndex(): number { return this.getIndex() }
   set siblingIndex(toIndex) { this._parent?.moveChild(this, toIndex) }
   get previousSibling(): Node | undefined { return this._parent?.children[this.getIndex() - 1] }
@@ -537,6 +538,15 @@ export class Node extends CoreObject {
       callbackfn(child)
       child.forEachDescendant(callbackfn)
     })
+    return this
+  }
+
+  forEachAncestor(callbackfn: (ancestor: Node) => void): this {
+    const parent = this.parent
+    if (parent) {
+      callbackfn(parent)
+      parent.forEachAncestor(callbackfn)
+    }
     return this
   }
 
