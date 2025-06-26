@@ -1,6 +1,5 @@
 import type { NormalizedOutline, Outline, PropertyDeclaration } from 'modern-idoc'
-import { isNone, normalizeOutline } from 'modern-idoc'
-import { property } from 'modern-idoc'
+import { isNone, normalizeOutline, property } from 'modern-idoc'
 import { BaseElement2DFill } from './BaseElement2DFill'
 
 export class BaseElement2DOutline extends BaseElement2DFill {

@@ -1,7 +1,6 @@
 import type { NormalizedShadow, PropertyDeclaration, Shadow } from 'modern-idoc'
 import type { BaseElement2D } from './BaseElement2D'
-import { isNone, normalizeShadow } from 'modern-idoc'
-import { property } from 'modern-idoc'
+import { isNone, normalizeShadow, property } from 'modern-idoc'
 import { CoreObject } from '../../core'
 import { DropShadowEffect } from '../effects'
 

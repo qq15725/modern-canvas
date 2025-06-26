@@ -1,6 +1,5 @@
 import type { NormalizedElementStyle, NormalizedStyle } from 'modern-idoc'
-import { getDefaultStyle } from 'modern-idoc'
-import { defineProperty } from 'modern-idoc'
+import { defineProperty, getDefaultStyle } from 'modern-idoc'
 import { Resource } from '../../core'
 
 export interface BaseElement2DStyleProperties extends Omit<NormalizedStyle, 'left' | 'top' | 'width' | 'height'> {
