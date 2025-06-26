@@ -1,12 +1,11 @@
 import type { NormalizedShape, PropertyDeclaration, Shape } from 'modern-idoc'
 import type { BaseElement2D } from './BaseElement2D'
-import { isNone, normalizeShape } from 'modern-idoc'
-import { property } from 'modern-idoc'
+import { isNone, normalizeShape, property } from 'modern-idoc'
 import {
   Matrix3,
   Path2D,
   Path2DSet,
-  svgToDOM,
+  svgToDom,
   svgToPath2DSet,
 } from 'modern-path2d'
 import { CoreObject } from '../../core'
@@ -52,7 +51,7 @@ export class BaseElement2DShape extends CoreObject {
   protected _updatePath2DSet(): void {
     let viewBox: number[] | undefined
     if (this.svg) {
-      const dom = svgToDOM(this.svg)
+      const dom = svgToDom(this.svg)
       this._path2DSet = svgToPath2DSet(dom)
       viewBox = this._path2DSet.viewBox
     }
