@@ -1,3 +1,12 @@
+## [0.5.1](https://github.com/qq15725/modern-canvas/compare/v0.5.0...v0.5.1) (2025-06-26)
+
+
+### Bug Fixes
+
+* parseCSSTransform ([fc3ac15](https://github.com/qq15725/modern-canvas/commit/fc3ac15901886ccc50a6fd704a5ef9f0d779010d))
+
+
+
 # [0.5.0](https://github.com/qq15725/modern-canvas/compare/v0.4.56...v0.5.0) (2025-06-26)
 
 
