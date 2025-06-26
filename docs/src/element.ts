@@ -6,8 +6,11 @@ import {
 
 const engine = new Engine({
   debug: true,
+  antialias: true,
   autoStart: true,
-  autoResize: true,
+  width: 1600,
+  height: 600,
+  backgroundColor: '#00FF00',
 })
 
 ;(window as any).engine = engine
@@ -20,8 +23,11 @@ async function init(): Promise<void> {
   engine.root.append([
     new Element2D({
       style: {
-        transformOrigin: 'top left',
-        transform: 'scale(0.5)',
+        width: 1600,
+        height: 1000,
+        backgroundColor: 'red',
+        transformOrigin: 'center center',
+        transform: 'scale(0.8)',
       },
     }, [
       new Element2D({

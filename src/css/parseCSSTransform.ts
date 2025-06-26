@@ -8,6 +8,7 @@ export function parseCSSTransform(
 ): Transform2D {
   transform = (!transform || transform === 'none') ? '' : transform
   parseCssFunctions(transform, { width, height })
+    .reverse()
     .forEach(({ name, args }) => {
       const values = args.map(arg => arg.normalizedIntValue)
       switch (name) {
