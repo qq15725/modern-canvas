@@ -78,10 +78,10 @@
   "devDependencies": {
     "@antfu/eslint-config": "^4.16.1",
     "@types/earcut": "^3.0.0",
-    "@types/node": "^24.0.4",
+    "@types/node": "^24.0.7",
     "bumpp": "^10.2.0",
     "conventional-changelog-cli": "^5.0.0",
-    "eslint": "^9.29.0",
+    "eslint": "^9.30.0",
     "lint-staged": "^16.1.2",
     "lottie-web": "^5.13.0",
     "modern-gif": "^2.0.4",

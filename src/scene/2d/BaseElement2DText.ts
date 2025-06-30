@@ -3,8 +3,7 @@ import type { MeasureResult } from 'modern-text'
 import type { BaseElement2D } from './BaseElement2D'
 import { isNone, normalizeText, property } from 'modern-idoc'
 import { Text } from 'modern-text'
-import { CoreObject, protectedProperty, Transform2D } from '../../core'
-import { CanvasTexture } from '../resources'
+import { CoreObject, protectedProperty } from '../../core'
 
 export class BaseElement2DText extends CoreObject {
   @property({ default: true }) declare enabled: boolean
@@ -20,7 +19,6 @@ export class BaseElement2DText extends CoreObject {
   }
 
   base = new Text()
-  texture = new CanvasTexture()
   measureResult?: MeasureResult
 
   override setProperties(properties?: TextProperties): this {
@@ -69,35 +67,23 @@ export class BaseElement2DText extends CoreObject {
   canDraw(): boolean {
     return Boolean(
       this.enabled
-      && !/^\s*$/.test(this.base.toString())
-      && this.texture?.valid,
+      && !/^\s*$/.test(this.base.toString()),
     )
   }
 
   draw(): void {
-    this.base.render({
-      pixelRatio: this.texture.pixelRatio,
-      view: this.texture.source,
-    })
-    this.texture.requestUpload()
-    const textWidth = this.measureResult?.boundingBox.width
-      ?? this.parent.size.width
-    const textHeight = this.measureResult?.boundingBox.height
-      ?? this.parent.size.height
     const ctx = this.parent.context
-    ctx.fillStyle = this.texture
-    ctx.uvTransform = new Transform2D().scale(1 / textWidth, 1 / textHeight)
-    ctx.vertTransform = () => {
-      const parent = this.parent
-      const origin = parent.getTransformOrigin()
-      return new Transform2D()
-        .translate(-origin.x, -origin.y)
-        .scale(
-          parent.globalScale.x > 0 ? 1 : -1,
-          parent.globalScale.y > 0 ? 1 : -1,
-        )
-        .translate(origin.x, origin.y)
-    }
-    ctx.fill()
+    this.base.update()
+    this.base.paragraphs.forEach((p) => {
+      p.fragments.forEach((f) => {
+        f.characters.forEach((c) => {
+          ctx.fillStyle = c.computedStyle.color
+          ctx.addPath(c.path)
+          ctx.style.fillRule = 'evenodd'
+          ctx.closePath()
+          ctx.fill()
+        })
+      })
+    })
   }
 }
