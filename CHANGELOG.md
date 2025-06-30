@@ -1,3 +1,12 @@
+## [0.5.2](https://github.com/qq15725/modern-canvas/compare/v0.5.1...v0.5.2) (2025-06-30)
+
+
+### Features
+
+* text use path draw ([8aab236](https://github.com/qq15725/modern-canvas/commit/8aab2367e5b06746e354938994fb2d59b9543a74))
+
+
+
 ## [0.5.1](https://github.com/qq15725/modern-canvas/compare/v0.5.0...v0.5.1) (2025-06-26)
 
 
