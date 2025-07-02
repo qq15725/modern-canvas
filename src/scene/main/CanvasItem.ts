@@ -10,7 +10,7 @@ import type { CanvasBatchable } from './CanvasContext'
 import type { Node } from './Node'
 import type { TimelineNodeEventMap, TimelineNodeProperties } from './TimelineNode'
 import { property } from 'modern-idoc'
-import { clamp, Color, customNode, protectedProperty } from '../../core'
+import { clamp, Color, customNode } from '../../core'
 import { CanvasContext } from './CanvasContext'
 import { TimelineNode } from './TimelineNode'
 
@@ -36,10 +36,10 @@ export interface CanvasItem {
 
 @customNode('CanvasItem')
 export class CanvasItem extends TimelineNode {
-  @property() declare modulate?: ColorValue
-  @property() declare blendMode?: WebGLBlendMode
-  @protectedProperty({ default: true }) declare visible: boolean
-  @protectedProperty({ default: 1 }) declare opacity: number
+  @property() accessor modulate: ColorValue | undefined
+  @property() accessor blendMode: WebGLBlendMode | undefined
+  @property({ protected: true }) accessor visible: boolean = true
+  @property({ protected: true }) accessor opacity: number = 1
 
   protected _parentGlobalVisible?: boolean
   protected _globalVisible?: boolean
@@ -54,7 +54,7 @@ export class CanvasItem extends TimelineNode {
   // Batch render
   context = new CanvasContext()
   protected _resetContext = true
-  protected _redrawing = false
+  protected _redrawing = true
   protected _relayouting = false
   protected _repainting = false
   protected _originalBatchables: CanvasBatchable[] = []
@@ -69,7 +69,7 @@ export class CanvasItem extends TimelineNode {
       .append(nodes)
   }
 
-  protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     super._updateProperty(key, value, oldValue, declaration)
 
     switch (key) {
@@ -143,18 +143,18 @@ export class CanvasItem extends TimelineNode {
   }
 
   protected _redraw(): CanvasBatchable[] {
-    this._tree?.log(this.name, 'redrawing')
+    this._tree?.log(this.name, 'drawing')
     this._draw()
     return this.context.toBatchables()
   }
 
   protected _relayout(batchables: CanvasBatchable[]): CanvasBatchable[] {
-    this._tree?.log(this.name, 'relayouting')
+    this._tree?.log(this.name, 'layouting')
     return batchables
   }
 
   protected _repaint(batchables: CanvasBatchable[]): CanvasBatchable[] {
-    this._tree?.log(this.name, 'repainting')
+    this._tree?.log(this.name, 'painting')
     return batchables.map((batchable) => {
       return {
         ...batchable,
@@ -175,7 +175,7 @@ export class CanvasItem extends TimelineNode {
     }
   }
 
-  protected override _update(changed: Map<PropertyKey, any>): void {
+  protected override _update(changed: Map<string, any>): void {
     super._update(changed)
 
     const parent = this.getParent<CanvasItem>()

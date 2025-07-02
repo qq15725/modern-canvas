@@ -53,7 +53,7 @@ export class Element2D extends BaseElement2D {
       .append(nodes)
   }
 
-  protected _updateStyleProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected _updateStyleProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     super._updateStyleProperty(key, value, oldValue, declaration)
 
     switch (key) {

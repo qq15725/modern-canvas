@@ -5,11 +5,11 @@ import { CoreObject } from '../../core'
 import { DropShadowEffect } from '../effects'
 
 export class BaseElement2DShadow extends CoreObject {
-  @property({ default: true }) declare enabled: boolean
-  @property({ default: '#000000' }) declare color: NormalizedShadow['color']
-  @property({ default: 0 }) declare blur: NormalizedShadow['blur']
-  @property({ default: 0 }) declare offsetY: NormalizedShadow['offsetX']
-  @property({ default: 0 }) declare offsetX: NormalizedShadow['offsetY']
+  @property({ fallback: true }) accessor enabled!: boolean
+  @property() accessor color: NormalizedShadow['color'] = '#000000FF'
+  @property() accessor blur: NormalizedShadow['blur'] = 0
+  @property() accessor offsetY: NormalizedShadow['offsetX'] = 0
+  @property() accessor offsetX: NormalizedShadow['offsetY'] = 0
 
   constructor(
     public parent: BaseElement2D,
@@ -25,7 +25,7 @@ export class BaseElement2DShadow extends CoreObject {
     )
   }
 
-  protected _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     super._updateProperty(key, value, oldValue, declaration)
 
     switch (key) {

@@ -1,6 +1,7 @@
 import type { PropertyDeclaration } from 'modern-idoc'
 import type { CanvasBatchable, CanvasItemProperties, Node, VertTransform } from '../main'
-import { customNode, protectedProperty, Transform2D, Vector2 } from '../../core'
+import { property } from 'modern-idoc'
+import { customNode, Transform2D, Vector2 } from '../../core'
 import { CanvasItem } from '../main'
 
 export interface Node2DProperties extends CanvasItemProperties {
@@ -9,13 +10,13 @@ export interface Node2DProperties extends CanvasItemProperties {
 
 @customNode('Node2D')
 export class Node2D extends CanvasItem {
-  @protectedProperty({ default: 0 }) declare rotation: number
+  @property({ protected: true }) accessor rotation: number = 0
   readonly position = new Vector2().on('update', () => this.updateGlobalTransform())
   readonly scale = new Vector2(1, 1).on('update', () => this.updateGlobalTransform())
   readonly skew = new Vector2().on('update', () => this.updateGlobalTransform())
   readonly transform = new Transform2D()
   readonly globalPosition = new Vector2()
-  @protectedProperty({ default: 0 }) declare globalRotation: number
+  @property({ protected: true }) accessor globalRotation: number = 0
   readonly globalScale = new Vector2()
   readonly globalSkew = new Vector2()
   readonly globalTransform = new Transform2D()
@@ -30,7 +31,7 @@ export class Node2D extends CanvasItem {
       .append(nodes)
   }
 
-  protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     super._updateProperty(key, value, oldValue, declaration)
 
     switch (key) {

@@ -6,7 +6,7 @@ import type {
   WebGLTextureWrapMode,
 } from '../../../core'
 import { property } from 'modern-idoc'
-import { isPow2, protectedProperty, Resource, SUPPORTS_IMAGE_BITMAP } from '../../../core'
+import { isPow2, Resource, SUPPORTS_IMAGE_BITMAP } from '../../../core'
 
 export type Texture2DFilterMode = WebGLTextureFilterMode
 export type Texture2DWrapMode = WebGLTextureWrapMode
@@ -25,12 +25,12 @@ export class Texture2D<T extends Texture2DSource = Texture2DSource> extends Reso
   static get GREEN(): Texture2D { return new this({ width: 1, height: 1, pixels: new Uint8Array([0, 255, 0, 255]) }) }
   static get BLUE(): Texture2D { return new this({ width: 1, height: 1, pixels: new Uint8Array([0, 0, 255, 255]) }) }
 
-  @protectedProperty() declare source: T
-  @property({ default: 0 }) declare width: number
-  @property({ default: 0 }) declare height: number
-  @property({ default: 'linear' }) declare filterMode: Texture2DFilterMode
-  @property({ default: 'clamp_to_edge' }) declare wrapMode: Texture2DWrapMode
-  @property({ default: 1 }) declare pixelRatio: number
+  @property({ protected: true }) accessor source!: T
+  @property() accessor width: number = 0
+  @property() accessor height: number = 0
+  @property() accessor filterMode: Texture2DFilterMode = 'linear'
+  @property() accessor wrapMode: Texture2DWrapMode = 'clamp_to_edge'
+  @property() accessor pixelRatio: number = 1
 
   protected _isPowerOfTwo = false
   protected _needsUpload = false
@@ -68,7 +68,7 @@ export class Texture2D<T extends Texture2DSource = Texture2DSource> extends Reso
     })
   }
 
-  protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     super._updateProperty(key, value, oldValue, declaration)
 
     switch (key) {

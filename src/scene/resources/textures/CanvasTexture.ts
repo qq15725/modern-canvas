@@ -3,13 +3,13 @@ import { property } from 'modern-idoc'
 import { Texture2D } from './Texture2D'
 
 export class CanvasTexture extends Texture2D<HTMLCanvasElement> {
-  @property({ default: 2 }) declare pixelRatio: number
+  @property() accessor pixelRatio: number = 2
 
   constructor(source = document.createElement('canvas')) {
     super(source)
   }
 
-  protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     switch (key) {
       case 'width':
         this.source.width = Math.max(1, Math.ceil(value * this.pixelRatio))

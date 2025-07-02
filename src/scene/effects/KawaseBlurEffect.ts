@@ -44,10 +44,9 @@ void main(void) {
 
 @customNode('KawaseBlurEffect')
 export class KawaseBlurEffect extends Effect {
-  material: Material
-  @property({ default: 4 }) declare strength: number
-  @property({ default: 3 }) declare quality: number
-  @property({ default: [1, 1] }) declare pixelSize: [number, number]
+  @property() accessor strength: number = 4
+  @property() accessor quality: number = 3
+  @property() accessor pixelSize: [number, number] = [1, 1]
 
   protected _kernels: number[] = [0]
 
@@ -73,7 +72,7 @@ void main() {
     this._generateKernels()
   }
 
-  protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     super._updateProperty(key, value, oldValue, declaration)
 
     switch (key) {

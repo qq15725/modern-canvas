@@ -61,7 +61,7 @@ export class Control extends Element2D implements Rectangulable {
     this._guiInput(event, key)
   }
 
-  protected override _updateStyleProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected override _updateStyleProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     super._updateStyleProperty(key, value, oldValue, declaration)
 
     switch (key) {

@@ -3,14 +3,14 @@ import type { MeasureResult } from 'modern-text'
 import type { BaseElement2D } from './BaseElement2D'
 import { isNone, normalizeText, property } from 'modern-idoc'
 import { Text } from 'modern-text'
-import { CoreObject, protectedProperty } from '../../core'
+import { CoreObject } from '../../core'
 
 export class BaseElement2DText extends CoreObject {
-  @property({ default: true }) declare enabled: boolean
-  @property({ alias: 'base.content' }) declare content: Text['content']
-  @property({ alias: 'base.effects' }) declare effects?: Text['effects']
-  @protectedProperty({ alias: 'base.measureDOM' }) declare measureDOM?: Text['measureDOM']
-  @protectedProperty({ alias: 'base.fonts' }) declare fonts?: Text['fonts']
+  @property({ fallback: true }) accessor enabled!: boolean
+  @property({ alias: 'base.content', fallback: () => [] }) accessor content!: Text['content']
+  @property({ alias: 'base.effects' }) accessor effects: Text['effects']
+  @property({ protected: true, alias: 'base.measureDOM' }) accessor measureDOM: Text['measureDOM']
+  @property({ protected: true, alias: 'base.fonts' }) accessor fonts: Text['fonts']
 
   constructor(
     public parent: BaseElement2D,
@@ -29,7 +29,7 @@ export class BaseElement2DText extends CoreObject {
     )
   }
 
-  protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     super._updateProperty(key, value, oldValue, declaration)
 
     switch (key) {

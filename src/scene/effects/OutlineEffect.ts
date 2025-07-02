@@ -53,8 +53,6 @@ void main(void) {
 
 @customNode('OutlineEffect')
 export class OutlineEffect extends Effect {
-  material: Material
-
   static MIN_SAMPLES = 1
   static MAX_SAMPLES = 100
 
@@ -67,13 +65,13 @@ export class OutlineEffect extends Effect {
     )
   }
 
-  @property({ default: 0x000000 }) declare color: ColorValue
-  @property({ default: 1 }) declare width: number
-  @property({ default: 'solid' }) declare style: 'dashed' | 'solid' | string // TODO
-  @property() declare image?: string // TODO
-  @property({ default: 1 }) declare opacity: number
-  @property({ default: 0.1 }) declare quality: number
-  @property({ default: false }) declare knockout: boolean
+  @property() accessor color: ColorValue = '#000000ff'
+  @property() accessor width: number = 1
+  @property() accessor style: 'dashed' | 'solid' | string = 'solid'
+  @property() accessor image: string | undefined // TODO
+  @property() accessor opacity: number = 1
+  @property() accessor quality: number = 0.1
+  @property() accessor knockout: boolean = false
 
   protected _color = new Color()
 

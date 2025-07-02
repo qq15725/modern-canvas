@@ -19,16 +19,10 @@ export class BaseElement2DStyle extends Resource {
     this.setProperties(properties)
   }
 }
-
 const defaultStyles: NormalizedElementStyle = getDefaultStyle()
-
-delete defaultStyles.top
-delete defaultStyles.left
-delete defaultStyles.width
-delete defaultStyles.height
-
 for (const key in defaultStyles) {
+  const fallback = defaultStyles[key as keyof typeof defaultStyles]
   defineProperty(BaseElement2DStyle, key, {
-    default: defaultStyles[key as keyof typeof defaultStyles],
+    fallback,
   })
 }

@@ -40,7 +40,7 @@ import { BaseElement2DText } from './BaseElement2DText'
 import { Node2D } from './Node2D'
 
 export interface BaseElement2DEventMap extends CanvasItemEventMap {
-  updateStyleProperty: (key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration) => void
+  updateStyleProperty: (key: string, value: any, oldValue: any, declaration?: PropertyDeclaration) => void
 }
 
 export interface BaseElement2D {
@@ -120,7 +120,7 @@ export class BaseElement2D extends Node2D implements Rectangulable {
       .append(nodes)
   }
 
-  override setProperties(properties?: Record<PropertyKey, any>): this {
+  override setProperties(properties?: Record<string, any>): this {
     if (properties) {
       const {
         style,
@@ -146,8 +146,7 @@ export class BaseElement2D extends Node2D implements Rectangulable {
     return this
   }
 
-  // eslint-disable-next-line unused-imports/no-unused-vars
-  protected _updateStyleProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected _updateStyleProperty(key: string, value: any, _oldValue: any, _declaration?: PropertyDeclaration): void {
     switch (key) {
       case 'width':
       case 'height':
@@ -311,31 +310,31 @@ export class BaseElement2D extends Node2D implements Rectangulable {
     }
 
     if (this._background.canDraw()) {
-      this._tree?.log(this.name, 'draw background')
+      this._tree?.log(this.name, 'background drawing')
       this._shape.drawRect()
       this._background.draw()
     }
 
     if (this._fill.canDraw()) {
-      this._tree?.log(this.name, 'draw fill')
+      this._tree?.log(this.name, 'fill drawing')
       this._shape.draw()
       this._fill.draw()
     }
 
     if (this._outline.canDraw()) {
-      this._tree?.log(this.name, 'draw outline')
+      this._tree?.log(this.name, 'outline drawing')
       this._shape.draw()
       this._outline.draw()
     }
 
     if (this._foreground.canDraw()) {
-      this._tree?.log(this.name, 'draw foreground')
+      this._tree?.log(this.name, 'foreground drawing')
       this._shape.drawRect()
       this._foreground.draw()
     }
 
     if (this._text.canDraw()) {
-      this._tree?.log(this.name, 'draw text')
+      this._tree?.log(this.name, 'text drawing')
       this._text.draw()
     }
 
@@ -402,20 +401,18 @@ export class BaseElement2D extends Node2D implements Rectangulable {
   }
 
   override toJSON(): Record<string, any> {
-    const json = super.toJSON()
     return {
-      ...json,
-      props: {
-        ...json.props,
-        style: this.style.toJSON(),
-        background: this.background.toJSON(),
-        shape: this.shape.toJSON(),
-        fill: this.fill.toJSON(),
-        outline: this.outline.toJSON(),
-        text: this.text.toJSON(),
-        foreground: this.foreground.toJSON(),
-        shadow: this.shadow.toJSON(),
-      },
+      is: this.is,
+      ...this.toPropsJSON(),
+      children: [...this._children.map(child => child.toJSON())],
+      style: this.style.toJSON(),
+      background: this.background.toJSON(),
+      shape: this.shape.toJSON(),
+      fill: this.fill.toJSON(),
+      outline: this.outline.toJSON(),
+      text: this.text.toJSON(),
+      foreground: this.foreground.toJSON(),
+      shadow: this.shadow.toJSON(),
     }
   }
 }

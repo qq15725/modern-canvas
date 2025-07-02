@@ -7,16 +7,11 @@ import type {
   InputEventKey,
   InputEventMap,
   Maskable,
-  WebGLRenderer,
-} from '../../core'
+  WebGLRenderer } from '../../core'
 import type { SceneTree } from './SceneTree'
 import type { Viewport } from './Viewport'
-import { property } from 'modern-idoc'
-import {
-  CoreObject,
-  customNode,
-  customNodes,
-} from '../../core'
+import { idGenerator, property } from 'modern-idoc'
+import { CoreObject, customNode, customNodes } from '../../core'
 import { Children } from './Children'
 
 export interface NodeEventMap extends CoreObjectEventMap, InputEventMap {
@@ -65,26 +60,27 @@ export interface NodeProperties {
   meta: Record<string, any>
 }
 
-const tagUidMap: Record<string, number> = {}
+const iidMap: Record<string, number> = {}
 
-function getTagUid(tag: any): number {
-  let uid = tagUidMap[tag] ?? 0
-  uid++
-  tagUidMap[tag] = uid
-  return uid
+function getNodeIid(key: any): number {
+  let iid = iidMap[key] ?? 0
+  iid++
+  iidMap[key] = iid
+  return iid
 }
 
 @customNode('Node')
 export class Node extends CoreObject {
-  readonly declare tag: string
+  readonly declare is: string
 
-  @property() declare name: string
-  @property() declare mask?: Maskable
-  @property({ default: 'inherit' }) declare processMode: ProcessMode
-  @property({ default: 'default' }) declare processSortMode: ProcessSortMode
-  @property({ default: 'inherit' }) declare renderMode: RenderMode
-  @property({ default: 'default' }) declare internalMode: InternalMode
-  @property({ default: () => ({}) }) declare meta: Record<string, any>
+  @property({ fallback: idGenerator() }) accessor id!: string
+  @property() accessor name!: string
+  @property({ fallback: 'inherit' }) accessor processMode!: ProcessMode
+  @property({ fallback: 'default' }) accessor processSortMode!: ProcessSortMode
+  @property({ fallback: 'inherit' }) accessor renderMode!: RenderMode
+  @property({ fallback: 'default' }) accessor internalMode!: InternalMode
+  @property() accessor meta: Record<string, any> = {}
+  @property({ protected: true }) accessor mask: Maskable | undefined
 
   protected _readyed = false
 
@@ -100,7 +96,7 @@ export class Node extends CoreObject {
 
     this
       .setProperties({
-        name: `${this.tag}:${getTagUid(this.tag)}`,
+        name: `${this.is}:${getNodeIid(this.is)}`,
         ...properties,
       })
       .append(nodes)
@@ -113,7 +109,7 @@ export class Node extends CoreObject {
       .on('process', this._onProcess)
   }
 
-  override setProperties(properties?: Record<PropertyKey, any>): this {
+  override setProperties(properties?: Record<string, any>): this {
     if (properties) {
       const {
         meta,
@@ -148,7 +144,7 @@ export class Node extends CoreObject {
   isInsideTree(): boolean { return Boolean(this._tree) }
   setTree(tree: SceneTree | undefined): this {
     const oldTree = this._tree
-    if (!tree?.is(oldTree)) {
+    if (!tree?.equal(oldTree)) {
       if (oldTree) {
         this.emit('treeExit', oldTree)
       }
@@ -186,7 +182,7 @@ export class Node extends CoreObject {
   hasParent(): boolean { return Boolean(this._parent) }
   getParent<T extends Node = Node>(): T | undefined { return this._parent as T }
   setParent<T extends Node = Node>(parent: T | undefined): this {
-    if (!this._parent?.is(parent)) {
+    if (!this._parent?.equal(parent)) {
       const oldParent = this._parent
       if (oldParent) {
         this.emit('unparented', oldParent)
@@ -247,11 +243,11 @@ export class Node extends CoreObject {
     }
   }
 
-  protected override _update(changed: Map<PropertyKey, any>): void {
+  protected override _update(changed: Map<string, any>): void {
     super._update(changed)
   }
 
-  protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     super._updateProperty(key, value, oldValue, declaration)
   }
 
@@ -377,7 +373,7 @@ export class Node extends CoreObject {
   }
 
   addSibling(sibling: Node): this {
-    if (this.is(sibling) || !this.hasParent() || sibling.hasParent()) {
+    if (this.equal(sibling) || !this.hasParent() || sibling.hasParent()) {
       return this
     }
     sibling.internalMode = this.internalMode
@@ -446,7 +442,7 @@ export class Node extends CoreObject {
   }
 
   insertBefore<T extends Node>(node: T, child: Node): T {
-    if (!child.hasParent() || !this.is(child.parent)) {
+    if (!child.hasParent() || !this.equal(child.parent)) {
       return node
     }
     this.moveChild(node, child.getIndex())
@@ -454,7 +450,7 @@ export class Node extends CoreObject {
   }
 
   appendChild<T extends Node>(node: T, internalMode = node.internalMode): T {
-    if (this.is(node) || node.hasParent()) {
+    if (this.equal(node) || node.hasParent()) {
       return node
     }
     switch (internalMode) {
@@ -475,7 +471,7 @@ export class Node extends CoreObject {
   }
 
   moveChild(node: Node, toIndex: number, internalMode = node.internalMode): this {
-    if (this.is(node) || (node.hasParent() && !this.is(node.parent))) {
+    if (this.equal(node) || (node.hasParent() && !this.equal(node.parent))) {
       return this
     }
 
@@ -512,7 +508,7 @@ export class Node extends CoreObject {
 
   removeChild<T extends Node>(child: T): T {
     const index = child.getIndex()
-    if (this.is(child.parent) && index > -1) {
+    if (this.equal(child.parent) && index > -1) {
       this._children.getInternal(child.internalMode).splice(index, 1)
       child.setParent(undefined)
       this.emit('removeChild', child, index)
@@ -569,28 +565,28 @@ export class Node extends CoreObject {
 
   clone(): this {
     return new (this.constructor as any)(
-      this.toJSON().props,
+      this.toPropsJSON(),
       this._children.internal,
     )
   }
 
   override toJSON(): Record<string, any> {
     return {
-      tag: this.tag,
-      props: super.toJSON(),
+      ...super.toJSON(),
+      is: this.is,
       children: [...this._children.map(child => child.toJSON())],
     }
   }
 
-  static parse(JSON: Record<string, any>[]): Node[]
-  static parse(JSON: Record<string, any>): Node
-  static parse(JSON: any): any {
-    if (Array.isArray(JSON)) {
-      return JSON.map(val => this.parse(val))
+  static parse(value: Record<string, any>[]): Node[]
+  static parse(value: Record<string, any>): Node
+  static parse(value: any): any {
+    if (Array.isArray(value)) {
+      return value.map(val => this.parse(val))
     }
-    const { tag, props, children } = JSON
-    const NodeClass = (customNodes.get(tag) ?? Node) as any
-    const node = new NodeClass(props) as Node
+    const { is, props, children } = value
+    const Class = (customNodes.get(is) ?? Node) as any
+    const node = new Class(props) as Node
     children?.forEach((child: Record<string, any>) => node.appendChild(this.parse(child)))
     return node
   }

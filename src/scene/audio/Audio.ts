@@ -92,7 +92,7 @@ export class Audio extends TimelineNode {
     this.src = src
   }
 
-  protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     super._updateProperty(key, value, oldValue, declaration)
     switch (key) {
       case 'paused':

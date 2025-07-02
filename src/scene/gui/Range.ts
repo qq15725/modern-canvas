@@ -17,13 +17,13 @@ export interface RangeProperties extends ControlProperties {
 
 @customNode<RangeProperties>('Range')
 export class Range extends Control {
-  @property({ default: false }) declare allowGreater: boolean
-  @property({ default: false }) declare allowLesser: boolean
-  @property({ default: 1 }) declare page: number
-  @property({ default: 0 }) declare minValue: number
-  @property({ default: 100 }) declare maxValue: number
-  @property({ default: 0.01 }) declare step: number
-  @property({ default: 0 }) declare value: number
+  @property() accessor allowGreater: boolean = false
+  @property() accessor allowLesser: boolean = false
+  @property() accessor page: number = 1
+  @property() accessor minValue: number = 0
+  @property() accessor maxValue: number = 100
+  @property() accessor step: number = 0.01
+  @property() accessor value: number = 0
 
   constructor(properties?: Partial<RangeProperties>, children: Node[] = []) {
     super()
@@ -33,7 +33,7 @@ export class Range extends Control {
       .append(children)
   }
 
-  protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     super._updateProperty(key, value, oldValue, declaration)
 
     switch (key) {

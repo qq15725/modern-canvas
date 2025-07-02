@@ -89,7 +89,7 @@ export class CanvasItemEditor extends Control {
     this.append(this.ruler)
   }
 
-  protected override _updateStyleProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected override _updateStyleProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     super._updateStyleProperty(key, value, oldValue, declaration)
 
     switch (key) {

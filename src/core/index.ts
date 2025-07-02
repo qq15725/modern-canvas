@@ -1,4 +1,4 @@
-export * from './decorator'
+export * from './decorators'
 export * from './global'
 export * from './input'
 export * from './io'

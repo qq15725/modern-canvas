@@ -6,7 +6,7 @@ import type { Element2DEventMap } from './Element2D'
 import type { TextureRect2DProperties } from './TextureRect2D'
 import { property } from 'modern-idoc'
 import { Text, textDefaultStyle } from 'modern-text'
-import { customNode, protectedProperty } from '../../core'
+import { customNode } from '../../core'
 import { CanvasTexture } from '../resources'
 import { TextureRect2D } from './TextureRect2D'
 
@@ -43,11 +43,11 @@ const textStyles = new Set(Object.keys(textDefaultStyle))
  */
 @customNode('Text2D')
 export class Text2D extends TextureRect2D<CanvasTexture> {
-  @property({ default: false }) declare split: boolean
-  @property({ alias: 'base.content' }) declare content: Text['content']
-  @property({ alias: 'base.effects' }) declare effects?: Text['effects']
-  @protectedProperty({ alias: 'base.measureDOM' }) declare measureDOM?: Text['measureDOM']
-  @protectedProperty({ alias: 'base.fonts' }) declare fonts?: Text['fonts']
+  @property() accessor split: boolean = false
+  @property({ alias: 'base.content' }) accessor content!: Text['content']
+  @property({ alias: 'base.effects' }) accessor effects: Text['effects']
+  @property({ protected: true, alias: 'base.measureDOM' }) accessor measureDOM: Text['measureDOM']
+  @property({ protected: true, alias: 'base.fonts' }) accessor fonts: Text['fonts']
 
   override texture = new CanvasTexture()
 
@@ -66,7 +66,7 @@ export class Text2D extends TextureRect2D<CanvasTexture> {
     }
   }
 
-  protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     super._updateProperty(key, value, oldValue, declaration)
 
     switch (key) {
@@ -93,7 +93,7 @@ export class Text2D extends TextureRect2D<CanvasTexture> {
     this.base.requestUpdate()
   }
 
-  protected override _updateStyleProperty(key: PropertyKey, value: any, oldValue: any): void {
+  protected override _updateStyleProperty(key: string, value: any, oldValue: any): void {
     switch (key) {
       case 'left':
       case 'top':

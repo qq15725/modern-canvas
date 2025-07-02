@@ -12,7 +12,7 @@ export interface ScrollBarProperties extends RangeProperties {
 
 @customNode<ScrollBarProperties>('ScrollBar')
 export class ScrollBar extends Range {
-  @property({ default: 'vertical' }) declare direction: 'vertical' | 'horizontal'
+  @property() accessor direction: 'vertical' | 'horizontal' = 'vertical'
 
   constructor(properties?: Partial<ScrollBarProperties>, children: Node[] = []) {
     super()
@@ -22,7 +22,7 @@ export class ScrollBar extends Range {
       .append(children)
   }
 
-  protected override _updateStyleProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected override _updateStyleProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     super._updateStyleProperty(key, value, oldValue, declaration)
 
     switch (key) {

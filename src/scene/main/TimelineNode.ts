@@ -8,7 +8,6 @@ import { property } from 'modern-idoc'
 import {
   clamp,
   customNode,
-  protectedProperty,
 } from '../../core'
 import { Node } from './Node'
 
@@ -35,10 +34,10 @@ export interface TimelineNode {
 
 @customNode('TimelineNode')
 export class TimelineNode extends Node {
-  @property({ default: 0 }) declare delay: number
-  @property({ default: 0 }) declare duration: number
-  @property({ default: false }) declare paused: boolean
-  @protectedProperty() declare insideTimeRange: boolean
+  @property({ fallback: 0 }) accessor delay!: number
+  @property({ fallback: 0 }) accessor duration!: number
+  @property({ fallback: false }) accessor paused!: boolean
+  @property({ protected: true, fallback: false }) accessor insideTimeRange!: boolean
 
   constructor(properties?: Partial<TimelineNodeProperties>, nodes: Node[] = []) {
     super()

@@ -38,9 +38,9 @@ export interface ScalerProperties extends NodeProperties {
   renderMode: 'disabled',
 })
 export class Scaler extends Node {
-  @property({ default: 1 }) declare value: number
-  @property({ default: 0.05 }) declare minValue: number
-  @property({ default: 10 }) declare maxValue: number
+  @property() accessor value: number = 1
+  @property() accessor minValue: number = 0.05
+  @property() accessor maxValue: number = 10
 
   get target(): Element2D | undefined {
     if ((this.parent as Element2D)?.style) {
@@ -55,7 +55,7 @@ export class Scaler extends Node {
     this.append(children)
   }
 
-  protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     super._updateProperty(key, value, oldValue, declaration)
 
     switch (key) {

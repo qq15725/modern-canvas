@@ -5,7 +5,7 @@ import type { EffectContext, EffectProperties, Node, Viewport } from '../main'
 import type { Texture2D } from '../resources'
 import { property } from 'modern-idoc'
 import { assets } from '../../asset'
-import { customNode, protectedProperty } from '../../core'
+import { customNode } from '../../core'
 import { Effect } from '../main/Effect'
 import { Material, QuadUvGeometry } from '../resources'
 
@@ -63,8 +63,8 @@ void main(void) {
 }`,
   })
 
-  @protectedProperty() texture?: Texture2D<ImageBitmap>
-  @property({ default: '' }) declare src: string
+  @property({ protected: true }) accessor texture: Texture2D<ImageBitmap> | undefined
+  @property() accessor src: string = ''
 
   constructor(properties?: Partial<MaskEffectProperties>, children: Node[] = []) {
     super()
@@ -81,7 +81,7 @@ void main(void) {
     }
   }
 
-  protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     super._updateProperty(key, value, oldValue, declaration)
 
     switch (key) {

@@ -4,7 +4,7 @@ import type { ImageFrame, Texture2D } from '../resources'
 import type { Element2DProperties } from './Element2D'
 import { property } from 'modern-idoc'
 import { assets } from '../../asset'
-import { customNode, protectedProperty, Transform2D } from '../../core'
+import { customNode, Transform2D } from '../../core'
 import { AnimatedTexture } from '../resources'
 import { Element2D } from './Element2D'
 
@@ -16,10 +16,10 @@ export interface Image2DProperties extends Element2DProperties {
 
 @customNode('Image2D')
 export class Image2D extends Element2D {
-  @protectedProperty() texture?: AnimatedTexture
-  @property({ default: '' }) declare src: string
-  @property() declare srcRect: ImageFillCropRect
-  @property({ default: false }) declare gif: boolean
+  @property({ protected: true }) accessor texture: AnimatedTexture | undefined
+  @property() accessor src: string = ''
+  @property() accessor srcRect: ImageFillCropRect | undefined
+  @property() accessor gif: boolean = false
 
   get currentFrameTexture(): Texture2D | undefined { return this.texture?.frames[this._frameIndex]?.texture }
   get textureDuration(): number { return this.texture?.duration ?? 0 }
@@ -39,7 +39,7 @@ export class Image2D extends Element2D {
     this.append(children)
   }
 
-  protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     super._updateProperty(key, value, oldValue, declaration)
 
     switch (key) {

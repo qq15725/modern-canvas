@@ -1,11 +1,11 @@
-import type { PropertyDeclaration } from 'modern-idoc'
+import type { PropertyDeclaration, ReactiveObject, ReactiveObjectGetterSetterContext } from 'modern-idoc'
 import type { EventListenerOptions, EventListenerValue } from './EventEmitter'
 import { getDeclarations } from 'modern-idoc'
 import { nextTick } from '../global'
 import { EventEmitter } from './EventEmitter'
 
 export interface CoreObjectEventMap {
-  updateProperty: (key: PropertyKey, newValue: any, oldValue: any, declaration?: PropertyDeclaration) => void
+  updateProperty: (key: string, newValue: any, oldValue: any, declaration?: PropertyDeclaration) => void
 }
 
 export interface CoreObject {
@@ -19,18 +19,68 @@ export interface CoreObject {
     & ((type: string, ...args: any[]) => boolean)
 }
 
-let UID = 0
+export interface CustomPropertyAccessor {
+  get: (key: string, fallback: () => any) => any
+  set: (key: string, value: any) => void
+}
 
-export class CoreObject extends EventEmitter {
-  readonly instanceId = ++UID
+let IID = 0
 
-  protected _defaultProperties?: Record<PropertyKey, any>
-  protected _updatedProperties = new Map<PropertyKey, any>()
-  protected _changedProperties = new Set<PropertyKey>()
+export class CoreObject extends EventEmitter implements Required<ReactiveObject> {
+  readonly instanceId = ++IID
+
+  protected _customPropertyAccessor?: CustomPropertyAccessor
+  protected _properties = new Map<string, unknown>()
+  protected _updatedProperties = new Map<string, unknown>()
+  protected _changedProperties = new Set<string>()
   protected _updatingPromise = Promise.resolve()
   protected _updating = false
 
-  is(target: CoreObject | undefined | null): boolean {
+  useCustomPropertyAccessor(accessor: CustomPropertyAccessor): this {
+    this._customPropertyAccessor = accessor
+    this.getPropertyDeclarations().forEach((declaration, key) => {
+      const newValue = accessor.get(key, () => undefined)
+      const oldValue = this._properties.get(key)
+      if (newValue === undefined) {
+        if (oldValue !== undefined) {
+          accessor.set(key, oldValue)
+        }
+      }
+      else if (newValue !== oldValue) {
+        this._properties.set(key, newValue)
+        this._updateProperty(key, newValue, oldValue, declaration)
+        this.emit('updateProperty', key, newValue, oldValue, declaration)
+      }
+    })
+    return this
+  }
+
+  getter(key: string, context: ReactiveObjectGetterSetterContext): any {
+    if (context.declaration.protected) {
+      // @ts-expect-error ignore
+      return this[context.internalKey]
+    }
+    else {
+      return this._customPropertyAccessor
+        ? this._customPropertyAccessor.get(key, () => this._properties.get(key))
+        : this._properties.get(key)
+    }
+  }
+
+  setter(key: string, value: any, context: ReactiveObjectGetterSetterContext): void {
+    if (context.declaration.protected) {
+      // @ts-expect-error ignore
+      this[context.internalKey] = value
+    }
+    else {
+      if (this._customPropertyAccessor) {
+        this._customPropertyAccessor.set(key, value)
+      }
+      this._properties.set(key, value)
+    }
+  }
+
+  equal(target: CoreObject | undefined | null): boolean {
     return Boolean(target && this.instanceId === target.instanceId)
   }
 
@@ -55,12 +105,12 @@ export class CoreObject extends EventEmitter {
   }
 
   // eslint-disable-next-line unused-imports/no-unused-vars
-  protected _update(changed: Map<PropertyKey, any>): void {
+  protected _update(changed: Map<string, any>): void {
     /** override */
   }
 
   // eslint-disable-next-line unused-imports/no-unused-vars
-  protected _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     /** override */
   }
 
@@ -68,39 +118,27 @@ export class CoreObject extends EventEmitter {
     return this._updatedProperties.has(key)
   }
 
-  getPropertyDeclarations(): Map<PropertyKey, PropertyDeclaration> {
+  getPropertyDeclarations(): Map<string, PropertyDeclaration> {
     return getDeclarations(this.constructor)
   }
 
-  getPropertyDeclaration(key: PropertyKey): PropertyDeclaration | undefined {
+  getPropertyDeclaration(key: string): PropertyDeclaration | undefined {
     return this.getPropertyDeclarations().get(key)
   }
 
-  getDefaultProperties(): Record<PropertyKey, any> {
-    if (!this._defaultProperties) {
-      this._defaultProperties = {}
-      for (const [name, property] of this.getPropertyDeclarations()) {
-        if (!property.protected && !property.alias) {
-          this._defaultProperties[name] = typeof property.default === 'function'
-            ? property.default()
-            : property.default
-        }
-      }
-    }
-    return this._defaultProperties
+  getProperty(key: string): any | undefined {
+    // @ts-expect-error ignore
+    return this[key]
   }
 
-  getProperty(key: PropertyKey): any | undefined {
-    return (this as any)[key]
-  }
-
-  setProperty(key: PropertyKey, value: any): this {
-    (this as any)[key] = value
+  setProperty(key: string, value: any): this {
+    // @ts-expect-error ignore
+    this[key] = value
     return this
   }
 
-  getProperties(keys?: PropertyKey[]): Record<PropertyKey, any> {
-    const properties: Record<PropertyKey, any> = {}
+  getProperties(keys?: string[]): Record<string, any> {
+    const properties: Record<string, any> = {}
     for (const [name, property] of this.getPropertyDeclarations()) {
       if (!property.protected && !property.alias && (!keys || keys.includes(name))) {
         properties[name] = this.getProperty(name)
@@ -122,12 +160,21 @@ export class CoreObject extends EventEmitter {
 
   resetProperties(): this {
     for (const [name, property] of this.getPropertyDeclarations()) {
-      this.setProperty(name, property.default)
+      this.setProperty(
+        name,
+        typeof property.fallback === 'function'
+          ? property.fallback()
+          : property.fallback,
+      )
     }
     return this
   }
 
-  requestUpdate(key?: PropertyKey, newValue?: unknown, oldValue?: unknown, declaration?: PropertyDeclaration): void {
+  onUpdateProperty(key: string, newValue: unknown, oldValue: unknown, declaration: PropertyDeclaration): void {
+    this.requestUpdate(key, newValue, oldValue, declaration)
+  }
+
+  requestUpdate(key?: string, newValue?: unknown, oldValue?: unknown, declaration?: PropertyDeclaration): void {
     if (key !== undefined) {
       if (!Object.is(newValue, oldValue)) {
         this._updatedProperties.set(key, oldValue)
@@ -145,19 +192,14 @@ export class CoreObject extends EventEmitter {
     }
   }
 
-  toJSON(): Record<string, any> {
+  toPropsJSON(): Record<string, any> {
     const json: Record<string, any> = {}
-    const properties = this.getProperties(Array.from(this._changedProperties))
-    for (const key in properties) {
-      const value = properties[key]
-      if (
-        value
-        && typeof value === 'object'
-      ) {
-        if (
-          'toJSON' in value
-          && typeof value.toJSON === 'function'
-        ) {
+    this._properties.forEach((value, key) => {
+      if (value === undefined) {
+        return
+      }
+      if (value && typeof value === 'object') {
+        if ('toJSON' in value && typeof value.toJSON === 'function') {
           json[key] = value.toJSON()
         }
         else {
@@ -167,8 +209,12 @@ export class CoreObject extends EventEmitter {
       else {
         json[key] = value
       }
-    }
+    })
     return json
+  }
+
+  toJSON(): Record<string, any> {
+    return this.toPropsJSON()
   }
 
   clone(): this {

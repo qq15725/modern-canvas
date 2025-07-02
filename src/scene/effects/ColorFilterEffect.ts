@@ -39,7 +39,7 @@ void main(void) {
 }`,
   })
 
-  @property() declare filter?: string
+  @property() accessor filter: string | undefined
 
   protected _colorMatrix = new ColorMatrix()
 

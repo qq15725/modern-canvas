@@ -28,10 +28,10 @@ export interface TimelineProperties extends NodeProperties {
 
 @customNode('Timeline')
 export class Timeline extends Node {
-  @property({ default: 0 }) declare startTime: number
-  @property({ default: 0 }) declare currentTime: number
-  @property({ default: Number.MAX_SAFE_INTEGER }) declare endTime: number
-  @property({ default: false }) declare loop: boolean
+  @property() accessor startTime: number = 0
+  @property() accessor currentTime: number = 0
+  @property() accessor endTime: number = Number.MAX_SAFE_INTEGER
+  @property() accessor loop: boolean = false
 
   static from(range: number | number[], loop = false): Timeline {
     const [startTime, endTime] = range
@@ -51,7 +51,7 @@ export class Timeline extends Node {
     this.setProperties(properties)
   }
 
-  protected _updateProperty(key: PropertyKey, value: any, oldValue: any): void {
+  protected _updateProperty(key: string, value: any, oldValue: any): void {
     super._updateProperty(key, value, oldValue)
 
     switch (key) {

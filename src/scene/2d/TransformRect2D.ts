@@ -10,7 +10,7 @@ export interface TransformRect2DProperties extends BaseElement2DProperties {
 }
 
 export class TransformRect2D extends Element2D {
-  @property({ default: 6 }) declare handleSize: number
+  @property() accessor handleSize: number = 6
 
   constructor(properties?: Partial<TransformRect2DProperties>, nodes: Node[] = []) {
     super()
@@ -20,7 +20,7 @@ export class TransformRect2D extends Element2D {
       .append(nodes)
   }
 
-  protected _updateStyleProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected _updateStyleProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     super._updateStyleProperty(key, value, oldValue, declaration)
 
     switch (key) {

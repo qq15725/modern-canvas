@@ -7,7 +7,7 @@ import type { SceneTree } from './SceneTree'
 import type { TimelineNodeProperties } from './TimelineNode'
 import { property } from 'modern-idoc'
 import { assets } from '../../asset'
-import { customNode, protectedProperty } from '../../core'
+import { customNode } from '../../core'
 import { EffectMaterial, QuadUvGeometry } from '../resources'
 import { TimelineNode } from './TimelineNode'
 import { Viewport } from './Viewport'
@@ -33,10 +33,10 @@ export interface EffectContext {
 
 @customNode('Effect')
 export class Effect extends TimelineNode {
-  @protectedProperty() declare material?: Material
-  @property() declare effectMode?: EffectMode
-  @property({ default: '' }) declare glsl: string
-  @property({ default: '' }) declare glslSrc: string
+  @property({ protected: true }) accessor material: Material | undefined
+  @property() accessor effectMode: EffectMode | undefined
+  @property() accessor glsl: string = ''
+  @property() accessor glslSrc: string = ''
 
   protected get _effectMode(): EffectMode { return this.effectMode ?? 'parent' }
 
@@ -62,7 +62,7 @@ export class Effect extends TimelineNode {
       .append(children)
   }
 
-  protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     super._updateProperty(key, value, oldValue, declaration)
 
     switch (key) {
@@ -126,11 +126,11 @@ export class Effect extends TimelineNode {
       return
     switch (this._effectMode) {
       case 'transition':
-        if (node.is(this._previousSibling)) {
+        if (node.equal(this._previousSibling)) {
           this._previousSibling = undefined
           renderStack.push(this)
         }
-        else if (node.is(this._nextSibling)) {
+        else if (node.equal(this._nextSibling)) {
           this._nextSibling = undefined
           renderStack.push(this)
         }
@@ -149,7 +149,7 @@ export class Effect extends TimelineNode {
     let start: number | undefined
     let end: number | undefined
     calls.forEach((call, index) => {
-      if (call.renderable.is(this._parent) || call.renderable.parent?.is(this._parent)) {
+      if (call.renderable.equal(this._parent) || call.renderable.parent?.equal(this._parent)) {
         start = start ?? index
         end = index
       }

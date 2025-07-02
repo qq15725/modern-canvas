@@ -1,5 +1,6 @@
 import type { PropertyDeclaration } from 'modern-idoc'
-import { protectedProperty, Resource } from '../../../core'
+import { property } from 'modern-idoc'
+import { Resource } from '../../../core'
 import { VertexBuffer } from './VertexBuffer'
 
 export interface VertexAttributeOptions {
@@ -13,13 +14,13 @@ export interface VertexAttributeOptions {
 }
 
 export class VertexAttribute extends Resource {
-  @protectedProperty() declare buffer: VertexBuffer
-  @protectedProperty({ default: 0 }) declare size: number
-  @protectedProperty({ default: false }) declare normalized: boolean
-  @protectedProperty({ default: 'float' }) declare type: 'float' | 'unsigned_byte' | 'unsigned_short'
-  @protectedProperty() stride?: number
-  @protectedProperty() offset?: number
-  @protectedProperty() divisor?: number
+  @property({ protected: true }) accessor buffer!: VertexBuffer
+  @property() accessor size: number = 0
+  @property() accessor normalized: boolean = false
+  @property() accessor type: 'float' | 'unsigned_byte' | 'unsigned_short' = 'float'
+  @property() accessor stride: number | undefined
+  @property() accessor offset: number | undefined
+  @property() accessor divisor: number | undefined
 
   needsUpload = false
 
@@ -31,7 +32,7 @@ export class VertexAttribute extends Resource {
     })
   }
 
-  protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     super._updateProperty(key, value, oldValue, declaration)
 
     switch (key) {

@@ -14,9 +14,9 @@ export interface AudioWaveformProperties extends Element2DProperties {
 
 @customNode('AudioWaveform')
 export class AudioWaveform extends Element2D {
-  @property() src?: string
-  @property() gap = 0
-  @property() color = '#000000'
+  @property() accessor src: string | undefined
+  @property() accessor gap = 0
+  @property() accessor color = '#000000'
 
   protected _audioBuffer?: AudioBuffer
   protected _src = IN_BROWSER
@@ -30,7 +30,7 @@ export class AudioWaveform extends Element2D {
     this.setProperties(options)
   }
 
-  protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     super._updateProperty(key, value, oldValue, declaration)
 
     switch (key) {

@@ -1,6 +1,7 @@
 import type { PropertyDeclaration } from 'modern-idoc'
 import type { WebGLBufferOptions, WebGLRenderer } from '../../../core'
-import { protectedProperty, Resource } from '../../../core'
+import { property } from 'modern-idoc'
+import { Resource } from '../../../core'
 
 export interface VertexBufferOptions {
   data?: BufferSource | null
@@ -8,8 +9,8 @@ export interface VertexBufferOptions {
 }
 
 export class VertexBuffer extends Resource {
-  @protectedProperty({ default: null }) declare data: BufferSource | null
-  @protectedProperty({ default: false }) declare dynamic: boolean
+  @property({ protected: true }) accessor data: BufferSource | null = null
+  @property({ protected: true }) accessor dynamic: boolean = false
 
   needsUpload = false
 
@@ -34,7 +35,7 @@ export class VertexBuffer extends Resource {
     })
   }
 
-  protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     super._updateProperty(key, value, oldValue, declaration)
 
     switch (key) {

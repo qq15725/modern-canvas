@@ -13,7 +13,7 @@ export interface Video2DProperties extends TextureRect2DProperties {
 
 @customNode('Video2D')
 export class Video2D extends TextureRect2D<VideoTexture> {
-  @property({ default: '' }) declare src: string
+  @property() accessor src: string = ''
 
   get videoDuration(): number { return (this.texture?.duration ?? 0) * 1000 }
 
@@ -25,7 +25,7 @@ export class Video2D extends TextureRect2D<VideoTexture> {
     this.append(children)
   }
 
-  protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     super._updateProperty(key, value, oldValue, declaration)
 
     switch (key) {

@@ -49,7 +49,7 @@ void main(void) {
 }`,
   })
 
-  @property({ default: 10 }) declare strength: number
+  @property() accessor strength: number = 10
 
   constructor(properties?: Partial<PixelateEffectProperties>, children: Node[] = []) {
     super()

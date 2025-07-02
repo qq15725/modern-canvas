@@ -9,6 +9,8 @@ export class GradientTexture extends Texture2D {
   }
 
   static linearGradient(linearGradient: LinearGradient, width: number, height: number): Texture2DPixelsSource {
+    width = width || 1
+    height = height || 1
     const canvas = document.createElement('canvas')
     canvas.width = width
     canvas.height = height

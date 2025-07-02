@@ -11,11 +11,11 @@ import {
 import { CoreObject } from '../../core'
 
 export class BaseElement2DShape extends CoreObject {
-  @property({ default: true }) declare enabled: boolean
-  @property() declare preset?: Required<NormalizedShape>['preset']
-  @property() declare svg?: Required<NormalizedShape>['svg']
-  @property() declare viewBox?: Required<NormalizedShape>['viewBox']
-  @property({ default: () => [] }) declare paths: Required<NormalizedShape>['paths']
+  @property({ fallback: true }) accessor enabled!: boolean
+  @property() accessor preset: NormalizedShape['preset']
+  @property() accessor svg: NormalizedShape['svg']
+  @property() accessor viewBox: NormalizedShape['viewBox']
+  @property() accessor paths: Required<NormalizedShape>['paths'] = []
 
   protected _path2DSet: Path2DSet = new Path2DSet()
 
@@ -34,7 +34,7 @@ export class BaseElement2DShape extends CoreObject {
     )
   }
 
-  protected _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     super._updateProperty(key, value, oldValue, declaration)
 
     switch (key) {

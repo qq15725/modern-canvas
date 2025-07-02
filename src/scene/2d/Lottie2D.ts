@@ -14,7 +14,7 @@ export interface Lottie2DProperties extends TextureRect2DProperties {
 
 @customNode('Lottie2D')
 export class Lottie2D extends TextureRect2D {
-  @property({ default: '' }) declare src: string
+  @property() accessor src: string = ''
 
   readonly texture = new CanvasTexture()
   animation?: AnimationItem
@@ -25,7 +25,7 @@ export class Lottie2D extends TextureRect2D {
     this.append(children)
   }
 
-  protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     super._updateProperty(key, value, oldValue, declaration)
 
     switch (key) {
@@ -35,7 +35,7 @@ export class Lottie2D extends TextureRect2D {
     }
   }
 
-  protected override _updateStyleProperty(key: PropertyKey, value: any, oldValue: any): void {
+  protected override _updateStyleProperty(key: string, value: any, oldValue: any): void {
     super._updateStyleProperty(key, value, oldValue)
     switch (key) {
       case 'width':

@@ -8,7 +8,7 @@ import type {
 } from '../../core'
 import type { Node } from './Node'
 import { property } from 'modern-idoc'
-import { Color, Input, MainLoop, protectedProperty } from '../../core'
+import { Color, Input, MainLoop } from '../../core'
 import { QuadUvGeometry } from '../resources'
 import { RenderStack } from './RenderStack'
 import { Timeline } from './Timeline'
@@ -35,14 +35,15 @@ export interface SceneTree {
 }
 
 export class SceneTree extends MainLoop {
-  @property({ default: false }) declare processPaused: boolean
-  @property() declare backgroundColor?: ColorValue
-  @protectedProperty({ default: false }) declare debug: boolean
+  @property() accessor processPaused: boolean = false
+  @property() accessor backgroundColor: ColorValue | undefined
+  @property({ protected: true }) accessor debug: boolean = false
 
   readonly input = new Input()
   readonly renderStack = new RenderStack()
   readonly root = new Viewport(true).setTree(this)
   readonly timeline: Timeline
+  nodes = new Map<string, Node>()
 
   protected _backgroundColor = new Color()
   protected _currentViewport?: Viewport
@@ -55,7 +56,7 @@ export class SceneTree extends MainLoop {
     this.timeline = timeline.setTree(this)
   }
 
-  protected override _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     super._updateProperty(key, value, oldValue, declaration)
 
     switch (key) {

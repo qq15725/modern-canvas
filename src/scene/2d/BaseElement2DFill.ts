@@ -11,17 +11,17 @@ export interface BaseElement2DFill extends NormalizedFill {
 }
 
 export class BaseElement2DFill extends CoreObject {
-  @property({ default: true }) declare enabled: boolean
-  @property() declare color?: NormalizedFill['color']
-  @property() declare image?: NormalizedFill['image']
-  @property() declare linearGradient?: NormalizedFill['linearGradient']
-  @property() declare radialGradient?: NormalizedFill['radialGradient']
-  @property() declare cropRect?: NormalizedFill['cropRect']
-  @property() declare stretchRect?: NormalizedFill['stretchRect']
-  @property() declare dpi?: NormalizedFill['dpi']
-  @property() declare rotateWithShape?: NormalizedFill['rotateWithShape']
-  @property() declare tile?: NormalizedFill['tile']
-  @property() declare opacity?: NormalizedFill['opacity']
+  @property({ fallback: true }) accessor enabled!: boolean
+  @property() accessor color: NormalizedFill['color']
+  @property() accessor image: NormalizedFill['image']
+  @property() accessor linearGradient: NormalizedFill['linearGradient']
+  @property() accessor radialGradient: NormalizedFill['radialGradient']
+  @property() accessor cropRect: NormalizedFill['cropRect']
+  @property() accessor stretchRect: NormalizedFill['stretchRect']
+  @property() accessor dpi: NormalizedFill['dpi']
+  @property() accessor rotateWithShape: NormalizedFill['rotateWithShape']
+  @property() accessor tile: NormalizedFill['tile']
+  @property() accessor opacity: NormalizedFill['opacity']
 
   protected _texture?: Texture2D
 
@@ -43,7 +43,7 @@ export class BaseElement2DFill extends CoreObject {
     )
   }
 
-  protected _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     super._updateProperty(key, value, oldValue, declaration)
 
     switch (key) {
@@ -74,6 +74,7 @@ export class BaseElement2DFill extends CoreObject {
       )
     }
     else if (!isNone(this.image)) {
+      this.parent.tree?.log(`load image ${this.image}`)
       return await assets.texture.load(this.image)
     }
     else {

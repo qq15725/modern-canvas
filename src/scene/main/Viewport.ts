@@ -34,13 +34,6 @@ export interface ViewportFramebuffer {
 
 @customNode('Viewport')
 export class Viewport extends Node implements Rectangulable {
-  @property({ default: 0 }) declare x: number
-  @property({ default: 0 }) declare y: number
-  @property({ default: 0 }) declare width: number
-  @property({ default: 0 }) declare height: number
-
-  get valid(): boolean { return Boolean(this.width && this.height) }
-
   protected _projection = new Projection2D()
   protected _framebufferIndex = 0
   protected _framebuffers: ViewportFramebuffer[] = [
@@ -48,6 +41,12 @@ export class Viewport extends Node implements Rectangulable {
     { texture: new ViewportTexture(), needsUpload: false },
   ]
 
+  @property() accessor x: number = 0
+  @property() accessor y: number = 0
+  @property() accessor width: number = 0
+  @property() accessor height: number = 0
+
+  get valid(): boolean { return Boolean(this.width && this.height) }
   get framebuffer(): ViewportFramebuffer { return this._framebuffers[this._framebufferIndex] }
   get texture(): ViewportTexture { return this.framebuffer.texture }
 
@@ -87,7 +86,7 @@ export class Viewport extends Node implements Rectangulable {
     })
   }
 
-  protected _updateProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     super._updateProperty(key, value, oldValue, declaration)
 
     switch (key) {

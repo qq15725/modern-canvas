@@ -13,7 +13,7 @@ import { FlexElement2DStyle } from './FlexElement2DStyle'
 import { FlexLayout } from './FlexLayout'
 
 export interface FlexBaseElement2DEventMap extends BaseElement2DEventMap {
-  updateStyleProperty: (key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration) => void
+  updateStyleProperty: (key: string, value: any, oldValue: any, declaration?: PropertyDeclaration) => void
 }
 
 export interface FlexElement2D {
@@ -92,7 +92,7 @@ export class FlexElement2D extends BaseElement2D implements Rectangulable {
     }
   }
 
-  protected _updateStyleProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected _updateStyleProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     super._updateStyleProperty(key, value, oldValue, declaration)
 
     this._layout.updateStyleProperty(key, value, oldValue, declaration)

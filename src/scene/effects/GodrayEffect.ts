@@ -167,13 +167,13 @@ void main(void) {
 }`,
   })
 
-  @property({ default: 0 }) declare time: number
-  @property({ default: 30 }) declare angle: number
-  @property({ default: 0.5 }) declare gain: number
-  @property({ default: 2.5 }) declare lacunarity: number
-  @property({ default: true }) declare parallel: boolean
-  @property({ default: () => [0, 0] }) declare center: [number, number]
-  @property({ default: 1 }) declare alpha: number
+  @property() accessor time: number = 0
+  @property() accessor angle: number = 30
+  @property() accessor gain: number = 0.5
+  @property() accessor lacunarity: number = 2.5
+  @property() accessor parallel: boolean = true
+  @property() accessor center: [number, number] = [0, 0]
+  @property() accessor alpha: number = 1
 
   constructor(properties?: Partial<GodrayEffectProperties>, children: Node[] = []) {
     super()

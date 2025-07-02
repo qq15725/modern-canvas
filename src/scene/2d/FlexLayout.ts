@@ -134,7 +134,7 @@ export class FlexLayout {
   }
 
   // eslint-disable-next-line unused-imports/no-unused-vars
-  updateStyleProperty(key: PropertyKey, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  updateStyleProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     switch (key) {
       case 'alignContent':
         this._node.setAlignContent(
