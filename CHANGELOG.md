@@ -1,3 +1,12 @@
+# [0.6.0](https://github.com/qq15725/modern-canvas/compare/v0.5.2...v0.6.0) (2025-07-02)
+
+
+### Features
+
+* toggle accessor decorator ([2fb9993](https://github.com/qq15725/modern-canvas/commit/2fb99939750d4d4192cefcef20f32b3baea0e2ad))
+
+
+
 ## [0.5.2](https://github.com/qq15725/modern-canvas/compare/v0.5.1...v0.5.2) (2025-06-30)
 
 
