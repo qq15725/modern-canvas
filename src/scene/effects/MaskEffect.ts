@@ -63,8 +63,8 @@ void main(void) {
 }`,
   })
 
-  @property({ protected: true }) accessor texture: Texture2D<ImageBitmap> | undefined
-  @property() accessor src: string = ''
+  @property({ protected: true }) declare texture: Texture2D<ImageBitmap> | undefined
+  @property({ default: '' }) declare src: string
 
   constructor(properties?: Partial<MaskEffectProperties>, children: Node[] = []) {
     super()

@@ -16,10 +16,10 @@ export interface Image2DProperties extends Element2DProperties {
 
 @customNode('Image2D')
 export class Image2D extends Element2D {
-  @property({ protected: true }) accessor texture: AnimatedTexture | undefined
-  @property() accessor src: string = ''
-  @property() accessor srcRect: ImageFillCropRect | undefined
-  @property() accessor gif: boolean = false
+  @property({ protected: true }) declare texture: AnimatedTexture | undefined
+  @property({ fallback: '' }) declare src: string
+  @property() declare srcRect: ImageFillCropRect | undefined
+  @property({ fallback: false }) declare gif: boolean
 
   get currentFrameTexture(): Texture2D | undefined { return this.texture?.frames[this._frameIndex]?.texture }
   get textureDuration(): number { return this.texture?.duration ?? 0 }

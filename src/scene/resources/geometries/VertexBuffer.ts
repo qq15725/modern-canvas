@@ -9,8 +9,8 @@ export interface VertexBufferOptions {
 }
 
 export class VertexBuffer extends Resource {
-  @property({ protected: true }) accessor data: BufferSource | null = null
-  @property({ protected: true }) accessor dynamic: boolean = false
+  @property({ protected: true, default: null }) declare data: BufferSource | null
+  @property({ protected: true, fallback: false }) declare dynamic: boolean
 
   needsUpload = false
 

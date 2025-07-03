@@ -54,14 +54,14 @@ void main(void) {
 }`,
   })
 
-  @property() accessor saturation: number = 1
-  @property() accessor contrast: number = 1
-  @property() accessor brightness: number = 1
-  @property() accessor red: number = 1
-  @property() accessor green: number = 1
-  @property() accessor blue: number = 1
-  @property() accessor alpha: number = 1
-  @property() accessor gamma: number = 1
+  @property() declare saturation: number = 1
+  @property() declare contrast: number = 1
+  @property() declare brightness: number = 1
+  @property() declare red: number = 1
+  @property() declare green: number = 1
+  @property() declare blue: number = 1
+  @property() declare alpha: number = 1
+  @property() declare gamma: number = 1
 
   constructor(properties?: Partial<ColorAdjustEffectProperties>, children: Node[] = []) {
     super()

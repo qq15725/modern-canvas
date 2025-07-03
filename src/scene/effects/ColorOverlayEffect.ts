@@ -62,8 +62,8 @@ void main(void) {
 }`,
   })
 
-  @property() accessor colors: ColorValue[] = []
-  @property() accessor alpha: number = 0.5
+  @property() declare colors: ColorValue[] = []
+  @property() declare alpha: number = 0.5
 
   protected _color = new Color()
 

@@ -25,12 +25,12 @@ export class Texture2D<T extends Texture2DSource = Texture2DSource> extends Reso
   static get GREEN(): Texture2D { return new this({ width: 1, height: 1, pixels: new Uint8Array([0, 255, 0, 255]) }) }
   static get BLUE(): Texture2D { return new this({ width: 1, height: 1, pixels: new Uint8Array([0, 0, 255, 255]) }) }
 
-  @property({ protected: true }) accessor source!: T
-  @property() accessor width: number = 0
-  @property() accessor height: number = 0
-  @property() accessor filterMode: Texture2DFilterMode = 'linear'
-  @property() accessor wrapMode: Texture2DWrapMode = 'clamp_to_edge'
-  @property() accessor pixelRatio: number = 1
+  @property({ protected: true }) declare source: T
+  @property({ fallback: 0 }) declare width: number
+  @property({ fallback: 0 }) declare height: number
+  @property({ fallback: 'linear' }) declare filterMode: Texture2DFilterMode
+  @property({ fallback: 'clamp_to_edge' }) declare wrapMode: Texture2DWrapMode
+  @property({ fallback: 1 }) declare pixelRatio: number
 
   protected _isPowerOfTwo = false
   protected _needsUpload = false

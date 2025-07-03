@@ -14,7 +14,7 @@ export interface Lottie2DProperties extends TextureRect2DProperties {
 
 @customNode('Lottie2D')
 export class Lottie2D extends TextureRect2D {
-  @property() accessor src: string = ''
+  @property({ fallback: '' }) declare src: string
 
   readonly texture = new CanvasTexture()
   animation?: AnimationItem

@@ -19,8 +19,8 @@ export interface MainLoop {
 }
 
 export class MainLoop extends CoreObject {
-  @property() accessor fps: number = 24
-  @property() accessor speed: number = 1
+  @property({ fallback: 24 }) declare fps: number
+  @property({ fallback: 1 }) declare speed: number
 
   protected _starting = false
   protected _nextDeltaTime = 0

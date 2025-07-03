@@ -44,9 +44,9 @@ void main(void) {
 
 @customNode('KawaseBlurEffect')
 export class KawaseBlurEffect extends Effect {
-  @property() accessor strength: number = 4
-  @property() accessor quality: number = 3
-  @property() accessor pixelSize: [number, number] = [1, 1]
+  @property() declare strength: number = 4
+  @property() declare quality: number = 3
+  @property() declare pixelSize: [number, number] = [1, 1]
 
   protected _kernels: number[] = [0]
 

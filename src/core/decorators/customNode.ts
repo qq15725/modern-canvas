@@ -12,7 +12,7 @@ export function customNode<T = Record<string, any>>(name: string, defaultPropert
 
     if (defaultProperties) {
       Object.keys(defaultProperties).forEach((key) => {
-        defineProperty(constructor, key, {
+        defineProperty(constructor.prototype, key, {
           fallback: (defaultProperties as any)[key],
         })
       })

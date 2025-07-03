@@ -99,10 +99,10 @@ void main() {
 }`,
   })
 
-  @property() accessor center: number[] | undefined
-  @property() accessor innerRadius: number = 20
-  @property() accessor radius: number = -1
-  @property() accessor strength: number = 0.1
+  @property() declare center: number[] | undefined
+  @property() declare innerRadius: number = 20
+  @property() declare radius: number = -1
+  @property() declare strength: number = 0.1
 
   constructor(properties?: Partial<ZoomBlurEffectProperties>, children: Node[] = []) {
     super()

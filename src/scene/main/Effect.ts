@@ -33,10 +33,10 @@ export interface EffectContext {
 
 @customNode('Effect')
 export class Effect extends TimelineNode {
-  @property({ protected: true }) accessor material: Material | undefined
-  @property() accessor effectMode: EffectMode | undefined
-  @property() accessor glsl: string = ''
-  @property() accessor glslSrc: string = ''
+  @property({ protected: true }) material: Material | undefined
+  @property() declare effectMode: EffectMode | undefined
+  @property() declare glsl: string = ''
+  @property() declare glslSrc: string = ''
 
   protected get _effectMode(): EffectMode { return this.effectMode ?? 'parent' }
 

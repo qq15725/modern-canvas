@@ -73,14 +73,14 @@ function getNodeIid(key: any): number {
 export class Node extends CoreObject {
   readonly declare is: string
 
-  @property({ fallback: idGenerator() }) accessor id!: string
-  @property() accessor name!: string
-  @property({ fallback: 'inherit' }) accessor processMode!: ProcessMode
-  @property({ fallback: 'default' }) accessor processSortMode!: ProcessSortMode
-  @property({ fallback: 'inherit' }) accessor renderMode!: RenderMode
-  @property({ fallback: 'default' }) accessor internalMode!: InternalMode
-  @property() accessor meta: Record<string, any> = {}
-  @property({ protected: true }) accessor mask: Maskable | undefined
+  @property({ fallback: idGenerator() }) declare id: string
+  @property({ fallback: idGenerator() }) declare name: string
+  @property({ fallback: 'inherit' }) declare processMode: ProcessMode
+  @property({ fallback: 'default' }) declare processSortMode: ProcessSortMode
+  @property({ fallback: 'inherit' }) declare renderMode: RenderMode
+  @property({ fallback: 'default' }) declare internalMode: InternalMode
+  @property({ default: () => ({}) }) declare meta: Record<string, any>
+  @property({ protected: true }) declare mask?: Maskable
 
   protected _readyed = false
 

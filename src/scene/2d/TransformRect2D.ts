@@ -10,7 +10,7 @@ export interface TransformRect2DProperties extends BaseElement2DProperties {
 }
 
 export class TransformRect2D extends Element2D {
-  @property() accessor handleSize: number = 6
+  @property({ fallback: 6 }) declare handleSize: number
 
   constructor(properties?: Partial<TransformRect2DProperties>, nodes: Node[] = []) {
     super()

@@ -6,11 +6,11 @@ import { Text } from 'modern-text'
 import { CoreObject } from '../../core'
 
 export class BaseElement2DText extends CoreObject {
-  @property({ fallback: true }) accessor enabled!: boolean
-  @property({ alias: 'base.content', fallback: () => [] }) accessor content!: Text['content']
-  @property({ alias: 'base.effects' }) accessor effects: Text['effects']
-  @property({ protected: true, alias: 'base.measureDOM' }) accessor measureDOM: Text['measureDOM']
-  @property({ protected: true, alias: 'base.fonts' }) accessor fonts: Text['fonts']
+  @property({ fallback: true }) declare enabled: boolean
+  @property({ alias: 'base.content', fallback: () => [] }) declare content: Text['content']
+  @property({ alias: 'base.effects' }) declare effects: Text['effects']
+  @property({ protected: true, alias: 'base.measureDOM' }) declare measureDOM: Text['measureDOM']
+  @property({ protected: true, alias: 'base.fonts' }) declare fonts: Text['fonts']
 
   constructor(
     public parent: BaseElement2D,

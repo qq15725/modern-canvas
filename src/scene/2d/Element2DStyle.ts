@@ -28,5 +28,5 @@ const defaultStyles: Record<string, any> = {
 }
 
 for (const key in defaultStyles) {
-  defineProperty(Element2DStyle, key, { default: defaultStyles[key] })
+  defineProperty(Element2DStyle.prototype, key, { fallback: defaultStyles[key] })
 }

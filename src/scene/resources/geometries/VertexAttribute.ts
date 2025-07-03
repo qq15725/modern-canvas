@@ -14,13 +14,13 @@ export interface VertexAttributeOptions {
 }
 
 export class VertexAttribute extends Resource {
-  @property({ protected: true }) accessor buffer!: VertexBuffer
-  @property() accessor size: number = 0
-  @property() accessor normalized: boolean = false
-  @property() accessor type: 'float' | 'unsigned_byte' | 'unsigned_short' = 'float'
-  @property() accessor stride: number | undefined
-  @property() accessor offset: number | undefined
-  @property() accessor divisor: number | undefined
+  @property({ protected: true }) declare buffer: VertexBuffer
+  @property({ fallback: 0 }) declare size: number
+  @property({ fallback: false }) declare normalized: boolean
+  @property({ fallback: 'float' }) declare type: 'float' | 'unsigned_byte' | 'unsigned_short'
+  @property() declare stride: number | undefined
+  @property() declare offset: number | undefined
+  @property() declare divisor: number | undefined
 
   needsUpload = false
 

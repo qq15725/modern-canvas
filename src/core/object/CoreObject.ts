@@ -1,4 +1,4 @@
-import type { PropertyDeclaration, ReactiveObject, ReactiveObjectGetterSetterContext } from 'modern-idoc'
+import type { PropertyDeclaration, ReactiveObject, ReactiveObjectPropertyAccessorContext } from 'modern-idoc'
 import type { EventListenerOptions, EventListenerValue } from './EventEmitter'
 import { getDeclarations } from 'modern-idoc'
 import { nextTick } from '../global'
@@ -55,7 +55,7 @@ export class CoreObject extends EventEmitter implements Required<ReactiveObject>
     return this
   }
 
-  getter(key: string, context: ReactiveObjectGetterSetterContext): any {
+  getter(key: string, context: ReactiveObjectPropertyAccessorContext): any {
     if (context.declaration.protected) {
       // @ts-expect-error ignore
       return this[context.internalKey]
@@ -67,7 +67,7 @@ export class CoreObject extends EventEmitter implements Required<ReactiveObject>
     }
   }
 
-  setter(key: string, value: any, context: ReactiveObjectGetterSetterContext): void {
+  setter(key: string, value: any, context: ReactiveObjectPropertyAccessorContext): void {
     if (context.declaration.protected) {
       // @ts-expect-error ignore
       this[context.internalKey] = value

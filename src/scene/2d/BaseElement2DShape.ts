@@ -11,11 +11,11 @@ import {
 import { CoreObject } from '../../core'
 
 export class BaseElement2DShape extends CoreObject {
-  @property({ fallback: true }) accessor enabled!: boolean
-  @property() accessor preset: NormalizedShape['preset']
-  @property() accessor svg: NormalizedShape['svg']
-  @property() accessor viewBox: NormalizedShape['viewBox']
-  @property() accessor paths: Required<NormalizedShape>['paths'] = []
+  @property({ fallback: true }) declare enabled: boolean
+  @property() declare preset: NormalizedShape['preset']
+  @property() declare svg: NormalizedShape['svg']
+  @property() declare viewBox: NormalizedShape['viewBox']
+  @property({ default: () => [] }) declare paths: Required<NormalizedShape>['paths']
 
   protected _path2DSet: Path2DSet = new Path2DSet()
 

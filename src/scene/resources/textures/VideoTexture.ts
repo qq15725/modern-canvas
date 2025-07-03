@@ -31,8 +31,8 @@ function resolveOptions(options?: VideoTextureOptions): Required<VideoTextureOpt
 }
 
 export class VideoTexture extends Texture2D<HTMLVideoElement> {
-  @property({ protected: true }) accessor autoUpdate: boolean = true
-  @property({ protected: true }) accessor fps: number = 0
+  @property({ protected: true, fallback: true }) declare autoUpdate: boolean
+  @property({ protected: true, fallback: 0 }) declare fps: number
 
   static readonly mimeTypes = new Map(Object.entries({
     ogv: 'video/ogg',

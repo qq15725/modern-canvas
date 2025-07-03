@@ -28,10 +28,10 @@ export interface TimelineProperties extends NodeProperties {
 
 @customNode('Timeline')
 export class Timeline extends Node {
-  @property() accessor startTime: number = 0
-  @property() accessor currentTime: number = 0
-  @property() accessor endTime: number = Number.MAX_SAFE_INTEGER
-  @property() accessor loop: boolean = false
+  @property({ fallback: 0 }) declare startTime: number
+  @property({ fallback: 0 }) declare currentTime: number
+  @property({ fallback: Number.MAX_SAFE_INTEGER }) declare endTime: number
+  @property({ fallback: false }) declare loop: boolean
 
   static from(range: number | number[], loop = false): Timeline {
     const [startTime, endTime] = range

@@ -9,8 +9,8 @@ export interface IndexBufferOptions {
 }
 
 export class IndexBuffer extends Resource {
-  @property({ protected: true }) accessor data: Uint16Array | null = null
-  @property({ protected: true }) accessor dynamic: boolean = false
+  @property({ protected: true, default: null }) declare data: Uint16Array | null
+  @property({ protected: true, fallback: false }) declare dynamic: boolean
 
   needsUpload = false
 

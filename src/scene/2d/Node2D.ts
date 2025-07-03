@@ -10,13 +10,13 @@ export interface Node2DProperties extends CanvasItemProperties {
 
 @customNode('Node2D')
 export class Node2D extends CanvasItem {
-  @property({ protected: true }) accessor rotation: number = 0
+  @property({ protected: true, fallback: 0 }) declare rotation: number
   readonly position = new Vector2().on('update', () => this.updateGlobalTransform())
   readonly scale = new Vector2(1, 1).on('update', () => this.updateGlobalTransform())
   readonly skew = new Vector2().on('update', () => this.updateGlobalTransform())
   readonly transform = new Transform2D()
   readonly globalPosition = new Vector2()
-  @property({ protected: true }) accessor globalRotation: number = 0
+  @property({ protected: true, fallback: 0 }) declare globalRotation: number
   readonly globalScale = new Vector2()
   readonly globalSkew = new Vector2()
   readonly globalTransform = new Transform2D()

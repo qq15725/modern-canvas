@@ -34,10 +34,10 @@ export interface TimelineNode {
 
 @customNode('TimelineNode')
 export class TimelineNode extends Node {
-  @property({ fallback: 0 }) accessor delay!: number
-  @property({ fallback: 0 }) accessor duration!: number
-  @property({ fallback: false }) accessor paused!: boolean
-  @property({ protected: true, fallback: false }) accessor insideTimeRange!: boolean
+  @property({ fallback: 0 }) declare delay: number
+  @property({ fallback: 0 }) declare duration: number
+  @property({ fallback: false }) declare paused: boolean
+  @property({ protected: true, fallback: false }) declare insideTimeRange: boolean
 
   constructor(properties?: Partial<TimelineNodeProperties>, nodes: Node[] = []) {
     super()

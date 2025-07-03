@@ -3,9 +3,9 @@ import { isNone, normalizeOutline, property } from 'modern-idoc'
 import { BaseElement2DFill } from './BaseElement2DFill'
 
 export class BaseElement2DOutline extends BaseElement2DFill {
-  @property() accessor color: NormalizedOutline['color'] = '#00000000'
-  @property() accessor width: NormalizedOutline['width'] = 0
-  @property() accessor style: NormalizedOutline['style'] = 'solid'
+  @property({ fallback: '#00000000' }) declare color: NormalizedOutline['color']
+  @property({ fallback: 0 }) declare width: NormalizedOutline['width']
+  @property({ fallback: 'solid' }) declare style: NormalizedOutline['style']
 
   override setProperties(properties?: Outline): this {
     return super._setProperties(

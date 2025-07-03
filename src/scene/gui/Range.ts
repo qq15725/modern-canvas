@@ -17,13 +17,13 @@ export interface RangeProperties extends ControlProperties {
 
 @customNode<RangeProperties>('Range')
 export class Range extends Control {
-  @property() accessor allowGreater: boolean = false
-  @property() accessor allowLesser: boolean = false
-  @property() accessor page: number = 1
-  @property() accessor minValue: number = 0
-  @property() accessor maxValue: number = 100
-  @property() accessor step: number = 0.01
-  @property() accessor value: number = 0
+  @property({ fallback: false }) declare allowGreater: boolean
+  @property({ fallback: false }) declare allowLesser: boolean
+  @property({ fallback: 1 }) declare page: number
+  @property({ fallback: 0 }) declare minValue: number
+  @property({ fallback: 100 }) declare maxValue: number
+  @property({ fallback: 0.01 }) declare step: number
+  @property({ fallback: 0 }) declare value: number
 
   constructor(properties?: Partial<RangeProperties>, children: Node[] = []) {
     super()

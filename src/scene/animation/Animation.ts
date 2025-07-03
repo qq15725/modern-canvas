@@ -118,10 +118,10 @@ export interface AnimationProperties extends Omit<TimelineNodeProperties, 'rende
   duration: 2000,
 })
 export class Animation extends TimelineNode {
-  @property() accessor effectMode: AnimationEffectMode = 'parent'
-  @property() accessor loop: boolean = false
-  @property() accessor keyframes: Keyframe[] = []
-  @property() accessor easing: Easing | undefined
+  @property() declare effectMode: AnimationEffectMode = 'parent'
+  @property() declare loop: boolean = false
+  @property() declare keyframes: Keyframe[] = []
+  @property() declare easing: Easing | undefined
 
   protected _keyframes: NormalizedKeyframe[] = []
   protected _isFirstUpdatePosition = false

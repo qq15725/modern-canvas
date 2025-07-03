@@ -42,11 +42,11 @@ void main(void) {
 }`,
   })
 
-  @property() accessor color: ColorValue = '#000000FF'
-  @property() accessor blur: number = 4
-  @property() accessor offsetX: number = 4
-  @property() accessor offsetY: number = 4
-  @property() accessor shadowOnly: boolean = false
+  @property() declare color: ColorValue = '#000000FF'
+  @property() declare blur: number = 4
+  @property() declare offsetX: number = 4
+  @property() declare offsetY: number = 4
+  @property() declare shadowOnly: boolean = false
 
   blurEffect = new GaussianBlurEffect()
   viewport3 = new Viewport()

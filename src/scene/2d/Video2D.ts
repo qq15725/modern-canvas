@@ -13,7 +13,7 @@ export interface Video2DProperties extends TextureRect2DProperties {
 
 @customNode('Video2D')
 export class Video2D extends TextureRect2D<VideoTexture> {
-  @property() accessor src: string = ''
+  @property({ fallback: '' }) declare src: string
 
   get videoDuration(): number { return (this.texture?.duration ?? 0) * 1000 }
 

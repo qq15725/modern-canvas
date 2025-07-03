@@ -38,9 +38,9 @@ export interface ScalerProperties extends NodeProperties {
   renderMode: 'disabled',
 })
 export class Scaler extends Node {
-  @property() accessor value: number = 1
-  @property() accessor minValue: number = 0.05
-  @property() accessor maxValue: number = 10
+  @property() declare value: number = 1
+  @property() declare minValue: number = 0.05
+  @property() declare maxValue: number = 10
 
   get target(): Element2D | undefined {
     if ((this.parent as Element2D)?.style) {

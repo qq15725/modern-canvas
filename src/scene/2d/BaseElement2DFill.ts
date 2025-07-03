@@ -11,17 +11,17 @@ export interface BaseElement2DFill extends NormalizedFill {
 }
 
 export class BaseElement2DFill extends CoreObject {
-  @property({ fallback: true }) accessor enabled!: boolean
-  @property() accessor color: NormalizedFill['color']
-  @property() accessor image: NormalizedFill['image']
-  @property() accessor linearGradient: NormalizedFill['linearGradient']
-  @property() accessor radialGradient: NormalizedFill['radialGradient']
-  @property() accessor cropRect: NormalizedFill['cropRect']
-  @property() accessor stretchRect: NormalizedFill['stretchRect']
-  @property() accessor dpi: NormalizedFill['dpi']
-  @property() accessor rotateWithShape: NormalizedFill['rotateWithShape']
-  @property() accessor tile: NormalizedFill['tile']
-  @property() accessor opacity: NormalizedFill['opacity']
+  @property({ fallback: true }) declare enabled: boolean
+  @property() declare color: NormalizedFill['color']
+  @property() declare image: NormalizedFill['image']
+  @property() declare linearGradient: NormalizedFill['linearGradient']
+  @property() declare radialGradient: NormalizedFill['radialGradient']
+  @property() declare cropRect: NormalizedFill['cropRect']
+  @property() declare stretchRect: NormalizedFill['stretchRect']
+  @property() declare dpi: NormalizedFill['dpi']
+  @property() declare rotateWithShape: NormalizedFill['rotateWithShape']
+  @property() declare tile: NormalizedFill['tile']
+  @property() declare opacity: NormalizedFill['opacity']
 
   protected _texture?: Texture2D
 

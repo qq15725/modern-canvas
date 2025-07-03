@@ -3,7 +3,7 @@ import { property } from 'modern-idoc'
 import { Texture2D } from './Texture2D'
 
 export class CanvasTexture extends Texture2D<HTMLCanvasElement> {
-  @property() accessor pixelRatio: number = 2
+  @property() declare pixelRatio: number = 2
 
   constructor(source = document.createElement('canvas')) {
     super(source)

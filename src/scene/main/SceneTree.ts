@@ -35,9 +35,9 @@ export interface SceneTree {
 }
 
 export class SceneTree extends MainLoop {
-  @property() accessor processPaused: boolean = false
-  @property() accessor backgroundColor: ColorValue | undefined
-  @property({ protected: true }) accessor debug: boolean = false
+  @property({ fallback: false }) declare processPaused: boolean
+  @property() declare backgroundColor: ColorValue | undefined
+  @property({ protected: true, fallback: false }) declare debug: boolean
 
   readonly input = new Input()
   readonly renderStack = new RenderStack()

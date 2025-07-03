@@ -65,13 +65,13 @@ export class OutlineEffect extends Effect {
     )
   }
 
-  @property() accessor color: ColorValue = '#000000ff'
-  @property() accessor width: number = 1
-  @property() accessor style: 'dashed' | 'solid' | string = 'solid'
-  @property() accessor image: string | undefined // TODO
-  @property() accessor opacity: number = 1
-  @property() accessor quality: number = 0.1
-  @property() accessor knockout: boolean = false
+  @property() declare color: ColorValue = '#000000ff'
+  @property() declare width: number = 1
+  @property() declare style: 'dashed' | 'solid' | string = 'solid'
+  @property() declare image: string | undefined // TODO
+  @property() declare opacity: number = 1
+  @property() declare quality: number = 0.1
+  @property() declare knockout: boolean = false
 
   protected _color = new Color()
 

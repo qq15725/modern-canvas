@@ -36,10 +36,10 @@ export interface CanvasItem {
 
 @customNode('CanvasItem')
 export class CanvasItem extends TimelineNode {
-  @property() accessor modulate: ColorValue | undefined
-  @property() accessor blendMode: WebGLBlendMode | undefined
-  @property({ protected: true }) accessor visible: boolean = true
-  @property({ protected: true }) accessor opacity: number = 1
+  @property() declare modulate: ColorValue | undefined
+  @property() declare blendMode: WebGLBlendMode | undefined
+  @property({ protected: true, fallback: true }) declare visible: boolean
+  @property({ protected: true, fallback: 1 }) declare opacity: number
 
   protected _parentGlobalVisible?: boolean
   protected _globalVisible?: boolean

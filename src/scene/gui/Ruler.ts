@@ -20,15 +20,15 @@ export interface RulerProperties extends ControlProperties {
 
 @customNode('Ruler')
 export class Ruler extends Control {
-  @property() accessor offsetX: number = 0
-  @property() accessor offsetY: number = 0
-  @property() accessor thickness: number =20
-  @property() accessor markHeight: number = 3
-  @property() accessor color: string = '#b2b6bc'
-  @property() accessor markBackgroundColor: string = '#f9f9fa'
-  @property() accessor markColor: string = '#b2b6bc'
-  @property() accessor gap: number = 300
-  @property() accessor gapScale: number = 1
+  @property({ fallback: 0 }) declare offsetX: number
+  @property({ fallback: 0 }) declare offsetY: number
+  @property({ fallback: 20 }) declare thickness: number
+  @property({ fallback: 3 }) declare markHeight: number
+  @property({ fallback: '#b2b6bc' }) declare color: string
+  @property({ fallback: '#f9f9fa' }) declare markBackgroundColor: string
+  @property({ fallback: '#b2b6bc' }) declare markColor: string
+  @property({ fallback: 300 }) declare gap: number
+  @property({ fallback: 1 }) declare gapScale: number
 
   texture = new CanvasTexture()
 

@@ -43,11 +43,11 @@ const textStyles = new Set(Object.keys(textDefaultStyle))
  */
 @customNode('Text2D')
 export class Text2D extends TextureRect2D<CanvasTexture> {
-  @property() accessor split: boolean = false
-  @property({ alias: 'base.content' }) accessor content!: Text['content']
-  @property({ alias: 'base.effects' }) accessor effects: Text['effects']
-  @property({ protected: true, alias: 'base.measureDOM' }) accessor measureDOM: Text['measureDOM']
-  @property({ protected: true, alias: 'base.fonts' }) accessor fonts: Text['fonts']
+  @property({ fallback: false }) declare split: boolean
+  @property({ alias: 'base.content' }) declare content: Text['content']
+  @property({ alias: 'base.effects' }) declare effects: Text['effects']
+  @property({ protected: true, alias: 'base.measureDOM' }) declare measureDOM: Text['measureDOM']
+  @property({ protected: true, alias: 'base.fonts' }) declare fonts: Text['fonts']
 
   override texture = new CanvasTexture()
 

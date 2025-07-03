@@ -5,11 +5,11 @@ import { CoreObject } from '../../core'
 import { DropShadowEffect } from '../effects'
 
 export class BaseElement2DShadow extends CoreObject {
-  @property({ fallback: true }) accessor enabled!: boolean
-  @property() accessor color: NormalizedShadow['color'] = '#000000FF'
-  @property() accessor blur: NormalizedShadow['blur'] = 0
-  @property() accessor offsetY: NormalizedShadow['offsetX'] = 0
-  @property() accessor offsetX: NormalizedShadow['offsetY'] = 0
+  @property({ fallback: true }) declare enabled: boolean
+  @property({ fallback: '#000000FF' }) declare color: NormalizedShadow['color']
+  @property({ fallback: 0 }) declare blur: NormalizedShadow['blur']
+  @property({ fallback: 0 }) declare offsetY: NormalizedShadow['offsetX']
+  @property({ fallback: 0 }) declare offsetX: NormalizedShadow['offsetY']
 
   constructor(
     public parent: BaseElement2D,

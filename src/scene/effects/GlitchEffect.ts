@@ -131,15 +131,15 @@ void main(void) {
   protected _offsets: Float32Array
   protected _needsRedraw = false
 
-  @property() accessor slices: number = 10
-  @property() accessor sampleSize: number = 512
-  @property() accessor offset: number = 100
-  @property() accessor direction: number = 0
-  @property() accessor fillMode: number = 2
-  @property() accessor seed: number = 0
-  @property() accessor red: [number, number] = [2, 2]
-  @property() accessor green: [number, number] = [-10, 4]
-  @property() accessor blue: [number, number] = [10, -4]
+  @property() declare slices: number = 10
+  @property() declare sampleSize: number = 512
+  @property() declare offset: number = 100
+  @property() declare direction: number = 0
+  @property() declare fillMode: number = 2
+  @property() declare seed: number = 0
+  @property() declare red: [number, number] = [2, 2]
+  @property() declare green: [number, number] = [-10, 4]
+  @property() declare blue: [number, number] = [10, -4]
 
   constructor(properties?: Partial<GlitchEffectProperties>, children: Node[] = []) {
     super()

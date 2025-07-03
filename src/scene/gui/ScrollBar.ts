@@ -12,7 +12,7 @@ export interface ScrollBarProperties extends RangeProperties {
 
 @customNode<ScrollBarProperties>('ScrollBar')
 export class ScrollBar extends Range {
-  @property() accessor direction: 'vertical' | 'horizontal' = 'vertical'
+  @property({ fallback: 'vertical' }) declare direction: 'vertical' | 'horizontal'
 
   constructor(properties?: Partial<ScrollBarProperties>, children: Node[] = []) {
     super()

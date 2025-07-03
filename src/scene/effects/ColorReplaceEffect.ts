@@ -55,8 +55,8 @@ void main(void) {
 }`,
   })
 
-  @property() accessor colors: ColorValue[][] = []
-  @property() accessor epsilon: number = 0.05
+  @property() declare colors: ColorValue[][] = []
+  @property() declare epsilon: number = 0.05
 
   protected _color = new Color()
 

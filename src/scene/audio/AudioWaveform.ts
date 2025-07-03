@@ -14,9 +14,9 @@ export interface AudioWaveformProperties extends Element2DProperties {
 
 @customNode('AudioWaveform')
 export class AudioWaveform extends Element2D {
-  @property() accessor src: string | undefined
-  @property() accessor gap = 0
-  @property() accessor color = '#000000'
+  @property() declare src: string | undefined
+  @property() declare gap = 0
+  @property() declare color = '#000000'
 
   protected _audioBuffer?: AudioBuffer
   protected _src = IN_BROWSER
