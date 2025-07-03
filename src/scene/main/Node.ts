@@ -79,8 +79,9 @@ export class Node extends CoreObject {
   @property({ fallback: 'default' }) declare processSortMode: ProcessSortMode
   @property({ fallback: 'inherit' }) declare renderMode: RenderMode
   @property({ fallback: 'default' }) declare internalMode: InternalMode
-  @property({ default: () => ({}) }) declare meta: Record<string, any>
   @property({ protected: true }) declare mask?: Maskable
+
+  readonly meta: Record<string, any> = {}
 
   protected _readyed = false
 
@@ -581,6 +582,7 @@ export class Node extends CoreObject {
       children: this._children.length
         ? [...this._children.map(child => child.toJSON())]
         : undefined,
+      meta: Object.keys(this.meta).length ? { ...this.meta } : undefined,
     })
   }
 
