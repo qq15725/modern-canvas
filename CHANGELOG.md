@@ -1,3 +1,12 @@
+## [0.6.1](https://github.com/qq15725/modern-canvas/compare/v0.6.0...v0.6.1) (2025-07-03)
+
+
+### Bug Fixes
+
+* rollback ([3be09b6](https://github.com/qq15725/modern-canvas/commit/3be09b670d802c762147cc2cf579aeb207b8eafc))
+
+
+
 # [0.6.0](https://github.com/qq15725/modern-canvas/compare/v0.5.2...v0.6.0) (2025-07-02)
 
 
