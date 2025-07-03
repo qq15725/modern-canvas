@@ -10,7 +10,7 @@ import type {
   WebGLRenderer } from '../../core'
 import type { SceneTree } from './SceneTree'
 import type { Viewport } from './Viewport'
-import { idGenerator, property } from 'modern-idoc'
+import { clearUndef, idGenerator, property } from 'modern-idoc'
 import { CoreObject, customNode, customNodes } from '../../core'
 import { Children } from './Children'
 
@@ -464,7 +464,9 @@ export class Node extends CoreObject {
         this._children.back.push(node)
         break
     }
-    node.internalMode = internalMode
+    if (node.internalMode !== internalMode) {
+      node.internalMode = internalMode
+    }
     node.setParent(this)
     this.emit('appendChild', node)
     return node
@@ -501,7 +503,9 @@ export class Node extends CoreObject {
       }
     }
 
-    node.internalMode = internalMode
+    if (node.internalMode !== internalMode) {
+      node.internalMode = internalMode
+    }
 
     return this
   }
@@ -565,17 +569,19 @@ export class Node extends CoreObject {
 
   clone(): this {
     return new (this.constructor as any)(
-      this.toPropsJSON(),
+      this.toJSON(),
       this._children.internal,
     )
   }
 
   override toJSON(): Record<string, any> {
-    return {
+    return clearUndef({
       ...super.toJSON(),
       is: this.is,
-      children: [...this._children.map(child => child.toJSON())],
-    }
+      children: this._children.length
+        ? [...this._children.map(child => child.toJSON())]
+        : undefined,
+    })
   }
 
   static parse(value: Record<string, any>[]): Node[]

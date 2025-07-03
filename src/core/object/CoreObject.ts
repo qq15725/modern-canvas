@@ -192,7 +192,7 @@ export class CoreObject extends EventEmitter implements Required<ReactiveObject>
     }
   }
 
-  toPropsJSON(): Record<string, any> {
+  toJSON(): Record<string, any> {
     const json: Record<string, any> = {}
     this._properties.forEach((value, key) => {
       if (value === undefined) {
@@ -211,10 +211,6 @@ export class CoreObject extends EventEmitter implements Required<ReactiveObject>
       }
     })
     return json
-  }
-
-  toJSON(): Record<string, any> {
-    return this.toPropsJSON()
   }
 
   clone(): this {

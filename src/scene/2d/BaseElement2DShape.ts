@@ -15,7 +15,7 @@ export class BaseElement2DShape extends CoreObject {
   @property() declare preset: NormalizedShape['preset']
   @property() declare svg: NormalizedShape['svg']
   @property() declare viewBox: NormalizedShape['viewBox']
-  @property({ default: () => [] }) declare paths: Required<NormalizedShape>['paths']
+  @property() declare paths: NormalizedShape['paths']
 
   protected _path2DSet: Path2DSet = new Path2DSet()
 

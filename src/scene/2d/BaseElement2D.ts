@@ -7,8 +7,7 @@ import type {
   Shadow,
   Shape,
   Style,
-  Text,
-} from 'modern-idoc'
+  Text } from 'modern-idoc'
 import type {
   ColorValue,
   EventListenerOptions,
@@ -21,6 +20,8 @@ import type {
 } from '../../core'
 import type { CanvasBatchable, CanvasItemEventMap, Node, Rectangulable } from '../main'
 import type { Node2DProperties } from './Node2D'
+import { clearUndef,
+} from 'modern-idoc'
 import {
   customNode,
   DEG_TO_RAD,
@@ -401,18 +402,20 @@ export class BaseElement2D extends Node2D implements Rectangulable {
   }
 
   override toJSON(): Record<string, any> {
-    return {
-      is: this.is,
-      ...this.toPropsJSON(),
-      children: [...this._children.map(child => child.toJSON())],
-      style: this.style.toJSON(),
-      background: this.background.toJSON(),
-      shape: this.shape.toJSON(),
-      fill: this.fill.toJSON(),
-      outline: this.outline.toJSON(),
-      text: this.text.toJSON(),
-      foreground: this.foreground.toJSON(),
-      shadow: this.shadow.toJSON(),
+    const notEmptyObjectOrUndef = (obj: Record<string, any>): Record<string, any> | undefined => {
+      return Object.keys(obj).length > 0 ? obj : undefined
     }
+
+    return clearUndef({
+      ...super.toJSON(),
+      style: notEmptyObjectOrUndef(this.style.toJSON()),
+      background: notEmptyObjectOrUndef(this.background.toJSON()),
+      shape: notEmptyObjectOrUndef(this.shape.toJSON()),
+      fill: notEmptyObjectOrUndef(this.fill.toJSON()),
+      outline: notEmptyObjectOrUndef(this.outline.toJSON()),
+      text: notEmptyObjectOrUndef(this.text.toJSON()),
+      foreground: notEmptyObjectOrUndef(this.foreground.toJSON()),
+      shadow: notEmptyObjectOrUndef(this.shadow.toJSON()),
+    })
   }
 }
