@@ -58,8 +58,8 @@ export class CoreObject extends EventEmitter implements Required<ReactiveObject>
     return this
   }
 
-  getter(key: string, context: ReactiveObjectPropertyAccessorContext): any {
-    if (context.declaration.protected) {
+  getter(key: string, context?: ReactiveObjectPropertyAccessorContext): any {
+    if (context?.declaration.protected) {
       // @ts-expect-error ignore
       return this[context.internalKey]
     }
@@ -70,8 +70,8 @@ export class CoreObject extends EventEmitter implements Required<ReactiveObject>
     }
   }
 
-  setter(key: string, value: any, context: ReactiveObjectPropertyAccessorContext): void {
-    if (context.declaration.protected) {
+  setter(key: string, value: any, context?: ReactiveObjectPropertyAccessorContext): void {
+    if (context?.declaration.protected) {
       // @ts-expect-error ignore
       this[context.internalKey] = value
     }

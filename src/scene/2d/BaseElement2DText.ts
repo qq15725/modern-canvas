@@ -12,14 +12,23 @@ export class BaseElement2DText extends CoreObject {
   @property({ protected: true, alias: 'base.measureDOM' }) declare measureDOM: Text['measureDOM']
   @property({ protected: true, alias: 'base.fonts' }) declare fonts: Text['fonts']
 
+  readonly base = new Text()
+  measureResult?: MeasureResult
+
   constructor(
     public parent: BaseElement2D,
   ) {
     super()
+    this.base.on('updateProperty', (...args) => {
+      switch (args[0]) {
+        case 'content':
+        case 'effects':
+          this.setter(args[0], args[1])
+          break
+      }
+      this._updateProperty(...args)
+    })
   }
-
-  base = new Text()
-  measureResult?: MeasureResult
 
   override setProperties(properties?: TextProperties): this {
     return super.setProperties(
