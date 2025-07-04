@@ -70,5 +70,15 @@ export class Element2D extends BaseElement2D {
         this.size.height = Number(value)
         break
     }
+
+    switch (key) {
+      case 'width':
+      case 'height':
+        if (this.mask instanceof BaseElement2D) {
+          this.mask.size.width = this.size.width
+          this.mask.size.height = this.size.height
+        }
+        break
+    }
   }
 }

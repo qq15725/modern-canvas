@@ -70,7 +70,10 @@ export interface BaseElement2DProperties extends Node2DProperties {
 
 @customNode('BaseElement2D')
 export class BaseElement2D extends Node2D implements Rectangulable {
-  readonly size = new Vector2().on('update', () => this.updateGlobalTransform())
+  readonly size = new Vector2().on('update', () => {
+    this.updateGlobalTransform()
+    this.requestRedraw()
+  })
 
   protected declare _style: BaseElement2DStyle
   get style(): BaseElement2DStyle { return this._style }
@@ -148,16 +151,6 @@ export class BaseElement2D extends Node2D implements Rectangulable {
   }
 
   protected _updateStyleProperty(key: string, value: any, _oldValue: any, _declaration?: PropertyDeclaration): void {
-    switch (key) {
-      case 'width':
-      case 'height':
-        if (this.mask instanceof BaseElement2D) {
-          this.mask.size.x = this.size.x
-          this.mask.size.y = this.size.y
-        }
-        break
-    }
-
     switch (key) {
       case 'rotate':
         this.rotation = this.style.rotate * DEG_TO_RAD
