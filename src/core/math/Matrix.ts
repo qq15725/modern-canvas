@@ -1,4 +1,4 @@
-import { EventEmitter } from '../object'
+import { EventEmitter } from 'modern-idoc'
 import { Vector } from './Vector'
 
 export type MatrixLike = number | number[] | Matrix

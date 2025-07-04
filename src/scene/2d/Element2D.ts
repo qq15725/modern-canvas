@@ -1,8 +1,4 @@
-import type { PropertyDeclaration } from 'modern-idoc'
-import type {
-  EventListenerOptions,
-  EventListenerValue,
-} from '../../core'
+import type { EventListenerOptions, EventListenerValue, PropertyDeclaration } from 'modern-idoc'
 import type { Node } from '../main'
 import type { BaseElement2DEventMap, BaseElement2DProperties } from './BaseElement2D'
 import type { Element2DStyleProperties } from './Element2DStyle'

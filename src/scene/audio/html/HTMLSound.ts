@@ -1,7 +1,8 @@
 import type { IPlayOptions } from '../interfaces'
 import type { AudioProcessor } from '../pipeline'
 import type { HTMLAudio } from './HTMLAudio'
-import { EventEmitter, Ticker } from '../../../core'
+import { EventEmitter } from 'modern-idoc'
+import { Ticker } from '../../../core'
 
 export class HTMLSound extends EventEmitter {
   static readonly PADDING = 0.1

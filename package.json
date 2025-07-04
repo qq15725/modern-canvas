@@ -70,9 +70,9 @@
     "colord": "^2.9.3",
     "earcut": "^3.0.1",
     "modern-font": "^0.4.1",
-    "modern-idoc": "^0.7.7",
+    "modern-idoc": "^0.8.1",
     "modern-path2d": "^1.4.1",
-    "modern-text": "^1.5.0",
+    "modern-text": "^1.6.0",
     "yoga-layout": "^3.2.1"
   },
   "devDependencies": {
@@ -88,7 +88,7 @@
     "simple-git-hooks": "^2.13.0",
     "typescript": "^5.8.3",
     "unbuild": "^3.5.0",
-    "vite": "^7.0.0",
+    "vite": "^7.0.2",
     "vitest": "^3.2.4"
   },
   "simple-git-hooks": {

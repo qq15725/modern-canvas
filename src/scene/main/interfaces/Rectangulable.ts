@@ -1,4 +1,5 @@
-import type { EventListenerOptions, EventListenerValue, Rect2 } from '../../../core'
+import type { EventListenerOptions, EventListenerValue } from 'modern-idoc'
+import type { Rect2 } from '../../../core'
 
 export interface RectangulableEventMap {
   updateRect: () => void

@@ -1,4 +1,5 @@
-import type { CoreObjectEventMap, EventListenerOptions, EventListenerValue } from '../object'
+import type { EventListenerOptions, EventListenerValue } from 'modern-idoc'
+import type { CoreObjectEventMap } from '../object'
 import { property } from 'modern-idoc'
 import { Ticker } from '../global'
 import { CoreObject } from '../object'

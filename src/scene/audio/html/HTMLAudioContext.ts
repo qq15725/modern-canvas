@@ -1,6 +1,6 @@
 import type { IAudioContext } from '../interfaces'
 import type { AudioProcessor } from '../pipeline'
-import { EventEmitter } from '../../../core'
+import { EventEmitter } from 'modern-idoc'
 
 export class HTMLAudioContext extends EventEmitter implements IAudioContext {
   protected static _instance?: HTMLAudioContext

@@ -1,8 +1,6 @@
-import type { PropertyDeclaration } from 'modern-idoc'
+import type { EventListenerOptions, EventListenerValue, PropertyDeclaration } from 'modern-idoc'
 import type { Element2D } from '../2d'
 import type {
-  EventListenerOptions,
-  EventListenerValue,
   InputEvent,
   InputEventKey,
   WheelInputEvent,
@@ -38,9 +36,9 @@ export interface ScalerProperties extends NodeProperties {
   renderMode: 'disabled',
 })
 export class Scaler extends Node {
-  @property() declare value: number = 1
-  @property() declare minValue: number = 0.05
-  @property() declare maxValue: number = 10
+  @property({ default: 1 }) declare value: number
+  @property({ default: 0.05 }) declare minValue: number
+  @property({ default: 10 }) declare maxValue: number
 
   get target(): Element2D | undefined {
     if ((this.parent as Element2D)?.style) {

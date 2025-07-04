@@ -1,8 +1,6 @@
-import type { PropertyDeclaration } from 'modern-idoc'
+import type { EventListenerOptions, EventListenerValue, PropertyDeclaration } from 'modern-idoc'
 import type {
   ColorValue,
-  EventListenerOptions,
-  EventListenerValue,
   WebGLBlendMode,
   WebGLRenderer,
 } from '../../core'

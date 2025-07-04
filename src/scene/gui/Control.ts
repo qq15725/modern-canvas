@@ -1,11 +1,6 @@
-import type { PropertyDeclaration } from 'modern-idoc'
+import type { EventListenerOptions, EventListenerValue, PropertyDeclaration } from 'modern-idoc'
 import type { BaseElement2DProperties } from '../2d'
-import type {
-  EventListenerOptions,
-  EventListenerValue,
-  InputEvent,
-  InputEventKey,
-} from '../../core'
+import type { InputEvent, InputEventKey } from '../../core'
 import type { CanvasItemEventMap, Node, Rectangulable, RectangulableEventMap } from '../main'
 import { Element2D } from '../2d'
 import { customNode } from '../../core'

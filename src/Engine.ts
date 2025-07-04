@@ -1,7 +1,6 @@
+import type { EventListenerOptions, EventListenerValue } from 'modern-idoc'
 import type {
   ColorValue,
-  EventListenerOptions,
-  EventListenerValue,
   PointerInputEvent,
   WheelInputEvent,
 } from './core'

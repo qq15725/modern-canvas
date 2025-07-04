@@ -1,5 +1,5 @@
+import type { EventListenerOptions, EventListenerValue } from 'modern-idoc'
 import type { CoreObjectEventMap } from './CoreObject'
-import type { EventListenerOptions, EventListenerValue } from './EventEmitter'
 import { CoreObject } from './CoreObject'
 
 export interface RefCountedEventMap extends CoreObjectEventMap {

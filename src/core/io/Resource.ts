@@ -1,4 +1,5 @@
-import type { EventListenerOptions, EventListenerValue, RefCountedEventMap } from '../object'
+import type { EventListenerOptions, EventListenerValue } from 'modern-idoc'
+import type { RefCountedEventMap } from '../object'
 import { RefCounted } from '../object'
 
 export interface ResourceEventMap extends RefCountedEventMap {

@@ -1,7 +1,4 @@
-import type {
-  EventListenerOptions,
-  EventListenerValue,
-} from '../../core'
+import type { EventListenerOptions, EventListenerValue } from 'modern-idoc'
 import type { NodeEventMap, NodeProperties } from './Node'
 import type { Timeline } from './Timeline'
 import { property } from 'modern-idoc'

@@ -1,5 +1,7 @@
 import type {
   Background,
+  EventListenerOptions,
+  EventListenerValue,
   Fill,
   Foreground,
   Outline,
@@ -7,11 +9,10 @@ import type {
   Shadow,
   Shape,
   Style,
-  Text } from 'modern-idoc'
+  Text,
+} from 'modern-idoc'
 import type {
   ColorValue,
-  EventListenerOptions,
-  EventListenerValue,
   InputEvent,
   InputEventKey,
   PointerInputEvent,

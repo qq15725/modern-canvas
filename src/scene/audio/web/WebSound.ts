@@ -1,7 +1,8 @@
 import type { IPlayOptions } from '../interfaces'
 import type { AudioProcessor } from '../pipeline'
 import type { WebAudio } from './WebAudio'
-import { EventEmitter, Ticker } from '../../../core'
+import { EventEmitter } from 'modern-idoc'
+import { Ticker } from '../../../core'
 
 export class WebSound extends EventEmitter {
   protected _audio: WebAudio | null = null

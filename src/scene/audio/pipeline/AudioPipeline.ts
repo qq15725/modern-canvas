@@ -1,6 +1,6 @@
 import type { IAudioNode } from '../interfaces'
 import type { AudioProcessor } from './AudioProcessor'
-import { EventEmitter } from '../../../core'
+import { EventEmitter } from 'modern-idoc'
 
 export class AudioPipeline extends EventEmitter {
   protected _processers: AudioProcessor[] = []

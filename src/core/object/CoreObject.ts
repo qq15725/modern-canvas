@@ -1,8 +1,6 @@
-import type { PropertyDeclaration, ReactiveObject, ReactiveObjectPropertyAccessorContext } from 'modern-idoc'
-import type { EventListenerOptions, EventListenerValue } from './EventEmitter'
-import { getDeclarations } from 'modern-idoc'
+import type { EventListenerOptions, EventListenerValue, PropertyDeclaration, ReactiveObject, ReactiveObjectPropertyAccessorContext } from 'modern-idoc'
+import { EventEmitter, getDeclarations } from 'modern-idoc'
 import { nextTick } from '../global'
-import { EventEmitter } from './EventEmitter'
 
 export interface CoreObjectEventMap {
   updateProperty: (key: string, newValue: any, oldValue: any, declaration?: PropertyDeclaration) => void
@@ -47,7 +45,12 @@ export class CoreObject extends EventEmitter implements Required<ReactiveObject>
         }
       }
       else if (newValue !== oldValue) {
-        this._properties.set(key, newValue)
+        if (declaration.alias && declaration.alias !== key) {
+          this.setProperty(key, newValue)
+        }
+        else {
+          this._properties.set(key, newValue)
+        }
         this._updateProperty(key, newValue, oldValue, declaration)
         this.emit('updateProperty', key, newValue, oldValue, declaration)
       }

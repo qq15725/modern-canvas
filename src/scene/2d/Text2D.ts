@@ -1,6 +1,5 @@
-import type { PropertyDeclaration } from 'modern-idoc'
+import type { EventListenerOptions, EventListenerValue, PropertyDeclaration } from 'modern-idoc'
 import type { MeasureResult, TextOptions } from 'modern-text'
-import type { EventListenerOptions, EventListenerValue } from '../../core'
 import type { CanvasBatchable, Node } from '../main'
 import type { Element2DEventMap } from './Element2D'
 import type { TextureRect2DProperties } from './TextureRect2D'
