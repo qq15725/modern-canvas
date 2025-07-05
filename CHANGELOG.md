@@ -1,3 +1,12 @@
+## [0.6.7](https://github.com/qq15725/modern-canvas/compare/v0.6.6...v0.6.7) (2025-07-05)
+
+
+### Bug Fixes
+
+* waitUntilLoad ([4c6b39b](https://github.com/qq15725/modern-canvas/commit/4c6b39b46bba91889f2b3852eab97aaa8d3bb82b))
+
+
+
 ## [0.6.6](https://github.com/qq15725/modern-canvas/compare/v0.6.5...v0.6.6) (2025-07-05)
 
 
