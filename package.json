@@ -70,9 +70,9 @@
     "colord": "^2.9.3",
     "earcut": "^3.0.1",
     "modern-font": "^0.4.1",
-    "modern-idoc": "^0.8.1",
+    "modern-idoc": "^0.8.2",
     "modern-path2d": "^1.4.1",
-    "modern-text": "^1.6.0",
+    "modern-text": "^1.6.1",
     "yoga-layout": "^3.2.1"
   },
   "devDependencies": {

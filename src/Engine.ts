@@ -4,7 +4,7 @@ import type {
   PointerInputEvent,
   WheelInputEvent,
 } from './core'
-import type { Timeline } from './scene'
+import type { SceneTreeEventMap, Timeline } from './scene'
 import { assets } from './asset'
 import {
   DEVICE_PIXEL_RATIO,
@@ -26,7 +26,7 @@ export interface EngineOptions extends WebGLContextAttributes {
   timeline?: Timeline
 }
 
-interface EngineEventMap {
+interface EngineEventMap extends SceneTreeEventMap {
   pointerdown: (ev: PointerInputEvent) => void
   pointerover: (ev: PointerInputEvent) => void
   pointermove: (ev: PointerInputEvent) => void

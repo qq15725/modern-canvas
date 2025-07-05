@@ -23,5 +23,5 @@ export class BaseElement2DStyle extends Resource {
 const defaultStyles: NormalizedElementStyle = getDefaultStyle()
 for (const key in defaultStyles) {
   const fallback = defaultStyles[key as keyof typeof defaultStyles]
-  defineProperty(BaseElement2DStyle.prototype, key, { fallback })
+  defineProperty(BaseElement2DStyle, key, { fallback })
 }
