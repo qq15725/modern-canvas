@@ -1,3 +1,12 @@
+## [0.6.8](https://github.com/qq15725/modern-canvas/compare/v0.6.7...v0.6.8) (2025-07-06)
+
+
+### Features
+
+* opz perf ([1a3b262](https://github.com/qq15725/modern-canvas/commit/1a3b262ab9aec3fa1df59bd71e257fc2037327d8))
+
+
+
 ## [0.6.7](https://github.com/qq15725/modern-canvas/compare/v0.6.6...v0.6.7) (2025-07-05)
 
 
