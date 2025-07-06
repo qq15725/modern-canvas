@@ -67,7 +67,7 @@ export class SceneTree extends MainLoop {
   log(...args: any[]): void {
     if (this.debug) {
       // eslint-disable-next-line no-console
-      console.log(`[modern-canvas]`, ...args)
+      console.log(`[modern-canvas][${performance.now().toFixed(4)}ms]`, ...args)
     }
   }
 

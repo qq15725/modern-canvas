@@ -174,6 +174,10 @@ export class Node extends CoreObject {
     return this
   }
 
+  log(...args: any[]): void {
+    this._tree?.log(...args)
+  }
+
   /** Parent */
   protected _parent?: Node
   get parent(): Node | undefined { return this._parent }
@@ -355,7 +359,10 @@ export class Node extends CoreObject {
   }
 
   input(event: InputEvent, key: InputEventKey): void {
-    this._children.internal.forEach(child => child.input(event, key))
+    const array = this._children.internal
+    for (let i = array.length - 1; i >= 0; i--) {
+      array[i].input(event, key)
+    }
     this._input(event, key)
   }
 

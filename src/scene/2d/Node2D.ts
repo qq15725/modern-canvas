@@ -118,8 +118,9 @@ export class Node2D extends CanvasItem {
   }
 
   protected override _relayout(batchables: CanvasBatchable[]): CanvasBatchable[] {
+    batchables = super._relayout(batchables)
     this.updateGlobalTransform()
-    return super._relayout(batchables).map((batchable) => {
+    return batchables.map((batchable) => {
       return {
         ...batchable,
         vertices: this._transformVertices(batchable.vertices, batchable.vertTransform),

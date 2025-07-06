@@ -26,9 +26,9 @@ export interface Scaler {
 }
 
 export interface ScalerProperties extends NodeProperties {
-  value: number
-  minValue: number
-  maxValue: number
+  scale: number
+  minScale: number
+  maxScale: number
 }
 
 @customNode<ScalerProperties>('Scaler', {
@@ -36,9 +36,11 @@ export interface ScalerProperties extends NodeProperties {
   renderMode: 'disabled',
 })
 export class Scaler extends Node {
-  @property({ default: 1 }) declare value: number
-  @property({ default: 0.05 }) declare minValue: number
-  @property({ default: 10 }) declare maxValue: number
+  @property({ default: 1 }) declare translateX: number
+  @property({ default: 1 }) declare translateY: number
+  @property({ default: 1 }) declare scale: number
+  @property({ default: 0.05 }) declare minScale: number
+  @property({ default: 10 }) declare maxScale: number
 
   get target(): Element2D | undefined {
     if ((this.parent as Element2D)?.style) {
@@ -57,22 +59,23 @@ export class Scaler extends Node {
     super._updateProperty(key, value, oldValue, declaration)
 
     switch (key) {
-      case 'value':
+      case 'translateY':
+      case 'translateX':
+      case 'scale':
       case 'min':
       case 'max': {
-        this.value = clamp(this.minValue, this.value, this.maxValue)
-        this._updateScale()
+        this.scale = clamp(this.minScale, this.scale, this.maxScale)
+        this._updateTarget()
         break
       }
     }
   }
 
-  protected _updateScale(): void {
+  protected _updateTarget(): void {
     const target = this.target
     if (target) {
-      target.style.scaleX = this.value
-      target.style.scaleY = this.value
-      this.emit('updateScale', this.value)
+      target.style.transform = `translate(${this.translateX}px, ${this.translateY}px) scale(${this.scale})`
+      this.emit('updateScale', this.scale)
     }
   }
 
@@ -84,15 +87,18 @@ export class Scaler extends Node {
 
     e.preventDefault()
 
-    const isTouchPad = (e as any).wheelDeltaY
-      ? Math.abs(Math.abs((e as any).wheelDeltaY) - Math.abs(3 * e.deltaY)) < 3
-      : e.deltaMode === 0
-
-    if (!isTouchPad && e.ctrlKey) {
-      e.preventDefault()
-      let distance = e.deltaY / (e.ctrlKey ? 1 : 100)
-      distance *= -0.015
-      this.value += distance
+    if (e.ctrlKey) {
+      const isTouchPad = (e as any).wheelDeltaY
+        ? Math.abs(Math.abs((e as any).wheelDeltaY) - Math.abs(3 * e.deltaY)) < 3
+        : e.deltaMode === 0
+      if (!isTouchPad) {
+        e.preventDefault()
+        this.scale += e.deltaY * -0.015
+      }
+    }
+    else {
+      this.translateX -= e.deltaX
+      this.translateY -= e.deltaY
     }
   }
 

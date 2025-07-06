@@ -45,7 +45,7 @@ export class CanvasContext extends Path2D {
       return source
     }
     else {
-      return new ColorTexture(source)
+      return ColorTexture.get(source)
     }
   }
 

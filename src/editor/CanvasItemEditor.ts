@@ -1,8 +1,10 @@
 import type { PropertyDeclaration } from 'modern-idoc'
 import type { InputEvent, InputEventKey, PointerInputEvent } from '../core'
 import type { Element2DStyle } from '../scene'
+import { customNode } from '../core'
 import { Control, Element2D, Ruler, Scaler, TransformRect2D, XScrollBar, YScrollBar } from '../scene'
 
+@customNode('CanvasItemEditor')
 export class CanvasItemEditor extends Control {
   protected _pointerStart?: Element2DStyle
   protected _pointerOffset?: { x: number, y: number }
@@ -31,6 +33,7 @@ export class CanvasItemEditor extends Control {
   })
 
   scaler = new Scaler({
+    name: 'Scaler',
     internalMode: 'back',
   }).on('updateScale', (scale) => {
     this.ruler.gapScale = scale
@@ -39,6 +42,7 @@ export class CanvasItemEditor extends Control {
   })
 
   xScrollBar = new XScrollBar({
+    name: 'XScrollBar',
     internalMode: 'back',
     style: {
       visibility: 'hidden',
@@ -46,6 +50,7 @@ export class CanvasItemEditor extends Control {
   })
 
   yScrollBar = new YScrollBar({
+    name: 'yScrollBar',
     internalMode: 'back',
     style: {
       visibility: 'hidden',
@@ -58,9 +63,9 @@ export class CanvasItemEditor extends Control {
       width: 500,
       height: 500,
       backgroundColor: '#FFFFFFFF',
-      overflow: 'hidden',
+      // overflow: 'hidden',
       pointerEvents: 'none',
-      boxShadow: '2px 2px 2px 1px rgba(0, 0, 0, 0.2)',
+      // boxShadow: '2px 2px 2px 1px rgba(0, 0, 0, 0.2)',
     },
   }, [
     this.scaler,
@@ -121,11 +126,11 @@ export class CanvasItemEditor extends Control {
   }
 
   protected _onPointerdown(e: PointerInputEvent): void {
-    let target = e.target
-    if (target?.is(this)) {
+    let target = e.target as Element2D | undefined
+    if (target?.equal(this)) {
       target = undefined
     }
-    if (target?.is(this.transformRect)) {
+    if (target?.equal(this.transformRect)) {
       target = this.selected
     }
     this._pointerOffset = { x: e.offsetX, y: e.offsetY }
@@ -142,15 +147,15 @@ export class CanvasItemEditor extends Control {
   }
 
   protected _onPointermove(e: PointerInputEvent): void {
-    let target = e.target
-    if (target?.is(this)) {
+    let target = e.target as Element2D | undefined
+    if (target?.equal(this)) {
       target = undefined
     }
-    if (target?.is(this.transformRect)) {
+    if (target?.equal(this.transformRect)) {
       target = this.selected
     }
     const { selected, dragging, _pointerStart, _pointerOffset } = this
-    if (selected && target?.is(selected)) {
+    if (selected && target?.equal(selected)) {
       this.hovered = undefined
     }
     else {
@@ -160,8 +165,8 @@ export class CanvasItemEditor extends Control {
       ? { x: (e.offsetX - _pointerOffset.x), y: (e.offsetY - _pointerOffset.y) }
       : { x: 0, y: 0 }
     if (dragging && _pointerStart) {
-      dragging.style.left = _pointerStart.left + offset.x / this.scaler.value
-      dragging.style.top = _pointerStart.top + offset.y / this.scaler.value
+      dragging.style.left = _pointerStart.left + offset.x / this.scaler.scale
+      dragging.style.top = _pointerStart.top + offset.y / this.scaler.scale
       dragging.update()
     }
     this._updateHover()

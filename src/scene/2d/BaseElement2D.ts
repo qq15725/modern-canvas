@@ -356,8 +356,9 @@ export class BaseElement2D extends Node2D implements Rectangulable {
   }
 
   override input(event: InputEvent, key: InputEventKey): void {
-    for (let i = this._children.length - 1; i >= 0; i--) {
-      this._children[i].input(event, key)
+    const array = this._children.internal
+    for (let i = array.length - 1; i >= 0; i--) {
+      array[i].input(event, key)
     }
     if (this.isVisibleInTree()) {
       this._input(event, key)
