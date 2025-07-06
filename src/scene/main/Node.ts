@@ -246,10 +246,6 @@ export class Node extends CoreObject {
     }
   }
 
-  protected override _update(changed: Map<string, any>): void {
-    super._update(changed)
-  }
-
   protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
     super._updateProperty(key, value, oldValue, declaration)
   }

@@ -106,17 +106,14 @@ export class CanvasItem extends TimelineNode {
 
   requestRedraw(): void {
     this._redrawing = true
-    this.requestUpdate()
   }
 
   requestRelayout(): void {
     this._relayouting = true
-    this.requestUpdate()
   }
 
   requestRepaint(): void {
     this._repainting = true
-    this.requestUpdate()
   }
 
   protected _updateGlobalVisible(): void {
@@ -166,26 +163,14 @@ export class CanvasItem extends TimelineNode {
     super._process(delta)
     const parent = this.getParent<CanvasItem>()
     if (this._parentGlobalVisible !== parent?.globalVisible) {
-      this.requestUpdate()
-    }
-    if (this._parentGlobalOpacity !== parent?.globalOpacity) {
-      this.requestUpdate()
-    }
-  }
-
-  protected override _update(changed: Map<string, any>): void {
-    super._update(changed)
-
-    const parent = this.getParent<CanvasItem>()
-
-    if (this._parentGlobalVisible !== parent?.globalVisible) {
       this._updateGlobalVisible()
     }
-
     if (this._parentGlobalOpacity !== parent?.globalOpacity) {
       this._updateGlobalOpacity()
     }
+  }
 
+  protected _updateBatchables(): void {
     const redrawing = this._redrawing
     let relayouting = this._relayouting
     let repainting = this._repainting
@@ -220,6 +205,8 @@ export class CanvasItem extends TimelineNode {
   }
 
   protected override _render(renderer: WebGLRenderer): void {
+    this._updateBatchables()
+
     this._batchables.forEach((batchable) => {
       batchable.texture?.upload(renderer)
 
