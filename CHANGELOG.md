@@ -1,3 +1,12 @@
+## [0.6.10](https://github.com/qq15725/modern-canvas/compare/v0.6.9...v0.6.10) (2025-07-09)
+
+
+### Bug Fixes
+
+* text render ([0fa459e](https://github.com/qq15725/modern-canvas/commit/0fa459e64e8dbbe9ad8a85119d07067cf9e20e3a))
+
+
+
 ## [0.6.9](https://github.com/qq15725/modern-canvas/compare/v0.6.8...v0.6.9) (2025-07-06)
 
 
