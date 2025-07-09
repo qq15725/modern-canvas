@@ -83,15 +83,13 @@ export class BaseElement2DText extends CoreObject {
   draw(): void {
     const ctx = this.parent.context
     this.base.update()
-    this.base.paragraphs.forEach((p) => {
-      p.fragments.forEach((f) => {
-        f.characters.forEach((c) => {
-          ctx.fillStyle = c.computedStyle.color
-          ctx.addPath(c.path)
-          ctx.style.fillRule = 'evenodd'
-          ctx.closePath()
-          ctx.fill()
-        })
+    this.base.pathSets.forEach((pathSet) => {
+      pathSet.paths.forEach((path) => {
+        ctx.addPath(path)
+        ctx.style = { ...path.style }
+        ctx.fillStyle = undefined
+        ctx.strokeStyle = undefined
+        ctx.fill()
       })
     })
   }

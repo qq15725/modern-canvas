@@ -50,31 +50,36 @@ export class CanvasContext extends Path2D {
   }
 
   stroke(options?: Partial<StrokeDraw>): void {
-    const path = new Path2D(this)
-
-    let texture: Texture2D = this._defaultStyle
-    if (this.strokeStyle) {
-      texture = this._toTexture(this.strokeStyle)
+    if (!this.curves.length) {
+      return
     }
 
-    if (this.curves.length) {
-      this._draws.push({
-        ...options,
-        type: 'stroke',
-        path,
-        texture,
-        uvTransform: this.uvTransform,
-        vertTransform: this.vertTransform,
-        style: {
-          alignment: 0.5,
-          cap: this.lineCap ?? 'butt',
-          join: this.lineJoin ?? 'miter',
-          width: this.lineWidth ?? 1,
-          miterLimit: this.miterLimit ?? 10,
-        },
-      })
-      super.reset()
-    }
+    const strokeStyle = this.strokeStyle
+      ?? (
+        typeof this.style.stroke === 'string'
+          ? (this.style.stroke as string)
+          : undefined
+      )
+
+    this._draws.push({
+      ...options,
+      type: 'stroke',
+      path: new Path2D(this),
+      texture: strokeStyle
+        ? this._toTexture(strokeStyle)
+        : this._defaultStyle,
+      uvTransform: this.uvTransform,
+      vertTransform: this.vertTransform,
+      style: {
+        alignment: 0.5,
+        cap: this.lineCap ?? 'butt',
+        join: this.lineJoin ?? 'miter',
+        width: this.lineWidth ?? 1,
+        miterLimit: this.miterLimit ?? 10,
+      },
+    })
+
+    super.reset()
   }
 
   fillRect(x: number, y: number, width: number, height: number): void {
@@ -90,18 +95,24 @@ export class CanvasContext extends Path2D {
   }
 
   fill(options?: Partial<FillDraw>): void {
-    const path = new Path2D(this)
-
-    let texture: Texture2D = this._defaultStyle
-    if (this.fillStyle) {
-      texture = this._toTexture(this.fillStyle)
+    if (!this.curves.length) {
+      return
     }
+
+    const fillStyle = this.fillStyle
+      ?? (
+        typeof this.style.fill === 'string'
+          ? (this.style.fill as string)
+          : undefined
+      )
 
     this._draws.push({
       ...options,
       type: 'fill',
-      path,
-      texture,
+      path: new Path2D(this),
+      texture: fillStyle
+        ? this._toTexture(fillStyle)
+        : this._defaultStyle,
       uvTransform: this.uvTransform,
       vertTransform: this.vertTransform,
     })

@@ -62,7 +62,7 @@ export class CanvasItemEditor extends Control {
     style: {
       width: 500,
       height: 500,
-      backgroundColor: '#FFFFFFFF',
+      backgroundColor: '#00FFFFFF',
       // overflow: 'hidden',
       pointerEvents: 'none',
       // boxShadow: '2px 2px 2px 1px rgba(0, 0, 0, 0.2)',
