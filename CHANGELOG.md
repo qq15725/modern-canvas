@@ -1,3 +1,12 @@
+## [0.6.12](https://github.com/qq15725/modern-canvas/compare/v0.6.11...v0.6.12) (2025-07-10)
+
+
+### Features
+
+* text fill outline ([fdd7fe3](https://github.com/qq15725/modern-canvas/commit/fdd7fe39f6136464213c4cc2a36daf410e03b864))
+
+
+
 ## [0.6.11](https://github.com/qq15725/modern-canvas/compare/v0.6.10...v0.6.11) (2025-07-09)
 
 

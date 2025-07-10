@@ -1,7 +1,7 @@
 {
   "name": "modern-canvas",
   "type": "module",
-  "version": "0.6.11",
+  "version": "0.6.12",
   "packageManager": "pnpm@9.15.1",
   "description": "A JavaScript WebGL rendering engine.",
   "author": "wxm",
