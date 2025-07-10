@@ -9,7 +9,9 @@ export class BaseElement2DText extends CoreObject {
   @property({ fallback: true }) declare enabled: boolean
   @property({ alias: 'base.content', fallback: () => [] }) declare content: Text['content']
   @property({ alias: 'base.effects' }) declare effects: Text['effects']
-  @property({ protected: true, alias: 'base.measureDOM' }) declare measureDOM: Text['measureDOM']
+  @property({ alias: 'base.fill' }) declare fill: Text['fill']
+  @property({ alias: 'base.outline' }) declare outline: Text['outline']
+  @property({ protected: true, alias: 'base.measureDom' }) declare measureDom: Text['measureDom']
   @property({ protected: true, alias: 'base.fonts' }) declare fonts: Text['fonts']
 
   readonly base = new Text()
@@ -23,6 +25,8 @@ export class BaseElement2DText extends CoreObject {
       switch (args[0]) {
         case 'content':
         case 'effects':
+        case 'fill':
+        case 'outline':
           this.setter(args[0], args[1])
           break
       }
@@ -42,12 +46,14 @@ export class BaseElement2DText extends CoreObject {
     super._updateProperty(key, value, oldValue, declaration)
 
     switch (key) {
+      case 'enabled':
       case 'content':
       case 'effects':
-      case 'measureDOM':
+      case 'measureDom':
       case 'fonts':
+      case 'fill':
+      case 'outline':
       case 'split':
-      case 'enabled':
         this.parent.requestRedraw()
         break
     }

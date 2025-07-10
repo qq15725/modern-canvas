@@ -49,6 +49,7 @@ export type RenderMode = 'inherit' | 'always' | 'disabled'
 export type InternalMode = 'default' | 'front' | 'back'
 
 export interface NodeProperties {
+  id: string
   name: string
   mask: Maskable
   processMode: ProcessMode
@@ -578,11 +579,13 @@ export class Node extends CoreObject {
   override toJSON(): Record<string, any> {
     return clearUndef({
       ...super.toJSON(),
-      is: this.is,
       children: this._children.length
         ? [...this._children.map(child => child.toJSON())]
         : undefined,
-      meta: Object.keys(this.meta).length ? { ...this.meta } : undefined,
+      meta: {
+        ...this.meta,
+        inCanvasIs: this.is,
+      },
     })
   }
 
@@ -592,9 +595,10 @@ export class Node extends CoreObject {
     if (Array.isArray(value)) {
       return value.map(val => this.parse(val))
     }
-    const { is, props, children } = value
-    const Class = (customNodes.get(is) ?? Node) as any
-    const node = new Class(props) as Node
+    const { meta = {}, children, ...props } = value
+    const { inCanvasIs = 'Node' } = meta
+    const Class = (customNodes.get(inCanvasIs) ?? Node) as any
+    const node = new Class({ ...props, meta }) as Node
     children?.forEach((child: Record<string, any>) => node.appendChild(this.parse(child)))
     return node
   }

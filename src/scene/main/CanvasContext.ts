@@ -1,5 +1,6 @@
 import type { LineCap, LineJoin, LineStyle } from 'modern-path2d'
 import type { Batchable2D, ColorValue, Transform2D } from '../../core'
+import { isColorFillObject } from 'modern-idoc'
 import { Path2D } from 'modern-path2d'
 import { ColorTexture, Texture2D } from '../resources'
 
@@ -54,12 +55,19 @@ export class CanvasContext extends Path2D {
       return
     }
 
-    const strokeStyle = this.strokeStyle
-      ?? (
-        typeof this.style.stroke === 'string'
-          ? (this.style.stroke as string)
-          : undefined
-      )
+    let strokeStyle = this.strokeStyle
+    if (!strokeStyle && this.style.stroke) {
+      switch (typeof this.style.stroke) {
+        case 'string':
+          strokeStyle = this.style.stroke
+          break
+        case 'object':
+          if (isColorFillObject(this.style.stroke)) {
+            strokeStyle = this.style.stroke.color
+          }
+          break
+      }
+    }
 
     this._draws.push({
       ...options,
@@ -99,12 +107,19 @@ export class CanvasContext extends Path2D {
       return
     }
 
-    const fillStyle = this.fillStyle
-      ?? (
-        typeof this.style.fill === 'string'
-          ? (this.style.fill as string)
-          : undefined
-      )
+    let fillStyle = this.fillStyle
+    if (!fillStyle && this.style.fill) {
+      switch (typeof this.style.fill) {
+        case 'string':
+          fillStyle = this.style.fill
+          break
+        case 'object':
+          if (isColorFillObject(this.style.fill)) {
+            fillStyle = this.style.fill.color
+          }
+          break
+      }
+    }
 
     this._draws.push({
       ...options,
