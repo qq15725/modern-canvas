@@ -11,8 +11,9 @@ export class WebGLProgramModule extends WebGLModule {
 
   boundProgram: WebGLProgram | null = null
 
-  uniforms: Record<string, any> = {
+  uniforms = {
     projectionMatrix: [1, 0, 0, 0, 1, 0, 0, 0, 1],
+    worldTransformMatrix: [1, 0, 0, 0, 1, 0, 0, 0, 1],
   }
 
   create(options?: WebGLProgramOptions): WebGLProgram {
@@ -266,7 +267,10 @@ export class WebGLProgramModule extends WebGLModule {
   override reset(): void {
     super.reset()
     this.boundProgram = null
-    this.uniforms = {}
+    this.uniforms = {
+      projectionMatrix: [1, 0, 0, 0, 1, 0, 0, 0, 1],
+      worldTransformMatrix: [1, 0, 0, 0, 1, 0, 0, 0, 1],
+    }
   }
 
   free(): void {

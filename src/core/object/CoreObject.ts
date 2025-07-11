@@ -205,6 +205,9 @@ export class CoreObject extends EventEmitter implements Required<ReactiveObject>
         if ('toJSON' in value && typeof value.toJSON === 'function') {
           json[key] = value.toJSON()
         }
+        else if (Array.isArray(value)) {
+          json[key] = [...value]
+        }
         else {
           json[key] = { ...value }
         }

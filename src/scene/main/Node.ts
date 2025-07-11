@@ -589,8 +589,6 @@ export class Node extends CoreObject {
     })
   }
 
-  static parse(value: Record<string, any>[]): Node[]
-  static parse(value: Record<string, any>): Node
   static parse(value: any): any {
     if (Array.isArray(value)) {
       return value.map(val => this.parse(val))

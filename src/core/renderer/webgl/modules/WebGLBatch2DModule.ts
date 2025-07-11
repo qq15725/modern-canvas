@@ -92,7 +92,7 @@ attribute vec4 aColorMatrixOffset;
 attribute vec4 aDisableWrapMode;
 
 uniform mat3 projectionMatrix;
-uniform mat3 translationMatrix;
+uniform mat3 worldTransformMatrix;
 uniform vec4 modulate;
 
 varying float vTextureId;
@@ -104,8 +104,14 @@ varying vec4 vColorMatrixOffset;
 varying vec4 vDisableWrapMode;
 
 void main(void) {
+  mat3 modelMatrix = mat3(
+    1.0, 0.0, 0.0,
+    0.0, 1.0, 0.0,
+    0.0, 0.0, 1.0
+  );
   vTextureId = aTextureId;
-  gl_Position = vec4((projectionMatrix * translationMatrix * vec3(aPosition, 1.0)).xy, 0.0, 1.0);
+  mat3 modelViewProjectionMatrix = projectionMatrix * worldTransformMatrix * modelMatrix;
+  gl_Position = vec4((modelViewProjectionMatrix * vec3(aPosition, 1.0)).xy, 0.0, 1.0);
   vUv = aUv;
   vModulate = aModulate * modulate;
   vBackgroundColor = aBackgroundColor;
@@ -199,7 +205,6 @@ void main(void) {
         renderer.program.updateUniforms(program, {
           samplers,
           modulate: [1, 1, 1, 1],
-          translationMatrix: [1, 0, 0, 0, 1, 0, 0, 0, 1],
           ...renderer.program.uniforms,
         })
         renderer.vertexArray.bind(vao ?? vertexArray)

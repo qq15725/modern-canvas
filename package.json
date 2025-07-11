@@ -70,7 +70,7 @@
     "colord": "^2.9.3",
     "earcut": "^3.0.1",
     "modern-font": "^0.4.1",
-    "modern-idoc": "^0.8.5",
+    "modern-idoc": "^0.8.6",
     "modern-path2d": "^1.4.5",
     "modern-text": "^1.7.1",
     "yoga-layout": "^3.2.1"
@@ -78,7 +78,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^4.16.2",
     "@types/earcut": "^3.0.0",
-    "@types/node": "^24.0.12",
+    "@types/node": "^24.0.13",
     "bumpp": "^10.2.0",
     "conventional-changelog-cli": "^5.0.0",
     "eslint": "^9.30.1",
