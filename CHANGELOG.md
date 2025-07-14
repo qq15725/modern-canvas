@@ -1,3 +1,12 @@
+## [0.7.1](https://github.com/qq15725/modern-canvas/compare/v0.7.0...v0.7.1) (2025-07-14)
+
+
+### Bug Fixes
+
+* input ([1286615](https://github.com/qq15725/modern-canvas/commit/1286615fbfe24c1646183f450747ba9e6517c7c7))
+
+
+
 # [0.7.0](https://github.com/qq15725/modern-canvas/compare/v0.6.13...v0.7.0) (2025-07-14)
 
 
