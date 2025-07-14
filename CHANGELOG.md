@@ -1,3 +1,12 @@
+# [0.7.0](https://github.com/qq15725/modern-canvas/compare/v0.6.13...v0.7.0) (2025-07-14)
+
+
+### Features
+
+* Camera2D ([367a8fa](https://github.com/qq15725/modern-canvas/commit/367a8fa97596129ff34e3bb0937581ba2191452f))
+
+
+
 ## [0.6.13](https://github.com/qq15725/modern-canvas/compare/v0.6.12...v0.6.13) (2025-07-11)
 
 
