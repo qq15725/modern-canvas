@@ -93,7 +93,7 @@ export class ColorMatrix extends Matrix {
   }
 
   sepia(amount = 1): this {
-    const v = clamp(0, amount, 1)
+    const v = clamp(amount, 0, 1)
     return this.multiply([
       lerp(1, 0.393, v),
       lerp(0, 0.7689999, v),
@@ -128,7 +128,7 @@ export class ColorMatrix extends Matrix {
   }
 
   grayscale(amount = 1): this {
-    const v = clamp(0, amount, 1)
+    const v = clamp(amount, 0, 1)
     const r = lerp(1, 0.3, v)
     const rr = lerp(0, 0.3, v)
     const g = lerp(1, 0.59, v)

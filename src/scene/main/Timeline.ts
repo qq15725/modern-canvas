@@ -72,7 +72,7 @@ export class Timeline extends Node {
     if (this.loop && current > end) {
       current = start + (current % end)
     }
-    current = clamp(start, current, end)
+    current = clamp(current, start, end)
     this.currentTime = current
     this.emit('updateCurrentTime', current, delta)
     return this

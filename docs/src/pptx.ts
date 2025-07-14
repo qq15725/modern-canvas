@@ -10,6 +10,10 @@ const engine = new Engine({
   autoStart: true,
 })
 
+engine.on('pointerdown', (e) => {
+  console.warn(e.target?.toJSON())
+})
+
 const camera = new Camera2D()
 
 ;(window as any).engine = engine

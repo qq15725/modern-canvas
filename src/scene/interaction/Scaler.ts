@@ -64,7 +64,7 @@ export class Scaler extends Node {
       case 'scale':
       case 'min':
       case 'max': {
-        this.scale = clamp(this.minScale, this.scale, this.maxScale)
+        this.scale = clamp(this.scale, this.minScale, this.maxScale)
         this._updateTarget()
         break
       }

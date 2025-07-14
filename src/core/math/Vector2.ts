@@ -70,8 +70,8 @@ export class Vector2 extends Vector {
   static lerp(a: VectorLike, b: VectorLike, t: number): Vector2 {
     return new Vector2(b)
       .clone()
-      .sub(new Vector2(a))
+      .sub(a)
       .multiply(t)
-      .add(new Vector2(a))
+      .add(a)
   }
 }

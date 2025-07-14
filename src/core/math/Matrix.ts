@@ -25,7 +25,7 @@ export abstract class Matrix extends EventEmitter {
     }
   }
 
-  protected _operate(
+  operate(
     operator: string,
     target: MatrixLike | Vector,
     output?: MatrixOperateOutput,
@@ -130,7 +130,7 @@ export abstract class Matrix extends EventEmitter {
   }
 
   set(value: MatrixLike): this {
-    return this._operate('=', value) as this
+    return this.operate('=', value) as this
   }
 
   copy(value: MatrixLike): this {
@@ -147,7 +147,7 @@ export abstract class Matrix extends EventEmitter {
   multiply(value: MatrixLike): this
   multiply<T extends MatrixOperateOutput>(value: MatrixLike, output: T): T
   multiply(value: any, output?: any): any {
-    return this._operate('*', value, output)
+    return this.operate('*', value, output)
   }
 
   protected _onUpdate(_array: number[]): void {
@@ -173,6 +173,6 @@ export abstract class Matrix extends EventEmitter {
   }
 
   toJSON(): number[] {
-    return this._array
+    return this._array.slice()
   }
 }

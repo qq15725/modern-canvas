@@ -51,7 +51,7 @@ export class TimelineNode extends Node {
   get timeline(): Timeline | undefined { return this._tree?.timeline }
   get timelineCurrentTime(): number { return this.timeline?.currentTime ?? 0 }
   get parentStartTime(): number { return (this._parent as TimelineNode)?.startTime ?? 0 }
-  get currentTime(): number { return clamp(0, this._currentTime, this.computedDuration) }
+  get currentTime(): number { return clamp(this._currentTime, 0, this.computedDuration) }
   get startTime(): number { return this._startTime }
   set startTime(val: number) {
     this.delay = val - this.parentStartTime
@@ -59,7 +59,7 @@ export class TimelineNode extends Node {
   }
 
   get endTime(): number { return this._startTime + this.computedDuration }
-  get currentTimeProgress(): number { return this.computedDuration ? clamp(0, this._currentTime / this.computedDuration, 1) : 0 }
+  get currentTimeProgress(): number { return this.computedDuration ? clamp(this._currentTime / this.computedDuration, 0, 1) : 0 }
   isInsideTimeRange(): boolean {
     const current = this._currentTime
     if (this.computedDuration) {

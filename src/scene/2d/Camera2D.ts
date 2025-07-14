@@ -1,20 +1,37 @@
+import type { EventListenerValue } from 'modern-idoc'
 import type { InputEvent, InputEventKey, WheelInputEvent } from '../../core'
 import type { Node } from '../main'
-import type { Node2DProperties } from './Node2D'
-import { property } from 'modern-idoc'
-import { customNode, Vector2 } from '../../core'
+import type { Node2DEventMap, Node2DProperties } from './Node2D'
+import { clamp, customNode, Vector2 } from '../../core'
 import { Node2D } from './Node2D'
 
 export interface Camera2DProperties extends Node2DProperties {
   //
 }
 
-@customNode('Camera2D')
+export interface Camera2DEventMap extends Node2DEventMap {
+  updateCanvasTransform: () => void
+}
+
+export interface Camera2D {
+  on: (<K extends keyof Camera2DEventMap>(type: K, listener: Camera2DEventMap[K], options?: EventListenerOptions) => this)
+    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
+  once: (<K extends keyof Camera2DEventMap>(type: K, listener: Camera2DEventMap[K], options?: EventListenerOptions) => this)
+    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
+  off: (<K extends keyof Camera2DEventMap>(type: K, listener?: Camera2DEventMap[K], options?: EventListenerOptions) => this)
+    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
+  emit: (<K extends keyof Camera2DEventMap>(type: K, ...args: Parameters<Camera2DEventMap[K]>) => boolean)
+    & ((type: string, ...args: any[]) => boolean)
+}
+
+@customNode<Camera2D>('Camera2D', {
+  processMode: 'disabled',
+  renderMode: 'disabled',
+})
 export class Camera2D extends Node2D {
   readonly zoom = new Vector2(1, 1).on('update', () => this.updateCanvasTransform())
-
-  @property({ fallback: 6 }) declare maxZoom: number
-  @property({ fallback: 0.1 }) declare minZoom: number
+  readonly maxZoom = new Vector2(6, 6)
+  readonly minZoom = new Vector2(0.1, 0.1)
 
   constructor(properties?: Partial<Camera2DProperties>, nodes: Node[] = []) {
     super()
@@ -22,6 +39,22 @@ export class Camera2D extends Node2D {
     this
       .setProperties(properties)
       .append(nodes)
+  }
+
+  addZoom(x: number, y = x): this {
+    this.zoom.set(
+      clamp(this.zoom.x + x, this.minZoom.x, this.maxZoom.x),
+      clamp(this.zoom.y + y, this.minZoom.y, this.maxZoom.y),
+    )
+    return this
+  }
+
+  setZoom(x: number, y = x): this {
+    this.zoom.set(
+      clamp(x, this.minZoom.x, this.maxZoom.x),
+      clamp(y, this.minZoom.y, this.maxZoom.y),
+    )
+    return this
   }
 
   protected override _input(event: InputEvent, key: InputEventKey): void {
@@ -37,25 +70,18 @@ export class Camera2D extends Node2D {
 
         if (!isTouchPad) {
           e.preventDefault()
-          const value = this.zoom.x + e.deltaY * -0.015
-          const zoom = Math.min(this.maxZoom, Math.max(this.minZoom, value))
-          const ratio = 1 - zoom / this.zoom.x
-          this.zoom.set([
-            zoom,
-            zoom,
-          ])
-          this.position.add([
+          const oldZoom = this.zoom.x
+          this.addZoom(e.deltaY * -0.015)
+          const ratio = 1 - this.zoom.x / oldZoom
+          this.position.add(
             (e.screenX - this.position.x) * ratio,
             (e.screenY - this.position.y) * ratio,
-          ])
+          )
         }
       }
       else {
         e.preventDefault()
-        this.position.add([
-          -e.deltaX,
-          -e.deltaY,
-        ])
+        this.position.add(-e.deltaX, -e.deltaY)
       }
     }
   }
@@ -75,5 +101,7 @@ export class Camera2D extends Node2D {
       .identity()
       .scale(this.zoom.x, this.zoom.y)
       .translate(this.position.x, this.position.y)
+
+    this.emit('updateCanvasTransform')
   }
 }

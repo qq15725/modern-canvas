@@ -1,11 +1,32 @@
-import type { PropertyDeclaration } from 'modern-idoc'
-import type { CanvasBatchable, CanvasItemProperties, Node, VertTransform } from '../main'
+import type { EventListenerValue, PropertyDeclaration } from 'modern-idoc'
+import type {
+  CanvasBatchable,
+  CanvasItemEventMap,
+  CanvasItemProperties,
+  Node,
+  VertTransform,
+} from '../main'
 import { property } from 'modern-idoc'
 import { customNode, Transform2D, Vector2 } from '../../core'
 import { CanvasItem } from '../main'
 
 export interface Node2DProperties extends CanvasItemProperties {
   //
+}
+
+export interface Node2DEventMap extends CanvasItemEventMap {
+  //
+}
+
+export interface Node2D {
+  on: (<K extends keyof Node2DEventMap>(type: K, listener: Node2DEventMap[K], options?: EventListenerOptions) => this)
+    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
+  once: (<K extends keyof Node2DEventMap>(type: K, listener: Node2DEventMap[K], options?: EventListenerOptions) => this)
+    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
+  off: (<K extends keyof Node2DEventMap>(type: K, listener?: Node2DEventMap[K], options?: EventListenerOptions) => this)
+    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
+  emit: (<K extends keyof Node2DEventMap>(type: K, ...args: Parameters<Node2DEventMap[K]>) => boolean)
+    & ((type: string, ...args: any[]) => boolean)
 }
 
 @customNode('Node2D')

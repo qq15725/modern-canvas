@@ -118,9 +118,9 @@ export interface AnimationProperties extends Omit<TimelineNodeProperties, 'rende
   duration: 2000,
 })
 export class Animation extends TimelineNode {
-  @property() declare effectMode: AnimationEffectMode = 'parent'
-  @property() declare loop: boolean = false
-  @property() declare keyframes: Keyframe[] = []
+  @property({ fallback: 'parent' }) declare effectMode: AnimationEffectMode
+  @property({ fallback: false }) declare loop: boolean
+  @property({ default: () => [] }) declare keyframes: Keyframe[]
   @property() declare easing: Easing | undefined
 
   protected _keyframes: NormalizedKeyframe[] = []
@@ -235,7 +235,7 @@ export class Animation extends TimelineNode {
     targets.forEach((target, i) => {
       const tiem = offset === 1
         ? progress
-        : clamp(0, Math.max(0, progress - offset * i) / offset, 1)
+        : clamp(Math.max(0, progress - offset * i) / offset, 0, 1)
 
       const startProps = this._cachedProps.get(target)
       if (!startProps)

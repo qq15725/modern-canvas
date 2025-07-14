@@ -15,8 +15,8 @@ export abstract class Vector extends EventEmitter {
     super()
   }
 
-  protected _operate(
-    operator: '+' | '-' | '*' | '/' | 'rot' | '==' | '=' | string,
+  operate(
+    operator: '+' | '-' | '*' | '/' | 'rot' | '==' | '=',
     target: VectorLike,
     output?: VectorOperateOutput,
   ): any {
@@ -115,43 +115,47 @@ export abstract class Vector extends EventEmitter {
     return outputObject?.set(outputArray) ?? outputArray
   }
 
-  add(value: VectorLike): this
-  add<T extends VectorOperateOutput>(value: VectorLike, output: T): T
-  add(value: any, output?: any): any {
-    return this._operate('+', value, output)
+  add(value: VectorLike, ...args: number[]): this {
+    if (args.length && typeof value === 'number') {
+      value = [value, ...args]
+    }
+    return this.operate('+', value)
   }
 
-  sub(value: VectorLike): this
-  sub<T extends VectorOperateOutput>(value: VectorLike, output: T): T
-  sub(value: any, output?: any): any {
-    return this._operate('-', value, output)
+  sub(value: VectorLike, ...args: number[]): this {
+    if (args.length && typeof value === 'number') {
+      value = [value, ...args]
+    }
+    return this.operate('-', value)
   }
 
-  multiply(value: VectorLike): this
-  multiply<T extends VectorOperateOutput>(value: VectorLike, output: T): T
-  multiply(value: any, output?: any): any {
-    return this._operate('*', value, output)
+  multiply(value: VectorLike, ...args: number[]): this {
+    if (args.length && typeof value === 'number') {
+      value = [value, ...args]
+    }
+    return this.operate('*', value)
   }
 
-  divide(value: VectorLike): this
-  divide<T extends VectorOperateOutput>(value: VectorLike, output: T): T
-  divide(value: any, output?: any): any {
-    return this._operate('/', value, output)
+  divide(value: VectorLike, ...args: number[]): this {
+    if (args.length && typeof value === 'number') {
+      value = [value, ...args]
+    }
+    return this.operate('/', value)
   }
 
-  rotate(angle: number): this
-  rotate<T extends VectorOperateOutput>(angle: number, output: T): T
-  rotate(angle: any): any { return this._operate('rot', angle) }
+  rotate(angle: number): this {
+    return this.operate('rot', angle)
+  }
 
   set(value: VectorLike, ...args: number[]): this {
     if (args.length && typeof value === 'number') {
       value = [value, ...args]
     }
-    return this._operate('=', value)
+    return this.operate('=', value)
   }
 
   equals(value: VectorLike): boolean {
-    return this._operate('==', value)
+    return this.operate('==', value)
   }
 
   copy(value: VectorLike): this {
@@ -166,11 +170,15 @@ export abstract class Vector extends EventEmitter {
 
   protected _onUpdate(_array: number[]): void { /** override */ }
 
+  toName(): string {
+    return `Vector${this.dim}`
+  }
+
   toArray(): number[] {
     return this._array.slice()
   }
 
-  toName(): string {
-    return `Vector${this.dim}`
+  toJSON(): number[] {
+    return this.toArray()
   }
 }

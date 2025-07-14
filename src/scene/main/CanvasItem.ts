@@ -125,7 +125,7 @@ export class CanvasItem extends TimelineNode {
 
   protected _updateGlobalOpacity(): void {
     this._parentGlobalOpacity = this.getParent<CanvasItem>()?.opacity
-    const globalOpacity = clamp(0, this.opacity, 1)
+    const globalOpacity = clamp(this.opacity, 0, 1)
       * (this._parentGlobalOpacity ?? 1)
     if (this._globalOpacity !== globalOpacity) {
       this._globalOpacity = globalOpacity

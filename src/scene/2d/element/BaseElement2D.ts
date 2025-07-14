@@ -412,10 +412,14 @@ export class BaseElement2D extends Node2D implements Rectangulable {
       case 'pointermove':
       case 'pointerup': {
         if (this.canPointerEvents()) {
-          const { screenX, screenY } = event as PointerInputEvent
+          let { screenX, screenY } = event as PointerInputEvent
           if (screenX && screenY) {
-            const [x, y] = this.globalTransform.inverse().applyToPoint(screenX, screenY)
-            if (this._pointerInput({ x, y }, key)) {
+            const viewport = this.getViewport()
+            if (viewport) {
+              ([screenX, screenY] = viewport.canvasTransform.inverse().applyToPoint(screenX, screenY))
+            }
+            [screenX, screenY] = this.globalTransform.inverse().applyToPoint(screenX, screenY)
+            if (this._pointerInput({ x: screenX, y: screenY }, key)) {
               if (!event.target) {
                 event.target = this
               }
