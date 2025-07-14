@@ -3,7 +3,7 @@ import type { MeasureResult } from 'modern-text'
 import type { BaseElement2D } from './BaseElement2D'
 import { isNone, normalizeText, property } from 'modern-idoc'
 import { Text } from 'modern-text'
-import { CoreObject } from '../../core'
+import { CoreObject } from '../../../core'
 
 export class BaseElement2DText extends CoreObject {
   @property({ fallback: true }) declare enabled: boolean

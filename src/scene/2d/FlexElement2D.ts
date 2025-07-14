@@ -1,11 +1,9 @@
 import type { EventListenerOptions, EventListenerValue, PropertyDeclaration } from 'modern-idoc'
 import type { Node, Rectangulable } from '../main'
-import type { BaseElement2DEventMap, BaseElement2DProperties } from './BaseElement2D'
-import type { FlexElement2DStyleProperties } from './FlexElement2DStyle'
+import type { BaseElement2DEventMap, BaseElement2DProperties, FlexElement2DStyleProperties } from './element'
 import { Direction } from 'yoga-layout/load'
 import { customNode } from '../../core'
-import { BaseElement2D } from './BaseElement2D'
-import { FlexElement2DStyle } from './FlexElement2DStyle'
+import { BaseElement2D, FlexElement2DStyle } from './element'
 import { FlexLayout } from './FlexLayout'
 
 export interface FlexBaseElement2DEventMap extends BaseElement2DEventMap {

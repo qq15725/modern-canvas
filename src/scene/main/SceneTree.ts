@@ -5,12 +5,13 @@ import type {
   WebGLRenderer,
 } from '../../core'
 import type { Node } from './Node'
+import type { Viewport } from './Viewport'
 import { property } from 'modern-idoc'
 import { Color, Input, MainLoop } from '../../core'
 import { QuadUvGeometry } from '../resources'
 import { RenderStack } from './RenderStack'
 import { Timeline } from './Timeline'
-import { Viewport } from './Viewport'
+import { Window } from './Window'
 
 export interface SceneTreeEventMap extends MainLoopEventMap {
   processing: () => void
@@ -39,9 +40,8 @@ export class SceneTree extends MainLoop {
 
   readonly input = new Input()
   readonly renderStack = new RenderStack()
-  readonly root = new Viewport(true).setTree(this)
+  readonly root = new Window(true).setTree(this)
   readonly timeline: Timeline
-  nodes = new Map<string, Node>()
 
   protected _backgroundColor = new Color()
   protected _currentViewport?: Viewport
@@ -80,7 +80,6 @@ export class SceneTree extends MainLoop {
 
   protected _render(renderer: WebGLRenderer): void {
     this.emit('rendering')
-    renderer.program.uniforms.projectionMatrix = this.root.toProjectionArray(true)
     this.renderStack.render(renderer)
     this._renderScreen(renderer)
     this.emit('rendered')

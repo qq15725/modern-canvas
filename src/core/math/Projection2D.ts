@@ -56,15 +56,9 @@ export class Projection2D extends Matrix3 {
     const ty = -sign - (y * d)
 
     this.set([
-      a,
-      0,
-      tx,
-      0,
-      d,
-      ty,
-      0,
-      0,
-      1,
+      a, 0, tx,
+      0, d, ty,
+      0, 0, 1,
     ])
   }
 }

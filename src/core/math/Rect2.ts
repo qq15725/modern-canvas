@@ -53,4 +53,13 @@ export class Rect2 {
   toArray(): number[] {
     return [this.x, this.y, this.width, this.height]
   }
+
+  toJSON(): { x: number, y: number, width: number, height: number } {
+    return {
+      x: this.x,
+      y: this.y,
+      width: this.width,
+      height: this.height,
+    }
+  }
 }

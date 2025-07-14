@@ -2,6 +2,35 @@ import type { WebGLRenderer } from '../WebGLRenderer'
 import type { MaskData, MaskRect } from './WebGLMaskModule'
 import { WebGLModule } from './WebGLModule'
 
+function applyMatrixToPoint(m: number[], x: number, y: number): { x: number, y: number } {
+  const [a, d, g, b, e, h, c, f, i] = m
+  const xp = a * x + b * y + c
+  const yp = d * x + e * y + f
+  const wp = g * x + h * y + i
+  return { x: xp / wp, y: yp / wp }
+}
+
+function transformRectToAABB(m: number[], rect: MaskRect): MaskRect {
+  const { x, y, width, height } = rect
+  const p1 = applyMatrixToPoint(m, x, y)
+  const p2 = applyMatrixToPoint(m, x + width, y)
+  const p3 = applyMatrixToPoint(m, x + width, y + height)
+  const p4 = applyMatrixToPoint(m, x, y + height)
+  const pts = [p1, p2, p3, p4]
+  const xs = pts.map(p => p.x)
+  const ys = pts.map(p => p.y)
+  const minX = Math.min(...xs)
+  const maxX = Math.max(...xs)
+  const minY = Math.min(...ys)
+  const maxY = Math.max(...ys)
+  return {
+    x: minX,
+    y: minY,
+    width: maxX - minX,
+    height: maxY - minY,
+  }
+}
+
 export class WebGLScissorModule extends WebGLModule {
   override install(renderer: WebGLRenderer): void {
     super.install(renderer)
@@ -30,20 +59,25 @@ export class WebGLScissorModule extends WebGLModule {
 
   use(): void {
     const renderer = this._renderer
-    const { pixelRatio, mask, viewport, screen, gl } = renderer
-    const rect = mask.last.mask as MaskRect
-    let y: number
+    const { pixelRatio, mask, viewport, screen, gl, program } = renderer
+    const { worldTransformMatrix } = program.uniforms
+
+    const rect = transformRectToAABB(worldTransformMatrix, mask.last.mask as MaskRect)
+    const { x, y, width, height } = rect
+
+    let scissorY: number
     if (viewport.boundViewport) {
-      y = viewport.boundViewport.height - (rect.height + rect.y) * pixelRatio
+      scissorY = viewport.boundViewport.height - (height + y) * pixelRatio
     }
     else {
-      y = (screen.height - (rect.height + rect.y)) * pixelRatio
+      scissorY = (screen.height - (height + y)) * pixelRatio
     }
+
     gl.scissor(
-      rect.x * pixelRatio,
-      y,
-      rect.width * pixelRatio,
-      rect.height * pixelRatio,
+      x * pixelRatio,
+      scissorY,
+      width * pixelRatio,
+      height * pixelRatio,
     )
   }
 }

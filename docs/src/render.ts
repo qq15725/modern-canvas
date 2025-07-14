@@ -8,25 +8,25 @@ async function init(): Promise<void> {
     debug: true,
     data: [
       {
-        tag: 'Image2D',
-        props: {
-          style: { left: 0, top: 0, width: 100, height: 100 },
-          src: '/example.jpg',
+        meta: {
+          inCanvasIs: 'Image2D',
         },
+        style: { left: 0, top: 0, width: 100, height: 100 },
+        src: '/example.jpg',
       },
       {
-        tag: 'Image2D',
-        props: {
-          style: { left: 100, top: 100, width: 100, height: 100 },
-          src: '/example.jpg',
+        meta: {
+          inCanvasIs: 'Image2D',
         },
+        style: { left: 100, top: 100, width: 100, height: 100 },
+        src: '/example.jpg',
       },
       {
-        tag: 'Text2D',
-        props: {
-          style: { left: 200, top: 200, width: 100, height: 100 },
-          content: '/example.jpg',
+        meta: {
+          inCanvasIs: 'Element2D',
         },
+        style: { left: 200, top: 200, width: 100, height: 100 },
+        content: '/example.jpg',
       },
     ],
     width: 500,
@@ -39,25 +39,25 @@ async function init(): Promise<void> {
     debug: true,
     data: [
       {
-        tag: 'Image2D',
-        props: {
-          style: { left: 0, top: 0, width: 100, height: 100 },
-          src: '/example.jpg',
+        meta: {
+          inCanvasIs: 'Image2D',
         },
+        style: { left: 0, top: 0, width: 100, height: 100 },
+        src: '/example.jpg',
       },
       {
-        tag: 'Image2D',
-        props: {
-          style: { left: 100, top: 100, width: 100, height: 100 },
-          src: '/example.jpg',
+        meta: {
+          inCanvasIs: 'Image2D',
         },
+        style: { left: 100, top: 100, width: 100, height: 100 },
+        src: '/example.jpg',
       },
       {
-        tag: 'Text2D',
-        props: {
-          style: { left: 200, top: 200, width: 100, height: 100 },
-          content: '/example.jpg',
+        meta: {
+          inCanvasIs: 'Element2D',
         },
+        style: { left: 200, top: 200, width: 100, height: 100 },
+        content: '/example.jpg',
       },
     ],
     width: 150,

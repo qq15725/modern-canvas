@@ -1,10 +1,10 @@
 import type { Fill, NormalizedFill, PropertyDeclaration } from 'modern-idoc'
-import type { Texture2D } from '../resources'
+import type { Texture2D } from '../../resources'
 import type { BaseElement2D } from './BaseElement2D'
 import { isNone, normalizeFill, property } from 'modern-idoc'
-import { assets } from '../../asset'
-import { CoreObject, Transform2D } from '../../core'
-import { GradientTexture } from '../resources'
+import { assets } from '../../../asset'
+import { CoreObject, Transform2D } from '../../../core'
+import { GradientTexture } from '../../resources'
 
 export interface BaseElement2DFill extends NormalizedFill {
   //

@@ -8,6 +8,7 @@ import type {
   WebGLRenderer } from '../../core'
 import type { SceneTree } from './SceneTree'
 import type { Viewport } from './Viewport'
+import type { Window } from './Window'
 import { clearUndef, idGenerator, property } from 'modern-idoc'
 import { CoreObject, customNode, customNodes } from '../../core'
 import { Children } from './Children'
@@ -138,8 +139,8 @@ export class Node extends CoreObject {
   get tree(): SceneTree | undefined { return this.getTree() }
   set tree(tree: SceneTree | undefined) { this.setTree(tree) }
   getTree(): SceneTree | undefined { return this._tree }
-  getViewport(): Viewport | undefined { return this._tree?.getCurrentViewport() }
-  getWindow(): Viewport | undefined { return this._tree?.root }
+  getViewport(): Viewport | undefined { return this.parent?.getViewport() ?? this.getWindow() }
+  getWindow(): Window | undefined { return this._tree?.root }
   isInsideTree(): boolean { return Boolean(this._tree) }
   setTree(tree: SceneTree | undefined): this {
     const oldTree = this._tree

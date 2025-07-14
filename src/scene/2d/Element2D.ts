@@ -1,10 +1,8 @@
 import type { EventListenerOptions, EventListenerValue, PropertyDeclaration } from 'modern-idoc'
 import type { Node } from '../main'
-import type { BaseElement2DEventMap, BaseElement2DProperties } from './BaseElement2D'
-import type { Element2DStyleProperties } from './Element2DStyle'
+import type { BaseElement2DEventMap, BaseElement2DProperties, Element2DStyleProperties } from './element'
 import { customNode } from '../../core'
-import { BaseElement2D } from './BaseElement2D'
-import { Element2DStyle } from './Element2DStyle'
+import { BaseElement2D, Element2DStyle } from './element'
 
 export interface Element2DEventMap extends BaseElement2DEventMap {
   //

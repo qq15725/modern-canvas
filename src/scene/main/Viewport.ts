@@ -1,12 +1,12 @@
 import type { EventListenerOptions, EventListenerValue, PropertyDeclaration } from 'modern-idoc'
 import type {
   WebGLFramebufferOptions,
-  WebGLRenderer,
-} from '../../core'
+  WebGLRenderer } from '../../core'
 import type { Rectangulable, RectangulableEventMap } from './interfaces'
 import type { NodeEventMap } from './Node'
 import { property } from 'modern-idoc'
-import { customNode, Projection2D, Rect2 } from '../../core'
+import { customNode, Projection2D, Rect2, Transform2D,
+} from '../../core'
 import { QuadUvGeometry, UvMaterial, ViewportTexture } from '../resources'
 import { Node } from './Node'
 
@@ -32,7 +32,9 @@ export interface ViewportFramebuffer {
 
 @customNode('Viewport')
 export class Viewport extends Node implements Rectangulable {
-  protected _projection = new Projection2D()
+  readonly projection = new Projection2D()
+  readonly canvasTransform = new Transform2D()
+
   protected _framebufferIndex = 0
   protected _framebuffers: ViewportFramebuffer[] = [
     { texture: new ViewportTexture(), needsUpload: false },
@@ -48,11 +50,15 @@ export class Viewport extends Node implements Rectangulable {
   get framebuffer(): ViewportFramebuffer { return this._framebuffers[this._framebufferIndex] }
   get texture(): ViewportTexture { return this.framebuffer.texture }
 
+  override getViewport(): Viewport {
+    return this
+  }
+
   constructor(
     public flipY = false,
   ) {
     super()
-    this._projection.flipY(flipY)
+    this.projection.flipY(flipY)
   }
 
   /** @internal */
@@ -91,13 +97,13 @@ export class Viewport extends Node implements Rectangulable {
       case 'x':
       case 'y':
         this.requestUpload()
-        this._projection.translate(this.x, this.y)
+        this.projection.translate(this.x, this.y)
         this.emit('updateRect')
         break
       case 'width':
       case 'height':
         this.requestUpload()
-        this._projection.resize(this.width, this.height)
+        this.projection.resize(this.width, this.height)
         this.emit('updateRect')
         break
     }
@@ -164,8 +170,11 @@ export class Viewport extends Node implements Rectangulable {
   override render(renderer: WebGLRenderer, next?: () => void): void {
     // render before
     const oldViewport = this._tree?.getCurrentViewport()
+    renderer.program.uniforms.projectionMatrix = this.projection.toArray(true)
+    renderer.program.uniforms.worldTransformMatrix = this.canvasTransform.toArray(true)
     this.activate(renderer)
     renderer.clear()
+    // console.log(renderer.toPixels())
 
     super.render(renderer, next)
 
@@ -182,9 +191,5 @@ export class Viewport extends Node implements Rectangulable {
 
   getRect(): Rect2 {
     return new Rect2(this.x, this.y, this.width, this.height)
-  }
-
-  toProjectionArray(transpose = false): number[] {
-    return this._projection.toArray(transpose)
   }
 }

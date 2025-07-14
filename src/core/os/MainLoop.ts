@@ -20,7 +20,7 @@ export interface MainLoop {
 }
 
 export class MainLoop extends CoreObject {
-  @property({ fallback: 24 }) declare fps: number
+  @property({ fallback: 60 }) declare fps: number
   @property({ fallback: 1 }) declare speed: number
 
   protected _starting = false

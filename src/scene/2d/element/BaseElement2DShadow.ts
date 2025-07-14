@@ -1,8 +1,8 @@
 import type { NormalizedShadow, PropertyDeclaration, Shadow } from 'modern-idoc'
 import type { BaseElement2D } from './BaseElement2D'
 import { isNone, normalizeShadow, property } from 'modern-idoc'
-import { CoreObject } from '../../core'
-import { DropShadowEffect } from '../effects'
+import { CoreObject } from '../../../core'
+import { DropShadowEffect } from '../../effects'
 
 export class BaseElement2DShadow extends CoreObject {
   @property({ fallback: true }) declare enabled: boolean

@@ -283,15 +283,18 @@ export class WebGLRenderer extends Renderer {
     this.extensions.loseContext?.loseContext()
   }
 
-  toPixels(): Uint8ClampedArray {
-    const width = this.gl.drawingBufferWidth
-    const height = this.gl.drawingBufferHeight
+  toPixels(
+    x = 0,
+    y = 0,
+    width = this.gl.drawingBufferWidth,
+    height = this.gl.drawingBufferHeight,
+  ): Uint8ClampedArray {
     const length = width * height * 4
     const row = width * 4
     const end = (height - 1) * row
     const flipedPixels = new Uint8Array(length)
     const pixels = new Uint8ClampedArray(length)
-    this.gl.readPixels(0, 0, width, height, this.gl.RGBA, this.gl.UNSIGNED_BYTE, flipedPixels)
+    this.gl.readPixels(x, y, width, height, this.gl.RGBA, this.gl.UNSIGNED_BYTE, flipedPixels)
     for (let i = 0; i < length; i += row) {
       pixels.set(flipedPixels.subarray(i, i + row), end - i)
     }

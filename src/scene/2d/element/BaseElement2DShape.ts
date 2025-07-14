@@ -8,7 +8,7 @@ import {
   svgToDom,
   svgToPath2DSet,
 } from 'modern-path2d'
-import { CoreObject } from '../../core'
+import { CoreObject } from '../../../core'
 
 export class BaseElement2DShape extends CoreObject {
   @property({ fallback: true }) declare enabled: boolean

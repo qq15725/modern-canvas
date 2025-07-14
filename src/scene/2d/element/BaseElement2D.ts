@@ -18,19 +18,19 @@ import type {
   PointerInputEvent,
   Transform2D,
   WebGLBlendMode,
-} from '../../core'
-import type { CanvasBatchable, CanvasItemEventMap, Node, Rectangulable } from '../main'
-import type { Node2DProperties } from './Node2D'
-import { clearUndef,
-} from 'modern-idoc'
+} from '../../../core'
+import type { CanvasBatchable, CanvasItemEventMap, Node, Rectangulable } from '../../main'
+import type { Node2DProperties } from '../Node2D'
+import { clearUndef } from 'modern-idoc'
 import {
   customNode,
   DEG_TO_RAD,
   Rect2,
   Vector2,
-} from '../../core'
-import { parseCSSFilter, parseCSSTransform, parseCSSTransformOrigin } from '../../css'
-import { MaskEffect } from '../effects'
+} from '../../../core'
+import { parseCSSFilter, parseCSSTransform, parseCSSTransformOrigin } from '../../../css'
+import { MaskEffect } from '../../effects'
+import { Node2D } from '../Node2D'
 import { BaseElement2DBackground } from './BaseElement2DBackground'
 import { BaseElement2DFill } from './BaseElement2DFill'
 import { BaseElement2DForeground } from './BaseElement2DForeground'
@@ -39,7 +39,6 @@ import { BaseElement2DShadow } from './BaseElement2DShadow'
 import { BaseElement2DShape } from './BaseElement2DShape'
 import { BaseElement2DStyle } from './BaseElement2DStyle'
 import { BaseElement2DText } from './BaseElement2DText'
-import { Node2D } from './Node2D'
 
 export interface BaseElement2DEventMap extends CanvasItemEventMap {
   updateStyleProperty: (key: string, value: any, oldValue: any, declaration?: PropertyDeclaration) => void
@@ -282,15 +281,48 @@ export class BaseElement2D extends Node2D implements Rectangulable {
     )
   }
 
+  // protected _rectsOverlap(r1: any, r2: any): boolean {
+  //   return (
+  //     r1.x < r2.x + r2.width
+  //     && r1.x + r1.width > r2.x
+  //     && r1.y < r2.y + r2.height
+  //     && r1.y + r1.height > r2.y
+  //   )
+  // }
+
+  // TODO
+  // override isVisibleInTree(): boolean {
+  //   if (this._tree) {
+  //     const root = this._tree.root
+  //     const camera = root.canvasTransform.inverse()
+  //     const { x, y, width, height } = root
+  //     const p1 = camera.applyToPoint(x, y)
+  //     const p2 = camera.applyToPoint(x + width, y)
+  //     const p3 = camera.applyToPoint(x + width, y + height)
+  //     const p4 = camera.applyToPoint(x, y + height)
+  //     const pts = [p1, p2, p3, p4]
+  //     const xs = pts.map(p => p[0])
+  //     const ys = pts.map(p => p[1])
+  //     const minX = Math.min(...xs)
+  //     const maxX = Math.max(...xs)
+  //     const minY = Math.min(...ys)
+  //     const maxY = Math.max(...ys)
+  //     const rect2 = {
+  //       x: minX,
+  //       y: minY,
+  //       width: maxX - minX,
+  //       height: maxY - minY,
+  //     }
+  //     if (!this._rectsOverlap(rect2, this.getRect())) {
+  //       return false
+  //     }
+  //   }
+  //   return super.isVisibleInTree()
+  // }
+
   protected _updateOverflow(): void {
     if (this.style.overflow === 'hidden') {
-      const rect = this.getRect()
-      this.mask = {
-        x: rect.x,
-        y: rect.y,
-        width: rect.width,
-        height: rect.height,
-      }
+      this.mask = this.getRect().toJSON()
     }
     else {
       this.mask = undefined

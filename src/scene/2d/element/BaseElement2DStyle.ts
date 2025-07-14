@@ -1,6 +1,6 @@
 import type { FullStyle, NormalizedElementStyle } from 'modern-idoc'
 import { defineProperty, getDefaultStyle } from 'modern-idoc'
-import { Resource } from '../../core'
+import { Resource } from '../../../core'
 
 export interface BaseElement2DStyleProperties extends Omit<FullStyle, 'left' | 'top' | 'width' | 'height'> {
   left: number
