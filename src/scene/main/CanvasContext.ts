@@ -228,9 +228,9 @@ export class CanvasContext extends Path2D {
       this.buildUvs(0, vertices, uvs, current.texture, current.uvTransform)
 
       batchables.push({
-        vertices,
-        indices,
-        uvs,
+        vertices: new Float32Array(vertices),
+        indices: new Float32Array(indices),
+        uvs: new Float32Array(uvs),
         texture: current.texture,
         type: current.type,
         disableWrapMode: current.disableWrapMode,

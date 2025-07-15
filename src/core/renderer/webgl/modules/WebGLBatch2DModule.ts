@@ -5,9 +5,9 @@ import { WebGLModule } from './WebGLModule'
 import { WebGLState } from './WebGLStateModule'
 
 export interface Batchable2D {
-  vertices: number[]
-  indices: number[]
-  uvs?: number[]
+  vertices: Float32Array
+  indices: Float32Array
+  uvs?: Float32Array
   texture?: WebGLTexture
   backgroundColor?: number
   modulate?: number

@@ -114,7 +114,7 @@ export class Node2D extends CanvasItem {
     this.requestRelayout()
   }
 
-  protected _transformVertices(vertices: number[], vertTransform?: VertTransform): number[] {
+  protected _transformVertices(vertices: Float32Array, vertTransform?: VertTransform): Float32Array {
     let a, c, tx, b, d, ty
     if (vertTransform) {
       const globalTransform = this.globalTransform.clone()
