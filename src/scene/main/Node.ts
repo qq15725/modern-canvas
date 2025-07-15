@@ -75,11 +75,12 @@ export class Node extends CoreObject {
 
   @property({ fallback: idGenerator() }) declare id: string
   @property({ fallback: idGenerator() }) declare name: string
-  @property({ fallback: 'inherit' }) declare processMode: ProcessMode
-  @property({ fallback: 'default' }) declare processSortMode: ProcessSortMode
-  @property({ fallback: 'inherit' }) declare renderMode: RenderMode
-  @property({ fallback: 'default' }) declare internalMode: InternalMode
   @property({ default: () => ({}) }) declare meta: Record<string, any>
+
+  @property({ protected: true, fallback: 'inherit' }) declare processMode: ProcessMode
+  @property({ protected: true, fallback: 'default' }) declare processSortMode: ProcessSortMode
+  @property({ protected: true, fallback: 'inherit' }) declare renderMode: RenderMode
+  @property({ protected: true, fallback: 'default' }) declare internalMode: InternalMode
   @property({ protected: true }) declare mask?: Maskable
 
   protected _readyed = false
