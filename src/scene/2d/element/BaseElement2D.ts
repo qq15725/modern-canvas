@@ -338,7 +338,12 @@ export class BaseElement2D extends Node2D implements Rectangulable {
 
     if (this._background.canDraw()) {
       this._tree?.log(this.name, 'background drawing')
-      this._shape.drawRect()
+      if (this._background.fillWithShape) {
+        this._shape.draw()
+      }
+      else {
+        this._shape.drawRect()
+      }
       this._background.draw()
     }
 
@@ -356,7 +361,12 @@ export class BaseElement2D extends Node2D implements Rectangulable {
 
     if (this._foreground.canDraw()) {
       this._tree?.log(this.name, 'foreground drawing')
-      this._shape.drawRect()
+      if (this._foreground.fillWithShape) {
+        this._shape.draw()
+      }
+      else {
+        this._shape.drawRect()
+      }
       this._foreground.draw()
     }
 
