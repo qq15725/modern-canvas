@@ -11,8 +11,6 @@ export interface Batchable2D {
   texture?: WebGLTexture
   backgroundColor?: number
   modulate?: number
-  colorMatrix?: ArrayLike<number>
-  colorMatrixOffset?: ArrayLike<number>
   blendMode?: WebGLBlendMode
   disableWrapMode?: boolean
 }
@@ -41,13 +39,6 @@ export class WebGLBatch2DModule extends WebGLModule {
 
   protected _defaultModulate = 0xFFFFFFFF
   protected _defaultBackgroundColor = 0x00000000
-  protected _defaultColorMatrixOffset = [0, 0, 0, 0]
-  protected _defaultColorMatrix = [
-    1, 0, 0, 0,
-    0, 1, 0, 0,
-    0, 0, 1, 0,
-    0, 0, 0, 1,
-  ]
 
   protected _batchables: Batchable2D[] = []
   protected _vertexCount = 0
@@ -62,12 +53,10 @@ export class WebGLBatch2DModule extends WebGLModule {
     aUv: { size: 2, normalized: false, type: 'float' }, // 2
     aModulate: { size: 4, normalized: true, type: 'unsigned_byte' }, // 1
     aBackgroundColor: { size: 4, normalized: true, type: 'unsigned_byte' }, // 1
-    aDisableWrapMode: { size: 4, normalized: true, type: 'float' }, // 4 只是为了凑4的整数倍
-    aColorMatrixOffset: { size: 4, normalized: false, type: 'float' }, // 4 TODO bug
-    aColorMatrix: { size: 4, normalized: false, type: 'float' }, // 16 TODO bug
+    aDisableWrapMode: { size: 4, normalized: true, type: 'unsigned_byte' }, // 1
   }
 
-  protected _vertexSize = 1 + 2 + 2 + 1 + 1 + 4 + 4 + 16
+  protected _vertexSize = 1 + 2 + 2 + 1 + 1 + 1
 
   protected _getShader(maxTextureUnits: number): Shader {
     let shader = this._shaders.get(maxTextureUnits)
@@ -87,8 +76,6 @@ attribute vec2 aPosition;
 attribute vec2 aUv;
 attribute vec4 aModulate;
 attribute vec4 aBackgroundColor;
-attribute mat4 aColorMatrix;
-attribute vec4 aColorMatrixOffset;
 attribute vec4 aDisableWrapMode;
 
 uniform mat3 projectionMatrix;
@@ -99,8 +86,6 @@ varying float vTextureId;
 varying vec2 vUv;
 varying vec4 vModulate;
 varying vec4 vBackgroundColor;
-varying mat4 vColorMatrix;
-varying vec4 vColorMatrixOffset;
 varying vec4 vDisableWrapMode;
 
 void main(void) {
@@ -115,8 +100,6 @@ void main(void) {
   vUv = aUv;
   vModulate = aModulate * modulate;
   vBackgroundColor = aBackgroundColor;
-  vColorMatrix = aColorMatrix;
-  vColorMatrixOffset = aColorMatrixOffset;
   vDisableWrapMode = aDisableWrapMode;
 }`,
       frag: `precision highp float;
@@ -124,8 +107,6 @@ varying float vTextureId;
 varying vec2 vUv;
 varying vec4 vModulate;
 varying vec4 vBackgroundColor;
-varying mat4 vColorMatrix;
-varying vec4 vColorMatrixOffset;
 varying vec4 vDisableWrapMode;
 
 uniform sampler2D samplers[${maxTextureUnits}];
@@ -154,8 +135,6 @@ void main(void) {
   color += (1.0 - color.a) * vBackgroundColor;
   if (color.a > 0.0) {
     color *= vModulate;
-    color = vColorMatrix * color;
-    color += vColorMatrixOffset;
   }
   gl_FragColor = color;
 }`,
@@ -286,13 +265,9 @@ void main(void) {
             texture,
             modulate = this._defaultModulate,
             backgroundColor = this._defaultBackgroundColor,
-            colorMatrix = this._defaultColorMatrix,
-            colorMatrixOffset = this._defaultColorMatrixOffset,
             blendMode = WebGLBlendMode.NORMAL,
             disableWrapMode = false,
           } = batchables[i]
-
-          const textureLocation = (texture ? textureLocationMap.get(texture) : -1) ?? -1
 
           if (start < i && drawCall.blendMode !== blendMode) {
             drawCall.count = iIndex - drawCall.first
@@ -305,24 +280,18 @@ void main(void) {
 
           const iIndexStart = aIndex / this._vertexSize
 
+          const textureLocation = (texture ? textureLocationMap.get(texture) : 255) ?? 255
+          const disableWrapModeInt = disableWrapMode ? 1 : 0
+
           for (let len = vertices.length, i = 0; i < len; i += 2) {
             float32View[aIndex++] = textureLocation
             float32View[aIndex++] = vertices[i]
             float32View[aIndex++] = vertices[i + 1]
-            float32View[aIndex++] = uvs[i] ?? 0
-            float32View[aIndex++] = uvs[i + 1] ?? 0
+            float32View[aIndex++] = uvs[i]
+            float32View[aIndex++] = uvs[i + 1]
             uint32View[aIndex++] = modulate
             uint32View[aIndex++] = backgroundColor
-            float32View[aIndex++] = disableWrapMode ? 1 : 0
-            float32View[aIndex++] = 0
-            float32View[aIndex++] = 0
-            float32View[aIndex++] = 0
-            for (let i = 0; i < 4; i++) {
-              float32View[aIndex++] = colorMatrixOffset[i] ?? 0
-            }
-            for (let i = 0; i < 16; i++) {
-              float32View[aIndex++] = colorMatrix[i] ?? 0
-            }
+            uint32View[aIndex++] = disableWrapModeInt
           }
 
           for (let len = indices.length, i = 0; i < len; i++) {

@@ -28,7 +28,7 @@ import {
   Rect2,
   Vector2,
 } from '../../../core'
-import { parseCSSFilter, parseCSSTransform, parseCSSTransformOrigin } from '../../../css'
+import { parseCSSTransform, parseCSSTransformOrigin } from '../../../css'
 import { MaskEffect } from '../../effects'
 import { Node2D } from '../Node2D'
 import { BaseElement2DBackground } from './BaseElement2DBackground'
@@ -383,12 +383,13 @@ export class BaseElement2D extends Node2D implements Rectangulable {
   }
 
   protected _repaint(batchables: CanvasBatchable[]): CanvasBatchable[] {
-    const colorMatrix = parseCSSFilter(this.style.filter)
+    // TODO style.filter 支持
+    // const colorMatrix = parseCSSFilter(this.style.filter)
     return super._repaint(batchables).map((batchable) => {
       return {
         ...batchable,
-        colorMatrix: colorMatrix.toMatrix4().toArray(true),
-        colorMatrixOffset: colorMatrix.toVector4().toArray(),
+        // colorMatrix: colorMatrix.toMatrix4().toArray(true),
+        // colorMatrixOffset: colorMatrix.toVector4().toArray(),
       }
     })
   }

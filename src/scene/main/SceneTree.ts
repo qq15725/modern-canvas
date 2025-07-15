@@ -34,7 +34,7 @@ export interface SceneTree {
 }
 
 export class SceneTree extends MainLoop {
-  @property({ fallback: false }) declare processPaused: boolean
+  @property({ protected: true, fallback: false }) declare processPaused: boolean
   @property() declare backgroundColor: ColorValue | undefined
   @property({ protected: true, fallback: false }) declare debug: boolean
 
