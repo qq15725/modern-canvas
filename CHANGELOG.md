@@ -1,3 +1,17 @@
+## [0.7.2](https://github.com/qq15725/modern-canvas/compare/v0.7.1...v0.7.2) (2025-07-15)
+
+
+### Bug Fixes
+
+* fillWithShape ([1352682](https://github.com/qq15725/modern-canvas/commit/1352682c6be837863d5b3e9388c6836ff7308eb2))
+
+
+### Features
+
+* up deps ([b3ac886](https://github.com/qq15725/modern-canvas/commit/b3ac88634524e6963f1d9a282691a94f6cdf3b7e))
+
+
+
 ## [0.7.1](https://github.com/qq15725/modern-canvas/compare/v0.7.0...v0.7.1) (2025-07-14)
 
 
