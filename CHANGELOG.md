@@ -1,3 +1,7 @@
+## [0.4.40-patch.1](https://github.com/qq15725/modern-canvas/compare/v0.4.40...v0.4.40-patch.1) (2025-07-17)
+
+
+
 ## [0.4.40](https://github.com/qq15725/modern-canvas/compare/v0.4.39...v0.4.40) (2025-05-15)
 
 
