@@ -318,12 +318,13 @@ export class Input extends EventEmitter {
   mapPositionToPoint(point: { x: number, y: number }, x: number, y: number): void {
     if (!this.target)
       return
-    const width = Number(this.target.getAttribute('width')) || 0
-    const height = Number(this.target.getAttribute('height')) || 0
-    const pixelRatio = Number(this.target.getAttribute('data-pixel-ratio')) || 1
-    const rect = this.target.isConnected
+    const clientRect = this.target.isConnected
       ? this.target.getBoundingClientRect()
-      : { x: 0, y: 0, width, height, left: 0, top: 0 }
+      : undefined
+    const pixelRatio = Number(this.target.getAttribute('data-pixel-ratio')) || 1
+    const width = Number(this.target.getAttribute('width')) || (clientRect ? clientRect.width * pixelRatio : 0)
+    const height = Number(this.target.getAttribute('height')) || (clientRect ? clientRect.height * pixelRatio : 0)
+    const rect = clientRect ?? { x: 0, y: 0, width, height, left: 0, top: 0 }
     const multiplier = 1.0 / pixelRatio
     point.x = ((x - rect.left) * (width / rect.width)) * multiplier
     point.y = ((y - rect.top) * (height / rect.height)) * multiplier

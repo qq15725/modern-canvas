@@ -1,7 +1,7 @@
-import type { PropertyDeclaration, Text as TextProperties } from 'modern-idoc'
+import type { PropertyDeclaration, TextContent, Text as TextProperties } from 'modern-idoc'
 import type { MeasureResult } from 'modern-text'
 import type { BaseElement2D } from './BaseElement2D'
-import { isNone, normalizeText, property } from 'modern-idoc'
+import { isNone, normalizeText, normalizeTextContent, property } from 'modern-idoc'
 import { Text } from 'modern-text'
 import { CoreObject } from '../../../core'
 
@@ -53,7 +53,6 @@ export class BaseElement2DText extends CoreObject {
       case 'fonts':
       case 'fill':
       case 'outline':
-      case 'split':
         this.parent.requestRedraw()
         break
     }
@@ -67,6 +66,10 @@ export class BaseElement2DText extends CoreObject {
       ...this.parent.style.toJSON() as any,
     }
     this.base.requestUpdate()
+  }
+
+  setContent(content: TextContent): void {
+    this.content = normalizeTextContent(content)
   }
 
   measure(): MeasureResult {
@@ -93,8 +96,6 @@ export class BaseElement2DText extends CoreObject {
       pathSet.paths.forEach((path) => {
         ctx.addPath(path)
         ctx.style = { ...path.style }
-        ctx.fillStyle = undefined
-        ctx.strokeStyle = undefined
         ctx.fill()
       })
     })

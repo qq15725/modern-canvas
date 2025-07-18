@@ -87,7 +87,7 @@ export class CanvasContext extends Path2D {
       },
     })
 
-    super.reset()
+    this.reset()
   }
 
   fillRect(x: number, y: number, width: number, height: number): void {
@@ -132,7 +132,7 @@ export class CanvasContext extends Path2D {
       vertTransform: this.vertTransform,
     })
 
-    super.reset()
+    this.resetStatus()
   }
 
   override copy(source: CanvasContext): this {
@@ -149,7 +149,7 @@ export class CanvasContext extends Path2D {
     return this
   }
 
-  override reset(): this {
+  resetStatus(): void {
     super.reset()
     this.strokeStyle = undefined
     this.fillStyle = undefined
@@ -159,6 +159,10 @@ export class CanvasContext extends Path2D {
     this.lineJoin = undefined
     this.lineWidth = undefined
     this.miterLimit = undefined
+  }
+
+  override reset(): this {
+    this.resetStatus()
     this._draws.length = 0
     return this
   }
