@@ -87,7 +87,7 @@ export class CanvasContext extends Path2D {
       },
     })
 
-    this.reset()
+    this.resetStatus()
   }
 
   fillRect(x: number, y: number, width: number, height: number): void {
