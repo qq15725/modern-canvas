@@ -1,3 +1,12 @@
+## [0.7.8](https://github.com/qq15725/modern-canvas/compare/v0.7.7...v0.7.8) (2025-07-22)
+
+
+### Bug Fixes
+
+* text and path ([e3967d8](https://github.com/qq15725/modern-canvas/commit/e3967d88189c5ec7c6aa101241563fb37c13d895))
+
+
+
 ## [0.7.7](https://github.com/qq15725/modern-canvas/compare/v0.7.6...v0.7.7) (2025-07-19)
 
 
