@@ -71,12 +71,12 @@
     "earcut": "^3.0.2",
     "modern-font": "^0.4.1",
     "modern-idoc": "^0.8.6",
-    "modern-path2d": "^1.4.7",
-    "modern-text": "^1.7.3",
+    "modern-path2d": "^1.4.8",
+    "modern-text": "^1.7.4",
     "yoga-layout": "^3.2.1"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^4.17.0",
+    "@antfu/eslint-config": "^4.18.0",
     "@types/earcut": "^3.0.0",
     "@types/node": "^24.1.0",
     "bumpp": "^10.2.0",

@@ -43,6 +43,7 @@ export class BaseElement2DOutline extends BaseElement2DFill {
     ctx.lineWidth = this.width || 1
     ctx.uvTransform = uvTransform
     ctx.strokeStyle = this._texture ?? this.color
+    ctx.strokeAlignment = 0
     ctx.stroke({ disableWrapMode })
   }
 }

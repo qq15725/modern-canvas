@@ -29,6 +29,7 @@ export interface FillDraw extends Partial<CanvasBatchable> {
 export class CanvasContext extends Path2D {
   fillStyle?: ColorValue | Texture2D
   strokeStyle?: ColorValue | Texture2D
+  strokeAlignment?: number
   lineCap?: LineCap
   lineJoin?: LineJoin
   lineWidth?: number
@@ -79,7 +80,7 @@ export class CanvasContext extends Path2D {
       uvTransform: this.uvTransform,
       vertTransform: this.vertTransform,
       style: {
-        alignment: 0.5,
+        alignment: this.strokeAlignment ?? 0.5,
         cap: this.lineCap ?? 'butt',
         join: this.lineJoin ?? 'miter',
         width: this.lineWidth ?? 1,
@@ -141,6 +142,7 @@ export class CanvasContext extends Path2D {
     this.fillStyle = source.fillStyle
     this.uvTransform = source.uvTransform
     this.vertTransform = source.vertTransform
+    this.strokeAlignment = source.strokeAlignment
     this.lineCap = source.lineCap
     this.lineJoin = source.lineJoin
     this.lineWidth = source.lineWidth
@@ -155,6 +157,7 @@ export class CanvasContext extends Path2D {
     this.fillStyle = undefined
     this.uvTransform = undefined
     this.vertTransform = undefined
+    this.strokeAlignment = undefined
     this.lineCap = undefined
     this.lineJoin = undefined
     this.lineWidth = undefined
