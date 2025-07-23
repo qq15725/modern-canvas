@@ -1,3 +1,12 @@
+## [0.7.9](https://github.com/qq15725/modern-canvas/compare/v0.7.8...v0.7.9) (2025-07-23)
+
+
+### Bug Fixes
+
+* outline ([dfefbd7](https://github.com/qq15725/modern-canvas/commit/dfefbd76d053f6a2e3d7e1d1d1600b4fffafd3ea))
+
+
+
 ## [0.7.8](https://github.com/qq15725/modern-canvas/compare/v0.7.7...v0.7.8) (2025-07-22)
 
 
