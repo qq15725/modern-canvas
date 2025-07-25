@@ -1,3 +1,7 @@
+## [0.7.10](https://github.com/qq15725/modern-canvas/compare/v0.7.9...v0.7.10) (2025-07-25)
+
+
+
 ## [0.7.9](https://github.com/qq15725/modern-canvas/compare/v0.7.8...v0.7.9) (2025-07-23)
 
 
