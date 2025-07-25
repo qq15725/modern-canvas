@@ -184,9 +184,6 @@ export class BaseElement2D extends Node2D implements Rectangulable {
       case 'maskImage':
         this._updateMaskImage()
         break
-      case 'borderRadius':
-        this.requestRedraw()
-        break
       case 'backgroundColor':
         this.background.color = this.style.backgroundColor
         break
@@ -204,6 +201,10 @@ export class BaseElement2D extends Node2D implements Rectangulable {
       case 'borderColor':
       case 'outlineColor':
         this.outline.color = value
+        break
+      case 'borderRadius':
+      default:
+        this.requestRedraw()
         break
     }
   }
