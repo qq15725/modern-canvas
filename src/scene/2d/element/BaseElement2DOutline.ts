@@ -6,6 +6,8 @@ export class BaseElement2DOutline extends BaseElement2DFill {
   @property({ fallback: '#00000000' }) declare color: NormalizedOutline['color']
   @property({ fallback: 0 }) declare width: NormalizedOutline['width']
   @property({ fallback: 'solid' }) declare style: NormalizedOutline['style']
+  @property({ fallback: 'butt' }) declare lineCap: NormalizedOutline['lineCap']
+  @property({ fallback: 'miter' }) declare lineJoin: NormalizedOutline['lineJoin']
 
   override setProperties(properties?: Outline): this {
     return super._setProperties(
@@ -21,6 +23,8 @@ export class BaseElement2DOutline extends BaseElement2DFill {
     switch (key) {
       case 'width':
       case 'style':
+      case 'lineCap':
+      case 'lineJoin':
       case 'enabled':
         this.parent.requestRedraw()
         break
@@ -43,7 +47,8 @@ export class BaseElement2DOutline extends BaseElement2DFill {
     ctx.lineWidth = this.width || 1
     ctx.uvTransform = uvTransform
     ctx.strokeStyle = this._texture ?? this.color
-    ctx.strokeAlignment = 0
+    ctx.lineCap = this.lineCap
+    ctx.lineJoin = this.lineJoin
     ctx.stroke({ disableWrapMode })
   }
 }
