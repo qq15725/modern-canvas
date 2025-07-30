@@ -2,6 +2,7 @@ import type { EventListenerValue } from 'modern-idoc'
 import type { InputEvent, InputEventKey, KeyboardInputEvent, PointerInputEvent, WheelInputEvent } from '../../core'
 import type { Node } from '../main'
 import type { Node2DEventMap, Node2DProperties } from './Node2D'
+import { property } from 'modern-idoc'
 import { clamp, customNode, Vector2 } from '../../core'
 import { Node2D } from './Node2D'
 
@@ -33,8 +34,8 @@ export class Camera2D extends Node2D {
   readonly maxZoom = new Vector2(6, 6)
   readonly minZoom = new Vector2(0.1, 0.1)
 
-  protected _spaceKey = false
-  protected _grabbing = false
+  @property({ protected: true, fallback: false }) declare spaceKey: boolean
+  @property({ protected: true, fallback: false }) declare grabbing: boolean
   protected _screenOffset = { x: 0, y: 0 }
 
   constructor(properties?: Partial<Camera2DProperties>, nodes: Node[] = []) {
@@ -66,30 +67,30 @@ export class Camera2D extends Node2D {
 
     if (key === 'keydown') {
       const e = event as KeyboardInputEvent
-      if (!this._spaceKey && e.code === 'Space') {
+      if (!this.spaceKey && e.code === 'Space') {
         e.cursor = 'grab'
-        this._spaceKey = true
+        this.spaceKey = true
       }
     }
     else if (key === 'keyup') {
       const e = event as KeyboardInputEvent
       if (e.code === 'Space') {
         e.cursor = 'default'
-        this._spaceKey = false
-        this._grabbing = false
+        this.spaceKey = false
+        this.grabbing = false
       }
     }
     else if (key === 'pointerdown') {
       const e = event as PointerInputEvent
-      if (!this._grabbing && this._spaceKey) {
-        this._grabbing = true
+      if (!this.grabbing && this.spaceKey) {
+        this.grabbing = true
         e.cursor = 'grabbing'
         this._screenOffset = { x: e.screenX, y: e.screenY }
       }
     }
     else if (key === 'pointermove') {
       const e = event as PointerInputEvent
-      if (this._grabbing) {
+      if (this.grabbing) {
         this.position.add(
           -(this._screenOffset.x - e.screenX),
           -(this._screenOffset.y - e.screenY),
@@ -99,8 +100,8 @@ export class Camera2D extends Node2D {
     }
     else if (key === 'pointerup') {
       const e = event as PointerInputEvent
-      if (this._grabbing) {
-        this._grabbing = false
+      if (this.grabbing) {
+        this.grabbing = false
         e.cursor = 'grab'
       }
     }
