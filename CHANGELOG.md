@@ -1,3 +1,15 @@
+## [0.7.11](https://github.com/qq15725/modern-canvas/compare/v0.7.10...v0.7.11) (2025-07-30)
+
+
+### Features
+
+* Camera2D drag move with space keydown ([3715629](https://github.com/qq15725/modern-canvas/commit/3715629c8980e22f3fdd8bb5817d173597b33126))
+* Camera2D drag move with space keydown ([b70c7c1](https://github.com/qq15725/modern-canvas/commit/b70c7c17524a21dce5bc9359d747d9c74da4a1d3))
+* Camera2D drag move with space keydown ([d22a6d9](https://github.com/qq15725/modern-canvas/commit/d22a6d920b7d442e1515516d1709fc2afd67b1d0))
+* outline lineCap lineJoin ([5d690f5](https://github.com/qq15725/modern-canvas/commit/5d690f5c861f2b868c2147b8bc44efbf62b9d304))
+
+
+
 ## [0.7.10](https://github.com/qq15725/modern-canvas/compare/v0.7.9...v0.7.10) (2025-07-25)
 
 
