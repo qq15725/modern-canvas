@@ -76,6 +76,7 @@ export class Camera2D extends Node2D {
       if (e.code === 'Space') {
         e.cursor = 'default'
         this._spaceKey = false
+        this._grabbing = false
       }
     }
     else if (key === 'pointerdown') {
