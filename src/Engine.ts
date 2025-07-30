@@ -139,6 +139,9 @@ export class Engine extends SceneTree {
         'pointermove',
         'pointerup',
         'wheel',
+        'keydown',
+        'keypress',
+        'keyup',
       ].forEach((key) => {
         this.input.on(key, (event: any) => {
           this.root.input(event, key as any)

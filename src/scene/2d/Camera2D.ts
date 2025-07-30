@@ -1,5 +1,5 @@
 import type { EventListenerValue } from 'modern-idoc'
-import type { InputEvent, InputEventKey, WheelInputEvent } from '../../core'
+import type { InputEvent, InputEventKey, KeyboardInputEvent, PointerInputEvent, WheelInputEvent } from '../../core'
 import type { Node } from '../main'
 import type { Node2DEventMap, Node2DProperties } from './Node2D'
 import { clamp, customNode, Vector2 } from '../../core'
@@ -33,6 +33,10 @@ export class Camera2D extends Node2D {
   readonly maxZoom = new Vector2(6, 6)
   readonly minZoom = new Vector2(0.1, 0.1)
 
+  protected _spaceKey = false
+  protected _grabbing = false
+  protected _screenOffset = { x: 0, y: 0 }
+
   constructor(properties?: Partial<Camera2DProperties>, nodes: Node[] = []) {
     super()
 
@@ -60,29 +64,70 @@ export class Camera2D extends Node2D {
   protected override _input(event: InputEvent, key: InputEventKey): void {
     super._input(event, key)
 
-    if (key === 'wheel') {
-      const e = event as unknown as WheelInputEvent
-
-      if (e.ctrlKey) {
-        const isTouchPad = (e as any).wheelDeltaY
-          ? Math.abs(Math.abs((e as any).wheelDeltaY) - Math.abs(3 * e.deltaY)) < 3
-          : e.deltaMode === 0
-
-        if (!isTouchPad) {
-          e.preventDefault()
-          const oldZoom = this.zoom.x
-          this.addZoom(e.deltaY * -0.015)
-          const ratio = 1 - this.zoom.x / oldZoom
-          this.position.add(
-            (e.screenX - this.position.x) * ratio,
-            (e.screenY - this.position.y) * ratio,
-          )
-        }
+    if (key === 'keydown') {
+      const e = event as KeyboardInputEvent
+      if (!this._spaceKey && e.code === 'Space') {
+        e.cursor = 'grab'
+        this._spaceKey = true
       }
-      else {
+    }
+    else if (key === 'keyup') {
+      const e = event as KeyboardInputEvent
+      if (e.code === 'Space') {
+        e.cursor = 'default'
+        this._spaceKey = false
+      }
+    }
+    else if (key === 'pointerdown') {
+      const e = event as PointerInputEvent
+      if (!this._grabbing && this._spaceKey) {
+        this._grabbing = true
+        e.cursor = 'grabbing'
+        this._screenOffset = { x: e.screenX, y: e.screenY }
+      }
+    }
+    else if (key === 'pointermove') {
+      const e = event as PointerInputEvent
+      if (this._grabbing) {
+        this.position.add(
+          -(this._screenOffset.x - e.screenX),
+          -(this._screenOffset.y - e.screenY),
+        )
+        this._screenOffset = { x: e.screenX, y: e.screenY }
+      }
+    }
+    else if (key === 'pointerup') {
+      const e = event as PointerInputEvent
+      if (this._grabbing) {
+        this._grabbing = false
+        e.cursor = 'grab'
+      }
+    }
+    else if (key === 'wheel') {
+      this._onWheel(event as WheelInputEvent)
+    }
+  }
+
+  protected _onWheel(e: WheelInputEvent): void {
+    if (e.ctrlKey) {
+      const isTouchPad = (e as any).wheelDeltaY
+        ? Math.abs(Math.abs((e as any).wheelDeltaY) - Math.abs(3 * e.deltaY)) < 3
+        : e.deltaMode === 0
+
+      if (!isTouchPad) {
         e.preventDefault()
-        this.position.add(-e.deltaX, -e.deltaY)
+        const oldZoom = this.zoom.x
+        this.addZoom(e.deltaY * -0.015)
+        const ratio = 1 - this.zoom.x / oldZoom
+        this.position.add(
+          (e.screenX - this.position.x) * ratio,
+          (e.screenY - this.position.y) * ratio,
+        )
       }
+    }
+    else {
+      e.preventDefault()
+      this.position.add(-e.deltaX, -e.deltaY)
     }
   }
 

@@ -1,6 +1,7 @@
 export * from './Cursor'
 export * from './Input'
 export * from './InputEvent'
+export * from './KeyboardInputEvent'
 export * from './MouseInputEvent'
 export * from './PointerInputEvent'
 export * from './WheelInputEvent'

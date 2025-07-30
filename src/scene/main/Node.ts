@@ -357,9 +357,15 @@ export class Node extends CoreObject {
   }
 
   input(event: InputEvent, key: InputEventKey): void {
+    if (event.propagationStopped) {
+      return
+    }
     const array = this._children.internal
     for (let i = array.length - 1; i >= 0; i--) {
       array[i].input(event, key)
+    }
+    if (event.propagationStopped) {
+      return
     }
     this._input(event, key)
   }

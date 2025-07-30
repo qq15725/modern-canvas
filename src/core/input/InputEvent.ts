@@ -1,55 +1,50 @@
+import type { Cursor } from './Cursor'
+
 export class InputEvent<N extends UIEvent = UIEvent> implements UIEvent {
-  bubbles = true
-  readonly cancelable = false
-  which!: number
-  cancelBubble = true
-  returnValue!: boolean
-  srcElement!: EventTarget
-  readonly composed = false
-  currentTarget!: any
+  declare nativeEvent: N
+  cursor?: Cursor
+
+  // Event
+  bubbles = false
+  cancelBubble = false
+  cancelable = false
+  composed = false
+  declare currentTarget: any
   defaultPrevented = false
   eventPhase = InputEvent.prototype.NONE
-  isTrusted!: boolean
-  target!: any
-  timeStamp!: number
-  type!: string
-  nativeEvent!: N
-  originalEvent!: InputEvent<N> | null
-  propagationStopped = false
-  propagationImmediatelyStopped = false
-  path!: any[]
-  detail!: number
-  view!: WindowProxy
-  layer = { x: 0, y: 0 }
-  get layerX(): number { return this.layer.x }
-  get layerY(): number { return this.layer.y }
-  page = { x: 0, y: 0 }
-  get pageX(): number { return this.page.x }
-  get pageY(): number { return this.page.y }
-  initEvent(..._args: any[]): void {
-    throw new Error('initEvent() is a legacy DOM API. It is not implemented in the Federated Events API.')
-  }
+  isTrusted = false
+  declare returnValue: boolean
+  declare srcElement: EventTarget | null
+  declare target: any
+  timeStamp: number = 0
+  type: string = ''
 
-  initUIEvent(..._args: any[]): void {
-    throw new Error('initUIEvent() is a legacy DOM API. It is not implemented in the Federated Events API.')
-  }
-
+  declare path: any[]
   composedPath(): any[] {
     return this.path
   }
 
+  initEvent(..._args: any[]): void {
+    throw new Error('initEvent() is a legacy DOM API. It is not implemented in the Federated Events API.')
+  }
+
   preventDefault(): void {
-    if (this.nativeEvent instanceof Event && this.nativeEvent.cancelable) {
+    if ('preventDefault' in this.nativeEvent && this.nativeEvent.cancelable) {
       this.nativeEvent.preventDefault()
     }
     this.defaultPrevented = true
   }
 
+  propagationImmediatelyStopped = false
   stopImmediatePropagation(): void {
     this.propagationImmediatelyStopped = true
   }
 
+  propagationStopped = false
   stopPropagation(): void {
+    if ('stopPropagation' in this.nativeEvent) {
+      this.nativeEvent.stopPropagation()
+    }
     this.propagationStopped = true
   }
 
@@ -57,4 +52,13 @@ export class InputEvent<N extends UIEvent = UIEvent> implements UIEvent {
   readonly CAPTURING_PHASE = 1
   readonly AT_TARGET = 2
   readonly BUBBLING_PHASE = 3
+
+  // UIEvent
+  declare detail: number
+  declare view: WindowProxy
+  declare which: number
+
+  initUIEvent(..._args: any[]): void {
+    throw new Error('initUIEvent() is a legacy DOM API. It is not implemented in the Federated Events API.')
+  }
 }

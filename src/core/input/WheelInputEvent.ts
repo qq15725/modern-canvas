@@ -1,10 +1,10 @@
 import { MouseInputEvent } from './MouseInputEvent'
 
 export class WheelInputEvent extends MouseInputEvent implements WheelEvent {
-  deltaMode!: number
-  deltaX!: number
-  deltaY!: number
-  deltaZ!: number
+  declare deltaMode: number
+  declare deltaX: number
+  declare deltaY: number
+  declare deltaZ: number
   static readonly DOM_DELTA_PIXEL = 0
   readonly DOM_DELTA_PIXEL = 0
   static readonly DOM_DELTA_LINE = 1

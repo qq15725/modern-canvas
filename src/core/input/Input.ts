@@ -1,8 +1,10 @@
 import type { EventListenerOptions, EventListenerValue } from 'modern-idoc'
 import type { Cursor } from './Cursor'
+import type { InputEvent } from './InputEvent'
 import type { MouseInputEvent } from './MouseInputEvent'
 import { EventEmitter } from 'modern-idoc'
 import { SUPPORTS_POINTER_EVENTS, SUPPORTS_TOUCH_EVENTS, SUPPORTS_WHEEL_EVENTS } from '../shared'
+import { KeyboardInputEvent } from './KeyboardInputEvent'
 import { PointerInputEvent } from './PointerInputEvent'
 import { WheelInputEvent } from './WheelInputEvent'
 
@@ -20,6 +22,9 @@ export interface InputEventMap {
   pointermove: (ev: PointerInputEvent) => void
   pointerup: (ev: PointerInputEvent) => void
   wheel: (ev: WheelInputEvent) => void
+  keydown: (ev: KeyboardInputEvent) => void
+  keypress: (ev: KeyboardInputEvent) => void
+  keyup: (ev: KeyboardInputEvent) => void
 }
 
 export type InputEventKey = keyof InputEventMap
@@ -36,19 +41,19 @@ export interface Input {
 }
 
 export class Input extends EventEmitter {
+  /**
+   * Current event
+   */
+  event?: PointerInputEvent | WheelInputEvent | KeyboardInputEvent
+
   target?: HTMLElement
-  cursor: Cursor | string = 'default'
+  cursor: Cursor = 'default'
   cursorStyles: Record<string, any> = {
     default: 'inherit',
     pointer: 'pointer',
   }
 
   setuped = false
-
-  /**
-   * Current event
-   */
-  event?: PointerInputEvent | WheelInputEvent
 
   enableMoveEvent = true
   enableWheelEvent = true
@@ -72,26 +77,32 @@ export class Input extends EventEmitter {
     else if (SUPPORTS_POINTER_EVENTS) {
       style.touchAction = ''
     }
+
     if (SUPPORTS_POINTER_EVENTS) {
-      this.target.removeEventListener('pointerdown', this.onPointerDown)
-      this.target.removeEventListener('pointerleave', this.onPointerOver)
-      this.target.removeEventListener('pointerover', this.onPointerOver)
-      this.target.removeEventListener('pointermove', this.onPointerMove)
-      this.target.removeEventListener('pointerup', this.onPointerUp)
+      this.target.removeEventListener('pointerdown', this._onPointerDown)
+      this.target.removeEventListener('pointerleave', this._onPointerOver)
+      this.target.removeEventListener('pointerover', this._onPointerOver)
+      this.target.removeEventListener('pointermove', this._onPointerMove)
+      this.target.removeEventListener('pointerup', this._onPointerUp)
     }
     else {
-      this.target.removeEventListener('mousedown', this.onPointerDown)
-      this.target.removeEventListener('mouseout', this.onPointerOver)
-      this.target.removeEventListener('mouseover', this.onPointerOver)
-      this.target.removeEventListener('mousemove', this.onPointerMove)
-      this.target.removeEventListener('mouseup', this.onPointerUp)
+      this.target.removeEventListener('mousedown', this._onPointerDown)
+      this.target.removeEventListener('mouseout', this._onPointerOver)
+      this.target.removeEventListener('mouseover', this._onPointerOver)
+      this.target.removeEventListener('mousemove', this._onPointerMove)
+      this.target.removeEventListener('mouseup', this._onPointerUp)
     }
+
     if (SUPPORTS_TOUCH_EVENTS) {
-      this.target.removeEventListener('touchstart', this.onPointerDown)
-      this.target.removeEventListener('touchmove', this.onPointerMove)
-      this.target.removeEventListener('touchend', this.onPointerUp)
+      this.target.removeEventListener('touchstart', this._onPointerDown)
+      this.target.removeEventListener('touchmove', this._onPointerMove)
+      this.target.removeEventListener('touchend', this._onPointerUp)
     }
-    this.target.removeEventListener('wheel', this.onWheel)
+
+    this.target.removeEventListener('wheel', this._onWheel)
+    document.removeEventListener('keydown', this._onKeyDown)
+    document.removeEventListener('keypress', this._onKeyPress)
+    document.removeEventListener('keyup', this._onKeyUp)
     this.target = undefined
     this.setuped = false
   }
@@ -100,7 +111,9 @@ export class Input extends EventEmitter {
     if (this.setuped || !this.target) {
       return
     }
+
     const style = this.target.style as Record<string, any>
+
     if (style) {
       if ((globalThis.navigator as any).msPointerEnabled) {
         style.msContentZooming = 'none'
@@ -110,29 +123,36 @@ export class Input extends EventEmitter {
         style.touchAction = 'none'
       }
     }
+
     if (SUPPORTS_POINTER_EVENTS) {
-      this.target.addEventListener('pointerdown', this.onPointerDown)
-      this.target.addEventListener('pointerleave', this.onPointerOver)
-      this.target.addEventListener('pointerover', this.onPointerOver)
-      this.target.addEventListener('pointermove', this.onPointerMove)
-      this.target.addEventListener('pointerup', this.onPointerUp)
+      this.target.addEventListener('pointerdown', this._onPointerDown)
+      this.target.addEventListener('pointerleave', this._onPointerOver)
+      this.target.addEventListener('pointerover', this._onPointerOver)
+      this.target.addEventListener('pointermove', this._onPointerMove)
+      this.target.addEventListener('pointerup', this._onPointerUp)
     }
     else {
-      this.target.addEventListener('mousedown', this.onPointerDown)
-      this.target.addEventListener('mouseout', this.onPointerOver)
-      this.target.addEventListener('mouseover', this.onPointerOver)
-      this.target.addEventListener('mousemove', this.onPointerMove)
-      this.target.addEventListener('mouseup', this.onPointerUp)
+      this.target.addEventListener('mousedown', this._onPointerDown)
+      this.target.addEventListener('mouseout', this._onPointerOver)
+      this.target.addEventListener('mouseover', this._onPointerOver)
+      this.target.addEventListener('mousemove', this._onPointerMove)
+      this.target.addEventListener('mouseup', this._onPointerUp)
     }
+
     if (SUPPORTS_TOUCH_EVENTS) {
-      this.target.addEventListener('touchstart', this.onPointerDown)
-      this.target.addEventListener('touchmove', this.onPointerMove)
-      this.target.addEventListener('touchend', this.onPointerUp)
+      this.target.addEventListener('touchstart', this._onPointerDown)
+      this.target.addEventListener('touchmove', this._onPointerMove)
+      this.target.addEventListener('touchend', this._onPointerUp)
     }
-    this.target.addEventListener('wheel', this.onWheel)
+
+    this.target.addEventListener('wheel', this._onWheel)
+    document.addEventListener('keydown', this._onKeyDown)
+    document.addEventListener('keypress', this._onKeyPress)
+    document.addEventListener('keyup', this._onKeyUp)
     this.setuped = true
   }
 
+  protected normalize(event: KeyboardEvent): KeyboardEvent[]
   protected normalize(event: WheelEvent): WheelEvent[]
   protected normalize(event: TouchEvent | PointerEvent | MouseEvent): PointerEvent[]
   protected normalize(event: any): any[] {
@@ -207,27 +227,8 @@ export class Input extends EventEmitter {
     return events as any
   }
 
-  protected cloneWheelEvent(nativeEvent: WheelEvent): WheelInputEvent {
-    const event = new WheelInputEvent()
-    this.copyMouseEvent(event, nativeEvent)
-    ;(event as any).wheelDeltaY = (nativeEvent as any).wheelDeltaY
-    event.deltaX = nativeEvent.deltaX
-    event.deltaY = nativeEvent.deltaY
-    event.deltaZ = nativeEvent.deltaZ
-    event.deltaMode = nativeEvent.deltaMode
-    this.mapPositionToPoint(event.screen, nativeEvent.clientX, nativeEvent.clientY)
-    event.global.x = event.screen.x
-    event.global.y = event.screen.y
-    event.offset.x = event.screen.x
-    event.offset.y = event.screen.y
-    event.nativeEvent = nativeEvent
-    event.type = nativeEvent.type
-    return event
-  }
-
-  protected clonePointerEvent(nativeEvent: PointerEvent): PointerInputEvent {
+  protected _clonePointerEvent(nativeEvent: PointerEvent): PointerInputEvent {
     const event = new PointerInputEvent()
-    event.originalEvent = null
     event.nativeEvent = nativeEvent
     event.pointerId = nativeEvent.pointerId
     event.width = nativeEvent.width
@@ -240,7 +241,7 @@ export class Input extends EventEmitter {
     event.tiltY = nativeEvent.tiltY
     event.twist = nativeEvent.twist
     event.isTrusted = nativeEvent.isTrusted
-    this.copyMouseEvent(event, nativeEvent)
+    this._copyMouseEvent(event, nativeEvent)
     this.mapPositionToPoint(event.screen, nativeEvent.clientX, nativeEvent.clientY)
     event.global.x = event.screen.x
     event.global.y = event.screen.y
@@ -258,12 +259,24 @@ export class Input extends EventEmitter {
     return event
   }
 
-  protected copyMouseEvent(event: MouseInputEvent, nativeEvent: MouseEvent): void {
-    event.preventDefault = nativeEvent.preventDefault.bind(nativeEvent)
-    event.stopPropagation = nativeEvent.stopPropagation.bind(nativeEvent)
+  protected _copyInputEvent(event: InputEvent, nativeEvent: UIEvent): void {
+    event.nativeEvent = nativeEvent
+    event.bubbles = nativeEvent.bubbles
+    event.cancelBubble = nativeEvent.cancelBubble
+    event.cancelable = nativeEvent.cancelable
+    event.composed = nativeEvent.composed
+    event.currentTarget = nativeEvent.currentTarget
+    event.defaultPrevented = nativeEvent.defaultPrevented
+    event.eventPhase = nativeEvent.eventPhase
     event.isTrusted = nativeEvent.isTrusted
-    event.timeStamp = performance.now()
+    event.returnValue = nativeEvent.returnValue
+    event.srcElement = nativeEvent.srcElement
+    event.timeStamp = nativeEvent.timeStamp
     event.type = nativeEvent.type
+  }
+
+  protected _copyMouseEvent(event: MouseInputEvent, nativeEvent: MouseEvent): void {
+    this._copyInputEvent(event, nativeEvent)
     event.altKey = nativeEvent.altKey
     event.button = nativeEvent.button
     event.buttons = nativeEvent.buttons
@@ -279,13 +292,47 @@ export class Input extends EventEmitter {
     event.shiftKey = nativeEvent.shiftKey
   }
 
-  setCursor(mode?: Cursor): void {
+  protected _cloneWheelEvent(nativeEvent: WheelEvent): WheelInputEvent {
+    const event = new WheelInputEvent()
+    this._copyMouseEvent(event, nativeEvent)
+    ;(event as any).wheelDeltaY = (nativeEvent as any).wheelDeltaY
+    event.deltaX = nativeEvent.deltaX
+    event.deltaY = nativeEvent.deltaY
+    event.deltaZ = nativeEvent.deltaZ
+    event.deltaMode = nativeEvent.deltaMode
+    this.mapPositionToPoint(event.screen, nativeEvent.clientX, nativeEvent.clientY)
+    event.global.x = event.screen.x
+    event.global.y = event.screen.y
+    event.offset.x = event.screen.x
+    event.offset.y = event.screen.y
+    return event
+  }
+
+  protected _cloneKeyboardEvent(nativeEvent: KeyboardEvent): KeyboardInputEvent {
+    const event = new KeyboardInputEvent()
+    this._copyInputEvent(event, nativeEvent)
+    event.altKey = nativeEvent.altKey
+    event.charCode = nativeEvent.charCode
+    event.code = nativeEvent.code
+    event.ctrlKey = nativeEvent.ctrlKey
+    event.isComposing = nativeEvent.isComposing
+    event.key = nativeEvent.key
+    event.keyCode = nativeEvent.keyCode
+    event.location = nativeEvent.location
+    event.metaKey = nativeEvent.metaKey
+    event.repeat = nativeEvent.repeat
+    event.shiftKey = nativeEvent.shiftKey
+    return event
+  }
+
+  setCursor(mode: Cursor = 'default'): void {
     if (!this.target)
       return
-    mode = mode || 'default'
+
     if (this.cursor === mode) {
       return
     }
+
     this.cursor = mode
     const applyStyles = !(globalThis.OffscreenCanvas && this.target instanceof OffscreenCanvas)
     const style = this.cursorStyles[mode]
@@ -330,39 +377,77 @@ export class Input extends EventEmitter {
     point.y = ((y - rect.top) * (height / rect.height)) * multiplier
   }
 
-  protected onPointerDown = (nativeEvent: PointerEvent | TouchEvent | MouseEvent): void => {
+  protected _onKeyDown = (nativeEvent: KeyboardEvent): void => {
+    const events = this.normalize(nativeEvent)
+    for (let i = 0, len = events.length; i < len; i++) {
+      this.emit('keydown', this.event = this._cloneKeyboardEvent(events[i]))
+    }
+    if (this.event?.cursor) {
+      this.setCursor(this.event.cursor)
+    }
+  }
+
+  protected _onKeyPress = (nativeEvent: KeyboardEvent): void => {
+    const events = this.normalize(nativeEvent)
+    for (let i = 0, len = events.length; i < len; i++) {
+      this.emit('keypress', this.event = this._cloneKeyboardEvent(events[i]))
+    }
+    if (this.event?.cursor) {
+      this.setCursor(this.event.cursor)
+    }
+  }
+
+  protected _onKeyUp = (nativeEvent: KeyboardEvent): void => {
+    const events = this.normalize(nativeEvent)
+    for (let i = 0, len = events.length; i < len; i++) {
+      this.emit('keyup', this.event = this._cloneKeyboardEvent(events[i]))
+    }
+    if (this.event?.cursor) {
+      this.setCursor(this.event.cursor)
+    }
+  }
+
+  protected _onPointerDown = (nativeEvent: PointerEvent | TouchEvent | MouseEvent): void => {
     if (SUPPORTS_TOUCH_EVENTS && (nativeEvent as PointerEvent).pointerType === 'touch')
       return
     const events = this.normalize(nativeEvent)
     for (let i = 0, len = events.length; i < len; i++) {
-      this.emit('pointerdown', this.event = this.clonePointerEvent(events[i]))
+      this.emit('pointerdown', this.event = this._clonePointerEvent(events[i]))
     }
-    this.setCursor(this.cursor)
+    if (this.event?.cursor) {
+      this.setCursor(this.event.cursor)
+    }
   }
 
-  protected onPointerOver = (nativeEvent: PointerEvent | TouchEvent | MouseEvent): void => {
+  protected _onPointerOver = (nativeEvent: PointerEvent | TouchEvent | MouseEvent): void => {
     if (!this.enableClickEvent)
       return
     if (SUPPORTS_TOUCH_EVENTS && (nativeEvent as PointerEvent).pointerType === 'touch')
       return
     const events = this.normalize(nativeEvent)
     for (let i = 0, len = events.length; i < len; i++) {
-      this.emit('pointerover', this.event = this.clonePointerEvent(events[i]))
+      this.emit('pointerover', this.event = this._clonePointerEvent(events[i]))
+    }
+    if (this.event?.cursor) {
+      this.setCursor(this.event.cursor)
     }
   }
 
-  protected onPointerMove = (nativeEvent: PointerEvent | TouchEvent | MouseEvent): void => {
+  protected _onPointerMove = (nativeEvent: PointerEvent | TouchEvent | MouseEvent): void => {
     if (!this.enableMoveEvent)
       return
     if (SUPPORTS_TOUCH_EVENTS && (nativeEvent as PointerEvent).pointerType === 'touch')
       return
     const events = this.normalize(nativeEvent)
     for (let i = 0, len = events.length; i < len; i++) {
-      this.emit('pointermove', this.event = this.clonePointerEvent(events[i]))
+      this.emit('pointermove', this.event = this._clonePointerEvent(events[i]))
+    }
+    if (this.event?.cursor) {
+      this.setCursor(this.event.cursor)
     }
   }
 
-  protected onPointerUp = (nativeEvent: PointerEvent | TouchEvent | MouseEvent): void => {
+  protected _onPointerUp = (nativeEvent: PointerEvent | TouchEvent | MouseEvent): void => {
     if (!this.enableClickEvent)
       return
     if (SUPPORTS_TOUCH_EVENTS && (nativeEvent as PointerEvent).pointerType === 'touch')
@@ -374,18 +459,24 @@ export class Input extends EventEmitter {
     const outside = target !== this.target ? 'outside' : ''
     const events = this.normalize(nativeEvent)
     for (let i = 0, len = events.length; i < len; i++) {
-      const event = this.clonePointerEvent(events[i])
+      const event = this._clonePointerEvent(events[i])
       event.type += outside
       this.emit('pointerup', this.event = event)
     }
+    if (this.event?.cursor) {
+      this.setCursor(this.event.cursor)
+    }
   }
 
-  protected onWheel = (nativeEvent: WheelEvent): void => {
+  protected _onWheel = (nativeEvent: WheelEvent): void => {
     if (!this.enableWheelEvent)
       return
     const events = this.normalize(nativeEvent)
     for (let i = 0, len = events.length; i < len; i++) {
-      this.emit('wheel', this.event = this.cloneWheelEvent(events[i]))
+      this.emit('wheel', this.event = this._cloneWheelEvent(events[i]))
+    }
+    if (this.event?.cursor) {
+      this.setCursor(this.event.cursor)
     }
   }
 }
