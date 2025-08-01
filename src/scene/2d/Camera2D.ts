@@ -82,7 +82,7 @@ export class Camera2D extends Node2D {
     }
     else if (key === 'pointerdown') {
       const e = event as PointerInputEvent
-      if (!this.grabbing && this.spaceKey) {
+      if (!this.grabbing && (this.spaceKey || e.button === 1)) {
         this.grabbing = true
         e.cursor = 'grabbing'
         this._screenOffset = { x: e.screenX, y: e.screenY }
@@ -102,7 +102,12 @@ export class Camera2D extends Node2D {
       const e = event as PointerInputEvent
       if (this.grabbing) {
         this.grabbing = false
-        e.cursor = 'grab'
+        if (this.spaceKey) {
+          e.cursor = 'grab'
+        }
+        else {
+          e.cursor = 'default'
+        }
       }
     }
     else if (key === 'wheel') {

@@ -32,7 +32,7 @@ async function init(): Promise<void> {
     }, [
       new Element2D({
         style: { top: 100, left: 100, width: 100, height: 100 },
-        outline: { width: 10, image: 'linear-gradient(0deg, blue, pink)' },
+        outline: { width: 10, image: 'linear-gradient(0deg, blue, pink)', lineJoin: 'round' },
         text: 'TEXT',
       }),
       new Element2D({
