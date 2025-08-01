@@ -1,3 +1,12 @@
+## [0.7.12](https://github.com/qq15725/modern-canvas/compare/v0.7.11...v0.7.12) (2025-08-01)
+
+
+### Features
+
+* Camera2D wheel key can be drag viewport when pressed ([757f58a](https://github.com/qq15725/modern-canvas/commit/757f58a3a3a4bfaedccbb32f886d42f98497328b))
+
+
+
 ## [0.7.11](https://github.com/qq15725/modern-canvas/compare/v0.7.10...v0.7.11) (2025-07-30)
 
 
