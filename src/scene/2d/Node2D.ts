@@ -95,22 +95,28 @@ export class Node2D extends CanvasItem {
     const parent = this.getParent<Node2D>()
     if (parent?.globalTransform) {
       this._parentTransformDirtyId = parent.globalTransform.dirtyId
-      this.globalScale.set(parent.globalScale.x * this.scale.x, parent.globalScale.y * this.scale.y)
+      this.globalPosition.set(
+        parent.globalPosition.x + this.position.x,
+        parent.globalPosition.y + this.position.y,
+      )
+      this.globalScale.set(
+        parent.globalScale.x * this.scale.x,
+        parent.globalScale.y * this.scale.y,
+      )
+      this.globalSkew.set(
+        parent.globalSkew.x * this.skew.x,
+        parent.globalSkew.y * this.skew.y,
+      )
       this.globalRotation = parent.globalRotation + this.rotation
       parent.globalTransform.multiply(this.transform, this.globalTransform)
     }
     else {
+      this.globalPosition.copy(this.position)
       this.globalScale.copy(this.scale)
+      this.globalSkew.copy(this.skew)
       this.globalRotation = this.rotation
       this.globalTransform.copy(this.transform)
     }
-    const [
-      a, c, tx,
-      b, d, ty,
-    ] = this.globalTransform.toArray()
-    this.globalPosition.set(tx, ty)
-    this.globalSkew.x = Math.atan2(c, a) - this.globalRotation
-    this.globalSkew.y = Math.atan2(b, d) - this.globalRotation
     this.requestRelayout()
   }
 

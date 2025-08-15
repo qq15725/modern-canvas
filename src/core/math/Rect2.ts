@@ -15,6 +15,7 @@ export class Rect2 {
   readonly size: Vector2
 
   constructor(from: Rect2)
+  constructor(pointArray: [number, number][])
   constructor(position: Vector2, size: Vector2)
   constructor(x: number, y: number, width: number, height: number)
   constructor(...args: any[]) {
@@ -23,10 +24,24 @@ export class Rect2 {
     switch (args.length) {
       case 0:
         break
-      case 1:
-        position.set(args[0].position)
-        size.set(args[0].size)
+      case 1: {
+        const arg = args[0]
+        if (arg instanceof Rect2) {
+          position.set(arg.position)
+          size.set(arg.size)
+        }
+        else {
+          const xx = arg.map((p: [number, number]) => p[0])
+          const yy = arg.map((p: [number, number]) => p[1])
+          const minX = Math.min(...xx)
+          const maxX = Math.max(...xx)
+          const minY = Math.min(...yy)
+          const maxY = Math.max(...yy)
+          position.set(minX, minY)
+          size.set(maxX - minX, maxY - minY)
+        }
         break
+      }
       case 2:
         position.set(args[0])
         size.set(args[1])
@@ -48,6 +63,15 @@ export class Rect2 {
       this.position.y + this.size.y,
     )
     return this
+  }
+
+  toMinmax(): { minX: number, minY: number, maxX: number, maxY: number } {
+    return {
+      minX: this.position.x,
+      minY: this.position.y,
+      maxX: this.end.x,
+      maxY: this.end.y,
+    }
   }
 
   toArray(): number[] {

@@ -1,7 +1,7 @@
 import { PI_2 } from '../shared'
 import { Matrix3 } from './Matrix3'
 
-export interface Transform2DObject {
+export interface TransformObject {
   a: number
   c: number
   tx: number
@@ -9,6 +9,13 @@ export interface Transform2DObject {
   d: number
   ty: number
   tz: number
+}
+
+export interface TransformableObject {
+  position: { x: number, y: number }
+  scale: { x: number, y: number }
+  skew: { x: number, y: number }
+  rotation: number
 }
 
 /**
@@ -124,12 +131,41 @@ export class Transform2D extends Matrix3 {
     return this
   }
 
-  applyToPoint(x: number, y: number): number[] {
+  applyToPoint(x: number, y: number): [number, number] {
     const { a, c, tx, b, d, ty } = this.toObject()
     return [
       (a * x) + (c * y) + tx,
       (b * x) + (d * y) + ty,
     ]
+  }
+
+  decompose(
+    pivot = { x: 0, y: 0 },
+    output: TransformableObject = {
+      position: { x: 0, y: 0 },
+      scale: { x: 0, y: 0 },
+      skew: { x: 0, y: 0 },
+      rotation: 0,
+    },
+  ): TransformableObject {
+    const { a, b, c, d, tx, ty } = this.toObject()
+    const skewX = -Math.atan2(-c, d)
+    const skewY = Math.atan2(b, a)
+    const delta = Math.abs(skewX + skewY)
+    if (delta < 0.00001 || Math.abs(PI_2 - delta) < 0.00001) {
+      output.rotation = skewY
+      output.skew.x = output.skew.y = 0
+    }
+    else {
+      output.rotation = 0
+      output.skew.x = skewX
+      output.skew.y = skewY
+    }
+    output.scale.x = Math.sqrt((a * a) + (b * b))
+    output.scale.y = Math.sqrt((c * c) + (d * d))
+    output.position.x = tx + ((pivot.x * a) + (pivot.y * c))
+    output.position.y = ty + ((pivot.x * b) + (pivot.y * d))
+    return output
   }
 
   inverse(): this {
@@ -141,8 +177,12 @@ export class Transform2D extends Matrix3 {
     return a === 1 && b === 0 && c === 0 && d === 1 && tx === 0 && ty === 0
   }
 
-  toObject(): Transform2DObject {
-    const [a, c, tx, b, d, ty, ,, tz] = this._array
+  toObject(): TransformObject {
+    const [
+      a, c, tx,
+      b, d, ty,,,
+      tz,
+    ] = this._array
     return { a, c, tx, b, d, ty, tz }
   }
 }

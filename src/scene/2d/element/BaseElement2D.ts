@@ -251,35 +251,73 @@ export class BaseElement2D extends Node2D implements Rectangulable {
   }
 
   getRect(): Rect2 {
-    const { width: w, height: h } = this.size
+    return this.getGlobalAabb()
+  }
+
+  protected _getPointArray(): [number, number][] {
+    const { width, height } = this.size
     const x1 = 0
     const y1 = 0
-    const x2 = x1 + w
-    const y2 = y1 + h
-    const [a, c, tx, b, d, ty] = this.globalTransform.toArray()
-    const points = [
+    const x2 = x1 + width
+    const y2 = y1 + height
+    return [
       [x1, y1],
       [x1, y2],
       [x2, y1],
       [x2, y2],
-    ].map((p) => {
-      return [
-        (a * p[0]) + (c * p[1]) + tx,
-        (b * p[0]) + (d * p[1]) + ty,
-      ]
-    })
-    const xx = points.map(p => p[0])
-    const yy = points.map(p => p[1])
-    const minX = Math.min(...xx)
-    const maxX = Math.max(...xx)
-    const minY = Math.min(...yy)
-    const maxY = Math.max(...yy)
+    ]
+  }
+
+  getAabb(): Rect2 {
     return new Rect2(
-      minX,
-      minY,
-      maxX - minX,
-      maxY - minY,
+      this._getPointArray().map((p) => {
+        return this.transform.applyToPoint(p[0], p[1])
+      }),
     )
+  }
+
+  getGlobalAabb(): Rect2 {
+    return new Rect2(
+      this._getPointArray().map((p) => {
+        return this.globalTransform.applyToPoint(p[0], p[1])
+      }),
+    )
+  }
+
+  getObb(): { rect: Rect2, rotation: number } {
+    const origin = this.getTransformOrigin()
+    const _origin = this.transform.applyToPoint(origin.x, origin.y)
+    const offset = [_origin[0] - origin.x, _origin[1] - origin.y]
+
+    return {
+      rect: new Rect2(
+        this._getPointArray().map((p) => {
+          return [
+            p[0] + offset[0],
+            p[1] + offset[1],
+          ] as [number, number]
+        }),
+      ),
+      rotation: this.rotation,
+    }
+  }
+
+  getGlobalObb(): { rect: Rect2, rotation: number } {
+    const origin = this.getTransformOrigin()
+    const _origin = this.globalTransform.applyToPoint(origin.x, origin.y)
+    const offset = [_origin[0] - origin.x, _origin[1] - origin.y]
+
+    return {
+      rect: new Rect2(
+        this._getPointArray().map((p) => {
+          return [
+            p[0] + offset[0],
+            p[1] + offset[1],
+          ] as [number, number]
+        }),
+      ),
+      rotation: this.globalRotation,
+    }
   }
 
   // protected _rectsOverlap(r1: any, r2: any): boolean {
