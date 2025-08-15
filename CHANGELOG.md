@@ -1,3 +1,17 @@
+## [0.7.13](https://github.com/qq15725/modern-canvas/compare/v0.7.12...v0.7.13) (2025-08-15)
+
+
+### Bug Fixes
+
+* effects ([b697f19](https://github.com/qq15725/modern-canvas/commit/b697f193db8d40c2ed0825efe10946f0ca4e1e57))
+
+
+### Features
+
+* aabb obb ([53a2be6](https://github.com/qq15725/modern-canvas/commit/53a2be63f93bc46d640c419ed773516f43f18c48))
+
+
+
 ## [0.7.12](https://github.com/qq15725/modern-canvas/compare/v0.7.11...v0.7.12) (2025-08-01)
 
 
