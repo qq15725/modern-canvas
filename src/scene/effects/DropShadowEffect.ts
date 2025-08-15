@@ -42,11 +42,11 @@ void main(void) {
 }`,
   })
 
-  @property() declare color: ColorValue = '#000000FF'
-  @property() declare blur: number = 4
-  @property() declare offsetX: number = 4
-  @property() declare offsetY: number = 4
-  @property() declare shadowOnly: boolean = false
+  @property({ fallback: '#000000FF' }) declare color: ColorValue
+  @property({ fallback: 4 }) declare blur: number
+  @property({ fallback: 4 }) declare offsetX: number
+  @property({ fallback: 4 }) declare offsetY: number
+  @property({ fallback: false }) declare shadowOnly: boolean
 
   blurEffect = new GaussianBlurEffect()
   viewport3 = new Viewport()

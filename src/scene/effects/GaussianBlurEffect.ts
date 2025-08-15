@@ -90,8 +90,8 @@ void main(void) {
     frag,
   })
 
-  @property({ default: 4 }) declare strength: number
-  @property({ default: 3 }) declare quality: number
+  @property({ fallback: 4 }) declare strength: number
+  @property({ fallback: 3 }) declare quality: number
 
   constructor(properties?: Partial<GaussianBlurEffectProperties>, children: Node[] = []) {
     super()

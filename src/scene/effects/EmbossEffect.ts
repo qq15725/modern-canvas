@@ -38,7 +38,7 @@ void main(void) {
 }`,
   })
 
-  @property() declare strength: number = 5
+  @property({ fallback: 5 }) declare strength: number
 
   constructor(properties?: Partial<EmbossEffectProperties>, children: Node[] = []) {
     super()

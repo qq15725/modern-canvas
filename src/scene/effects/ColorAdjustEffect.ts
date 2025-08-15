@@ -54,14 +54,14 @@ void main(void) {
 }`,
   })
 
-  @property() declare saturation: number = 1
-  @property() declare contrast: number = 1
-  @property() declare brightness: number = 1
-  @property() declare red: number = 1
-  @property() declare green: number = 1
-  @property() declare blue: number = 1
-  @property() declare alpha: number = 1
-  @property() declare gamma: number = 1
+  @property({ fallback: 1 }) declare saturation: number
+  @property({ fallback: 1 }) declare contrast: number
+  @property({ fallback: 1 }) declare brightness: number
+  @property({ fallback: 1 }) declare red: number
+  @property({ fallback: 1 }) declare green: number
+  @property({ fallback: 1 }) declare blue: number
+  @property({ fallback: 1 }) declare alpha: number
+  @property({ fallback: 1 }) declare gamma: number
 
   constructor(properties?: Partial<ColorAdjustEffectProperties>, children: Node[] = []) {
     super()

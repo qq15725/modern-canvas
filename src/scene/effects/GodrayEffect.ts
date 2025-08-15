@@ -167,13 +167,13 @@ void main(void) {
 }`,
   })
 
-  @property() declare time: number = 0
-  @property() declare angle: number = 30
-  @property() declare gain: number = 0.5
-  @property() declare lacunarity: number = 2.5
-  @property() declare parallel: boolean = true
-  @property() declare center: [number, number] = [0, 0]
-  @property() declare alpha: number = 1
+  @property({ fallback: 0 }) declare time: number
+  @property({ fallback: 30 }) declare angle: number
+  @property({ fallback: 0.5 }) declare gain: number
+  @property({ fallback: 2.5 }) declare lacunarity: number
+  @property({ fallback: true }) declare parallel: boolean
+  @property({ default: () => ([0, 0]) }) declare center: [number, number]
+  @property({ fallback: 1 }) declare alpha: number
 
   constructor(properties?: Partial<GodrayEffectProperties>, children: Node[] = []) {
     super()

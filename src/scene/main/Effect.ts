@@ -35,8 +35,8 @@ export interface EffectContext {
 export class Effect extends TimelineNode {
   @property({ protected: true }) material: Material | undefined
   @property() declare effectMode: EffectMode | undefined
-  @property() declare glsl: string = ''
-  @property() declare glslSrc: string = ''
+  @property({ fallback: '' }) declare glsl: string
+  @property({ fallback: '' }) declare glslSrc: string
 
   protected get _effectMode(): EffectMode { return this.effectMode ?? 'parent' }
 

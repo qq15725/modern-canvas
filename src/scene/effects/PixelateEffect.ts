@@ -49,7 +49,7 @@ void main(void) {
 }`,
   })
 
-  @property() declare strength: number = 10
+  @property({ fallback: 10 }) declare strength: number
 
   constructor(properties?: Partial<PixelateEffectProperties>, children: Node[] = []) {
     super()

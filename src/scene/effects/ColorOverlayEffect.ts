@@ -62,8 +62,8 @@ void main(void) {
 }`,
   })
 
-  @property() declare colors: ColorValue[] = []
-  @property() declare alpha: number = 0.5
+  @property({ default: () => ([]) }) declare colors: ColorValue[]
+  @property({ fallback: 0.5 }) declare alpha: number
 
   protected _color = new Color()
 
