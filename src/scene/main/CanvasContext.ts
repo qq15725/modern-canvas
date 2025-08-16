@@ -4,7 +4,7 @@ import { isColorFillObject } from 'modern-idoc'
 import { Path2D } from 'modern-path2d'
 import { ColorTexture, Texture2D } from '../resources'
 
-export type UVTransform = Transform2D | ((x: number, y: number) => [number, number])
+export type UvTransform = Transform2D | ((x: number, y: number) => [number, number])
 export type VertTransform = Transform2D | (() => Transform2D)
 
 export interface CanvasBatchable extends Batchable2D {
@@ -17,13 +17,13 @@ export interface StrokeDraw extends Partial<CanvasBatchable> {
   type: 'stroke'
   path: Path2D
   style: LineStyle
-  uvTransform?: UVTransform
+  uvTransform?: UvTransform
 }
 
 export interface FillDraw extends Partial<CanvasBatchable> {
   type: 'fill'
   path: Path2D
-  uvTransform?: UVTransform
+  uvTransform?: UvTransform
 }
 
 export class CanvasContext extends Path2D {
@@ -36,7 +36,7 @@ export class CanvasContext extends Path2D {
   miterLimit?: number
 
   // custom
-  uvTransform?: UVTransform
+  uvTransform?: UvTransform
   vertTransform?: VertTransform
 
   protected _defaultStyle = Texture2D.EMPTY
@@ -175,13 +175,13 @@ export class CanvasContext extends Path2D {
     vertices: number[],
     uvs: number[],
     texture?: Texture2D,
-    uvTransform?: UVTransform,
+    uvTransform?: UvTransform,
   ): void {
     if (texture) {
       const _uvTransform = uvTransform
         ? typeof uvTransform === 'function'
           ? uvTransform
-          : (x: number, y: number) => uvTransform.applyToPoint(x, y)
+          : (x: number, y: number) => uvTransform.apply({ x, y }).toArray()
         : uvTransform
 
       const w = texture.width

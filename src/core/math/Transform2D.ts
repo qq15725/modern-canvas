@@ -1,5 +1,7 @@
+import type { Vector2Data } from './Vector2'
 import { PI_2 } from '../shared'
 import { Matrix3 } from './Matrix3'
+import { Vector2 } from './Vector2'
 
 export interface TransformObject {
   a: number
@@ -131,14 +133,6 @@ export class Transform2D extends Matrix3 {
     return this
   }
 
-  applyToPoint(x: number, y: number): [number, number] {
-    const { a, c, tx, b, d, ty } = this.toObject()
-    return [
-      (a * x) + (c * y) + tx,
-      (b * x) + (d * y) + ty,
-    ]
-  }
-
   decompose(
     pivot = { x: 0, y: 0 },
     output: TransformableObject = {
@@ -168,8 +162,29 @@ export class Transform2D extends Matrix3 {
     return output
   }
 
+  apply<P extends Vector2Data = Vector2>(pos: Vector2Data, newPos?: P): P {
+    newPos = (newPos || new Vector2()) as P
+    const { a, c, tx, b, d, ty } = this.toObject()
+    const x = pos.x
+    const y = pos.y
+    newPos.x = (a * x) + (c * y) + tx
+    newPos.y = (b * x) + (d * y) + ty
+    return newPos
+  }
+
   inverse(): this {
     return this.clone().invert()
+  }
+
+  applyInverse<P extends Vector2Data = Vector2>(pos: Vector2Data, newPos?: P): P {
+    newPos = (newPos || new Vector2()) as P
+    const { a, b, c, d, tx, ty } = this.toObject()
+    const id = 1 / ((a * d) + (c * -b))
+    const x = pos.x
+    const y = pos.y
+    newPos.x = (d * id * x) + (-c * id * y) + (((ty * c) - (tx * d)) * id)
+    newPos.y = (a * id * y) + (-b * id * x) + (((-ty * a) + (tx * b)) * id)
+    return newPos
   }
 
   isIdentity(): boolean {

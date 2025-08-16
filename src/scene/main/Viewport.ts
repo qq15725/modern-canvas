@@ -1,12 +1,9 @@
 import type { EventListenerOptions, EventListenerValue, PropertyDeclaration } from 'modern-idoc'
-import type {
-  WebGLFramebufferOptions,
-  WebGLRenderer } from '../../core'
+import type { Vector2, Vector2Data, WebGLFramebufferOptions, WebGLRenderer } from '../../core'
 import type { Rectangulable, RectangulableEventMap } from './interfaces'
 import type { NodeEventMap } from './Node'
 import { property } from 'modern-idoc'
-import { customNode, Projection2D, Rect2, Transform2D,
-} from '../../core'
+import { customNode, Projection2D, Rect2, Transform2D } from '../../core'
 import { QuadUvGeometry, UvMaterial, ViewportTexture } from '../resources'
 import { Node } from './Node'
 
@@ -33,7 +30,7 @@ export interface ViewportFramebuffer {
 @customNode('Viewport')
 export class Viewport extends Node implements Rectangulable {
   readonly projection = new Projection2D()
-  readonly canvasTransform = new Transform2D()
+  readonly worldTransform = new Transform2D()
 
   protected _framebufferIndex = 0
   protected _framebuffers: ViewportFramebuffer[] = [
@@ -171,10 +168,9 @@ export class Viewport extends Node implements Rectangulable {
     // render before
     const oldViewport = this._tree?.getCurrentViewport()
     renderer.program.uniforms.projectionMatrix = this.projection.toArray(true)
-    renderer.program.uniforms.worldTransformMatrix = this.canvasTransform.toArray(true)
+    renderer.program.uniforms.worldTransformMatrix = this.worldTransform.toArray(true)
     this.activate(renderer)
     renderer.clear()
-    // console.log(renderer.toPixels())
 
     super.render(renderer, next)
 
@@ -191,5 +187,13 @@ export class Viewport extends Node implements Rectangulable {
 
   getRect(): Rect2 {
     return new Rect2(this.x, this.y, this.width, this.height)
+  }
+
+  toGlobal<P extends Vector2Data = Vector2>(worldPos: Vector2Data, newPos?: P): P {
+    return this.worldTransform.applyInverse(worldPos, newPos)
+  }
+
+  toWorld<P extends Vector2Data = Vector2>(globalPos: Vector2Data, newPos?: P): P {
+    return this.worldTransform.apply(globalPos, newPos)
   }
 }

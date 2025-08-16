@@ -11,7 +11,7 @@ export interface Camera2DProperties extends Node2DProperties {
 }
 
 export interface Camera2DEventMap extends Node2DEventMap {
-  updateCanvasTransform: () => void
+  updateWorldTransform: () => void
 }
 
 export interface Camera2D {
@@ -30,7 +30,7 @@ export interface Camera2D {
   renderMode: 'disabled',
 })
 export class Camera2D extends Node2D {
-  readonly zoom = new Vector2(1, 1).on('update', () => this.updateCanvasTransform())
+  readonly zoom = new Vector2(1, 1).on('update', () => this.updateWorldTransform())
   readonly maxZoom = new Vector2(6, 6)
   readonly minZoom = new Vector2(0.1, 0.1)
 
@@ -140,20 +140,21 @@ export class Camera2D extends Node2D {
 
   override updateTransform(): void {
     super.updateTransform()
-    this.updateCanvasTransform()
+    this.updateWorldTransform()
   }
 
-  updateCanvasTransform(): void {
+  updateWorldTransform(): void {
     const viewport = this.getViewport()
 
     if (!viewport)
       return
 
-    viewport.canvasTransform
+    viewport
+      .worldTransform
       .identity()
       .scale(this.zoom.x, this.zoom.y)
       .translate(this.position.x, this.position.y)
 
-    this.emit('updateCanvasTransform')
+    this.emit('updateWorldTransform')
   }
 }

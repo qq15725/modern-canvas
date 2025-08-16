@@ -1,4 +1,5 @@
 import type { EventListenerValue, PropertyDeclaration } from 'modern-idoc'
+import type { Vector2Data } from '../../core'
 import type {
   CanvasBatchable,
   CanvasItemEventMap,
@@ -164,5 +165,13 @@ export class Node2D extends CanvasItem {
     ) {
       this.requestRelayout()
     }
+  }
+
+  toLocal<P extends Vector2Data = Vector2>(globalPos: Vector2Data, newPos?: P): P {
+    return this.globalTransform.applyInverse(globalPos, newPos)
+  }
+
+  toGlobal<P extends Vector2Data = Vector2>(localPos: Vector2Data, newPos?: P): P {
+    return this.globalTransform.apply(localPos, newPos)
   }
 }

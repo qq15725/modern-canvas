@@ -58,7 +58,11 @@ export class BaseElement2DText extends CoreObject {
     }
   }
 
-  protected _updateText(): void {
+  setContent(content: TextContent): void {
+    this.content = normalizeTextContent(content)
+  }
+
+  measure(): MeasureResult {
     this.base.style = {
       justifyContent: 'center',
       alignItems: 'center',
@@ -66,14 +70,6 @@ export class BaseElement2DText extends CoreObject {
       ...this.parent.style.toJSON() as any,
     }
     this.base.requestUpdate()
-  }
-
-  setContent(content: TextContent): void {
-    this.content = normalizeTextContent(content)
-  }
-
-  measure(): MeasureResult {
-    this._updateText()
     return this.base.measure()
   }
 

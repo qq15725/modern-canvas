@@ -17,7 +17,7 @@ import type {
   InputEventKey,
   PointerInputEvent,
   Transform2D,
-  WebGLBlendMode,
+  Vector2Data, WebGLBlendMode,
 } from '../../../core'
 import type { CanvasBatchable, CanvasItemEventMap, Node, Rectangulable } from '../../main'
 import type { Node2DProperties } from '../Node2D'
@@ -254,24 +254,24 @@ export class BaseElement2D extends Node2D implements Rectangulable {
     return this.getGlobalAabb()
   }
 
-  protected _getPointArray(): [number, number][] {
+  protected _getPointArray(): Vector2Data[] {
     const { width, height } = this.size
     const x1 = 0
     const y1 = 0
     const x2 = x1 + width
     const y2 = y1 + height
     return [
-      [x1, y1],
-      [x1, y2],
-      [x2, y1],
-      [x2, y2],
+      { x: x1, y: y1 },
+      { x: x1, y: y2 },
+      { x: x2, y: y1 },
+      { x: x2, y: y2 },
     ]
   }
 
   getAabb(): Rect2 {
     return new Rect2(
       this._getPointArray().map((p) => {
-        return this.transform.applyToPoint(p[0], p[1])
+        return this.transform.apply(p)
       }),
     )
   }
@@ -279,23 +279,20 @@ export class BaseElement2D extends Node2D implements Rectangulable {
   getGlobalAabb(): Rect2 {
     return new Rect2(
       this._getPointArray().map((p) => {
-        return this.globalTransform.applyToPoint(p[0], p[1])
+        return this.globalTransform.apply(p)
       }),
     )
   }
 
   getObb(): { rect: Rect2, rotation: number } {
     const origin = this.getTransformOrigin()
-    const _origin = this.transform.applyToPoint(origin.x, origin.y)
-    const offset = [_origin[0] - origin.x, _origin[1] - origin.y]
-
+    const _origin = this.transform.apply(origin).sub(origin)
     return {
       rect: new Rect2(
         this._getPointArray().map((p) => {
-          return [
-            p[0] + offset[0],
-            p[1] + offset[1],
-          ] as [number, number]
+          p.x += _origin.x
+          p.y += _origin.y
+          return p
         }),
       ),
       rotation: this.rotation,
@@ -304,16 +301,14 @@ export class BaseElement2D extends Node2D implements Rectangulable {
 
   getGlobalObb(): { rect: Rect2, rotation: number } {
     const origin = this.getTransformOrigin()
-    const _origin = this.globalTransform.applyToPoint(origin.x, origin.y)
-    const offset = [_origin[0] - origin.x, _origin[1] - origin.y]
+    const _origin = this.globalTransform.apply(origin).sub(origin)
 
     return {
       rect: new Rect2(
         this._getPointArray().map((p) => {
-          return [
-            p[0] + offset[0],
-            p[1] + offset[1],
-          ] as [number, number]
+          p.x += _origin.x
+          p.y += _origin.y
+          return p
         }),
       ),
       rotation: this.globalRotation,
@@ -333,12 +328,12 @@ export class BaseElement2D extends Node2D implements Rectangulable {
   // override isVisibleInTree(): boolean {
   //   if (this._tree) {
   //     const root = this._tree.root
-  //     const camera = root.canvasTransform.inverse()
+  //     const camera = root.worldTransform.inverse()
   //     const { x, y, width, height } = root
-  //     const p1 = camera.applyToPoint(x, y)
-  //     const p2 = camera.applyToPoint(x + width, y)
-  //     const p3 = camera.applyToPoint(x + width, y + height)
-  //     const p4 = camera.applyToPoint(x, y + height)
+  //     const p1 = camera.apply(x, y)
+  //     const p2 = camera.apply(x + width, y)
+  //     const p3 = camera.apply(x + width, y + height)
+  //     const p4 = camera.apply(x, y + height)
   //     const pts = [p1, p2, p3, p4]
   //     const xs = pts.map(p => p[0])
   //     const ys = pts.map(p => p[1])
@@ -448,12 +443,12 @@ export class BaseElement2D extends Node2D implements Rectangulable {
   }
 
   // eslint-disable-next-line unused-imports/no-unused-vars
-  protected _pointerInput(point: { x: number, y: number }, key: InputEventKey): boolean {
+  protected _positionInput(localPos: Vector2Data, key: InputEventKey): boolean {
     const { width, height } = this.size
-    return point.x >= 0
-      && point.x < width
-      && point.y >= 0
-      && point.y < height
+    return localPos.x >= 0
+      && localPos.x < width
+      && localPos.y >= 0
+      && localPos.y < height
   }
 
   protected override _input(event: InputEvent, key: InputEventKey): void {
@@ -462,14 +457,15 @@ export class BaseElement2D extends Node2D implements Rectangulable {
       case 'pointermove':
       case 'pointerup': {
         if (this.canPointerEvents()) {
-          let { screenX, screenY } = event as PointerInputEvent
+          const { screenX, screenY } = event as PointerInputEvent
           if (screenX && screenY) {
+            const pos = new Vector2(screenX, screenY)
             const viewport = this.getViewport()
             if (viewport) {
-              ([screenX, screenY] = viewport.canvasTransform.inverse().applyToPoint(screenX, screenY))
+              viewport.toGlobal(pos, pos)
             }
-            [screenX, screenY] = this.globalTransform.inverse().applyToPoint(screenX, screenY)
-            if (this._pointerInput({ x: screenX, y: screenY }, key)) {
+            this.toLocal(pos, pos)
+            if (this._positionInput(pos, key)) {
               if (!event.target) {
                 event.target = this
               }

@@ -1,3 +1,4 @@
+import type { Vector2Data } from './Vector2'
 import { Vector2 } from './Vector2'
 
 export class Rect2 {
@@ -15,8 +16,8 @@ export class Rect2 {
   readonly size: Vector2
 
   constructor(from: Rect2)
-  constructor(pointArray: [number, number][])
-  constructor(position: Vector2, size: Vector2)
+  constructor(pointArray: Vector2Data[])
+  constructor(position: Vector2Data, size: Vector2Data)
   constructor(x: number, y: number, width: number, height: number)
   constructor(...args: any[]) {
     const position = new Vector2()
@@ -31,8 +32,8 @@ export class Rect2 {
           size.set(arg.size)
         }
         else {
-          const xx = arg.map((p: [number, number]) => p[0])
-          const yy = arg.map((p: [number, number]) => p[1])
+          const xx = arg.map((p: Vector2Data) => p.x)
+          const yy = arg.map((p: Vector2Data) => p.y)
           const minX = Math.min(...xx)
           const maxX = Math.max(...xx)
           const minY = Math.min(...yy)
