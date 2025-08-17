@@ -235,10 +235,10 @@ export class BaseElement2D extends Node2D implements Rectangulable {
     return new Vector2(originX * width, originY * height)
   }
 
-  override getTransform(cb?: (transform: Transform2D) => void): Transform2D {
+  override updateTransform(cb?: (transform: Transform2D) => void): void {
     const { width, height } = this.size
 
-    return super.getTransform((transform) => {
+    super.updateTransform((transform) => {
       parseCSSTransform(this.style.transform ?? '', width, height, transform)
 
       cb?.(transform)

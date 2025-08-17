@@ -13,7 +13,7 @@ export class WebGLProgramModule extends WebGLModule {
 
   uniforms = {
     projectionMatrix: [1, 0, 0, 0, 1, 0, 0, 0, 1],
-    worldTransformMatrix: [1, 0, 0, 0, 1, 0, 0, 0, 1],
+    viewMatrix: [1, 0, 0, 0, 1, 0, 0, 0, 1],
   }
 
   create(options?: WebGLProgramOptions): WebGLProgram {
@@ -269,7 +269,7 @@ export class WebGLProgramModule extends WebGLModule {
     this.boundProgram = null
     this.uniforms = {
       projectionMatrix: [1, 0, 0, 0, 1, 0, 0, 0, 1],
-      worldTransformMatrix: [1, 0, 0, 0, 1, 0, 0, 0, 1],
+      viewMatrix: [1, 0, 0, 0, 1, 0, 0, 0, 1],
     }
   }
 

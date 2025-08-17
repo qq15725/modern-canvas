@@ -172,11 +172,11 @@ export class Transform2D extends Matrix3 {
     return newPos
   }
 
-  inverse(): this {
-    return this.clone().invert()
+  affineInverse(): this {
+    return this.clone().affineInvert()
   }
 
-  applyInverse<P extends Vector2Data = Vector2>(pos: Vector2Data, newPos?: P): P {
+  applyAffineInverse<P extends Vector2Data = Vector2>(pos: Vector2Data, newPos?: P): P {
     newPos = (newPos || new Vector2()) as P
     const { a, b, c, d, tx, ty } = this.toObject()
     const id = 1 / ((a * d) + (c * -b))

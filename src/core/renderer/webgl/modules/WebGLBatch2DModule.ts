@@ -79,7 +79,7 @@ attribute vec4 aBackgroundColor;
 attribute vec4 aDisableWrapMode;
 
 uniform mat3 projectionMatrix;
-uniform mat3 worldTransformMatrix;
+uniform mat3 viewMatrix;
 uniform vec4 modulate;
 
 varying float vTextureId;
@@ -95,7 +95,7 @@ void main(void) {
     0.0, 0.0, 1.0
   );
   vTextureId = aTextureId;
-  mat3 modelViewProjectionMatrix = projectionMatrix * worldTransformMatrix * modelMatrix;
+  mat3 modelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
   gl_Position = vec4((modelViewProjectionMatrix * vec3(aPosition, 1.0)).xy, 0.0, 1.0);
   vUv = aUv;
   vModulate = aModulate * modulate;

@@ -1,5 +1,12 @@
 import type { EventListenerValue } from 'modern-idoc'
-import type { InputEvent, InputEventKey, KeyboardInputEvent, PointerInputEvent, WheelInputEvent } from '../../core'
+import type {
+  InputEvent,
+  InputEventKey,
+  KeyboardInputEvent,
+  PointerInputEvent,
+  Vector2Data,
+  WheelInputEvent,
+} from '../../core'
 import type { Node } from '../main'
 import type { Node2DEventMap, Node2DProperties } from './Node2D'
 import { property } from 'modern-idoc'
@@ -11,7 +18,7 @@ export interface Camera2DProperties extends Node2DProperties {
 }
 
 export interface Camera2DEventMap extends Node2DEventMap {
-  updateWorldTransform: () => void
+  updateCanvasTransform: () => void
 }
 
 export interface Camera2D {
@@ -30,7 +37,7 @@ export interface Camera2D {
   renderMode: 'disabled',
 })
 export class Camera2D extends Node2D {
-  readonly zoom = new Vector2(1, 1).on('update', () => this.updateWorldTransform())
+  readonly zoom = new Vector2(1, 1).on('update', () => this.updateCanvasTransform())
   readonly maxZoom = new Vector2(6, 6)
   readonly minZoom = new Vector2(0.1, 0.1)
 
@@ -140,21 +147,43 @@ export class Camera2D extends Node2D {
 
   override updateTransform(): void {
     super.updateTransform()
-    this.updateWorldTransform()
+    this.updateCanvasTransform()
   }
 
-  updateWorldTransform(): void {
+  updateCanvasTransform(): void {
     const viewport = this.getViewport()
 
     if (!viewport)
       return
 
     viewport
-      .worldTransform
+      .canvasTransform
       .identity()
       .scale(this.zoom.x, this.zoom.y)
       .translate(this.position.x, this.position.y)
 
-    this.emit('updateWorldTransform')
+    this.emit('updateCanvasTransform')
+  }
+
+  toGlobal<P extends Vector2Data = Vector2>(screenPos: Vector2Data, newPos?: P): P {
+    const viewport = this.getViewport()
+
+    if (!viewport)
+      throw new Error('Failed to toGlobal, viewport is empty')
+
+    return viewport
+      .canvasTransform
+      .applyAffineInverse(screenPos, newPos)
+  }
+
+  toScreen<P extends Vector2Data = Vector2>(globalPos: Vector2Data, newPos?: P): P {
+    const viewport = this.getViewport()
+
+    if (!viewport)
+      throw new Error('Failed to toScreen, viewport is empty')
+
+    return viewport
+      .canvasTransform
+      .apply(globalPos, newPos)
   }
 }

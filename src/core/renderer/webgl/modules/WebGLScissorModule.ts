@@ -60,9 +60,9 @@ export class WebGLScissorModule extends WebGLModule {
   use(): void {
     const renderer = this._renderer
     const { pixelRatio, mask, viewport, screen, gl, program } = renderer
-    const { worldTransformMatrix } = program.uniforms
+    const { viewMatrix } = program.uniforms
 
-    const rect = transformRectToAABB(worldTransformMatrix, mask.last.mask as MaskRect)
+    const rect = transformRectToAABB(viewMatrix, mask.last.mask as MaskRect)
     const { x, y, width, height } = rect
 
     let scissorY: number

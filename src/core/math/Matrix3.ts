@@ -12,7 +12,7 @@ export class Matrix3 extends Matrix {
     super(3, 3, array)
   }
 
-  invert(): this {
+  affineInvert(): this {
     const [
       n11, n21, n31,
       n12, n22, n32,

@@ -67,12 +67,11 @@ export class Node2D extends CanvasItem {
     return new Vector2(0, 0)
   }
 
-  getTransform(cb?: (transform: Transform2D) => void): Transform2D {
+  updateTransform(cb?: (transform: Transform2D) => void): void {
     const origin = this.getTransformOrigin()
 
-    const transform = new Transform2D()
-
-    transform
+    const transform = this.transform
+      .identity()
       .translate(-origin.x, -origin.y)
       .scale(this.scale.x, this.scale.y)
       .skew(this.skew.x, this.skew.y)
@@ -83,32 +82,24 @@ export class Node2D extends CanvasItem {
     transform
       .translate(this.position.x, this.position.y)
       .translate(origin.x, origin.y)
-
-    return transform
-  }
-
-  updateTransform(): void {
-    this.transform.copy(this.getTransform())
   }
 
   updateGlobalTransform(): void {
     this.updateTransform()
     const parent = this.getParent<Node2D>()
     if (parent?.globalTransform) {
-      this._parentTransformDirtyId = parent.globalTransform.dirtyId
-      this.globalPosition.set(
-        parent.globalPosition.x + this.position.x,
-        parent.globalPosition.y + this.position.y,
-      )
-      this.globalScale.set(
-        parent.globalScale.x * this.scale.x,
-        parent.globalScale.y * this.scale.y,
-      )
-      this.globalSkew.set(
-        parent.globalSkew.x * this.skew.x,
-        parent.globalSkew.y * this.skew.y,
-      )
-      this.globalRotation = parent.globalRotation + this.rotation
+      const {
+        globalPosition,
+        globalScale,
+        globalSkew,
+        globalTransform,
+        globalRotation,
+      } = parent
+      this._parentTransformDirtyId = globalTransform.dirtyId
+      this.globalPosition.set(globalPosition.x + this.position.x, globalPosition.y + this.position.y)
+      this.globalScale.set(globalScale.x * this.scale.x, globalScale.y * this.scale.y)
+      this.globalSkew.set(globalSkew.x * this.skew.x, globalSkew.y * this.skew.y)
+      this.globalRotation = globalRotation + this.rotation
       parent.globalTransform.multiply(this.transform, this.globalTransform)
     }
     else {
@@ -168,7 +159,7 @@ export class Node2D extends CanvasItem {
   }
 
   toLocal<P extends Vector2Data = Vector2>(globalPos: Vector2Data, newPos?: P): P {
-    return this.globalTransform.applyInverse(globalPos, newPos)
+    return this.globalTransform.applyAffineInverse(globalPos, newPos)
   }
 
   toGlobal<P extends Vector2Data = Vector2>(localPos: Vector2Data, newPos?: P): P {
