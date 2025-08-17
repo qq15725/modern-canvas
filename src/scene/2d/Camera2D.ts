@@ -171,9 +171,7 @@ export class Camera2D extends Node2D {
     if (!viewport)
       throw new Error('Failed to toGlobal, viewport is empty')
 
-    return viewport
-      .canvasTransform
-      .applyAffineInverse(screenPos, newPos)
+    return viewport.toCanvasGlobal(screenPos, newPos)
   }
 
   toScreen<P extends Vector2Data = Vector2>(globalPos: Vector2Data, newPos?: P): P {
@@ -182,8 +180,6 @@ export class Camera2D extends Node2D {
     if (!viewport)
       throw new Error('Failed to toScreen, viewport is empty')
 
-    return viewport
-      .canvasTransform
-      .apply(globalPos, newPos)
+    return viewport.toCanvasScreen(globalPos, newPos)
   }
 }

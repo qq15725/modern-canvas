@@ -462,7 +462,7 @@ export class BaseElement2D extends Node2D implements Rectangulable {
             const pos = new Vector2(screenX, screenY)
             const viewport = this.getViewport()
             if (viewport) {
-              viewport.toGlobal(pos, pos)
+              viewport.toCanvasGlobal(pos, pos)
             }
             this.toLocal(pos, pos)
             if (this._positionInput(pos, key)) {

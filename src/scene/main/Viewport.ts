@@ -1,5 +1,5 @@
 import type { EventListenerOptions, EventListenerValue, PropertyDeclaration } from 'modern-idoc'
-import type { WebGLFramebufferOptions, WebGLRenderer } from '../../core'
+import type { Vector2, Vector2Data, WebGLFramebufferOptions, WebGLRenderer } from '../../core'
 import type { Rectangulable, RectangulableEventMap } from './interfaces'
 import type { NodeEventMap } from './Node'
 import { property } from 'modern-idoc'
@@ -187,5 +187,13 @@ export class Viewport extends Node implements Rectangulable {
 
   getRect(): Rect2 {
     return new Rect2(this.x, this.y, this.width, this.height)
+  }
+
+  toCanvasGlobal<P extends Vector2Data = Vector2>(screenPos: Vector2Data, newPos?: P): P {
+    return this.canvasTransform.applyAffineInverse(screenPos, newPos)
+  }
+
+  toCanvasScreen<P extends Vector2Data = Vector2>(globalPos: Vector2Data, newPos?: P): P {
+    return this.canvasTransform.apply(globalPos, newPos)
   }
 }
