@@ -1,3 +1,13 @@
+# [0.8.0](https://github.com/qq15725/modern-canvas/compare/v0.7.15...v0.8.0) (2025-08-21)
+
+
+### Features
+
+* batch render roundPixels / optional yoga-layout ([19fab3b](https://github.com/qq15725/modern-canvas/commit/19fab3bb138bddf16f76a47fdc2097990ac4b6ff))
+* up deps ([fc0660a](https://github.com/qq15725/modern-canvas/commit/fc0660ac0602443459e1b53e08b6732d7ae1d17a))
+
+
+
 ## [0.7.15](https://github.com/qq15725/modern-canvas/compare/v0.7.14...v0.7.15) (2025-08-17)
 
 
