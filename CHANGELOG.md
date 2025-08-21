@@ -1,3 +1,12 @@
+## [0.8.1](https://github.com/qq15725/modern-canvas/compare/v0.8.0...v0.8.1) (2025-08-21)
+
+
+### Bug Fixes
+
+* optional yoga-layout ([9c7372b](https://github.com/qq15725/modern-canvas/commit/9c7372b1702495a7da97b3c21dd0f9bfead15d92))
+
+
+
 # [0.8.0](https://github.com/qq15725/modern-canvas/compare/v0.7.15...v0.8.0) (2025-08-21)
 
 
