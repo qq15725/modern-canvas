@@ -81,12 +81,18 @@ attribute vec4 aDisableWrapMode;
 uniform mat3 projectionMatrix;
 uniform mat3 viewMatrix;
 uniform vec4 modulate;
+uniform float canvasWidth;
+uniform float canvasHeight;
 
 varying float vTextureId;
 varying vec2 vUv;
 varying vec4 vModulate;
 varying vec4 vBackgroundColor;
 varying vec4 vDisableWrapMode;
+
+vec2 roundPixels(vec2 position, vec2 targetSize) {
+  return (floor(((position * 0.5 + 0.5) * targetSize) + 0.5) / targetSize) * 2.0 - 1.0;
+}
 
 void main(void) {
   mat3 modelMatrix = mat3(
@@ -95,8 +101,9 @@ void main(void) {
     0.0, 0.0, 1.0
   );
   vTextureId = aTextureId;
-  mat3 modelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
-  gl_Position = vec4((modelViewProjectionMatrix * vec3(aPosition, 1.0)).xy, 0.0, 1.0);
+  vec3 pos = projectionMatrix * viewMatrix * modelMatrix * vec3(aPosition, 1.0);
+  gl_Position = vec4(roundPixels(pos.xy, vec2(canvasWidth, canvasHeight)), 0.0, 1.0);
+
   vUv = aUv;
   vModulate = aModulate * modulate;
   vBackgroundColor = aBackgroundColor;
@@ -184,6 +191,8 @@ void main(void) {
         renderer.program.updateUniforms(program, {
           samplers,
           modulate: [1, 1, 1, 1],
+          canvasWidth: renderer.gl.drawingBufferWidth,
+          canvasHeight: renderer.gl.drawingBufferHeight,
           ...renderer.program.uniforms,
         })
         renderer.vertexArray.bind(vao ?? vertexArray)

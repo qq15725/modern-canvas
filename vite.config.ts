@@ -10,7 +10,7 @@ export default defineConfig({
       entry: resolvePath('./src/index.ts'),
     },
     rollupOptions: {
-      external: ['modern-gif', 'lottie-web'],
+      external: ['modern-gif', 'lottie-web', 'yoga-layout'],
       output: [
         {
           format: 'umd',
@@ -19,6 +19,7 @@ export default defineConfig({
           globals: {
             'modern-gif': 'modernGif',
             'lottie-web': 'lottie',
+            'yoga-layout': 'yogaLayout', // yoga-layout does not have umi
           },
         },
       ],

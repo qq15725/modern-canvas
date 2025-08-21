@@ -1,85 +1,87 @@
 import type { PropertyDeclaration } from 'modern-idoc'
-import type {
-  Node as YogaNode,
-} from 'yoga-layout/load'
+import type { Node as YogaNode } from 'yoga-layout/load'
 import type { FlexElement2DStyle } from './element'
 import type { FlexElement2D } from './FlexElement2D'
-import {
-  Align,
-  BoxSizing,
-  Direction,
-  Display,
-  Edge,
-  FlexDirection,
-  Gutter,
-  Justify,
-  loadYoga,
-  Overflow,
-  PositionType,
-  Wrap,
-} from 'yoga-layout/load'
 
-const alignMap = {
-  'auto': Align.Auto,
-  'flex-start': Align.FlexStart,
-  'center': Align.Center,
-  'flex-end': Align.FlexEnd,
-  'stretch': Align.Stretch,
-  'baseline': Align.Baseline,
-  'space-between': Align.SpaceBetween,
-  'space-around': Align.SpaceAround,
-  'space-evenly': Align.SpaceEvenly,
+export const edgeMap = {
+  left: 0, // Edge.Left
+  top: 1, // Edge.Top
+  right: 2, // Edge.Right
+  bottom: 3, // Edge.Bottom
+  start: 4, // Edge.Start
+  end: 5, // Edge.End
+  horizontal: 6, // Edge.Horizontal
+  vertical: 7, // Edge.Vertical
+  all: 8, // Edge.All
 }
 
-const displayMap = {
-  none: Display.None,
-  flex: Display.Flex,
-  contents: Display.Contents,
+export const gutterMap = {
+  column: 0, // Gutter.Column
+  row: 1, // Gutter.Row
+  all: 2, // Gutter.All
 }
 
-const directionMap = {
-  inherit: Direction.Inherit,
-  ltr: Direction.LTR,
-  rtl: Direction.RTL,
+export const alignMap = {
+  'auto': 0, // Align.Auto
+  'flex-start': 1, // Align.FlexStart
+  'center': 2, // Align.Center
+  'flex-end': 3, // Align.FlexEnd
+  'stretch': 4, // Align.Stretch
+  'baseline': 5, // Align.Baseline
+  'space-between': 6, // Align.SpaceBetween
+  'space-around': 7, // Align.SpaceAround
+  'space-evenly': 8, // Align.SpaceEvenly
 }
 
-const flexDirectionMap = {
-  'column': FlexDirection.Column,
-  'column-reverse': FlexDirection.ColumnReverse,
-  'row': FlexDirection.Row,
-  'row-reverse': FlexDirection.RowReverse,
+export const displayMap = {
+  flex: 0, // Display.Flex
+  none: 1, // Display.None
+  contents: 2, // Display.Contents
 }
 
-const flexWrapMap = {
-  'no-wrap': Wrap.NoWrap,
-  'wrap': Wrap.Wrap,
-  'Wrap-reverse': Wrap.WrapReverse,
+export const directionMap = {
+  inherit: 0, // Direction.Inherit
+  ltr: 1, // Direction.LTR
+  rtl: 2, // Direction.RTL
 }
 
-const justifyMap = {
-  'flex-start': Justify.FlexStart,
-  'center': Justify.Center,
-  'flex-end': Justify.FlexEnd,
-  'space-between': Justify.SpaceBetween,
-  'space-around': Justify.SpaceAround,
-  'space-evenly': Justify.SpaceEvenly,
+export const flexDirectionMap = {
+  'column': 0, // FlexDirection.Column
+  'column-reverse': 1, // FlexDirection.ColumnReverse
+  'row': 2, // FlexDirection.Row
+  'row-reverse': 3, // FlexDirection.RowReverse
 }
 
-const overflowMap = {
-  visible: Overflow.Visible,
-  hidden: Overflow.Hidden,
-  scroll: Overflow.Scroll,
+export const flexWrapMap = {
+  'no-wrap': 0, // Wrap.NoWrap
+  'wrap': 1, // Wrap.Wrap
+  'Wrap-reverse': 2, // Wrap.WrapReverse
 }
 
-const positionTypeMap = {
-  static: PositionType.Static,
-  relative: PositionType.Relative,
-  absolute: PositionType.Absolute,
+export const justifyMap = {
+  'flex-start': 0, // Justify.FlexStart
+  'center': 1, // Justify.Center
+  'flex-end': 2, // Justify.FlexEnd
+  'space-between': 3, // Justify.SpaceBetween
+  'space-around': 4, // Justify.SpaceAround
+  'space-evenly': 5, // Justify.SpaceEvenly
 }
 
-const boxSizingMap = {
-  'border-box': BoxSizing.BorderBox,
-  'content-box': BoxSizing.ContentBox,
+export const overflowMap = {
+  visible: 0, // Overflow.Visible
+  hidden: 1, // Overflow.Hidden
+  scroll: 2, // Overflow.Scroll
+}
+
+export const positionTypeMap = {
+  static: 0, // PositionType.Static
+  relative: 1, // PositionType.Relative
+  absolute: 2, // PositionType.Absolute
+}
+
+export const boxSizingMap = {
+  'border-box': 0, // BoxSizing.BorderBox
+  'content-box': 1, // BoxSizing.ContentBox
 }
 
 export interface ComputedLayout {
@@ -94,6 +96,7 @@ export interface ComputedLayout {
 export class FlexLayout {
   static _yoga?: any
   static async load(): Promise<void> {
+    const { loadYoga } = await import('yoga-layout/load')
     this._yoga = await loadYoga()
   }
 
@@ -125,7 +128,7 @@ export class FlexLayout {
     //
   }
 
-  calculateLayout(width?: number | 'auto', height?: number | 'auto', direction?: Direction): void {
+  calculateLayout(width?: number | 'auto', height?: number | 'auto', direction?: typeof displayMap[keyof typeof displayMap]): void {
     return this._node.calculateLayout(width, height, direction)
   }
 
@@ -162,19 +165,19 @@ export class FlexLayout {
         this._node.setAspectRatio(value)
         break
       case 'borderTop':
-        this._node.setBorder(Edge.Top, this._style.borderWidth)
+        this._node.setBorder(edgeMap.top, this._style.borderWidth)
         break
       case 'borderBottom':
-        this._node.setBorder(Edge.Bottom, this._style.borderWidth)
+        this._node.setBorder(edgeMap.bottom, this._style.borderWidth)
         break
       case 'borderLeft':
-        this._node.setBorder(Edge.Left, this._style.borderWidth)
+        this._node.setBorder(edgeMap.left, this._style.borderWidth)
         break
       case 'borderRight':
-        this._node.setBorder(Edge.Right, this._style.borderWidth)
+        this._node.setBorder(edgeMap.right, this._style.borderWidth)
         break
       case 'border':
-        this._node.setBorder(Edge.All, this._style.borderWidth)
+        this._node.setBorder(edgeMap.all, this._style.borderWidth)
         break
       case 'direction':
         this._node.setDirection(
@@ -227,22 +230,22 @@ export class FlexLayout {
         )
         break
       case 'gap':
-        value !== undefined && this._node.setGap(Gutter.All, value)
+        value !== undefined && this._node.setGap(gutterMap.all, value)
         break
       case 'marginTop':
-        this._node.setMargin(Edge.Top, value)
+        this._node.setMargin(edgeMap.top, value)
         break
       case 'marginBottom':
-        this._node.setMargin(Edge.Top, value)
+        this._node.setMargin(edgeMap.bottom, value)
         break
       case 'marginLeft':
-        this._node.setMargin(Edge.Left, value)
+        this._node.setMargin(edgeMap.left, value)
         break
       case 'marginRight':
-        this._node.setMargin(Edge.Top, value)
+        this._node.setMargin(edgeMap.right, value)
         break
       case 'margin':
-        this._node.setMargin(Edge.All, value)
+        this._node.setMargin(edgeMap.all, value)
         break
       case 'maxHeight':
         this._node.setMaxHeight(value)
@@ -266,31 +269,31 @@ export class FlexLayout {
         )
         break
       case 'paddingTop':
-        this._node.setPadding(Edge.Top, this._style.paddingTop)
+        this._node.setPadding(edgeMap.top, this._style.paddingTop)
         break
       case 'paddingBottom':
-        this._node.setPadding(Edge.Bottom, this._style.paddingBottom)
+        this._node.setPadding(edgeMap.bottom, this._style.paddingBottom)
         break
       case 'paddingLeft':
-        this._node.setPadding(Edge.Left, this._style.paddingLeft)
+        this._node.setPadding(edgeMap.left, this._style.paddingLeft)
         break
       case 'paddingRight':
-        this._node.setPadding(Edge.Right, this._style.paddingRight)
+        this._node.setPadding(edgeMap.right, this._style.paddingRight)
         break
       case 'padding':
-        this._node.setPadding(Edge.All, this._style.padding)
+        this._node.setPadding(edgeMap.all, this._style.padding)
         break
       case 'top':
-        this._node.setPosition(Edge.Top, this._style.top)
+        this._node.setPosition(edgeMap.top, this._style.top)
         break
       case 'bottom':
-        this._node.setPosition(Edge.Bottom, this._style.bottom)
+        this._node.setPosition(edgeMap.bottom, this._style.bottom)
         break
       case 'left':
-        this._node.setPosition(Edge.Left, this._style.left)
+        this._node.setPosition(edgeMap.left, this._style.left)
         break
       case 'right':
-        this._node.setPosition(Edge.Right, this._style.right)
+        this._node.setPosition(edgeMap.right, this._style.right)
         break
       case 'position':
         this._node.setPositionType(

@@ -1,10 +1,9 @@
 import type { EventListenerOptions, EventListenerValue, PropertyDeclaration } from 'modern-idoc'
 import type { Node, Rectangulable } from '../main'
 import type { BaseElement2DEventMap, BaseElement2DProperties, FlexElement2DStyleProperties } from './element'
-import { Direction } from 'yoga-layout/load'
 import { customNode } from '../../core'
 import { BaseElement2D, FlexElement2DStyle } from './element'
-import { FlexLayout } from './FlexLayout'
+import { directionMap, FlexLayout } from './FlexLayout'
 
 export interface FlexBaseElement2DEventMap extends BaseElement2DEventMap {
   updateStyleProperty: (key: string, value: any, oldValue: any, declaration?: PropertyDeclaration) => void
@@ -97,7 +96,7 @@ export class FlexElement2D extends BaseElement2D implements Rectangulable {
   }
 
   override updateTransform(): void {
-    this.calculateLayout(undefined, undefined, Direction.LTR)
+    this.calculateLayout(undefined, undefined, directionMap.ltr)
     const { left, top, width, height } = this._layout.getComputedLayout()
     this.position.x = left
     this.position.y = top
@@ -106,7 +105,7 @@ export class FlexElement2D extends BaseElement2D implements Rectangulable {
     super.updateTransform()
   }
 
-  calculateLayout(width?: number | 'auto', height?: number | 'auto', direction?: Direction): void {
+  calculateLayout(width?: number | 'auto', height?: number | 'auto', direction?: typeof directionMap[keyof typeof directionMap]): void {
     const parent = this.getParent<FlexElement2D>()
     if (parent?._layout?.calculateLayout) {
       parent?._layout.calculateLayout(width, height, direction)

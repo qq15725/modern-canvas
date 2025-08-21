@@ -56,13 +56,17 @@
   },
   "peerDependencies": {
     "lottie-web": "^5",
-    "modern-gif": "^2"
+    "modern-gif": "^2",
+    "yoga-layout": "^3"
   },
   "peerDependenciesMeta": {
     "lottie-web": {
       "optional": true
     },
     "modern-gif": {
+      "optional": true
+    },
+    "yoga-layout": {
       "optional": true
     }
   },
@@ -72,8 +76,7 @@
     "modern-font": "^0.4.1",
     "modern-idoc": "^0.8.7",
     "modern-path2d": "^1.4.8",
-    "modern-text": "^1.7.4",
-    "yoga-layout": "^3.2.1"
+    "modern-text": "^1.7.4"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^5.0.0",
@@ -89,7 +92,8 @@
     "typescript": "^5.8.3",
     "unbuild": "^3.6.0",
     "vite": "^7.0.6",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "yoga-layout": "^3.2.1"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm lint-staged"
