@@ -2,7 +2,7 @@ import type { Assets } from '../Assets'
 import { AnimatedTexture, PixelsTexture } from '../../scene'
 import { Loader } from './Loader'
 
-export class GIFLoader extends Loader {
+export class GifLoader extends Loader {
   declare load: (url: string) => Promise<AnimatedTexture>
 
   install(assets: Assets): this {

@@ -1,7 +1,7 @@
 import type { Assets } from '../Assets'
 import { Loader } from './Loader'
 
-export class JSONLoader extends Loader {
+export class JsonLoader extends Loader {
   declare load: (url: string) => Promise<Record<string, any>>
 
   install(assets: Assets): this {

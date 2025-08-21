@@ -2,8 +2,8 @@ import type { Loader } from './loaders'
 import { Ticker } from '../core'
 import {
   FontLoader,
-  GIFLoader,
-  JSONLoader,
+  GifLoader,
+  JsonLoader,
   LottieLoader,
   TextLoader,
   TextureLoader,
@@ -17,8 +17,8 @@ export type AssetHandler = (url: string, options?: any) => any | Promise<any>
 
 export interface Assets {
   font: FontLoader
-  gif: GIFLoader
-  json: JSONLoader
+  gif: GifLoader
+  json: JsonLoader
   lottie: LottieLoader
   text: TextLoader
   texture: TextureLoader
@@ -185,8 +185,8 @@ export class Assets {
 
 export const assets = new Assets()
   .use(new FontLoader())
-  .use(new GIFLoader())
-  .use(new JSONLoader())
+  .use(new GifLoader())
+  .use(new JsonLoader())
   .use(new LottieLoader())
   .use(new TextLoader())
   .use(new TextureLoader())
