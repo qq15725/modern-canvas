@@ -10,7 +10,7 @@ export default defineConfig({
       entry: resolvePath('./src/index.ts'),
     },
     rollupOptions: {
-      external: ['modern-gif', 'lottie-web', 'yoga-layout'],
+      external: ['modern-gif', 'lottie-web', /^yoga-layout/],
       output: [
         {
           format: 'umd',
