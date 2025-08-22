@@ -1,3 +1,12 @@
+## [0.8.2](https://github.com/qq15725/modern-canvas/compare/v0.8.1...v0.8.2) (2025-08-22)
+
+
+### Bug Fixes
+
+* batch render color ([3baa59b](https://github.com/qq15725/modern-canvas/commit/3baa59b65298875bda2ef8081aa2c69c5a2a4291))
+
+
+
 ## [0.8.1](https://github.com/qq15725/modern-canvas/compare/v0.8.0...v0.8.1) (2025-08-21)
 
 
