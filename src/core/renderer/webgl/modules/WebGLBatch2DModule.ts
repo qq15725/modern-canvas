@@ -9,8 +9,8 @@ export interface Batchable2D {
   indices: Float32Array
   uvs?: Float32Array
   texture?: WebGLTexture
-  backgroundColor?: number
-  modulate?: number
+  backgroundColor?: number[]
+  modulate?: number[]
   blendMode?: WebGLBlendMode
   disableWrapMode?: boolean
 }
@@ -23,7 +23,7 @@ type DrawCall = Required<WebGLDrawOptions> & {
 }
 
 interface Shader {
-  update: (attributeBuffer: ArrayBuffer, indexBuffer: Uint16Array) => void
+  update: (attributeBuffer: ArrayBuffer, indexBuffer: Uint16Array<ArrayBuffer>) => void
   draw: (options?: WebGLDrawOptions) => void
 }
 
@@ -37,14 +37,14 @@ export class WebGLBatch2DModule extends WebGLModule {
   protected _batchSize = 4096 * 4
   protected _drawCallUid = 0
 
-  protected _defaultModulate = 0xFFFFFFFF
-  protected _defaultBackgroundColor = 0x00000000
+  protected _defaultModulate = [255, 255, 255, 255]
+  protected _defaultBackgroundColor = [0, 0, 0, 0]
 
   protected _batchables: Batchable2D[] = []
   protected _vertexCount = 0
   protected _indexCount = 0
   protected _attributeBuffer: ArrayBuffer[] = []
-  protected _indexBuffers: Uint16Array[] = []
+  protected _indexBuffers: Uint16Array<ArrayBuffer>[] = []
   protected _shaders = new Map<number, Shader>()
 
   protected _attributes: Record<string, Partial<WebGLVertexAttrib>> = {
@@ -53,7 +53,7 @@ export class WebGLBatch2DModule extends WebGLModule {
     aUv: { size: 2, normalized: false, type: 'float' }, // 2
     aModulate: { size: 4, normalized: true, type: 'unsigned_byte' }, // 1
     aBackgroundColor: { size: 4, normalized: true, type: 'unsigned_byte' }, // 1
-    aDisableWrapMode: { size: 4, normalized: true, type: 'unsigned_byte' }, // 1
+    aDisableWrapMode: { size: 1, normalized: true, type: 'float' }, // 1
   }
 
   protected _vertexSize = 1 + 2 + 2 + 1 + 1 + 1
@@ -76,7 +76,7 @@ attribute vec2 aPosition;
 attribute vec2 aUv;
 attribute vec4 aModulate;
 attribute vec4 aBackgroundColor;
-attribute vec4 aDisableWrapMode;
+attribute float aDisableWrapMode;
 
 uniform mat3 projectionMatrix;
 uniform mat3 viewMatrix;
@@ -88,7 +88,7 @@ varying float vTextureId;
 varying vec2 vUv;
 varying vec4 vModulate;
 varying vec4 vBackgroundColor;
-varying vec4 vDisableWrapMode;
+varying float vDisableWrapMode;
 
 vec2 roundPixels(vec2 position, vec2 targetSize) {
   return (floor(((position * 0.5 + 0.5) * targetSize) + 0.5) / targetSize) * 2.0 - 1.0;
@@ -103,6 +103,7 @@ void main(void) {
   vTextureId = aTextureId;
   vec3 pos = projectionMatrix * viewMatrix * modelMatrix * vec3(aPosition, 1.0);
   gl_Position = vec4(roundPixels(pos.xy, vec2(canvasWidth, canvasHeight)), 0.0, 1.0);
+  // gl_Position = vec4(pos.xy, 0.0, 1.0);
 
   vUv = aUv;
   vModulate = aModulate * modulate;
@@ -114,20 +115,20 @@ varying float vTextureId;
 varying vec2 vUv;
 varying vec4 vModulate;
 varying vec4 vBackgroundColor;
-varying vec4 vDisableWrapMode;
+varying float vDisableWrapMode;
 
 uniform sampler2D samplers[${maxTextureUnits}];
 
 void main(void) {
-  vec4 color;
-  if (vDisableWrapMode.x > 0.0 && (vUv.x < 0.0 || vUv.y < 0.0 || vUv.x > 1.0 || vUv.y > 1.0))
+  vec4 color = vec4(0.0, 0.0, 0.0, 0.0);
+  if (vDisableWrapMode > 0.0 && (vUv.x < 0.0 || vUv.y < 0.0 || vUv.x > 1.0 || vUv.y > 1.0))
   {
-    color = vec4(0.0, 0.0, 0.0, 0.0);
+    //
   }
   else
   if (vTextureId < 0.0)
   {
-    color = vec4(0.0, 0.0, 0.0, 0.0);
+    //
   }${Array.from({ length: maxTextureUnits }, (_, i) => {
     let text = '  '
     if (i >= 0) {
@@ -231,7 +232,7 @@ void main(void) {
     const textureMaxUnits = this._renderer.texture.maxUnits
     const attributeBuffer = this._getAttributeBuffer(vertexCount)
     const float32View = new Float32Array(attributeBuffer)
-    const uint32View = new Uint32Array(attributeBuffer)
+    const uint8View = new Uint8Array(attributeBuffer)
     const indexBuffer = this._getIndexBuffer(indexCount)
     let aIndex = 0
     let iIndex = 0
@@ -289,7 +290,7 @@ void main(void) {
 
           const iIndexStart = aIndex / this._vertexSize
 
-          const textureLocation = (texture ? textureLocationMap.get(texture) : 255) ?? 255
+          const textureLocation = (texture ? textureLocationMap.get(texture) : -1) ?? -1
           const disableWrapModeInt = disableWrapMode ? 1 : 0
 
           for (let len = vertices.length, i = 0; i < len; i += 2) {
@@ -298,9 +299,23 @@ void main(void) {
             float32View[aIndex++] = vertices[i + 1]
             float32View[aIndex++] = uvs[i]
             float32View[aIndex++] = uvs[i + 1]
-            uint32View[aIndex++] = modulate
-            uint32View[aIndex++] = backgroundColor
-            uint32View[aIndex++] = disableWrapModeInt
+            if (modulate) {
+              const aU8Index = aIndex * 4
+              uint8View[aU8Index] = modulate[0]
+              uint8View[aU8Index + 1] = modulate[1]
+              uint8View[aU8Index + 2] = modulate[2]
+              uint8View[aU8Index + 3] = modulate[3]
+            }
+            aIndex++
+            if (backgroundColor) {
+              const aU8Index = aIndex * 4
+              uint8View[aU8Index] = backgroundColor[0]
+              uint8View[aU8Index + 1] = backgroundColor[1]
+              uint8View[aU8Index + 2] = backgroundColor[2]
+              uint8View[aU8Index + 3] = backgroundColor[3]
+            }
+            aIndex++
+            float32View[aIndex++] = disableWrapModeInt
           }
 
           for (let len = indices.length, i = 0; i < len; i++) {
@@ -379,7 +394,7 @@ void main(void) {
    * @param size - minimum required capacity
    * @returns - buffer that can fit `size` indices.
    */
-  protected _getIndexBuffer(size: number): Uint16Array {
+  protected _getIndexBuffer(size: number): Uint16Array<ArrayBuffer> {
     // 12 indices is enough for 2 quads
     const roundedP2 = nextPow2(Math.ceil(size / 12))
     const roundedSizeIndex = log2(roundedP2)

@@ -2,7 +2,8 @@ import type { LineCap, LineJoin, LineStyle } from 'modern-path2d'
 import type { Batchable2D, ColorValue, Transform2D } from '../../core'
 import { isColorFillObject } from 'modern-idoc'
 import { Path2D } from 'modern-path2d'
-import { ColorTexture, Texture2D } from '../resources'
+import { Color } from '../../core'
+import { Texture2D } from '../resources'
 
 export type UvTransform = Transform2D | ((x: number, y: number) => [number, number])
 export type VertTransform = Transform2D | (() => Transform2D)
@@ -16,7 +17,7 @@ export interface CanvasBatchable extends Batchable2D {
 export interface StrokeDraw extends Partial<CanvasBatchable> {
   type: 'stroke'
   path: Path2D
-  style: LineStyle
+  lineStyle: LineStyle
   uvTransform?: UvTransform
 }
 
@@ -39,16 +40,22 @@ export class CanvasContext extends Path2D {
   uvTransform?: UvTransform
   vertTransform?: VertTransform
 
-  protected _defaultStyle = Texture2D.EMPTY
   protected _draws: (StrokeDraw | FillDraw)[] = []
 
-  protected _toTexture(source: ColorValue | Texture2D): Texture2D {
-    if (source instanceof Texture2D) {
-      return source
+  protected _parseDrawStyle(source?: ColorValue | Texture2D): { texture?: Texture2D, backgroundColor?: number[] } {
+    if (source) {
+      if (source instanceof Texture2D) {
+        return {
+          texture: source,
+        }
+      }
+      else {
+        return {
+          backgroundColor: new Color(source).toInt8Array(),
+        }
+      }
     }
-    else {
-      return ColorTexture.get(source)
-    }
+    return {}
   }
 
   stroke(options?: Partial<StrokeDraw>): void {
@@ -72,14 +79,12 @@ export class CanvasContext extends Path2D {
 
     this._draws.push({
       ...options,
+      ...this._parseDrawStyle(strokeStyle),
       type: 'stroke',
       path: new Path2D(this),
-      texture: strokeStyle
-        ? this._toTexture(strokeStyle)
-        : this._defaultStyle,
       uvTransform: this.uvTransform,
       vertTransform: this.vertTransform,
-      style: {
+      lineStyle: {
         alignment: this.strokeAlignment ?? 0.5,
         cap: this.lineCap ?? 'butt',
         join: this.lineJoin ?? 'miter',
@@ -124,11 +129,9 @@ export class CanvasContext extends Path2D {
 
     this._draws.push({
       ...options,
+      ...this._parseDrawStyle(fillStyle),
       type: 'fill',
       path: new Path2D(this),
-      texture: fillStyle
-        ? this._toTexture(fillStyle)
-        : this._defaultStyle,
       uvTransform: this.uvTransform,
       vertTransform: this.vertTransform,
     })
@@ -226,19 +229,22 @@ export class CanvasContext extends Path2D {
         current.path.strokeTriangulate({
           vertices,
           indices,
-          lineStyle: current.style,
+          lineStyle: current.lineStyle,
           flipAlignment: false,
           closed: true,
         })
       }
 
-      this.buildUvs(0, vertices, uvs, current.texture, current.uvTransform)
+      if (current.texture) {
+        this.buildUvs(0, vertices, uvs, current.texture, current.uvTransform)
+      }
 
       batchables.push({
         vertices: new Float32Array(vertices),
         indices: new Float32Array(indices),
         uvs: new Float32Array(uvs),
         texture: current.texture,
+        backgroundColor: current.backgroundColor,
         type: current.type,
         disableWrapMode: current.disableWrapMode,
         vertTransform: current.vertTransform,

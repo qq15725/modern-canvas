@@ -62,6 +62,10 @@ export class Color {
     return (alpha * 255 << 24) + (r << 16) + (g << 8) + b
   }
 
+  toInt8Array(): [number, number, number, number] {
+    return [this.r8, this.g8, this.b8, this.a8]
+  }
+
   toArray(): [number, number, number, number] {
     return [this.r, this.g, this.b, this.a]
   }

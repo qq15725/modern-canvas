@@ -153,7 +153,7 @@ export class CanvasItem extends TimelineNode {
     return batchables.map((batchable) => {
       return {
         ...batchable,
-        modulate: this._modulate.toArgb(this.globalOpacity, true),
+        modulate: this._modulate.toInt8Array(),
         blendMode: this.blendMode,
       }
     })
