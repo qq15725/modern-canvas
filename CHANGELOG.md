@@ -1,3 +1,13 @@
+## [0.8.3](https://github.com/qq15725/modern-canvas/compare/v0.8.2...v0.8.3) (2025-08-24)
+
+
+### Features
+
+* text outline ([a84d0d7](https://github.com/qq15725/modern-canvas/commit/a84d0d73dfd912fccd4759ab82de8c8df9f56cb8))
+* text outline ([4499d9e](https://github.com/qq15725/modern-canvas/commit/4499d9eed6649b2cd693be2a0e1dd18506186cb2))
+
+
+
 ## [0.8.2](https://github.com/qq15725/modern-canvas/compare/v0.8.1...v0.8.2) (2025-08-22)
 
 
