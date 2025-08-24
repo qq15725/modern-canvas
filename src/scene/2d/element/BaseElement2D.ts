@@ -17,7 +17,8 @@ import type {
   InputEventKey,
   PointerInputEvent,
   Transform2D,
-  Vector2Data, WebGLBlendMode,
+  Vector2Data,
+  WebGLBlendMode,
 } from '../../../core'
 import type { CanvasBatchable, CanvasItemEventMap, Node, Rectangulable } from '../../main'
 import type { Node2DProperties } from '../Node2D'

@@ -27,7 +27,7 @@ let IID = 0
 export class CoreObject extends EventEmitter implements Required<ReactiveObject> {
   readonly instanceId = ++IID
 
-  protected _customPropertyAccessor?: CustomPropertyAccessor
+  protected _propertyAccessor?: CustomPropertyAccessor
   protected _properties = new Map<string, unknown>()
   protected _updatedProperties = new Map<string, unknown>()
   protected _changedProperties = new Set<string>()
@@ -35,7 +35,7 @@ export class CoreObject extends EventEmitter implements Required<ReactiveObject>
   protected _updating = false
 
   useCustomPropertyAccessor(accessor: CustomPropertyAccessor): this {
-    this._customPropertyAccessor = accessor
+    this._propertyAccessor = accessor
     this.getPropertyDeclarations().forEach((declaration, key) => {
       const newValue = accessor.get(key, () => undefined)
       const oldValue = this._properties.get(key)
@@ -64,8 +64,8 @@ export class CoreObject extends EventEmitter implements Required<ReactiveObject>
       return this[context.internalKey]
     }
     else {
-      return this._customPropertyAccessor
-        ? this._customPropertyAccessor.get(key, () => this._properties.get(key))
+      return this._propertyAccessor
+        ? this._propertyAccessor.get(key, () => this._properties.get(key))
         : this._properties.get(key)
     }
   }
@@ -76,8 +76,8 @@ export class CoreObject extends EventEmitter implements Required<ReactiveObject>
       this[context.internalKey] = value
     }
     else {
-      if (this._customPropertyAccessor) {
-        this._customPropertyAccessor.set(key, value)
+      if (this._propertyAccessor) {
+        this._propertyAccessor.set(key, value)
       }
       this._properties.set(key, value)
     }

@@ -3,8 +3,9 @@ import type { Texture2D } from '../../resources'
 import type { BaseElement2D } from './BaseElement2D'
 import { isNone, normalizeFill, property } from 'modern-idoc'
 import { assets } from '../../../asset'
-import { CoreObject, Transform2D } from '../../../core'
+import { CoreObject } from '../../../core'
 import { GradientTexture } from '../../resources'
+import { getDrawOptions } from './utils'
 
 export interface BaseElement2DFill extends NormalizedFill {
   //
@@ -96,61 +97,11 @@ export class BaseElement2DFill extends CoreObject {
     )
   }
 
-  protected _getDrawOptions(): { disableWrapMode: boolean, uvTransform: Transform2D } {
-    let disableWrapMode = false
-
-    const { width, height } = this.parent.size
-
-    const uvTransform = new Transform2D()
-      .scale(1 / width, 1 / height)
-
-    if (this.cropRect) {
-      const {
-        left = 0,
-        top = 0,
-        right = 0,
-        bottom = 0,
-      } = this.cropRect
-      uvTransform
-        .scale(
-          Math.abs(1 - (left + right)),
-          Math.abs(1 - (top + bottom)),
-        )
-        .translate(left, top)
-      disableWrapMode = true
-    }
-
-    if (this.tile) {
-      const {
-        translateX = 0,
-        translateY = 0,
-        scaleX = 1,
-        scaleY = 1,
-        // flip, TODO
-        // alignment, TODO
-      } = this.tile
-      uvTransform
-        .translate(-translateX / width, -translateY / height)
-        .scale(1 / scaleX, 1 / scaleY)
-      disableWrapMode = true
-    }
-    else if (this.stretchRect) {
-      const { left = 0, top = 0, right = 0, bottom = 0 } = this.stretchRect
-      uvTransform
-        .scale(
-          Math.abs(1 - (-left + -right)),
-          Math.abs(1 - (-top + -bottom)),
-        )
-        .translate(-left, -top)
-      disableWrapMode = true
-    }
-
-    return { disableWrapMode, uvTransform }
-  }
-
   draw(): void {
     const ctx = this.parent.context
-    const { uvTransform, disableWrapMode } = this._getDrawOptions()
+    const { uvTransform, disableWrapMode } = getDrawOptions(
+      this, this.parent.size,
+    )
     ctx.uvTransform = uvTransform
     ctx.fillStyle = this._texture ?? this.color
     ctx.fill({

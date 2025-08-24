@@ -209,12 +209,16 @@ export class Engine extends SceneTree {
     this.renderer.free()
   }
 
-  toPixels(): Uint8ClampedArray {
+  toPixels(): Uint8ClampedArray<ArrayBuffer> {
     return this.renderer.toPixels()
   }
 
   toImageData(): ImageData {
-    return new ImageData(this.toPixels(), this.gl.drawingBufferWidth, this.gl.drawingBufferHeight)
+    return new ImageData(
+      this.toPixels(),
+      this.gl.drawingBufferWidth,
+      this.gl.drawingBufferHeight,
+    )
   }
 
   toCanvas2D(): HTMLCanvasElement {

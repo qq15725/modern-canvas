@@ -1,6 +1,7 @@
 import type { NormalizedOutline, Outline, PropertyDeclaration } from 'modern-idoc'
 import { isNone, normalizeOutline, property } from 'modern-idoc'
 import { BaseElement2DFill } from './BaseElement2DFill'
+import { getDrawOptions } from './utils'
 
 export class BaseElement2DOutline extends BaseElement2DFill {
   @property({ fallback: '#00000000' }) declare color: NormalizedOutline['color']
@@ -43,7 +44,9 @@ export class BaseElement2DOutline extends BaseElement2DFill {
 
   draw(): void {
     const ctx = this.parent.context
-    const { uvTransform, disableWrapMode } = this._getDrawOptions()
+    const { uvTransform, disableWrapMode } = getDrawOptions(
+      this, this.parent.size,
+    )
     ctx.lineWidth = this.width || 1
     ctx.uvTransform = uvTransform
     ctx.strokeStyle = this._texture ?? this.color

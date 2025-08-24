@@ -288,7 +288,7 @@ export class WebGLRenderer extends Renderer {
     y = 0,
     width = this.gl.drawingBufferWidth,
     height = this.gl.drawingBufferHeight,
-  ): Uint8ClampedArray {
+  ): Uint8ClampedArray<ArrayBuffer> {
     const length = width * height * 4
     const row = width * 4
     const end = (height - 1) * row

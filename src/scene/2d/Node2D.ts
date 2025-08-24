@@ -58,7 +58,7 @@ export class Node2D extends CanvasItem {
 
     switch (key) {
       case 'rotation':
-        this.requestRelayout()
+        this.updateGlobalTransform()
         break
     }
   }
