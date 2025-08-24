@@ -84,7 +84,7 @@
     "@types/node": "^24.3.0",
     "bumpp": "^10.2.3",
     "conventional-changelog-cli": "^5.0.0",
-    "eslint": "^9.33.0",
+    "eslint": "^9.34.0",
     "lint-staged": "^16.1.5",
     "lottie-web": "^5.13.0",
     "modern-gif": "^2.0.4",

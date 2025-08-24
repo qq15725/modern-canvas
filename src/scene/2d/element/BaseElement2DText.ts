@@ -1,4 +1,4 @@
-import type { NormalizedFill, PropertyDeclaration, TextContent, Text as TextProperties } from 'modern-idoc'
+import type { NormalizedFill, NormalizedOutline, PropertyDeclaration, TextContent, Text as TextProperties } from 'modern-idoc'
 import type { MeasureResult } from 'modern-text'
 import type { Texture2D } from '../../resources'
 import type { BaseElement2D } from './BaseElement2D'
@@ -121,10 +121,14 @@ export class BaseElement2DText extends CoreObject {
     this.base.update()
     this.base.pathSets.forEach((pathSet) => {
       pathSet.paths.forEach((path) => {
-        if (path.style.stroke) {
+        if (path.style.stroke && !isNone(path.style.stroke)) {
           if (typeof path.style.stroke === 'object') {
-            const outline = path.style.stroke
-            if (outline.enabled !== false && (this._textures[0] || outline.color)) {
+            const outline = path.style.stroke as NormalizedOutline
+            if (
+              outline.enabled !== false
+              && (this._textures[0] || outline.color)
+              && (outline.width === undefined || outline.width)
+            ) {
               const { uvTransform, disableWrapMode } = getDrawOptions(outline, this.parent.size)
               ctx.addPath(path)
               ctx.style = { ...path.style }
@@ -142,10 +146,13 @@ export class BaseElement2DText extends CoreObject {
             ctx.stroke()
           }
         }
-        if (path.style.fill) {
+        if (path.style.fill && !isNone(path.style.fill)) {
           if (typeof path.style.fill === 'object') {
-            const fill = path.style.fill
-            if (fill.enabled !== false && (this._textures[1] || fill.color)) {
+            const fill = path.style.fill as NormalizedFill
+            if (
+              fill.enabled !== false
+              && (this._textures[1] || fill.color)
+            ) {
               const { uvTransform, disableWrapMode } = getDrawOptions(fill, this.parent.size)
               ctx.addPath(path)
               ctx.style = { ...path.style }
