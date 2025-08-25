@@ -5,7 +5,7 @@ import type { BaseElement2D } from './BaseElement2D'
 import { isNone, normalizeText, normalizeTextContent, property } from 'modern-idoc'
 import { Text } from 'modern-text'
 import { assets } from '../../../asset'
-import { CoreObject } from '../../../core'
+import { CoreObject, Transform2D } from '../../../core'
 import { GradientTexture } from '../../resources'
 import { getDrawOptions } from './utils'
 
@@ -116,6 +116,19 @@ export class BaseElement2DText extends CoreObject {
     )
   }
 
+  protected _getVertTransform(): Transform2D | undefined {
+    const parent = this.parent
+    if (parent.style.scaleX > 0 && parent.style.scaleY > 0) {
+      return undefined
+    }
+    const scale = parent.style.scaleX * parent.style.scaleY
+    const origin = parent.getTransformOrigin()
+    return new Transform2D()
+      .translate(-origin.x, -origin.y)
+      .scale(scale > 0 ? 1 : -1, 1)
+      .translate(origin.x, origin.y)
+  }
+
   draw(): void {
     const ctx = this.parent.context
     this.base.update()
@@ -137,12 +150,14 @@ export class BaseElement2DText extends CoreObject {
               ctx.strokeStyle = this._textures[0] ?? outline.color
               ctx.lineCap = outline.lineCap
               ctx.lineJoin = outline.lineJoin
+              ctx.vertTransform = this._getVertTransform()
               ctx.stroke({ disableWrapMode })
             }
           }
           else {
             ctx.addPath(path)
             ctx.style = { ...path.style }
+            ctx.vertTransform = this._getVertTransform()
             ctx.stroke()
           }
         }
@@ -158,14 +173,14 @@ export class BaseElement2DText extends CoreObject {
               ctx.style = { ...path.style }
               ctx.uvTransform = uvTransform
               ctx.fillStyle = this._textures[1] ?? fill.color
-              ctx.fill({
-                disableWrapMode,
-              })
+              ctx.vertTransform = this._getVertTransform()
+              ctx.fill({ disableWrapMode })
             }
           }
           else {
             ctx.addPath(path)
             ctx.style = { ...path.style }
+            ctx.vertTransform = this._getVertTransform()
             ctx.fill()
           }
         }
