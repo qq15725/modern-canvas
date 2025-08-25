@@ -67,7 +67,7 @@ export class BaseElement2DShape extends CoreObject {
     if (!viewBox) {
       const bbox = this._path2DSet.getBoundingBox()
       viewBox = bbox
-        ? [bbox.x, bbox.y, bbox.width, bbox.height]
+        ? [bbox.x, bbox.y, bbox.width || 1, bbox.height || 1]
         : [0, 0, 1, 1]
     }
     const [x, y, w, h] = viewBox
