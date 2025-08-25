@@ -118,10 +118,10 @@ export class BaseElement2DText extends CoreObject {
 
   protected _getVertTransform(): Transform2D | undefined {
     const parent = this.parent
-    if (parent.style.scaleX > 0 && parent.style.scaleY > 0) {
+    if (parent.scale.x > 0 && parent.scale.y > 0) {
       return undefined
     }
-    const scale = parent.style.scaleX * parent.style.scaleY
+    const scale = parent.scale.x * parent.scale.y
     const origin = parent.getTransformOrigin()
     return new Transform2D()
       .translate(-origin.x, -origin.y)

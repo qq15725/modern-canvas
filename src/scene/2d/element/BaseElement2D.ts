@@ -151,16 +151,22 @@ export class BaseElement2D extends Node2D implements Rectangulable {
     return this
   }
 
-  protected _updateStyleProperty(key: string, value: any, _oldValue: any, _declaration?: PropertyDeclaration): void {
+  protected _updateStyleProperty(key: string, value: any, oldValue: any, _declaration?: PropertyDeclaration): void {
     switch (key) {
       case 'rotate':
         this.rotation = this.style.rotate * DEG_TO_RAD
         break
       case 'scaleX':
         this.scale.x = this.style.scaleX
+        if (this.text.canDraw() && (value ^ oldValue) < 0) {
+          this.requestRedraw()
+        }
         break
       case 'scaleY':
         this.scale.y = this.style.scaleY
+        if (this.text.canDraw() && (value ^ oldValue) < 0) {
+          this.requestRedraw()
+        }
         break
       case 'skewX':
         this.skew.x = this.style.skewX
