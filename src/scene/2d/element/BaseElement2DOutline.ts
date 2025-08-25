@@ -45,7 +45,10 @@ export class BaseElement2DOutline extends BaseElement2DFill {
   draw(): void {
     const ctx = this.parent.context
     const { uvTransform, disableWrapMode } = getDrawOptions(
-      this, this.parent.size,
+      this, {
+        width: this.parent.size.width,
+        height: this.parent.size.height,
+      },
     )
     ctx.lineWidth = this.width || 1
     ctx.uvTransform = uvTransform

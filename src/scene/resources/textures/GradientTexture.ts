@@ -18,21 +18,26 @@ export class GradientTexture extends Texture2D {
     if (!ctx) {
       throw new Error('Failed to parse linear gradient, get canvas context is null.')
     }
-    let { angle = 0, stops } = linearGradient
-    angle -= Math.PI / 2
-    const halfWidth = width / 2
-    const halfHeight = height / 2
-    const length = Math.sqrt(width * width + height * height) / 2
-    const x0 = halfWidth + length * Math.cos(angle + Math.PI)
-    const y0 = halfHeight + length * Math.sin(angle + Math.PI)
-    const x1 = halfWidth + length * Math.cos(angle)
-    const y1 = halfHeight + length * Math.sin(angle)
+    const { angle = 0, stops } = linearGradient
+    const w = width
+    const h = height
+    const cx = w / 2
+    const cy = h / 2
+    const canAng = angle * Math.PI / 180
+    const hypt = cy / Math.cos(canAng)
+    const fromTopRight = cx - Math.sqrt(hypt * hypt - cy * cy)
+    const diag = Math.sin(canAng) * fromTopRight
+    const len = hypt + diag
+    const x0 = cx + Math.cos(-Math.PI / 2 + canAng) * len
+    const y0 = cy + Math.sin(-Math.PI / 2 + canAng) * len
+    const x1 = cx + Math.cos(Math.PI / 2 + canAng) * len
+    const y1 = cy + Math.sin(Math.PI / 2 + canAng) * len
     const gradient = ctx.createLinearGradient(x0, y0, x1, y1)
     stops.forEach((stop) => {
       gradient.addColorStop(stop.offset, stop.color)
     })
     ctx.fillStyle = gradient
-    ctx.fillRect(0, 0, canvas.width, canvas.height)
+    ctx.fillRect(0, 0, w, h)
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
     return {
       width: imageData.width,

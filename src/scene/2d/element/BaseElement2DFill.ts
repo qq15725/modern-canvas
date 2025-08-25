@@ -100,7 +100,10 @@ export class BaseElement2DFill extends CoreObject {
   draw(): void {
     const ctx = this.parent.context
     const { uvTransform, disableWrapMode } = getDrawOptions(
-      this, this.parent.size,
+      this, {
+        width: this.parent.size.width,
+        height: this.parent.size.height,
+      },
     )
     ctx.uvTransform = uvTransform
     ctx.fillStyle = this._texture ?? this.color

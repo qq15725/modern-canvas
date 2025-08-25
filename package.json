@@ -75,8 +75,8 @@
     "earcut": "^3.0.2",
     "modern-font": "^0.4.1",
     "modern-idoc": "^0.8.9",
-    "modern-path2d": "^1.4.8",
-    "modern-text": "^1.7.4"
+    "modern-path2d": "^1.4.9",
+    "modern-text": "^1.7.6"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^5.2.1",
