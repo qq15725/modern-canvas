@@ -1,3 +1,12 @@
+## [0.8.6](https://github.com/qq15725/modern-canvas/compare/v0.8.5...v0.8.6) (2025-08-25)
+
+
+### Bug Fixes
+
+* text gradient ([4b6ec71](https://github.com/qq15725/modern-canvas/commit/4b6ec714184cdc9b3e19f5cb57ee79ace6611124))
+
+
+
 ## [0.8.5](https://github.com/qq15725/modern-canvas/compare/v0.8.4...v0.8.5) (2025-08-25)
 
 
