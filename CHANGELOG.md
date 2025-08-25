@@ -1,3 +1,12 @@
+## [0.8.7](https://github.com/qq15725/modern-canvas/compare/v0.8.6...v0.8.7) (2025-08-25)
+
+
+### Bug Fixes
+
+* linearGradient ([6f0815c](https://github.com/qq15725/modern-canvas/commit/6f0815c8beea5ded97b6669772576a921db579d4))
+
+
+
 ## [0.8.6](https://github.com/qq15725/modern-canvas/compare/v0.8.5...v0.8.6) (2025-08-25)
 
 
