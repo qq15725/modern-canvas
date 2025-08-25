@@ -1,3 +1,12 @@
+## [0.8.5](https://github.com/qq15725/modern-canvas/compare/v0.8.4...v0.8.5) (2025-08-25)
+
+
+### Bug Fixes
+
+* text scale transform ([699d8fe](https://github.com/qq15725/modern-canvas/commit/699d8feec47cb7b14aa7b8a105dc757dadfae08c))
+
+
+
 ## [0.8.4](https://github.com/qq15725/modern-canvas/compare/v0.8.3...v0.8.4) (2025-08-25)
 
 
