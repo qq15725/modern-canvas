@@ -1,3 +1,12 @@
+## [0.8.8](https://github.com/qq15725/modern-canvas/compare/v0.8.7...v0.8.8) (2025-08-26)
+
+
+### Bug Fixes
+
+* engine.toCanvas support transparent ([102c527](https://github.com/qq15725/modern-canvas/commit/102c527167b61572dc9a0cd7d0ef66c27a0a02dd))
+
+
+
 ## [0.8.7](https://github.com/qq15725/modern-canvas/compare/v0.8.6...v0.8.7) (2025-08-25)
 
 
