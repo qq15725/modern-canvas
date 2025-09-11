@@ -1,3 +1,12 @@
+## [0.8.9](https://github.com/qq15725/modern-canvas/compare/v0.8.8...v0.8.9) (2025-09-11)
+
+
+### Features
+
+* add inputMode prop to Node ([3c4cd02](https://github.com/qq15725/modern-canvas/commit/3c4cd02c1a363e9e7c2111e546832c57d4190ea0))
+
+
+
 ## [0.8.8](https://github.com/qq15725/modern-canvas/compare/v0.8.7...v0.8.8) (2025-08-26)
 
 
