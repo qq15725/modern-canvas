@@ -47,6 +47,7 @@ export interface Node {
 export type ProcessMode = 'inherit' | 'pausable' | 'when_paused' | 'always' | 'disabled'
 export type ProcessSortMode = 'default' | 'parent_before'
 export type RenderMode = 'inherit' | 'always' | 'disabled'
+export type InputMode = 'inherit' | 'always' | 'disabled'
 export type InternalMode = 'default' | 'front' | 'back'
 
 export interface NodeProperties {
@@ -80,6 +81,7 @@ export class Node extends CoreObject {
   @property({ protected: true, fallback: 'inherit' }) declare processMode: ProcessMode
   @property({ protected: true, fallback: 'default' }) declare processSortMode: ProcessSortMode
   @property({ protected: true, fallback: 'inherit' }) declare renderMode: RenderMode
+  @property({ protected: true, fallback: 'inherit' }) declare inputMode: InputMode
   @property({ protected: true, fallback: 'default' }) declare internalMode: InternalMode
   @property({ protected: true }) declare mask?: Maskable
 
@@ -234,6 +236,20 @@ export class Node extends CoreObject {
     }
   }
 
+  canInput(): boolean {
+    if (!this._tree)
+      return false
+    switch (this.inputMode) {
+      case 'inherit':
+        return this._parent?.canInput() ?? true
+      case 'always':
+        return true
+      case 'disabled':
+      default:
+        return false
+    }
+  }
+
   canRender(): boolean {
     if (!this._tree)
       return false
@@ -360,14 +376,19 @@ export class Node extends CoreObject {
     if (event.propagationStopped) {
       return
     }
+
     const array = this._children.internal
     for (let i = array.length - 1; i >= 0; i--) {
       array[i].input(event, key)
     }
+
     if (event.propagationStopped) {
       return
     }
-    this._input(event, key)
+
+    if (this.canInput()) {
+      this._input(event, key)
+    }
   }
 
   getIndex(): number {
