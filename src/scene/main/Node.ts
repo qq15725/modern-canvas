@@ -205,9 +205,10 @@ export class Node extends CoreObject {
 
   /** Children */
   protected _children = new Children()
-  get children(): Children { return this._children }
-  set children(value: Node[] | Children) { value instanceof Children ? (this._children = value) : this._children.set(value) }
-  getChild<T extends Node = Node>(index = 0): T | undefined { return this._children[index] as T }
+  get children(): Node[] { return this._children.default }
+  set children(value: Node[]) { this._children.set(value) }
+  getChildren(includeInternal: InternalMode): Node[] { return this._children.getInternal(includeInternal) }
+  getChild<T extends Node = Node>(index = 0): T | undefined { return this.children[index] as T }
   get siblingIndex(): number { return this.getIndex() }
   set siblingIndex(toIndex) { this._parent?.moveChild(this, toIndex) }
   get previousSibling(): Node | undefined { return this._parent?.children[this.getIndex() - 1] }
@@ -392,7 +393,7 @@ export class Node extends CoreObject {
   }
 
   getIndex(): number {
-    return this._parent?.children.getInternal(this.internalMode).indexOf(this) ?? 0
+    return this._parent?.getChildren(this.internalMode).indexOf(this) ?? 0
   }
 
   getNode<T extends Node>(path: string): T | undefined {
@@ -489,7 +490,7 @@ export class Node extends CoreObject {
         this._children.front.push(node)
         break
       case 'default':
-        this._children.push(node)
+        this._children.default.push(node)
         break
       case 'back':
         this._children.back.push(node)
@@ -544,7 +545,7 @@ export class Node extends CoreObject {
   removeChild<T extends Node>(child: T): T {
     const index = child.getIndex()
     if (this.equal(child.parent) && index > -1) {
-      this._children.getInternal(child.internalMode).splice(index, 1)
+      this.getChildren(child.internalMode).splice(index, 1)
       child.setParent(undefined)
       this.emit('removeChild', child, index)
     }
@@ -552,7 +553,7 @@ export class Node extends CoreObject {
   }
 
   removeChildren(): void {
-    this._children.forEach(child => this.removeChild(child))
+    this.children.forEach(child => this.removeChild(child))
   }
 
   remove(): void {
@@ -560,12 +561,12 @@ export class Node extends CoreObject {
   }
 
   forEachChild(callbackfn: (value: Node, index: number, array: Node[]) => void): this {
-    this._children.forEach(callbackfn)
+    this.children.forEach(callbackfn)
     return this
   }
 
   forEachDescendant(callbackfn: (descendant: Node) => void): this {
-    this._children.forEach((child) => {
+    this.children.forEach((child) => {
       callbackfn(child)
       child.forEachDescendant(callbackfn)
     })
@@ -608,8 +609,8 @@ export class Node extends CoreObject {
   override toJSON(): Record<string, any> {
     return clearUndef({
       ...super.toJSON(),
-      children: this._children.length
-        ? [...this._children.map(child => child.toJSON())]
+      children: this.children.length
+        ? [...this.children.map(child => child.toJSON())]
         : undefined,
       meta: {
         ...this.meta,

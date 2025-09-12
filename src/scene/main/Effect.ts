@@ -161,7 +161,7 @@ export class Effect extends TimelineNode {
   }
 
   protected _processChildren(): void {
-    if (this._children.length) {
+    if (this.children.length) {
       super.emit('process')
       this._tree?.renderStack.push(this)
     }

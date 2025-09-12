@@ -1,25 +1,25 @@
 import type { InternalMode, Node } from './Node'
 
-export class Children<T extends Node = Node> extends Array<T> {
-  readonly front: T[] = []
-  readonly back: T[] = []
+export class Children<T extends Node = Node> {
+  front: T[] = []
+  default: T[] = []
+  back: T[] = []
 
   get internal(): T[] {
     return [
       ...this.front,
-      ...this,
+      ...this.default,
       ...this.back,
     ]
   }
 
   constructor(...items: T[]) {
-    super()
     this.set(items)
   }
 
   set(items: T[]): this {
     this.front.length = 0
-    this.length = 0
+    this.default.length = 0
     this.back.length = 0
     items.forEach((item) => {
       switch (item.internalMode) {
@@ -27,7 +27,7 @@ export class Children<T extends Node = Node> extends Array<T> {
           this.front.push(item)
           break
         case 'default':
-          this.push(item)
+          this.default.push(item)
           break
         case 'back':
           this.back.push(item)
@@ -42,7 +42,7 @@ export class Children<T extends Node = Node> extends Array<T> {
       case 'front':
         return this.front
       case 'default':
-        return this
+        return this.default
       case 'back':
         return this.back
       default:
@@ -51,6 +51,6 @@ export class Children<T extends Node = Node> extends Array<T> {
   }
 
   toJSON(): T[] {
-    return [...this]
+    return [...this.default]
   }
 }
