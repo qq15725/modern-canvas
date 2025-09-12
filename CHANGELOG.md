@@ -1,3 +1,12 @@
+## [0.8.10](https://github.com/qq15725/modern-canvas/compare/v0.8.9...v0.8.10) (2025-09-12)
+
+
+### Features
+
+* fix children reactive ([65ce26a](https://github.com/qq15725/modern-canvas/commit/65ce26aabc7e18f07e9d083ad5580ea326eb80c2))
+
+
+
 ## [0.8.9](https://github.com/qq15725/modern-canvas/compare/v0.8.8...v0.8.9) (2025-09-11)
 
 
