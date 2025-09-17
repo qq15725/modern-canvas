@@ -32,7 +32,7 @@ export class BaseElement2DFill extends CoreObject {
     super()
   }
 
-  protected _setProperties(properties?: Fill): this {
+  protected _setProperties(properties?: NormalizedFill): this {
     return super.setProperties(properties)
   }
 

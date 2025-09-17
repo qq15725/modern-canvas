@@ -17,10 +17,6 @@ engine.on('pointerdown', (e) => {
 
 const camera = new Camera2D()
 
-camera.on('updateCanvasTransform', () => {
-  console.warn(camera.zoom.toArray())
-})
-
 ;(window as any).engine = engine
 ;(window as any).camera = camera
 
