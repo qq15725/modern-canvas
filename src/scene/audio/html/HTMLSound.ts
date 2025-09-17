@@ -1,10 +1,10 @@
 import type { IPlayOptions } from '../interfaces'
 import type { AudioProcessor } from '../pipeline'
 import type { HTMLAudio } from './HTMLAudio'
-import { EventEmitter } from 'modern-idoc'
+import { Observable } from 'modern-idoc'
 import { Ticker } from '../../../core'
 
-export class HTMLSound extends EventEmitter {
+export class HTMLSound extends Observable {
   static readonly PADDING = 0.1
   protected _source: HTMLAudioElement | null = null
   protected _audio: HTMLAudio | null = null
@@ -242,9 +242,9 @@ export class HTMLSound extends EventEmitter {
     this.emit('end', this)
   }
 
-  free(): void {
+  destroy(): void {
     Ticker.off(this._onUpdate)
-    this.removeAllListeners()
+    super.destroy()
 
     const source = this._source
 

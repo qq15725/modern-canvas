@@ -1,4 +1,3 @@
-import type { PropertyDeclaration } from 'modern-idoc'
 import type { InputEventKey } from '../../core'
 import type { Node } from '../main'
 import type { RangeProperties } from './Range'
@@ -22,8 +21,8 @@ export class ScrollBar extends Range {
       .append(children)
   }
 
-  protected override _updateStyleProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    super._updateStyleProperty(key, value, oldValue, declaration)
+  protected override _updateStyleProperty(key: string, value: any, oldValue: any): void {
+    super._updateStyleProperty(key, value, oldValue)
 
     switch (key) {
       case 'width':

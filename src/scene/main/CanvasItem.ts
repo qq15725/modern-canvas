@@ -1,4 +1,3 @@
-import type { EventListenerOptions, EventListenerValue, PropertyDeclaration } from 'modern-idoc'
 import type {
   ColorValue,
   WebGLBlendMode,
@@ -6,7 +5,7 @@ import type {
 } from '../../core'
 import type { CanvasBatchable } from './CanvasContext'
 import type { Node } from './Node'
-import type { TimelineNodeEventMap, TimelineNodeProperties } from './TimelineNode'
+import type { TimelineNodeEvents, TimelineNodeProperties } from './TimelineNode'
 import { property } from 'modern-idoc'
 import { clamp, Color, customNode } from '../../core'
 import { CanvasContext } from './CanvasContext'
@@ -17,27 +16,23 @@ export interface CanvasItemProperties extends TimelineNodeProperties {
   blendMode: WebGLBlendMode
 }
 
-export interface CanvasItemEventMap extends TimelineNodeEventMap {
+export interface CanvasItemEvents extends TimelineNodeEvents {
   draw: () => void
 }
 
 export interface CanvasItem {
-  on: (<K extends keyof CanvasItemEventMap>(type: K, listener: CanvasItemEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  once: (<K extends keyof CanvasItemEventMap>(type: K, listener: CanvasItemEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  off: (<K extends keyof CanvasItemEventMap>(type: K, listener?: CanvasItemEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  emit: (<K extends keyof CanvasItemEventMap>(type: K, ...args: Parameters<CanvasItemEventMap[K]>) => boolean)
-    & ((type: string, ...args: any[]) => boolean)
+  on: <K extends keyof CanvasItemEvents & string>(event: K, listener: CanvasItemEvents[K]) => this
+  once: <K extends keyof CanvasItemEvents & string>(event: K, listener: CanvasItemEvents[K]) => this
+  off: <K extends keyof CanvasItemEvents & string>(event: K, listener: CanvasItemEvents[K]) => this
+  emit: <K extends keyof CanvasItemEvents & string>(event: K, ...args: Parameters<CanvasItemEvents[K]>) => this
 }
 
 @customNode('CanvasItem')
 export class CanvasItem extends TimelineNode {
   @property() declare modulate: ColorValue | undefined
   @property() declare blendMode: WebGLBlendMode | undefined
-  @property({ protected: true, fallback: true }) declare visible: boolean
-  @property({ protected: true, fallback: 1 }) declare opacity: number
+  @property({ internal: true, fallback: true }) declare visible: boolean
+  @property({ internal: true, fallback: 1 }) declare opacity: number
 
   protected _parentGlobalVisible?: boolean
   protected _globalVisible?: boolean
@@ -67,8 +62,8 @@ export class CanvasItem extends TimelineNode {
       .append(nodes)
   }
 
-  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    super._updateProperty(key, value, oldValue, declaration)
+  protected override _updateProperty(key: string, value: any, oldValue: any): void {
+    super._updateProperty(key, value, oldValue)
 
     switch (key) {
       case 'modulate':

@@ -1,22 +1,17 @@
-import type { EventListenerOptions, EventListenerValue } from 'modern-idoc'
-import type { NodeEventMap, NodeProperties } from './Node'
+import type { NodeEvents, NodeProperties } from './Node'
 import { property } from 'modern-idoc'
 import { clamp, customNode } from '../../core'
 import { Node } from './Node'
 
-export interface TimelineEventMap extends NodeEventMap {
+export interface TimelineEvents extends NodeEvents {
   updateCurrentTime: (current: number, delta: number) => void
 }
 
 export interface Timeline {
-  on: (<K extends keyof TimelineEventMap>(type: K, listener: TimelineEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  once: (<K extends keyof TimelineEventMap>(type: K, listener: TimelineEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  off: (<K extends keyof TimelineEventMap>(type: K, listener?: TimelineEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  emit: (<K extends keyof TimelineEventMap>(type: K, ...args: Parameters<TimelineEventMap[K]>) => boolean)
-    & ((type: string, ...args: any[]) => boolean)
+  on: <K extends keyof TimelineEvents & string>(event: K, listener: TimelineEvents[K]) => this
+  once: <K extends keyof TimelineEvents & string>(event: K, listener: TimelineEvents[K]) => this
+  off: <K extends keyof TimelineEvents & string>(event: K, listener: TimelineEvents[K]) => this
+  emit: <K extends keyof TimelineEvents & string>(event: K, ...args: Parameters<TimelineEvents[K]>) => this
 }
 
 export interface TimelineProperties extends NodeProperties {

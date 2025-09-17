@@ -1,4 +1,3 @@
-import type { PropertyDeclaration } from 'modern-idoc'
 import type { InputEvent, InputEventKey, PointerInputEvent } from '../core'
 import type { Element2DStyle } from '../scene'
 import { customNode } from '../core'
@@ -94,8 +93,8 @@ export class CanvasItemEditor extends Control {
     this.append(this.ruler)
   }
 
-  protected override _updateStyleProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    super._updateStyleProperty(key, value, oldValue, declaration)
+  protected override _updateStyleProperty(key: string, value: any, oldValue: any): void {
+    super._updateStyleProperty(key, value, oldValue)
 
     switch (key) {
       case 'width':

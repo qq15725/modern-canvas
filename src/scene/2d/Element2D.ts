@@ -1,22 +1,17 @@
-import type { EventListenerOptions, EventListenerValue, PropertyDeclaration } from 'modern-idoc'
 import type { Node } from '../main'
-import type { BaseElement2DEventMap, BaseElement2DProperties, Element2DStyleProperties } from './element'
+import type { BaseElement2DEvents, BaseElement2DProperties, Element2DStyleProperties } from './element'
 import { customNode } from '../../core'
 import { BaseElement2D, Element2DStyle } from './element'
 
-export interface Element2DEventMap extends BaseElement2DEventMap {
+export interface Element2DEvents extends BaseElement2DEvents {
   //
 }
 
 export interface Element2D {
-  on: (<K extends keyof Element2DEventMap>(type: K, listener: Element2DEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  once: (<K extends keyof Element2DEventMap>(type: K, listener: Element2DEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  off: (<K extends keyof Element2DEventMap>(type: K, listener?: Element2DEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  emit: (<K extends keyof Element2DEventMap>(type: K, ...args: Parameters<Element2DEventMap[K]>) => boolean)
-    & ((type: string, ...args: any[]) => boolean)
+  on: <K extends keyof Element2DEvents & string>(event: K, listener: Element2DEvents[K]) => this
+  once: <K extends keyof Element2DEvents & string>(event: K, listener: Element2DEvents[K]) => this
+  off: <K extends keyof Element2DEvents & string>(event: K, listener: Element2DEvents[K]) => this
+  emit: <K extends keyof Element2DEvents & string>(event: K, ...args: Parameters<Element2DEvents[K]>) => this
 }
 
 export interface Element2DProperties extends BaseElement2DProperties {
@@ -29,8 +24,8 @@ export class Element2D extends BaseElement2D {
   get style(): Element2DStyle { return this._style }
   set style(style) {
     const cb = (...args: any[]): void => {
-      this.emit('updateStyleProperty', ...args)
-      this._updateStyleProperty(args[0], args[1], args[2], args[3])
+      this.emit('updateStyleProperty', args[0], args[1], args[2])
+      this._updateStyleProperty(args[0], args[1], args[2])
     }
     style.on('updateProperty', cb)
     this._style?.off('updateProperty', cb)
@@ -47,8 +42,8 @@ export class Element2D extends BaseElement2D {
       .append(nodes)
   }
 
-  protected _updateStyleProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    super._updateStyleProperty(key, value, oldValue, declaration)
+  protected _updateStyleProperty(key: string, value: any, oldValue: any): void {
+    super._updateStyleProperty(key, value, oldValue)
 
     switch (key) {
       case 'left':

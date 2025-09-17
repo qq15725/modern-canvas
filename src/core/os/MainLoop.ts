@@ -1,22 +1,17 @@
-import type { EventListenerOptions, EventListenerValue } from 'modern-idoc'
-import type { CoreObjectEventMap } from '../object'
+import type { CoreObjectEvents } from '../object'
 import { property } from 'modern-idoc'
 import { Ticker } from '../global'
 import { CoreObject } from '../object'
 
-export interface MainLoopEventMap extends CoreObjectEventMap {
+export interface MainLoopEvents extends CoreObjectEvents {
   process: (delta: number) => void
 }
 
 export interface MainLoop {
-  on: (<K extends keyof MainLoopEventMap>(type: K, listener: MainLoopEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  once: (<K extends keyof MainLoopEventMap>(type: K, listener: MainLoopEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  off: (<K extends keyof MainLoopEventMap>(type: K, listener?: MainLoopEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  emit: (<K extends keyof EventListenerOptions>(type: K, ...args: Parameters<EventListenerOptions[K]>) => boolean)
-    & ((type: string, ...args: any[]) => boolean)
+  on: <K extends keyof MainLoopEvents & string>(event: K, listener: MainLoopEvents[K]) => this
+  once: <K extends keyof MainLoopEvents & string>(event: K, listener: MainLoopEvents[K]) => this
+  off: <K extends keyof MainLoopEvents & string>(event: K, listener: MainLoopEvents[K]) => this
+  emit: <K extends keyof MainLoopEvents & string>(event: K, ...args: Parameters<MainLoopEvents[K]>) => this
 }
 
 export class MainLoop extends CoreObject {
@@ -25,6 +20,7 @@ export class MainLoop extends CoreObject {
 
   protected _starting = false
   protected _nextDeltaTime = 0
+  protected _startedProcess?: (delta: number) => void
 
   get starting(): boolean { return this._starting }
   get spf(): number { return this.fps ? Math.floor(1000 / this.fps) : 0 }
@@ -37,7 +33,10 @@ export class MainLoop extends CoreObject {
   start(process: (delta: number) => void): void {
     if (!this._starting) {
       this._starting = true
-      this.off('process')
+      if (this._startedProcess) {
+        this.off('process', this._startedProcess)
+      }
+      this._startedProcess = process
       this.on('process', process)
       Ticker.on(this._onNextTick, { sort: 0 })
     }
@@ -59,8 +58,8 @@ export class MainLoop extends CoreObject {
     }
   }
 
-  override free(): void {
-    super.free()
+  override destroy(): void {
+    super.destroy()
     this.stop()
   }
 }

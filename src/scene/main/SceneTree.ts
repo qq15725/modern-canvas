@@ -1,7 +1,6 @@
-import type { EventListenerOptions, EventListenerValue, PropertyDeclaration } from 'modern-idoc'
 import type {
   ColorValue,
-  MainLoopEventMap,
+  MainLoopEvents,
   WebGLRenderer,
 } from '../../core'
 import type { Node } from './Node'
@@ -13,7 +12,7 @@ import { RenderStack } from './RenderStack'
 import { Timeline } from './Timeline'
 import { Window } from './Window'
 
-export interface SceneTreeEventMap extends MainLoopEventMap {
+export interface SceneTreeEvents extends MainLoopEvents {
   processing: () => void
   processed: () => void
   rendering: () => void
@@ -23,20 +22,16 @@ export interface SceneTreeEventMap extends MainLoopEventMap {
 }
 
 export interface SceneTree {
-  on: (<K extends keyof SceneTreeEventMap>(type: K, listener: SceneTreeEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  once: (<K extends keyof SceneTreeEventMap>(type: K, listener: SceneTreeEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  off: (<K extends keyof SceneTreeEventMap>(type: K, listener?: SceneTreeEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  emit: (<K extends keyof SceneTreeEventMap>(type: K, ...args: Parameters<SceneTreeEventMap[K]>) => boolean)
-    & ((type: string, ...args: any[]) => boolean)
+  on: <K extends keyof SceneTreeEvents & string>(event: K, listener: SceneTreeEvents[K]) => this
+  once: <K extends keyof SceneTreeEvents & string>(event: K, listener: SceneTreeEvents[K]) => this
+  off: <K extends keyof SceneTreeEvents & string>(event: K, listener: SceneTreeEvents[K]) => this
+  emit: <K extends keyof SceneTreeEvents & string>(event: K, ...args: Parameters<SceneTreeEvents[K]>) => this
 }
 
 export class SceneTree extends MainLoop {
-  @property({ protected: true, fallback: false }) declare processPaused: boolean
+  @property({ internal: true, fallback: false }) declare processPaused: boolean
   @property() declare backgroundColor: ColorValue | undefined
-  @property({ protected: true, fallback: false }) declare debug: boolean
+  @property({ internal: true, fallback: false }) declare debug: boolean
 
   readonly input = new Input()
   readonly renderStack = new RenderStack()
@@ -54,8 +49,8 @@ export class SceneTree extends MainLoop {
     this.timeline = timeline.setTree(this)
   }
 
-  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    super._updateProperty(key, value, oldValue, declaration)
+  protected override _updateProperty(key: string, value: any, oldValue: any): void {
+    super._updateProperty(key, value, oldValue)
 
     switch (key) {
       case 'backgroundColor':
@@ -107,10 +102,9 @@ export class SceneTree extends MainLoop {
     renderer.texture.unbind(texture)
   }
 
-  override free(): void {
-    super.free()
-    this.root.children.internal
-      .forEach(node => this.root.removeChild(node))
+  override destroy(): void {
+    super.destroy()
+    this.root.destroy()
     this.input.removeEventListeners()
   }
 }

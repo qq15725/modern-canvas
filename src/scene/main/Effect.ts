@@ -1,4 +1,3 @@
-import type { PropertyDeclaration } from 'modern-idoc'
 import type { WebGLRenderer } from '../../core'
 import type { Material } from '../resources'
 import type { Rectangulable } from './interfaces'
@@ -62,8 +61,8 @@ export class Effect extends TimelineNode {
       .append(children)
   }
 
-  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    super._updateProperty(key, value, oldValue, declaration)
+  protected override _updateProperty(key: string, value: any, oldValue: any): void {
+    super._updateProperty(key, value, oldValue)
 
     switch (key) {
       case 'glsl': {

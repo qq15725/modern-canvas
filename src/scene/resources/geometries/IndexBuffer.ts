@@ -1,16 +1,15 @@
-import type { PropertyDeclaration } from 'modern-idoc'
 import type { WebGLBufferOptions, WebGLRenderer } from '../../../core'
 import { property } from 'modern-idoc'
 import { Resource } from '../../../core'
 
 export interface IndexBufferOptions {
-  data?: Uint16Array | null
+  data?: Uint16Array<ArrayBuffer> | null
   dynamic?: boolean
 }
 
 export class IndexBuffer extends Resource {
-  @property({ protected: true, default: null }) declare data: Uint16Array | null
-  @property({ protected: true, fallback: false }) declare dynamic: boolean
+  @property({ internal: true, fallback: null }) declare data: Uint16Array<ArrayBuffer> | null
+  @property({ internal: true, fallback: false }) declare dynamic: boolean
 
   needsUpload = false
 
@@ -35,8 +34,8 @@ export class IndexBuffer extends Resource {
     })
   }
 
-  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    super._updateProperty(key, value, oldValue, declaration)
+  protected override _updateProperty(key: string, value: any, oldValue: any): void {
+    super._updateProperty(key, value, oldValue)
 
     switch (key) {
       case 'data':

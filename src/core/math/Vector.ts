@@ -1,10 +1,10 @@
-import { EventEmitter } from 'modern-idoc'
+import { Observable } from 'modern-idoc'
 import { Matrix } from './Matrix'
 
 export type VectorLike = number | number[] | Matrix | Vector
 export type VectorOperateOutput = number[] | Vector
 
-export abstract class Vector extends EventEmitter {
+export abstract class Vector extends Observable {
   protected _array: number[] = []
 
   get length(): number { return this.dim }

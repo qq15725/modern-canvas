@@ -273,8 +273,8 @@ export class WebGLProgramModule extends WebGLModule {
     }
   }
 
-  free(): void {
-    super.free()
+  destroy(): void {
+    super.destroy()
     this.bind(null)
   }
 }

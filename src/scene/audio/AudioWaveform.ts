@@ -1,4 +1,3 @@
-import type { PropertyDeclaration } from 'modern-idoc'
 import type { Element2DProperties } from '../2d'
 import { property } from 'modern-idoc'
 import { Element2D } from '../2d'
@@ -15,8 +14,8 @@ export interface AudioWaveformProperties extends Element2DProperties {
 @customNode('AudioWaveform')
 export class AudioWaveform extends Element2D {
   @property() declare src: string | undefined
-  @property() declare gap = 0
-  @property() declare color = '#000000'
+  @property({ fallback: 0 }) declare gap: number
+  @property({ fallback: '#000000' }) declare color: string
 
   protected _audioBuffer?: AudioBuffer
   protected _src = IN_BROWSER
@@ -30,8 +29,8 @@ export class AudioWaveform extends Element2D {
     this.setProperties(options)
   }
 
-  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    super._updateProperty(key, value, oldValue, declaration)
+  protected override _updateProperty(key: string, value: any, oldValue: any): void {
+    super._updateProperty(key, value, oldValue)
 
     switch (key) {
       case 'src':

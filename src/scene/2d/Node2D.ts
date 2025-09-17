@@ -1,8 +1,7 @@
-import type { EventListenerValue, PropertyDeclaration } from 'modern-idoc'
 import type { Vector2Data } from '../../core'
 import type {
   CanvasBatchable,
-  CanvasItemEventMap,
+  CanvasItemEvents,
   CanvasItemProperties,
   Node,
   VertTransform,
@@ -15,30 +14,26 @@ export interface Node2DProperties extends CanvasItemProperties {
   //
 }
 
-export interface Node2DEventMap extends CanvasItemEventMap {
+export interface Node2DEvents extends CanvasItemEvents {
   //
 }
 
 export interface Node2D {
-  on: (<K extends keyof Node2DEventMap>(type: K, listener: Node2DEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  once: (<K extends keyof Node2DEventMap>(type: K, listener: Node2DEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  off: (<K extends keyof Node2DEventMap>(type: K, listener?: Node2DEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  emit: (<K extends keyof Node2DEventMap>(type: K, ...args: Parameters<Node2DEventMap[K]>) => boolean)
-    & ((type: string, ...args: any[]) => boolean)
+  on: <K extends keyof Node2DEvents & string>(event: K, listener: Node2DEvents[K]) => this
+  once: <K extends keyof Node2DEvents & string>(event: K, listener: Node2DEvents[K]) => this
+  off: <K extends keyof Node2DEvents & string>(event: K, listener: Node2DEvents[K]) => this
+  emit: <K extends keyof Node2DEvents & string>(event: K, ...args: Parameters<Node2DEvents[K]>) => this
 }
 
 @customNode('Node2D')
 export class Node2D extends CanvasItem {
-  @property({ protected: true, fallback: 0 }) declare rotation: number
+  @property({ internal: true, fallback: 0 }) declare rotation: number
   readonly position = new Vector2().on('update', () => this.updateGlobalTransform())
   readonly scale = new Vector2(1, 1).on('update', () => this.updateGlobalTransform())
   readonly skew = new Vector2().on('update', () => this.updateGlobalTransform())
   readonly transform = new Transform2D()
   readonly globalPosition = new Vector2()
-  @property({ protected: true, fallback: 0 }) declare globalRotation: number
+  @property({ internal: true, fallback: 0 }) declare globalRotation: number
   readonly globalScale = new Vector2()
   readonly globalSkew = new Vector2()
   readonly globalTransform = new Transform2D()
@@ -53,8 +48,8 @@ export class Node2D extends CanvasItem {
       .append(nodes)
   }
 
-  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    super._updateProperty(key, value, oldValue, declaration)
+  protected override _updateProperty(key: string, value: any, oldValue: any): void {
+    super._updateProperty(key, value, oldValue)
 
     switch (key) {
       case 'rotation':

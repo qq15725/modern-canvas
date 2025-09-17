@@ -1,11 +1,8 @@
 import type {
   Background,
-  EventListenerOptions,
-  EventListenerValue,
   Fill,
   Foreground,
   Outline,
-  PropertyDeclaration,
   Shadow,
   Shape,
   Style,
@@ -20,8 +17,8 @@ import type {
   Vector2Data,
   WebGLBlendMode,
 } from '../../../core'
-import type { CanvasBatchable, CanvasItemEventMap, Node, Rectangulable } from '../../main'
-import type { Node2DProperties } from '../Node2D'
+import type { CanvasBatchable, Node, Rectangulable } from '../../main'
+import type { Node2DEvents, Node2DProperties } from '../Node2D'
 import { clearUndef } from 'modern-idoc'
 import {
   customNode,
@@ -41,19 +38,15 @@ import { BaseElement2DShape } from './BaseElement2DShape'
 import { BaseElement2DStyle } from './BaseElement2DStyle'
 import { BaseElement2DText } from './BaseElement2DText'
 
-export interface BaseElement2DEventMap extends CanvasItemEventMap {
-  updateStyleProperty: (key: string, value: any, oldValue: any, declaration?: PropertyDeclaration) => void
+export interface BaseElement2DEvents extends Node2DEvents {
+  updateStyleProperty: (key: string, value: any, oldValue: any) => void
 }
 
 export interface BaseElement2D {
-  on: (<K extends keyof BaseElement2DEventMap>(type: K, listener: BaseElement2DEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  once: (<K extends keyof BaseElement2DEventMap>(type: K, listener: BaseElement2DEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  off: (<K extends keyof BaseElement2DEventMap>(type: K, listener?: BaseElement2DEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  emit: (<K extends keyof BaseElement2DEventMap>(type: K, ...args: Parameters<BaseElement2DEventMap[K]>) => boolean)
-    & ((type: string, ...args: any[]) => boolean)
+  on: <K extends keyof BaseElement2DEvents & string>(event: K, listener: BaseElement2DEvents[K]) => this
+  once: <K extends keyof BaseElement2DEvents & string>(event: K, listener: BaseElement2DEvents[K]) => this
+  off: <K extends keyof BaseElement2DEvents & string>(event: K, listener: BaseElement2DEvents[K]) => this
+  emit: <K extends keyof BaseElement2DEvents & string>(event: K, ...args: Parameters<BaseElement2DEvents[K]>) => this
 }
 
 export interface BaseElement2DProperties extends Node2DProperties {
@@ -80,8 +73,8 @@ export class BaseElement2D extends Node2D implements Rectangulable {
   get style(): BaseElement2DStyle { return this._style }
   set style(style) {
     const cb = (...args: any[]): void => {
-      this.emit('updateStyleProperty', ...args)
-      this._updateStyleProperty(args[0], args[1], args[2], args[3])
+      this.emit('updateStyleProperty', args[0], args[1], args[2])
+      this._updateStyleProperty(args[0], args[1], args[2])
     }
     style.on('updateProperty', cb)
     this._style?.off('updateProperty', cb)
@@ -151,7 +144,7 @@ export class BaseElement2D extends Node2D implements Rectangulable {
     return this
   }
 
-  protected _updateStyleProperty(key: string, value: any, oldValue: any, _declaration?: PropertyDeclaration): void {
+  protected _updateStyleProperty(key: string, value: any, oldValue: any): void {
     switch (key) {
       case 'rotate':
         this.rotation = this.style.rotate * DEG_TO_RAD
@@ -440,7 +433,7 @@ export class BaseElement2D extends Node2D implements Rectangulable {
   }
 
   override input(event: InputEvent, key: InputEventKey): void {
-    const array = this._children.internal
+    const array = this.getChildren(true)
     for (let i = array.length - 1; i >= 0; i--) {
       array[i].input(event, key)
     }
@@ -476,7 +469,7 @@ export class BaseElement2D extends Node2D implements Rectangulable {
               if (!event.target) {
                 event.target = this
               }
-              this.emit(key, event)
+              this.emit(key, event as any)
             }
           }
         }

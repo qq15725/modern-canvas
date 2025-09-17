@@ -1,4 +1,3 @@
-import type { PropertyDeclaration } from 'modern-idoc'
 import type {
   WebGLRenderer,
   WebGLTextureFilterMode,
@@ -68,8 +67,8 @@ export class Texture2D<T extends Texture2DSource = Texture2DSource> extends Reso
     })
   }
 
-  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    super._updateProperty(key, value, oldValue, declaration)
+  protected override _updateProperty(key: string, value: any, oldValue: any): void {
+    super._updateProperty(key, value, oldValue)
 
     switch (key) {
       case 'width':
@@ -139,7 +138,7 @@ export class Texture2D<T extends Texture2DSource = Texture2DSource> extends Reso
     renderer.texture.unbind(this._glTexture(renderer))
   }
 
-  free(): void {
+  destroy(): void {
     if (SUPPORTS_IMAGE_BITMAP && this.source instanceof ImageBitmap) {
       this.source.close()
     }

@@ -1,10 +1,10 @@
 import type { IPlayOptions } from '../interfaces'
 import type { AudioProcessor } from '../pipeline'
 import type { WebAudio } from './WebAudio'
-import { EventEmitter } from 'modern-idoc'
+import { Observable } from 'modern-idoc'
 import { Ticker } from '../../../core'
 
-export class WebSound extends EventEmitter {
+export class WebSound extends Observable {
   protected _audio: WebAudio | null = null
   protected _sourceNode: AudioBufferSourceNode | null = null
   protected _gain: GainNode | null = null
@@ -275,8 +275,8 @@ export class WebSound extends EventEmitter {
     }
   }
 
-  free(): void {
-    this.removeAllListeners()
+  destroy(): void {
+    super.destroy()
     this._stop()
     this._gain?.disconnect()
     this._gain = null

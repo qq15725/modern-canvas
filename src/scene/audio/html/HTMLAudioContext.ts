@@ -1,8 +1,8 @@
 import type { IAudioContext } from '../interfaces'
 import type { AudioProcessor } from '../pipeline'
-import { EventEmitter } from 'modern-idoc'
+import { Observable } from 'modern-idoc'
 
-export class HTMLAudioContext extends EventEmitter implements IAudioContext {
+export class HTMLAudioContext extends Observable implements IAudioContext {
   protected static _instance?: HTMLAudioContext
   static get instance(): HTMLAudioContext {
     if (!this._instance) {
@@ -48,9 +48,5 @@ export class HTMLAudioContext extends EventEmitter implements IAudioContext {
     this.paused = !this.paused
     this.refreshPaused()
     return this.paused
-  }
-
-  free(): void {
-    this.removeAllListeners()
   }
 }

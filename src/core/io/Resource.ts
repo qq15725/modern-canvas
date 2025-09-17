@@ -1,20 +1,15 @@
-import type { EventListenerOptions, EventListenerValue } from 'modern-idoc'
-import type { RefCountedEventMap } from '../object'
+import type { RefCountedEvents } from '../object'
 import { RefCounted } from '../object'
 
-export interface ResourceEventMap extends RefCountedEventMap {
+export interface ResourceEvents extends RefCountedEvents {
   //
 }
 
 export interface Resource {
-  on: (<K extends keyof ResourceEventMap>(type: K, listener: ResourceEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  once: (<K extends keyof ResourceEventMap>(type: K, listener: ResourceEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  off: (<K extends keyof ResourceEventMap>(type: K, listener?: ResourceEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  emit: (<K extends keyof ResourceEventMap>(type: K, ...args: Parameters<ResourceEventMap[K]>) => boolean)
-    & ((type: string, ...args: any[]) => boolean)
+  on: <K extends keyof ResourceEvents & string>(event: K, listener: ResourceEvents[K]) => this
+  once: <K extends keyof ResourceEvents & string>(event: K, listener: ResourceEvents[K]) => this
+  off: <K extends keyof ResourceEvents & string>(event: K, listener: ResourceEvents[K]) => this
+  emit: <K extends keyof ResourceEvents & string>(event: K, ...args: Parameters<ResourceEvents[K]>) => this
 }
 
 export class Resource extends RefCounted {

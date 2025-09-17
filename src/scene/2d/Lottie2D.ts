@@ -1,5 +1,4 @@
 import type { AnimationItem } from 'lottie-web'
-import type { PropertyDeclaration } from 'modern-idoc'
 import type { Node } from '../main'
 import type { TextureRect2DProperties } from './TextureRect2D'
 import { property } from 'modern-idoc'
@@ -25,8 +24,8 @@ export class Lottie2D extends TextureRect2D {
     this.append(children)
   }
 
-  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    super._updateProperty(key, value, oldValue, declaration)
+  protected override _updateProperty(key: string, value: any, oldValue: any): void {
+    super._updateProperty(key, value, oldValue)
 
     switch (key) {
       case 'src':

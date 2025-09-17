@@ -6,11 +6,7 @@ export class Children<T extends Node = Node> {
   back: T[] = []
 
   get internal(): T[] {
-    return [
-      ...this.front,
-      ...this.default,
-      ...this.back,
-    ]
+    return this.getInternal()
   }
 
   constructor(...items: T[]) {
@@ -37,16 +33,25 @@ export class Children<T extends Node = Node> {
     return this
   }
 
-  getInternal(includeInternal: InternalMode): T[] {
-    switch (includeInternal) {
-      case 'front':
-        return this.front
-      case 'default':
-        return this.default
-      case 'back':
-        return this.back
-      default:
-        throw new Error(`Unknown internal mode: ${includeInternal}`)
+  getInternal(includeInternal?: InternalMode): T[] {
+    if (includeInternal) {
+      switch (includeInternal) {
+        case 'front':
+          return this.front
+        case 'default':
+          return this.default
+        case 'back':
+          return this.back
+        default:
+          throw new Error(`Unknown internal mode: ${includeInternal}`)
+      }
+    }
+    else {
+      return [
+        ...this.front,
+        ...this.default,
+        ...this.back,
+      ]
     }
   }
 

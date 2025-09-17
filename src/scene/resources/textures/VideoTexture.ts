@@ -1,4 +1,3 @@
-import type { PropertyDeclaration } from 'modern-idoc'
 import { property } from 'modern-idoc'
 import { crossOrigin, isVideoElement, Ticker } from '../../../core'
 import { Texture2D } from './Texture2D'
@@ -31,8 +30,8 @@ function resolveOptions(options?: VideoTextureOptions): Required<VideoTextureOpt
 }
 
 export class VideoTexture extends Texture2D<HTMLVideoElement> {
-  @property({ protected: true, fallback: true }) declare autoUpdate: boolean
-  @property({ protected: true, fallback: 0 }) declare fps: number
+  @property({ internal: true, fallback: true }) declare autoUpdate: boolean
+  @property({ internal: true, fallback: 0 }) declare fps: number
 
   static readonly mimeTypes = new Map(Object.entries({
     ogv: 'video/ogg',
@@ -115,8 +114,8 @@ export class VideoTexture extends Texture2D<HTMLVideoElement> {
     this._setupAutoUpdate()
   }
 
-  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    super._updateProperty(key, value, oldValue, declaration)
+  protected override _updateProperty(key: string, value: any, oldValue: any): void {
+    super._updateProperty(key, value, oldValue)
 
     switch (key) {
       case 'fps':
@@ -286,7 +285,7 @@ export class VideoTexture extends Texture2D<HTMLVideoElement> {
     return this._sourceLoad
   }
 
-  override free(): void {
+  override destroy(): void {
     this._setupAutoUpdate()
     const source = this.source
     if (source) {

@@ -1,4 +1,3 @@
-import type { PropertyDeclaration } from 'modern-idoc'
 import type { Node } from '../main'
 import type { BaseElement2DProperties } from './element'
 import { property } from 'modern-idoc'
@@ -20,8 +19,8 @@ export class TransformRect2D extends Element2D {
       .append(nodes)
   }
 
-  protected _updateStyleProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    super._updateStyleProperty(key, value, oldValue, declaration)
+  protected _updateStyleProperty(key: string, value: any, oldValue: any): void {
+    super._updateStyleProperty(key, value, oldValue)
 
     switch (key) {
       case 'width':

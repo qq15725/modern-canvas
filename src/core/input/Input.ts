@@ -1,8 +1,8 @@
-import type { EventListenerOptions, EventListenerValue } from 'modern-idoc'
+import type { ObservableEvents } from 'modern-idoc'
 import type { Cursor } from './Cursor'
 import type { InputEvent } from './InputEvent'
 import type { MouseInputEvent } from './MouseInputEvent'
-import { EventEmitter } from 'modern-idoc'
+import { Observable } from 'modern-idoc'
 import { SUPPORTS_POINTER_EVENTS, SUPPORTS_TOUCH_EVENTS, SUPPORTS_WHEEL_EVENTS } from '../shared'
 import { KeyboardInputEvent } from './KeyboardInputEvent'
 import { PointerInputEvent } from './PointerInputEvent'
@@ -16,7 +16,7 @@ const TOUCH_TO_POINTER: Record<string, string> = {
   touchcancel: 'pointercancel',
 }
 
-export interface InputEventMap {
+export interface InputEvents extends ObservableEvents {
   pointerdown: (ev: PointerInputEvent) => void
   pointerover: (ev: PointerInputEvent) => void
   pointermove: (ev: PointerInputEvent) => void
@@ -27,20 +27,16 @@ export interface InputEventMap {
   keyup: (ev: KeyboardInputEvent) => void
 }
 
-export type InputEventKey = keyof InputEventMap
+export type InputEventKey = keyof InputEvents
 
 export interface Input {
-  on: (<K extends keyof InputEventMap>(type: K, listener: InputEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  once: (<K extends keyof InputEventMap>(type: K, listener: InputEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  off: (<K extends keyof InputEventMap>(type: K, listener?: InputEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  emit: (<K extends keyof InputEventMap>(type: K, ...args: Parameters<InputEventMap[K]>) => boolean)
-    & ((type: string, ...args: any[]) => boolean)
+  on: <K extends keyof InputEvents & string>(event: K, listener: InputEvents[K]) => this
+  once: <K extends keyof InputEvents & string>(event: K, listener: InputEvents[K]) => this
+  off: <K extends keyof InputEvents & string>(event: K, listener: InputEvents[K]) => this
+  emit: <K extends keyof InputEvents & string>(event: K, ...args: Parameters<InputEvents[K]>) => this
 }
 
-export class Input extends EventEmitter {
+export class Input extends Observable {
   /**
    * Current event
    */

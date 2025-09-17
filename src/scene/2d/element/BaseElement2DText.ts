@@ -1,4 +1,4 @@
-import type { NormalizedFill, NormalizedOutline, PropertyDeclaration, TextContent, Text as TextProperties } from 'modern-idoc'
+import type { NormalizedFill, NormalizedOutline, TextContent, Text as TextProperties } from 'modern-idoc'
 import type { MeasureResult } from 'modern-text'
 import type { Texture2D } from '../../resources'
 import type { BaseElement2D } from './BaseElement2D'
@@ -16,8 +16,8 @@ export class BaseElement2DText extends CoreObject {
   @property({ alias: 'base.effects' }) declare effects: Text['effects']
   @property({ alias: 'base.fill' }) declare fill: Text['fill']
   @property({ alias: 'base.outline' }) declare outline: Text['outline']
-  @property({ protected: true, alias: 'base.measureDom' }) declare measureDom: Text['measureDom']
-  @property({ protected: true, alias: 'base.fonts' }) declare fonts: Text['fonts']
+  @property({ internal: true, alias: 'base.measureDom' }) declare measureDom: Text['measureDom']
+  @property({ internal: true, alias: 'base.fonts' }) declare fonts: Text['fonts']
 
   readonly base = new Text()
   measureResult?: MeasureResult
@@ -36,7 +36,7 @@ export class BaseElement2DText extends CoreObject {
         case 'effects':
         case 'fill':
         case 'outline':
-          this.setter(args[0], args[1])
+          this.setProperty(args[0], args[1])
           break
       }
       this._updateProperty(...args)
@@ -51,8 +51,8 @@ export class BaseElement2DText extends CoreObject {
     )
   }
 
-  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    super._updateProperty(key, value, oldValue, declaration)
+  protected override _updateProperty(key: string, value: any, oldValue: any): void {
+    super._updateProperty(key, value, oldValue)
 
     switch (key) {
       case 'enabled':

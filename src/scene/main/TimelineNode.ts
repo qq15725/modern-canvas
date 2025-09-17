@@ -1,5 +1,4 @@
-import type { EventListenerOptions, EventListenerValue } from 'modern-idoc'
-import type { NodeEventMap, NodeProperties } from './Node'
+import type { NodeEvents, NodeProperties } from './Node'
 import type { Timeline } from './Timeline'
 import { property } from 'modern-idoc'
 import {
@@ -14,19 +13,15 @@ export interface TimelineNodeProperties extends NodeProperties {
   paused: boolean
 }
 
-export interface TimelineNodeEventMap extends NodeEventMap {
+export interface TimelineNodeEvents extends NodeEvents {
   updateCurrentTime: (currentTime: number) => void
 }
 
 export interface TimelineNode {
-  on: (<K extends keyof TimelineNodeEventMap>(type: K, listener: TimelineNodeEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  once: (<K extends keyof TimelineNodeEventMap>(type: K, listener: TimelineNodeEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  off: (<K extends keyof TimelineNodeEventMap>(type: K, listener?: TimelineNodeEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  emit: (<K extends keyof TimelineNodeEventMap>(type: K, ...args: Parameters<TimelineNodeEventMap[K]>) => boolean)
-    & ((type: string, ...args: any[]) => boolean)
+  on: <K extends keyof TimelineNodeEvents & string>(event: K, listener: TimelineNodeEvents[K]) => this
+  once: <K extends keyof TimelineNodeEvents & string>(event: K, listener: TimelineNodeEvents[K]) => this
+  off: <K extends keyof TimelineNodeEvents & string>(event: K, listener: TimelineNodeEvents[K]) => this
+  emit: <K extends keyof TimelineNodeEvents & string>(event: K, ...args: Parameters<TimelineNodeEvents[K]>) => this
 }
 
 @customNode('TimelineNode')
@@ -34,7 +29,7 @@ export class TimelineNode extends Node {
   @property({ fallback: 0 }) declare delay: number
   @property({ fallback: 0 }) declare duration: number
   @property({ fallback: false }) declare paused: boolean
-  @property({ protected: true, fallback: false }) declare insideTimeRange: boolean
+  @property({ internal: true, fallback: false }) declare insideTimeRange: boolean
 
   constructor(properties?: Partial<TimelineNodeProperties>, nodes: Node[] = []) {
     super()

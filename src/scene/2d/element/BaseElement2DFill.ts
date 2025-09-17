@@ -1,4 +1,4 @@
-import type { Fill, NormalizedFill, PropertyDeclaration } from 'modern-idoc'
+import type { Fill, NormalizedFill } from 'modern-idoc'
 import type { Texture2D } from '../../resources'
 import type { BaseElement2D } from './BaseElement2D'
 import { isNone, normalizeFill, property } from 'modern-idoc'
@@ -44,8 +44,8 @@ export class BaseElement2DFill extends CoreObject {
     )
   }
 
-  protected _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    super._updateProperty(key, value, oldValue, declaration)
+  protected _updateProperty(key: string, value: any, oldValue: any): void {
+    super._updateProperty(key, value, oldValue)
 
     switch (key) {
       case 'color':

@@ -1,19 +1,14 @@
-import type { EventListenerOptions, EventListenerValue } from 'modern-idoc'
 import type { Rect2 } from '../../../core'
 
-export interface RectangulableEventMap {
+export interface RectangulableEvents {
   updateRect: () => void
 }
 
 export interface Rectangulable {
-  on: (<K extends keyof RectangulableEventMap>(type: K, listener: RectangulableEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  once: (<K extends keyof RectangulableEventMap>(type: K, listener: RectangulableEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  off: (<K extends keyof RectangulableEventMap>(type: K, listener?: RectangulableEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  emit: (<K extends keyof RectangulableEventMap>(type: K, ...args: Parameters<RectangulableEventMap[K]>) => boolean)
-    & ((type: string, ...args: any[]) => boolean)
+  on: <K extends keyof RectangulableEvents & string>(event: K, listener: RectangulableEvents[K]) => this
+  once: <K extends keyof RectangulableEvents & string>(event: K, listener: RectangulableEvents[K]) => this
+  off: <K extends keyof RectangulableEvents & string>(event: K, listener: RectangulableEvents[K]) => this
+  emit: <K extends keyof RectangulableEvents & string>(event: K, ...args: Parameters<RectangulableEvents[K]>) => this
 }
 
 export interface Rectangulable {

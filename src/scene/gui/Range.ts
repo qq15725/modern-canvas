@@ -1,4 +1,3 @@
-import type { PropertyDeclaration } from 'modern-idoc'
 import type { Node } from '../main'
 import type { ControlProperties } from './Control'
 import { property } from 'modern-idoc'
@@ -33,8 +32,8 @@ export class Range extends Control {
       .append(children)
   }
 
-  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    super._updateProperty(key, value, oldValue, declaration)
+  protected override _updateProperty(key: string, value: any, oldValue: any): void {
+    super._updateProperty(key, value, oldValue)
 
     switch (key) {
       case 'allowGreater':

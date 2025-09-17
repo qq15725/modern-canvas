@@ -1,4 +1,4 @@
-import type { ImageFillCropRect, PropertyDeclaration } from 'modern-idoc'
+import type { ImageFillCropRect } from 'modern-idoc'
 import type { CanvasBatchable, Node } from '../main'
 import type { ImageFrame, Texture2D } from '../resources'
 import type { Element2DProperties } from './Element2D'
@@ -39,8 +39,8 @@ export class Image2D extends Element2D {
     this.append(children)
   }
 
-  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    super._updateProperty(key, value, oldValue, declaration)
+  protected override _updateProperty(key: string, value: any, oldValue: any): void {
+    super._updateProperty(key, value, oldValue)
 
     switch (key) {
       case 'src':

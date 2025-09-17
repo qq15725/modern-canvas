@@ -1,25 +1,20 @@
-import type { EventListenerOptions, EventListenerValue, PropertyDeclaration } from 'modern-idoc'
 import type { Vector2, Vector2Data, WebGLFramebufferOptions, WebGLRenderer } from '../../core'
-import type { Rectangulable, RectangulableEventMap } from './interfaces'
-import type { NodeEventMap } from './Node'
+import type { Rectangulable, RectangulableEvents } from './interfaces'
+import type { NodeEvents } from './Node'
 import { property } from 'modern-idoc'
 import { customNode, Projection2D, Rect2, Transform2D } from '../../core'
 import { QuadUvGeometry, UvMaterial, ViewportTexture } from '../resources'
 import { Node } from './Node'
 
-export interface ViewportEventMap extends NodeEventMap, RectangulableEventMap {
+export interface ViewportEvents extends NodeEvents, RectangulableEvents {
   //
 }
 
 export interface Viewport {
-  on: (<K extends keyof ViewportEventMap>(type: K, listener: ViewportEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  once: (<K extends keyof ViewportEventMap>(type: K, listener: ViewportEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  off: (<K extends keyof ViewportEventMap>(type: K, listener?: ViewportEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  emit: (<K extends keyof ViewportEventMap>(type: K, ...args: Parameters<ViewportEventMap[K]>) => boolean)
-    & ((type: string, ...args: any[]) => boolean)
+  on: <K extends keyof ViewportEvents & string>(event: K, listener: ViewportEvents[K]) => this
+  once: <K extends keyof ViewportEvents & string>(event: K, listener: ViewportEvents[K]) => this
+  off: <K extends keyof ViewportEvents & string>(event: K, listener: ViewportEvents[K]) => this
+  emit: <K extends keyof ViewportEvents & string>(event: K, ...args: Parameters<ViewportEvents[K]>) => this
 }
 
 export interface ViewportFramebuffer {
@@ -87,8 +82,8 @@ export class Viewport extends Node implements Rectangulable {
     })
   }
 
-  protected _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    super._updateProperty(key, value, oldValue, declaration)
+  protected _updateProperty(key: string, value: any, oldValue: any): void {
+    super._updateProperty(key, value, oldValue)
 
     switch (key) {
       case 'x':

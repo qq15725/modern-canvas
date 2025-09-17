@@ -1,4 +1,3 @@
-import type { PropertyDeclaration } from 'modern-idoc'
 import type { Node as YogaNode } from 'yoga-layout/load'
 import type { FlexElement2DStyle } from './element'
 import type { FlexElement2D } from './FlexElement2D'
@@ -137,7 +136,7 @@ export class FlexLayout {
   }
 
   // eslint-disable-next-line unused-imports/no-unused-vars
-  updateStyleProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  updateStyleProperty(key: string, value: any, oldValue: any): void {
     switch (key) {
       case 'alignContent':
         this._node.setAlignContent(

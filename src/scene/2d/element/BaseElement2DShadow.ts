@@ -1,4 +1,4 @@
-import type { NormalizedShadow, PropertyDeclaration, Shadow } from 'modern-idoc'
+import type { NormalizedShadow, Shadow } from 'modern-idoc'
 import type { BaseElement2D } from './BaseElement2D'
 import { isNone, normalizeShadow, property } from 'modern-idoc'
 import { CoreObject } from '../../../core'
@@ -25,8 +25,8 @@ export class BaseElement2DShadow extends CoreObject {
     )
   }
 
-  protected _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    super._updateProperty(key, value, oldValue, declaration)
+  protected _updateProperty(key: string, value: any, oldValue: any): void {
+    super._updateProperty(key, value, oldValue)
 
     switch (key) {
       case 'color':

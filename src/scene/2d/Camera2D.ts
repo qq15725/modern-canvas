@@ -1,4 +1,3 @@
-import type { EventListenerValue } from 'modern-idoc'
 import type {
   InputEvent,
   InputEventKey,
@@ -8,7 +7,7 @@ import type {
   WheelInputEvent,
 } from '../../core'
 import type { Node } from '../main'
-import type { Node2DEventMap, Node2DProperties } from './Node2D'
+import type { Node2DEvents, Node2DProperties } from './Node2D'
 import { property } from 'modern-idoc'
 import { clamp, customNode, Vector2 } from '../../core'
 import { Node2D } from './Node2D'
@@ -17,19 +16,15 @@ export interface Camera2DProperties extends Node2DProperties {
   //
 }
 
-export interface Camera2DEventMap extends Node2DEventMap {
+export interface Camera2DEvents extends Node2DEvents {
   updateCanvasTransform: () => void
 }
 
 export interface Camera2D {
-  on: (<K extends keyof Camera2DEventMap>(type: K, listener: Camera2DEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  once: (<K extends keyof Camera2DEventMap>(type: K, listener: Camera2DEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  off: (<K extends keyof Camera2DEventMap>(type: K, listener?: Camera2DEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  emit: (<K extends keyof Camera2DEventMap>(type: K, ...args: Parameters<Camera2DEventMap[K]>) => boolean)
-    & ((type: string, ...args: any[]) => boolean)
+  on: <K extends keyof Camera2DEvents & string>(event: K, listener: Camera2DEvents[K]) => this
+  once: <K extends keyof Camera2DEvents & string>(event: K, listener: Camera2DEvents[K]) => this
+  off: <K extends keyof Camera2DEvents & string>(event: K, listener: Camera2DEvents[K]) => this
+  emit: <K extends keyof Camera2DEvents & string>(event: K, ...args: Parameters<Camera2DEvents[K]>) => this
 }
 
 @customNode<Camera2D>('Camera2D', {
@@ -41,8 +36,8 @@ export class Camera2D extends Node2D {
   readonly maxZoom = new Vector2(6, 6)
   readonly minZoom = new Vector2(0.1, 0.1)
 
-  @property({ protected: true, fallback: false }) declare spaceKey: boolean
-  @property({ protected: true, fallback: false }) declare grabbing: boolean
+  @property({ internal: true, fallback: false }) declare spaceKey: boolean
+  @property({ internal: true, fallback: false }) declare grabbing: boolean
   protected _screenOffset = { x: 0, y: 0 }
 
   constructor(properties?: Partial<Camera2DProperties>, nodes: Node[] = []) {

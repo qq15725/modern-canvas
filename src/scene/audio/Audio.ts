@@ -1,4 +1,3 @@
-import type { PropertyDeclaration } from 'modern-idoc'
 import type { HTMLSound } from './html'
 import type { IPlayOptions } from './interfaces'
 import type { WebSound } from './web'
@@ -92,8 +91,8 @@ export class Audio extends TimelineNode {
     this.src = src
   }
 
-  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    super._updateProperty(key, value, oldValue, declaration)
+  protected override _updateProperty(key: string, value: any, oldValue: any): void {
+    super._updateProperty(key, value, oldValue)
     switch (key) {
       case 'paused':
         this.refreshPaused()
@@ -191,7 +190,7 @@ export class Audio extends TimelineNode {
   }
 
   protected _recycleSound(sound: PlatformSound): void {
-    sound.free()
+    sound.destroy()
     if (!Audio._soundPool.includes(sound)) {
       Audio._soundPool.push(sound)
     }

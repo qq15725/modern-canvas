@@ -1,4 +1,3 @@
-import type { PropertyDeclaration } from 'modern-idoc'
 import type { Node } from '../main'
 import type { VideoTexture } from '../resources'
 import type { TextureRect2DProperties } from './TextureRect2D'
@@ -25,8 +24,8 @@ export class Video2D extends TextureRect2D<VideoTexture> {
     this.append(children)
   }
 
-  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    super._updateProperty(key, value, oldValue, declaration)
+  protected override _updateProperty(key: string, value: any, oldValue: any): void {
+    super._updateProperty(key, value, oldValue)
 
     switch (key) {
       case 'src':

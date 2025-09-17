@@ -1,11 +1,11 @@
-import type { EventListenerOptions, EventListenerValue, PropertyDeclaration } from 'modern-idoc'
 import type {
-  CoreObjectEventMap,
+  CoreObjectEvents,
   InputEvent,
   InputEventKey,
-  InputEventMap,
+  InputEvents,
   Maskable,
-  WebGLRenderer } from '../../core'
+  WebGLRenderer,
+} from '../../core'
 import type { SceneTree } from './SceneTree'
 import type { Viewport } from './Viewport'
 import type { Window } from './Window'
@@ -13,7 +13,7 @@ import { clearUndef, idGenerator, property } from 'modern-idoc'
 import { CoreObject, customNode, customNodes } from '../../core'
 import { Children } from './Children'
 
-export interface NodeEventMap extends CoreObjectEventMap, InputEventMap {
+export interface NodeEvents extends CoreObjectEvents, InputEvents {
   treeEnter: (tree: SceneTree) => void
   treeEntered: (tree: SceneTree) => void
   treePostEnter: (tree: SceneTree) => void
@@ -34,14 +34,10 @@ export interface NodeEventMap extends CoreObjectEventMap, InputEventMap {
 }
 
 export interface Node {
-  on: (<K extends keyof NodeEventMap>(type: K, listener: NodeEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  once: (<K extends keyof NodeEventMap>(type: K, listener?: NodeEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  off: (<K extends keyof NodeEventMap>(type: K, listener: NodeEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  emit: (<K extends keyof NodeEventMap>(type: K, ...args: Parameters<NodeEventMap[K]>) => boolean)
-    & ((type: string, ...args: any[]) => boolean)
+  on: <K extends keyof NodeEvents & string>(event: K, listener: NodeEvents[K]) => this
+  once: <K extends keyof NodeEvents & string>(event: K, listener: NodeEvents[K]) => this
+  off: <K extends keyof NodeEvents & string>(event: K, listener: NodeEvents[K]) => this
+  emit: <K extends keyof NodeEvents & string>(event: K, ...args: Parameters<NodeEvents[K]>) => this
 }
 
 export type ProcessMode = 'inherit' | 'pausable' | 'when_paused' | 'always' | 'disabled'
@@ -78,11 +74,11 @@ export class Node extends CoreObject {
   @property({ fallback: idGenerator() }) declare name: string
   @property({ default: () => ({}) }) declare meta: Record<string, any>
 
-  @property({ protected: true, fallback: 'inherit' }) declare processMode: ProcessMode
-  @property({ protected: true, fallback: 'default' }) declare processSortMode: ProcessSortMode
-  @property({ protected: true, fallback: 'inherit' }) declare renderMode: RenderMode
-  @property({ protected: true, fallback: 'inherit' }) declare inputMode: InputMode
-  @property({ protected: true, fallback: 'default' }) declare internalMode: InternalMode
+  @property({ internal: true, fallback: 'inherit' }) declare processMode: ProcessMode
+  @property({ internal: true, fallback: 'default' }) declare processSortMode: ProcessSortMode
+  @property({ internal: true, fallback: 'inherit' }) declare renderMode: RenderMode
+  @property({ internal: true, fallback: 'inherit' }) declare inputMode: InputMode
+  @property({ internal: true, fallback: 'default' }) declare internalMode: InternalMode
   @property({ protected: true }) declare mask?: Maskable
 
   protected _readyed = false
@@ -207,7 +203,7 @@ export class Node extends CoreObject {
   protected _children = new Children()
   get children(): Node[] { return this._children.default }
   set children(value: Node[]) { this._children.set(value) }
-  getChildren(includeInternal: InternalMode): Node[] { return this._children.getInternal(includeInternal) }
+  getChildren(internalMode: InternalMode | true = 'default'): Node[] { return this._children.getInternal(internalMode === true ? undefined : internalMode) }
   getChild<T extends Node = Node>(index = 0): T | undefined { return this.children[index] as T }
   get siblingIndex(): number { return this.getIndex() }
   set siblingIndex(toIndex) { this._parent?.moveChild(this, toIndex) }
@@ -263,10 +259,6 @@ export class Node extends CoreObject {
       default:
         return false
     }
-  }
-
-  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    super._updateProperty(key, value, oldValue, declaration)
   }
 
   protected _onTreeEnter(tree: SceneTree): void {
@@ -598,6 +590,11 @@ export class Node extends CoreObject {
   protected _input(event: InputEvent, key: InputEventKey): void {}
   // eslint-disable-next-line unused-imports/no-unused-vars
   protected _render(renderer: WebGLRenderer): void {}
+
+  override destroy(): void {
+    super.destroy()
+    this._children.internal.forEach(node => this.removeChild(node))
+  }
 
   clone(): this {
     return new (this.constructor as any)(

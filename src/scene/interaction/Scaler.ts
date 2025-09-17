@@ -1,28 +1,23 @@
-import type { EventListenerOptions, EventListenerValue, PropertyDeclaration } from 'modern-idoc'
 import type { Element2D } from '../2d'
 import type {
   InputEvent,
   InputEventKey,
   WheelInputEvent,
 } from '../../core'
-import type { NodeEventMap, NodeProperties } from '../main'
+import type { NodeEvents, NodeProperties } from '../main'
 import { property } from 'modern-idoc'
 import { clamp, customNode } from '../../core'
 import { Node } from '../main'
 
-export interface ScalerEventMap extends NodeEventMap {
+export interface ScalerEvents extends NodeEvents {
   updateScale: (scale: number) => void
 }
 
 export interface Scaler {
-  on: (<K extends keyof ScalerEventMap>(type: K, listener: ScalerEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  once: (<K extends keyof ScalerEventMap>(type: K, listener: ScalerEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  off: (<K extends keyof ScalerEventMap>(type: K, listener?: ScalerEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  emit: (<K extends keyof ScalerEventMap>(type: K, ...args: Parameters<ScalerEventMap[K]>) => boolean)
-    & ((type: string, ...args: any[]) => boolean)
+  on: <K extends keyof ScalerEvents & string>(event: K, listener: ScalerEvents[K]) => this
+  once: <K extends keyof ScalerEvents & string>(event: K, listener: ScalerEvents[K]) => this
+  off: <K extends keyof ScalerEvents & string>(event: K, listener: ScalerEvents[K]) => this
+  emit: <K extends keyof ScalerEvents & string>(event: K, ...args: Parameters<ScalerEvents[K]>) => this
 }
 
 export interface ScalerProperties extends NodeProperties {
@@ -55,8 +50,8 @@ export class Scaler extends Node {
     this.append(children)
   }
 
-  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    super._updateProperty(key, value, oldValue, declaration)
+  protected override _updateProperty(key: string, value: any, oldValue: any): void {
+    super._updateProperty(key, value, oldValue)
 
     switch (key) {
       case 'translateY':

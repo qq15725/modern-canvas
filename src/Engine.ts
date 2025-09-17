@@ -1,10 +1,9 @@
-import type { EventListenerOptions, EventListenerValue } from 'modern-idoc'
 import type {
   ColorValue,
   PointerInputEvent,
   WheelInputEvent,
 } from './core'
-import type { SceneTreeEventMap, Timeline } from './scene'
+import type { SceneTreeEvents, Timeline } from './scene'
 import { assets } from './asset'
 import {
   DEVICE_PIXEL_RATIO,
@@ -26,7 +25,7 @@ export interface EngineOptions extends WebGLContextAttributes {
   timeline?: Timeline
 }
 
-interface EngineEventMap extends SceneTreeEventMap {
+interface EngineEvents extends SceneTreeEvents {
   pointerdown: (ev: PointerInputEvent) => void
   pointerover: (ev: PointerInputEvent) => void
   pointermove: (ev: PointerInputEvent) => void
@@ -35,14 +34,10 @@ interface EngineEventMap extends SceneTreeEventMap {
 }
 
 export interface Engine {
-  on: (<K extends keyof EngineEventMap>(type: K, listener: EngineEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  once: (<K extends keyof EngineEventMap>(type: K, listener: EngineEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  off: (<K extends keyof EngineEventMap>(type: K, listener?: EngineEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  emit: (<K extends keyof EngineEventMap>(type: K, ...args: Parameters<EngineEventMap[K]>) => boolean)
-    & ((type: string, ...args: any[]) => boolean)
+  on: <K extends keyof EngineEvents>(event: K, listener: EngineEvents[K]) => this
+  once: <K extends keyof EngineEvents>(event: K, listener: EngineEvents[K]) => this
+  off: <K extends keyof EngineEvents>(event: K, listener: EngineEvents[K]) => this
+  emit: <K extends keyof EngineEvents>(event: K, ...args: Parameters<EngineEvents[K]>) => this
 }
 
 export const defaultOptions = {
@@ -203,10 +198,10 @@ export class Engine extends SceneTree {
     })
   }
 
-  override free(): void {
-    super.free()
+  override destroy(): void {
+    super.destroy()
     this.enableAutoResize(false)
-    this.renderer.free()
+    this.renderer.destroy()
   }
 
   toPixels(): Uint8ClampedArray<ArrayBuffer> {

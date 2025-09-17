@@ -1,4 +1,3 @@
-import type { PropertyDeclaration } from 'modern-idoc'
 import type { Texture2DPixelsSource } from './Texture2D'
 import { Texture2D } from './Texture2D'
 
@@ -26,7 +25,7 @@ export class PixelsTexture extends Texture2D<Texture2DPixelsSource> {
     super(source)
   }
 
-  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected override _updateProperty(key: string, value: any, oldValue: any): void {
     switch (key) {
       case 'width':
         this.source.width = Math.round(this.width * this.pixelRatio)
@@ -40,6 +39,6 @@ export class PixelsTexture extends Texture2D<Texture2DPixelsSource> {
         break
     }
 
-    super._updateProperty(key, value, oldValue, declaration)
+    super._updateProperty(key, value, oldValue)
   }
 }

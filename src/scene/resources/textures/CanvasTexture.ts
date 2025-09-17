@@ -1,4 +1,3 @@
-import type { PropertyDeclaration } from 'modern-idoc'
 import { property } from 'modern-idoc'
 import { Texture2D } from './Texture2D'
 
@@ -9,7 +8,7 @@ export class CanvasTexture extends Texture2D<HTMLCanvasElement> {
     super(source)
   }
 
-  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
+  protected override _updateProperty(key: string, value: any, oldValue: any): void {
     switch (key) {
       case 'width':
         this.source.width = Math.max(1, Math.ceil(value * this.pixelRatio))
@@ -19,6 +18,6 @@ export class CanvasTexture extends Texture2D<HTMLCanvasElement> {
         break
     }
 
-    super._updateProperty(key, value, oldValue, declaration)
+    super._updateProperty(key, value, oldValue)
   }
 }

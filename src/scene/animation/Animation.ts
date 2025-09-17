@@ -1,4 +1,3 @@
-import type { PropertyDeclaration } from 'modern-idoc'
 import type { CssFunction, CssFunctionArg } from '../../core'
 import type { Node, TimelineNodeProperties } from '../main'
 import { property, RawWeakMap } from 'modern-idoc'
@@ -152,8 +151,8 @@ export class Animation extends TimelineNode {
     }
   }
 
-  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    super._updateProperty(key, value, oldValue, declaration)
+  protected override _updateProperty(key: string, value: any, oldValue: any): void {
+    super._updateProperty(key, value, oldValue)
 
     switch (key) {
       case 'effectMode':
@@ -167,7 +166,7 @@ export class Animation extends TimelineNode {
     let targets
     switch (this.effectMode) {
       case 'sibling':
-        targets = this.getParent()?.children.internal.filter(val => val instanceof CanvasItem) ?? []
+        targets = this.getParent()?.getChildren(true).filter(val => val instanceof CanvasItem) ?? []
         break
       case 'parent':
       default:

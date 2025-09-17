@@ -33,8 +33,8 @@ export class Assets {
   protected _gc = SUPPORTS_WEAK_REF
     ? new FinalizationRegistry<string>((id) => {
       const ref = this.get<any>(id)
-      if (ref && 'free' in ref) {
-        ref.free()
+      if (ref && 'destroy' in ref) {
+        ref.destroy()
       }
       this._handled.delete(id)
     })
@@ -175,8 +175,8 @@ export class Assets {
   gc(): void {
     this._handled.forEach((_, id) => {
       const ref = this.get<any>(id)
-      if (ref && 'free' in ref) {
-        ref.free()
+      if (ref && 'destroy' in ref) {
+        ref.destroy()
       }
     })
     this._handled.clear()

@@ -1,4 +1,4 @@
-import type { NormalizedOutline, Outline, PropertyDeclaration } from 'modern-idoc'
+import type { NormalizedOutline, Outline } from 'modern-idoc'
 import { isNone, normalizeOutline, property } from 'modern-idoc'
 import { BaseElement2DFill } from './BaseElement2DFill'
 import { getDrawOptions } from './utils'
@@ -18,8 +18,8 @@ export class BaseElement2DOutline extends BaseElement2DFill {
     )
   }
 
-  protected _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    super._updateProperty(key, value, oldValue, declaration)
+  protected _updateProperty(key: string, value: any, oldValue: any): void {
+    super._updateProperty(key, value, oldValue)
 
     switch (key) {
       case 'width':

@@ -1,23 +1,18 @@
-import type { EventListenerOptions, EventListenerValue, PropertyDeclaration } from 'modern-idoc'
 import type { BaseElement2DProperties } from '../2d'
 import type { InputEvent, InputEventKey } from '../../core'
-import type { CanvasItemEventMap, Node, Rectangulable, RectangulableEventMap } from '../main'
+import type { CanvasItemEvents, Node, Rectangulable, RectangulableEvents } from '../main'
 import { Element2D } from '../2d'
 import { customNode } from '../../core'
 
-export interface ControlEventMap extends CanvasItemEventMap, RectangulableEventMap {
+export interface ControlEvents extends CanvasItemEvents, RectangulableEvents {
   //
 }
 
 export interface Control {
-  on: (<K extends keyof ControlEventMap>(type: K, listener: ControlEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  once: (<K extends keyof ControlEventMap>(type: K, listener: ControlEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  off: (<K extends keyof ControlEventMap>(type: K, listener?: ControlEventMap[K], options?: EventListenerOptions) => this)
-    & ((type: string, listener: EventListenerValue, options?: EventListenerOptions) => this)
-  emit: (<K extends keyof ControlEventMap>(type: K, ...args: Parameters<ControlEventMap[K]>) => boolean)
-    & ((type: string, ...args: any[]) => boolean)
+  on: <K extends keyof ControlEvents & string>(event: K, listener: ControlEvents[K]) => this
+  once: <K extends keyof ControlEvents & string>(event: K, listener: ControlEvents[K]) => this
+  off: <K extends keyof ControlEvents & string>(event: K, listener: ControlEvents[K]) => this
+  emit: <K extends keyof ControlEvents & string>(event: K, ...args: Parameters<ControlEvents[K]>) => this
 }
 
 export interface ControlProperties extends BaseElement2DProperties {
@@ -56,8 +51,8 @@ export class Control extends Element2D implements Rectangulable {
     this._guiInput(event, key)
   }
 
-  protected override _updateStyleProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    super._updateStyleProperty(key, value, oldValue, declaration)
+  protected override _updateStyleProperty(key: string, value: any, oldValue: any): void {
+    super._updateStyleProperty(key, value, oldValue)
 
     switch (key) {
       case 'width':

@@ -1,4 +1,3 @@
-import type { PropertyDeclaration } from 'modern-idoc'
 import type { WebGLRenderer } from '../../core'
 import type { EffectProperties, Node, Viewport } from '../main'
 import { property } from 'modern-idoc'
@@ -72,8 +71,8 @@ void main() {
     this._generateKernels()
   }
 
-  protected override _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    super._updateProperty(key, value, oldValue, declaration)
+  protected override _updateProperty(key: string, value: any, oldValue: any): void {
+    super._updateProperty(key, value, oldValue)
 
     switch (key) {
       case 'quality':

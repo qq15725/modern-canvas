@@ -1,4 +1,4 @@
-import type { NormalizedShape, PropertyDeclaration, Shape } from 'modern-idoc'
+import type { NormalizedShape, Shape } from 'modern-idoc'
 import type { BaseElement2D } from './BaseElement2D'
 import { isNone, normalizeShape, property } from 'modern-idoc'
 import {
@@ -34,8 +34,8 @@ export class BaseElement2DShape extends CoreObject {
     )
   }
 
-  protected _updateProperty(key: string, value: any, oldValue: any, declaration?: PropertyDeclaration): void {
-    super._updateProperty(key, value, oldValue, declaration)
+  protected _updateProperty(key: string, value: any, oldValue: any): void {
+    super._updateProperty(key, value, oldValue)
 
     switch (key) {
       case 'svg':
