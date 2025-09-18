@@ -79,7 +79,7 @@ export class Node extends CoreObject {
   @property({ internal: true, fallback: 'inherit' }) declare renderMode: RenderMode
   @property({ internal: true, fallback: 'inherit' }) declare inputMode: InputMode
   @property({ internal: true, fallback: 'default' }) declare internalMode: InternalMode
-  @property({ protected: true }) declare mask?: Maskable
+  @property({ internal: true }) declare mask?: Maskable
 
   protected _readyed = false
 

@@ -1,3 +1,4 @@
+import type { Fonts } from 'modern-font'
 import type {
   ColorValue,
   MainLoopEvents,
@@ -33,6 +34,7 @@ export class SceneTree extends MainLoop {
   @property() declare backgroundColor: ColorValue | undefined
   @property({ internal: true, fallback: false }) declare debug: boolean
 
+  fonts?: Fonts
   readonly input = new Input()
   readonly renderStack = new RenderStack()
   readonly root = new Window(true).setTree(this)

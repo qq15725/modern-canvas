@@ -32,7 +32,7 @@ export interface EffectContext {
 
 @customNode('Effect')
 export class Effect extends TimelineNode {
-  @property({ protected: true }) material: Material | undefined
+  @property({ internal: true }) material: Material | undefined
   @property() declare effectMode: EffectMode | undefined
   @property({ fallback: '' }) declare glsl: string
   @property({ fallback: '' }) declare glslSrc: string

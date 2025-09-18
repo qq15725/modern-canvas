@@ -13,7 +13,7 @@ export interface VertexAttributeOptions {
 }
 
 export class VertexAttribute extends Resource {
-  @property({ protected: true }) declare buffer: VertexBuffer
+  @property({ internal: true }) declare buffer: VertexBuffer
   @property({ fallback: 0 }) declare size: number
   @property({ fallback: false }) declare normalized: boolean
   @property({ fallback: 'float' }) declare type: 'float' | 'unsigned_byte' | 'unsigned_short'

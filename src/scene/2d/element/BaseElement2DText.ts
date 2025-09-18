@@ -20,7 +20,7 @@ export class BaseElement2DText extends CoreObject {
   @property({ alias: 'base.measureDom' }) declare measureDom: Text['measureDom']
   @property({ alias: 'base.fonts' }) declare fonts: Text['fonts']
 
-  readonly base = new Text()
+  readonly base: Text
   measureResult?: MeasureResult
   protected _textureMap = new Map<string, {
     texture: Texture2D | undefined
@@ -31,7 +31,8 @@ export class BaseElement2DText extends CoreObject {
     public parent: BaseElement2D,
   ) {
     super()
-    this.base.setPropertyAccessor(this)
+
+    this.base = new Text().setPropertyAccessor(this)
   }
 
   override setProperties(properties?: TextProperties): this {
@@ -60,8 +61,13 @@ export class BaseElement2DText extends CoreObject {
     }
   }
 
-  protected _updateTextureMap(): void {
+  protected _updateBase(): void {
+    this.base.fonts = this.base.fonts ?? this.parent.tree?.fonts
     this.base.update()
+  }
+
+  protected _updateTextureMap(): void {
+    this._updateBase()
     this._textureMap.clear()
     const pGlyphBoxs: BoundingBox[] = []
     this.base.paragraphs.forEach((p, pIndex) => {
@@ -123,6 +129,7 @@ export class BaseElement2DText extends CoreObject {
   }
 
   measure(): MeasureResult {
+    this._updateBase()
     return this.base.measure()
   }
 
@@ -153,7 +160,7 @@ export class BaseElement2DText extends CoreObject {
 
   draw(): void {
     const ctx = this.parent.context
-    this.base.update()
+    this._updateBase()
     this.base.pathSets.forEach((pathSet) => {
       pathSet.paths.forEach((path) => {
         const meta = path.getMeta()

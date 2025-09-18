@@ -1,3 +1,4 @@
+import type { Fonts } from 'modern-font'
 import type {
   ColorValue,
   PointerInputEvent,
@@ -20,6 +21,7 @@ export interface EngineOptions extends WebGLContextAttributes {
   height?: number
   pixelRatio?: number
   backgroundColor?: ColorValue
+  fonts?: Fonts
   autoResize?: boolean
   autoStart?: boolean
   timeline?: Timeline
@@ -86,6 +88,7 @@ export class Engine extends SceneTree {
       height,
       pixelRatio = DEVICE_PIXEL_RATIO,
       backgroundColor = 0x00000000,
+      fonts,
       autoResize,
       autoStart,
       timeline,
@@ -106,6 +109,7 @@ export class Engine extends SceneTree {
 
     this.pixelRatio = pixelRatio
     this.backgroundColor = backgroundColor
+    this.fonts = fonts
     if (autoResize) {
       if (!view && this.renderer.view) {
         this.renderer.view.style.width = '100%'

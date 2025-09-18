@@ -16,7 +16,7 @@ export interface Image2DProperties extends Element2DProperties {
 
 @customNode('Image2D')
 export class Image2D extends Element2D {
-  @property({ protected: true }) declare texture: AnimatedTexture | undefined
+  @property({ internal: true }) declare texture: AnimatedTexture | undefined
   @property({ fallback: '' }) declare src: string
   @property() declare srcRect: ImageFillCropRect | undefined
   @property({ fallback: false }) declare gif: boolean

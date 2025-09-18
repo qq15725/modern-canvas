@@ -24,7 +24,7 @@ export class Texture2D<T extends Texture2DSource = Texture2DSource> extends Reso
   static get GREEN(): Texture2D { return new this({ width: 1, height: 1, pixels: new Uint8Array([0, 255, 0, 255]) }) }
   static get BLUE(): Texture2D { return new this({ width: 1, height: 1, pixels: new Uint8Array([0, 0, 255, 255]) }) }
 
-  @property({ protected: true }) declare source: T
+  @property({ internal: true }) declare source: T
   @property({ fallback: 0 }) declare width: number
   @property({ fallback: 0 }) declare height: number
   @property({ fallback: 'linear' }) declare filterMode: Texture2DFilterMode
