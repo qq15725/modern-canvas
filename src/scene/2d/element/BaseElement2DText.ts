@@ -12,12 +12,13 @@ import { getDrawOptions } from './utils'
 
 export class BaseElement2DText extends CoreObject {
   @property({ fallback: true }) declare enabled: boolean
-  @property({ alias: 'base.content', fallback: () => [] }) declare content: Text['content']
-  @property({ alias: 'base.effects' }) declare effects: Text['effects']
-  @property({ alias: 'base.fill' }) declare fill: Text['fill']
-  @property({ alias: 'base.outline' }) declare outline: Text['outline']
-  @property({ internal: true, alias: 'base.measureDom' }) declare measureDom: Text['measureDom']
-  @property({ internal: true, alias: 'base.fonts' }) declare fonts: Text['fonts']
+  @property({ fallback: () => [] }) declare content: Text['content']
+  @property({ alias: 'parent.style.json' }) declare style: Text['style']
+  @property() declare effects: Text['effects']
+  @property() declare fill: Text['fill']
+  @property() declare outline: Text['outline']
+  @property({ alias: 'base.measureDom' }) declare measureDom: Text['measureDom']
+  @property({ alias: 'base.fonts' }) declare fonts: Text['fonts']
 
   readonly base = new Text()
   measureResult?: MeasureResult
@@ -30,17 +31,7 @@ export class BaseElement2DText extends CoreObject {
     public parent: BaseElement2D,
   ) {
     super()
-    this.base.on('updateProperty', (...args) => {
-      switch (args[0]) {
-        case 'content':
-        case 'effects':
-        case 'fill':
-        case 'outline':
-          this.setProperty(args[0], args[1])
-          break
-      }
-      this._updateProperty(...args)
-    })
+    this.base.setPropertyAccessor(this)
   }
 
   override setProperties(properties?: TextProperties): this {
@@ -69,18 +60,8 @@ export class BaseElement2DText extends CoreObject {
     }
   }
 
-  protected _update(): void {
-    this.base.style = {
-      justifyContent: 'center',
-      alignItems: 'center',
-      textAlign: 'center',
-      ...this.parent.style.toJSON() as any,
-    }
-    this.base.update()
-  }
-
   protected _updateTextureMap(): void {
-    this._update()
+    this.base.update()
     this._textureMap.clear()
     const pGlyphBoxs: BoundingBox[] = []
     this.base.paragraphs.forEach((p, pIndex) => {
@@ -142,12 +123,6 @@ export class BaseElement2DText extends CoreObject {
   }
 
   measure(): MeasureResult {
-    this.base.style = {
-      justifyContent: 'center',
-      alignItems: 'center',
-      textAlign: 'center',
-      ...this.parent.style.toJSON() as any,
-    }
     return this.base.measure()
   }
 
@@ -178,7 +153,7 @@ export class BaseElement2DText extends CoreObject {
 
   draw(): void {
     const ctx = this.parent.context
-    this._update()
+    this.base.update()
     this.base.pathSets.forEach((pathSet) => {
       pathSet.paths.forEach((path) => {
         const meta = path.getMeta()

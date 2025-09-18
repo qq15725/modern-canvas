@@ -74,14 +74,14 @@
     "colord": "^2.9.3",
     "earcut": "^3.0.2",
     "modern-font": "^0.4.1",
-    "modern-idoc": "^0.9.3",
+    "modern-idoc": "^0.9.11",
     "modern-path2d": "^1.4.9",
-    "modern-text": "^1.8.2"
+    "modern-text": "^1.8.3"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^5.3.0",
     "@types/earcut": "^3.0.0",
-    "@types/node": "^24.5.1",
+    "@types/node": "^24.5.2",
     "bumpp": "^10.2.3",
     "conventional-changelog-cli": "^5.0.0",
     "eslint": "^9.35.0",
@@ -91,7 +91,7 @@
     "simple-git-hooks": "^2.13.1",
     "typescript": "^5.9.2",
     "unbuild": "^3.6.1",
-    "vite": "^7.1.5",
+    "vite": "^7.1.6",
     "vitest": "^3.2.4",
     "yoga-layout": "^3.2.1"
   },
