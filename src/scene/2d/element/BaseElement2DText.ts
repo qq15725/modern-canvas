@@ -32,7 +32,8 @@ export class BaseElement2DText extends CoreObject {
   ) {
     super()
 
-    this.base = new Text().setPropertyAccessor(this)
+    this.base = new Text()
+    this.base.setPropertyAccessor(this)
   }
 
   override setProperties(properties?: TextProperties): this {
