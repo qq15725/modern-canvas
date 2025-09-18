@@ -19,6 +19,7 @@ export class CoreObject extends Reactivable {
   readonly instanceId = ++IID
 
   get json(): Record<string, any> { return this.toJSON() }
+  set json(val) { this.setProperties(val) }
 
   protected override _nextTick(): Promise<void> {
     return nextTick()
