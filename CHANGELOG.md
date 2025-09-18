@@ -1,3 +1,12 @@
+## [0.9.5](https://github.com/qq15725/modern-canvas/compare/v0.9.4...v0.9.5) (2025-09-18)
+
+
+### Bug Fixes
+
+* null pointer ([b2e4db2](https://github.com/qq15725/modern-canvas/commit/b2e4db28af46279b206fe9a55c6bd672dc12e507))
+
+
+
 ## [0.9.4](https://github.com/qq15725/modern-canvas/compare/v0.9.3...v0.9.4) (2025-09-18)
 
 
