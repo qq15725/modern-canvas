@@ -1,3 +1,12 @@
+## [0.9.3](https://github.com/qq15725/modern-canvas/compare/v0.9.2...v0.9.3) (2025-09-18)
+
+
+### Features
+
+* add CoreObject.json setter ([cb49420](https://github.com/qq15725/modern-canvas/commit/cb494201cfb29f1c2f3dffeb1cf0822cd4ee8860))
+
+
+
 ## [0.9.2](https://github.com/qq15725/modern-canvas/compare/v0.9.1...v0.9.2) (2025-09-18)
 
 
