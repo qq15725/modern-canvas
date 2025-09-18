@@ -1,3 +1,12 @@
+## [0.9.4](https://github.com/qq15725/modern-canvas/compare/v0.9.3...v0.9.4) (2025-09-18)
+
+
+### Features
+
+* Engine add fonts option ([f9b69fe](https://github.com/qq15725/modern-canvas/commit/f9b69feb9712a684e8cf2c1db1b58e2bf3c3228a))
+
+
+
 ## [0.9.3](https://github.com/qq15725/modern-canvas/compare/v0.9.2...v0.9.3) (2025-09-18)
 
 
