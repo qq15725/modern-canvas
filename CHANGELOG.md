@@ -1,3 +1,12 @@
+## [0.9.6](https://github.com/qq15725/modern-canvas/compare/v0.9.5...v0.9.6) (2025-09-24)
+
+
+### Features
+
+* msaa ([f4c896c](https://github.com/qq15725/modern-canvas/commit/f4c896c28c24757fa92187d5bcf04d3f856a8fde))
+
+
+
 ## [0.9.5](https://github.com/qq15725/modern-canvas/compare/v0.9.4...v0.9.5) (2025-09-18)
 
 
