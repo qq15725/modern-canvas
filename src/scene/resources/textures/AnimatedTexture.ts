@@ -7,8 +7,12 @@ export interface ImageFrame {
 }
 
 export class AnimatedTexture extends Resource {
-  frames: ImageFrame[]
   declare duration: number
+  frames: ImageFrame[]
+  frameIndex = 0
+  get currentFrame(): ImageFrame {
+    return this.frames[this.frameIndex]
+  }
 
   constructor(
     source: Texture2D | ImageFrame[],

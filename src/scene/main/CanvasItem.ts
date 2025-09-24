@@ -145,10 +145,11 @@ export class CanvasItem extends TimelineNode {
 
   protected _repaint(batchables: CanvasBatchable[]): CanvasBatchable[] {
     this.log(this.name, 'painting')
+    const globalOpacity = this.globalOpacity
     return batchables.map((batchable) => {
       return {
         ...batchable,
-        modulate: this._modulate.toInt8Array(),
+        modulate: this._modulate.toInt8Array().map(v => v * globalOpacity),
         blendMode: this.blendMode,
       }
     })

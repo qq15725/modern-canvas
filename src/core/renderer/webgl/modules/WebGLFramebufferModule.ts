@@ -48,8 +48,7 @@ export class WebGLFramebufferModule extends WebGLModule {
     }
 
     if (options) {
-      this.bind(framebuffer)
-      this.update(options)
+      this.update(framebuffer, options)
     }
 
     return framebuffer
@@ -61,11 +60,15 @@ export class WebGLFramebufferModule extends WebGLModule {
         width: 0,
         height: 0,
         mipLevel: 0,
+        msaa: false,
         stencil: false,
         depth: false,
         depthTexture: null,
         colorTextures: [],
-        multisample: 0,
+        multisample: 4,
+        stencilBuffer: null,
+        msaaRenderBuffers: [],
+        framebuffer: null,
       }
     })
   }
@@ -94,6 +97,8 @@ export class WebGLFramebufferModule extends WebGLModule {
       count = Math.min(count, 1)
     }
 
+    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer)
+
     for (let i = 0; i < count; i++) {
       const texture = meta.colorTextures[i]
 
@@ -121,7 +126,40 @@ export class WebGLFramebufferModule extends WebGLModule {
       )
     }
 
-    if (meta.depthTexture && (this._renderer.version > 1 || this._renderer.extensions.depthTexture)) {
+    if (meta.msaa) {
+      if (!meta.framebuffer) {
+        const gl = this._renderer.gl
+        meta.framebuffer = gl.createFramebuffer()
+        gl.bindFramebuffer(gl.FRAMEBUFFER, meta.framebuffer)
+        meta.colorTextures.forEach((_, i) => {
+          meta.msaaRenderBuffers[i] = gl.createRenderbuffer()
+        })
+      }
+      gl.bindFramebuffer(gl.FRAMEBUFFER, meta.framebuffer)
+      meta.colorTextures.forEach((texture, i) => {
+        this._renderer.texture.bind({ value: texture, location: 0 })
+        const msaaRenderBuffer = meta.msaaRenderBuffers[i]
+        gl.bindRenderbuffer(gl.RENDERBUFFER, msaaRenderBuffer)
+        ;(gl as WebGL2RenderingContext).renderbufferStorageMultisample(
+          gl.RENDERBUFFER,
+          4,
+          gl.RGBA8, // TODO
+          meta.width * this._renderer.pixelRatio,
+          meta.height * this._renderer.pixelRatio,
+        )
+        gl.framebufferRenderbuffer(
+          gl.FRAMEBUFFER,
+          gl.COLOR_ATTACHMENT0 + i,
+          gl.RENDERBUFFER,
+          msaaRenderBuffer,
+        )
+      })
+    }
+
+    if (
+      meta.depthTexture
+      && (this._renderer.version > 1 || this._renderer.extensions.depthTexture)
+    ) {
       this._renderer.texture.bind({
         location: 0,
         target: 'texture_2d',
@@ -150,7 +188,7 @@ export class WebGLFramebufferModule extends WebGLModule {
 
       const { attachment, format } = this._getAttachmentAndFormat(meta)
 
-      if (meta.msaaBuffer) {
+      if (meta.msaa) {
         (gl as WebGL2RenderingContext).renderbufferStorageMultisample(
           gl.RENDERBUFFER,
           meta.multisample,
@@ -207,7 +245,7 @@ export class WebGLFramebufferModule extends WebGLModule {
     if (meta.stencil) {
       const { format } = this._getAttachmentAndFormat(meta)
       gl.bindRenderbuffer(gl.RENDERBUFFER, meta.stencil)
-      if (meta.msaaBuffer) {
+      if (meta.msaa) {
         (gl as WebGL2RenderingContext).renderbufferStorageMultisample(
           gl.RENDERBUFFER,
           meta.multisample,
@@ -218,34 +256,6 @@ export class WebGLFramebufferModule extends WebGLModule {
       }
       else {
         gl.renderbufferStorage(gl.RENDERBUFFER, format, meta.width, meta.height)
-      }
-    }
-
-    let count = meta.colorTextures.length
-    if (!(gl as WebGL2RenderingContext).drawBuffers) {
-      count = Math.min(count, 1)
-    }
-
-    for (let i = 0; i < count; i++) {
-      const texture = meta.colorTextures[i]
-
-      this._renderer.texture.update(texture, {
-        value: {
-          pixels: null,
-          width: meta.width,
-          height: meta.height,
-        },
-      })
-
-      if (i === 0 && meta.msaaBuffer) {
-        gl.bindRenderbuffer(gl.RENDERBUFFER, meta.msaaBuffer)
-        ;(gl as WebGL2RenderingContext).renderbufferStorageMultisample(
-          gl.RENDERBUFFER,
-          meta.multisample,
-          gl.RGBA,
-          meta.width,
-          meta.height,
-        )
       }
     }
 
@@ -260,8 +270,49 @@ export class WebGLFramebufferModule extends WebGLModule {
     }
   }
 
+  finishRenderPass(framebuffer: WebGLFramebuffer): void {
+    const meta = this.getMeta(framebuffer)
+    if (!meta.msaa || !meta.framebuffer)
+      return
+    const gl = this._renderer.gl as WebGL2RenderingContext
+    gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, framebuffer)
+    gl.bindFramebuffer(gl.READ_FRAMEBUFFER, meta.framebuffer)
+    const width = meta.width * this._renderer.pixelRatio
+    const height = meta.height * this._renderer.pixelRatio
+    gl.blitFramebuffer(
+      0, 0, width, height,
+      0, 0, width, height,
+      gl.COLOR_BUFFER_BIT, gl.NEAREST,
+    )
+    gl.bindFramebuffer(gl.FRAMEBUFFER, meta.framebuffer)
+  }
+
+  copyToTexture(
+    framebuffer: WebGLFramebuffer,
+    texture: WebGLTexture,
+  ): void {
+    const gl = this._renderer.gl
+    const meta = this.getMeta(framebuffer)
+    this.finishRenderPass(framebuffer)
+    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer)
+    this._renderer.texture.bind({
+      value: texture,
+      location: 0,
+    })
+    gl.copyTexSubImage2D(
+      gl.TEXTURE_2D, 0,
+      0, 0,
+      0, 0,
+      meta.width, meta.height,
+    )
+  }
+
   bind(framebuffer: WebGLFramebuffer | null): void {
     const gl = this._renderer.gl
+
+    const meta = framebuffer
+      ? this.getMeta(framebuffer)
+      : undefined
 
     // changed
     const value = framebuffer
@@ -272,13 +323,16 @@ export class WebGLFramebufferModule extends WebGLModule {
 
     // bind framebuffer
     if (changed.value) {
-      gl.bindFramebuffer(gl.FRAMEBUFFER, value)
+      gl.bindFramebuffer(
+        gl.FRAMEBUFFER,
+        meta?.msaa && meta.framebuffer
+          ? meta.framebuffer
+          : value,
+      )
       this.boundFramebuffer = value
     }
 
-    if (value) {
-      const meta = this.getMeta(value)
-
+    if (meta) {
       for (let i = 0; i < meta.colorTextures.length; i++) {
         this._renderer.texture.unbind(meta.colorTextures[i])
       }
@@ -291,16 +345,14 @@ export class WebGLFramebufferModule extends WebGLModule {
       const mipHeight = (meta.height >> meta.mipLevel)
 
       this._renderer.viewport.bind({
-        x: 0,
-        y: 0,
+        x: 0, y: 0,
         width: mipWidth * this._renderer.pixelRatio,
         height: mipHeight * this._renderer.pixelRatio,
       })
     }
     else {
       this._renderer.viewport.bind({
-        x: 0,
-        y: 0,
+        x: 0, y: 0,
         width: this._renderer.screen.width * this._renderer.pixelRatio,
         height: this._renderer.screen.height * this._renderer.pixelRatio,
       })
@@ -341,7 +393,7 @@ export class WebGLFramebufferModule extends WebGLModule {
       format = gl.STENCIL_INDEX8
     }
 
-    if (meta.msaaBuffer) {
+    if (meta.msaa) {
       (gl as WebGL2RenderingContext).renderbufferStorageMultisample(
         gl.RENDERBUFFER,
         meta.multisample,

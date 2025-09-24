@@ -243,6 +243,12 @@ export class BaseElement2DText extends CoreObject {
             }
           }
         }
+        else {
+          ctx.addPath(path)
+          ctx.style = { ...path.style }
+          ctx.vertTransform = this._getVertTransform()
+          ctx.fill()
+        }
       })
     })
   }

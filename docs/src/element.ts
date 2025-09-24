@@ -37,6 +37,17 @@ async function init(): Promise<void> {
     }, [
       new Element2D({
         style: {
+          top: 10, left: 10, width: 100, height: 100,
+          borderRadius: 10,
+          opacity: 0.6,
+        },
+        foreground: {
+          image: '/example.gif',
+          fillWithShape: true,
+        },
+      }),
+      new Element2D({
+        style: {
           top: 100, left: 100, width: 100, height: 100,
           justifyContent: 'center',
           alignItems: 'center',

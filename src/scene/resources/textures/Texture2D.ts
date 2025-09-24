@@ -63,7 +63,9 @@ export class Texture2D<T extends Texture2DSource = Texture2DSource> extends Reso
   /** @internal */
   _glTexture(renderer: WebGLRenderer, options?: Partial<WebGLTextureOptions>): WebGLTexture {
     return renderer.getRelated(this, () => {
-      return renderer.texture.create(this._glTextureOptions(renderer, options))
+      return renderer.texture.create(
+        this._glTextureOptions(renderer, options),
+      )
     })
   }
 

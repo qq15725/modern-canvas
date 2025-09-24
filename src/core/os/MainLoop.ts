@@ -14,6 +14,11 @@ export interface MainLoop {
   emit: <K extends keyof MainLoopEvents & string>(event: K, ...args: Parameters<MainLoopEvents[K]>) => this
 }
 
+export interface MainLoopProperties {
+  fps: number
+  speed: number
+}
+
 export class MainLoop extends CoreObject {
   @property({ fallback: 60 }) declare fps: number
   @property({ fallback: 1 }) declare speed: number
@@ -25,9 +30,10 @@ export class MainLoop extends CoreObject {
   get starting(): boolean { return this._starting }
   get spf(): number { return this.fps ? Math.floor(1000 / this.fps) : 0 }
 
-  constructor() {
+  constructor(properties?: Partial<MainLoopProperties>) {
     super()
-    this._onNextTick = this._onNextTick.bind(this)
+    this._onTicker = this._onTicker.bind(this)
+    this.setProperties(properties)
   }
 
   start(process: (delta: number) => void): void {
@@ -38,18 +44,18 @@ export class MainLoop extends CoreObject {
       }
       this._startedProcess = process
       this.on('process', process)
-      Ticker.on(this._onNextTick, { sort: 0 })
+      Ticker.on(this._onTicker, { sort: 0 })
     }
   }
 
   stop(): void {
     if (this._starting) {
       this._starting = false
-      Ticker.off(this._onNextTick, { sort: 0 })
+      Ticker.off(this._onTicker, { sort: 0 })
     }
   }
 
-  protected _onNextTick(): void {
+  protected _onTicker(): void {
     const elapsed = Ticker.elapsed * this.speed
     const time = this._nextDeltaTime -= elapsed
     if (time <= 0) {
@@ -59,7 +65,7 @@ export class MainLoop extends CoreObject {
   }
 
   override destroy(): void {
-    super.destroy()
     this.stop()
+    super.destroy()
   }
 }

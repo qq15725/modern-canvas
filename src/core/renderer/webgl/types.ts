@@ -71,6 +71,7 @@ export interface WebGLFramebufferOptions {
   width: number
   height: number
   mipLevel?: number
+  msaa?: boolean
   stencil?: boolean
   depth?: boolean
   depthTexture?: WebGLTexture | null
@@ -79,8 +80,9 @@ export interface WebGLFramebufferOptions {
 
 export interface WebGLFramebufferMeta extends Required<WebGLFramebufferOptions> {
   multisample: number
-  stencilBuffer?: WebGLBuffer | null
-  msaaBuffer?: WebGLBuffer | null
+  stencilBuffer: WebGLBuffer | null
+  msaaRenderBuffers: WebGLRenderbuffer[]
+  framebuffer: WebGLFramebuffer | null
 }
 
 type Pick<T> = T extends string

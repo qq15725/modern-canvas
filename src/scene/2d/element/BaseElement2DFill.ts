@@ -1,5 +1,5 @@
 import type { Fill, NormalizedFill } from 'modern-idoc'
-import type { Texture2D } from '../../resources'
+import type { AnimatedTexture, Texture2D } from '../../resources'
 import type { BaseElement2D } from './BaseElement2D'
 import { isNone, normalizeFill, property } from 'modern-idoc'
 import { assets } from '../../../asset'
@@ -25,6 +25,7 @@ export class BaseElement2DFill extends CoreObject {
   @property() declare opacity: NormalizedFill['opacity']
 
   protected _texture?: Texture2D
+  protected _animatedTexture?: AnimatedTexture
 
   constructor(
     public parent: BaseElement2D,
@@ -66,9 +67,9 @@ export class BaseElement2DFill extends CoreObject {
     }
   }
 
-  async loadTexture(): Promise<Texture2D | undefined> {
+  async loadTexture(): Promise<void> {
     if (this.linearGradient || this.radialGradient) {
-      return new GradientTexture(
+      this._texture = new GradientTexture(
         (this.linearGradient ?? this.radialGradient)!,
         this.parent.size.width,
         this.parent.size.height,
@@ -76,15 +77,17 @@ export class BaseElement2DFill extends CoreObject {
     }
     else if (!isNone(this.image)) {
       this.parent.tree?.log(`load image ${this.image}`)
-      return await assets.texture.load(this.image)
-    }
-    else {
-      return undefined
+      if (this.image.split('?')[0].endsWith('.gif')) {
+        this._animatedTexture = await assets.gif.load(this.image)
+      }
+      else {
+        this._texture = await assets.texture.load(this.image)
+      }
     }
   }
 
   protected async _updateTexture(): Promise<void> {
-    this._texture = await this.loadTexture()
+    await this.loadTexture()
     this.parent.requestRedraw()
   }
 
@@ -92,6 +95,7 @@ export class BaseElement2DFill extends CoreObject {
     return Boolean(
       this.enabled && (
         this._texture
+        || this._animatedTexture
         || this.color
       ),
     )
@@ -106,9 +110,44 @@ export class BaseElement2DFill extends CoreObject {
       },
     )
     ctx.uvTransform = uvTransform
-    ctx.fillStyle = this._texture ?? this.color
+    ctx.fillStyle = this._animatedTexture?.currentFrame.texture
+      ?? this._texture
+      ?? this.color
     ctx.fill({
       disableWrapMode,
     })
+  }
+
+  protected _getFrameCurrentTime(): number {
+    const duration = this._animatedTexture?.duration ?? 0
+    if (!duration)
+      return 0
+    const currentTime = this.parent._currentTime
+    if (currentTime < 0)
+      return 0
+    return currentTime % duration
+  }
+
+  updateFrameIndex(): this {
+    if (!this._animatedTexture)
+      return this
+    const currentTime = this._getFrameCurrentTime()
+    const frames = this._animatedTexture.frames
+    const len = frames.length
+    if (len <= 1 && this._animatedTexture.frameIndex === 0)
+      return this
+    let index = len - 1
+    for (let time = 0, i = 0; i < len; i++) {
+      time += frames[i].duration ?? 0
+      if (time >= currentTime) {
+        index = i
+        break
+      }
+    }
+    if (this._animatedTexture.frameIndex !== index) {
+      this._animatedTexture.frameIndex = index
+      this.parent.requestRedraw()
+    }
+    return this
   }
 }

@@ -8,7 +8,9 @@ import {
 const engine = new Engine({
   autoResize: true,
   autoStart: true,
-  antialias: true,
+  backgroundColor: '#00FF00FF',
+  // msaa: true,
+  // antialias: true,
 })
 
 engine.on('pointerdown', (e) => {

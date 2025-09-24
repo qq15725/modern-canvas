@@ -37,6 +37,7 @@ export class Viewport extends Node implements Rectangulable {
   @property({ fallback: 0 }) declare y: number
   @property({ fallback: 0 }) declare width: number
   @property({ fallback: 0 }) declare height: number
+  @property({ internal: true, fallback: false }) declare msaa: boolean
 
   get valid(): boolean { return Boolean(this.width && this.height) }
   get framebuffer(): ViewportFramebuffer { return this._framebuffers[this._framebufferIndex] }
@@ -69,6 +70,7 @@ export class Viewport extends Node implements Rectangulable {
     return {
       width,
       height,
+      msaa: this.msaa,
       colorTextures: [this.texture._glTexture(renderer)],
     }
   }
@@ -97,6 +99,9 @@ export class Viewport extends Node implements Rectangulable {
         this.requestUpload()
         this.projection.resize(this.width, this.height)
         this.emit('updateRect')
+        break
+      case 'msaa':
+        this.requestUpload()
         break
     }
   }

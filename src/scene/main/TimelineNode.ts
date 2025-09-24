@@ -41,8 +41,8 @@ export class TimelineNode extends Node {
 
   /** Timeline */
   computedDuration = 0
-  protected _currentTime = 0
-  protected _startTime = 0
+  _currentTime = 0
+  _startTime = 0
   get timeline(): Timeline | undefined { return this._tree?.timeline }
   get timelineCurrentTime(): number { return this.timeline?.currentTime ?? 0 }
   get parentStartTime(): number { return (this._parent as TimelineNode)?.startTime ?? 0 }

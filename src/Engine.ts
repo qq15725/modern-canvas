@@ -1,10 +1,9 @@
-import type { Fonts } from 'modern-font'
 import type {
-  ColorValue,
   PointerInputEvent,
   WheelInputEvent,
 } from './core'
-import type { SceneTreeEvents, Timeline } from './scene'
+import type { SceneTreeEvents, SceneTreeProperties } from './scene'
+import { property } from 'modern-idoc'
 import { assets } from './asset'
 import {
   DEVICE_PIXEL_RATIO,
@@ -14,17 +13,14 @@ import {
 } from './core'
 import { SceneTree } from './scene'
 
-export interface EngineOptions extends WebGLContextAttributes {
-  debug?: boolean
+export interface EngineProperties extends WebGLContextAttributes, SceneTreeProperties {
   view?: HTMLCanvasElement | WebGLRenderingContext | WebGL2RenderingContext
   width?: number
   height?: number
   pixelRatio?: number
-  backgroundColor?: ColorValue
-  fonts?: Fonts
-  autoResize?: boolean
-  autoStart?: boolean
-  timeline?: Timeline
+  autoResize: boolean
+  autoStart: boolean
+  msaa: boolean
 }
 
 interface EngineEvents extends SceneTreeEvents {
@@ -52,6 +48,10 @@ export const defaultOptions = {
 } as const
 
 export class Engine extends SceneTree {
+  @property({ alias: 'root.msaa' }) declare msaa: boolean
+  @property({ fallback: false }) declare autoResize: boolean
+  @property({ fallback: false }) declare autoStart: boolean
+
   readonly renderer: WebGLRenderer
   get view(): HTMLCanvasElement | undefined { return this.renderer.view }
   get gl(): WebGLRenderingContext | WebGL2RenderingContext { return this.renderer.gl }
@@ -63,9 +63,6 @@ export class Engine extends SceneTree {
   set pixelRatio(val) {
     this.renderer.pixelRatio = val
     this.resize(this.width, this.height)
-    if (this.view) {
-      this.view.dataset.pixelRatio = String(val)
-    }
   }
 
   protected _resizeObserver = SUPPORTS_RESIZE_OBSERVER
@@ -80,42 +77,31 @@ export class Engine extends SceneTree {
     })
     : undefined
 
-  constructor(options: EngineOptions = {}) {
+  constructor(properties: Partial<EngineProperties> = {}) {
     const {
-      debug = false,
       view,
       width,
       height,
       pixelRatio = DEVICE_PIXEL_RATIO,
-      backgroundColor = 0x00000000,
-      fonts,
       autoResize,
-      autoStart,
-      timeline,
-      ...glOptions
-    } = options
+    } = properties
 
-    super(timeline)
-
-    this.debug = debug
-
+    super()
     this.renderer = new WebGLRenderer(view, {
-      ...defaultOptions,
-      ...glOptions,
+      alpha: defaultOptions.alpha ?? properties.alpha,
+      stencil: defaultOptions.stencil ?? properties.stencil,
+      antialias: defaultOptions.antialias ?? properties.antialias,
+      premultipliedAlpha: defaultOptions.premultipliedAlpha ?? properties.premultipliedAlpha,
+      preserveDrawingBuffer: defaultOptions.preserveDrawingBuffer ?? properties.preserveDrawingBuffer,
+      powerPreference: defaultOptions.powerPreference ?? properties.powerPreference,
     })
-
-    this
-      ._setupInput()
-
+    this._setupInput()
     this.pixelRatio = pixelRatio
-    this.backgroundColor = backgroundColor
-    this.fonts = fonts
     if (autoResize) {
       if (!view && this.renderer.view) {
         this.renderer.view.style.width = '100%'
         this.renderer.view.style.height = '100%'
       }
-      this.enableAutoResize(autoResize)
     }
     else {
       this.resize(
@@ -124,8 +110,29 @@ export class Engine extends SceneTree {
         !view,
       )
     }
+    this.setProperties(properties)
+  }
 
-    autoStart && this.start()
+  protected override _updateProperty(key: string, value: any, oldValue: any): void {
+    super._updateProperty(key, value, oldValue)
+
+    switch (key) {
+      case 'autoResize':
+        if (this.view) {
+          if (this.autoResize) {
+            this._resizeObserver?.observe(this.view)
+          }
+          else {
+            this._resizeObserver?.unobserve(this.view)
+          }
+        }
+        break
+      case 'autoStart':
+        if (this.autoStart) {
+          this.start()
+        }
+        break
+    }
   }
 
   protected _setupInput(): this {
@@ -149,18 +156,6 @@ export class Engine extends SceneTree {
       })
     }
 
-    return this
-  }
-
-  enableAutoResize(enable = true): this {
-    if (this.view) {
-      if (enable) {
-        this._resizeObserver?.observe(this.view)
-      }
-      else {
-        this._resizeObserver?.unobserve(this.view)
-      }
-    }
     return this
   }
 
@@ -202,12 +197,6 @@ export class Engine extends SceneTree {
     })
   }
 
-  override destroy(): void {
-    super.destroy()
-    this.enableAutoResize(false)
-    this.renderer.destroy()
-  }
-
   toPixels(): Uint8ClampedArray<ArrayBuffer> {
     return this.renderer.toPixels()
   }
@@ -245,5 +234,11 @@ export class Engine extends SceneTree {
       )
     }
     return canvas2
+  }
+
+  override destroy(): void {
+    this._resizeObserver?.disconnect()
+    this.renderer.destroy()
+    super.destroy()
   }
 }

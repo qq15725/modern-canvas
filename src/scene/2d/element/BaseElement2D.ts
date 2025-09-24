@@ -209,6 +209,14 @@ export class BaseElement2D extends Node2D implements Rectangulable {
     }
   }
 
+  protected override _process(delta: number): void {
+    this.foreground.updateFrameIndex()
+    this.fill.updateFrameIndex()
+    this.outline.updateFrameIndex()
+    this.background.updateFrameIndex()
+    super._process(delta)
+  }
+
   protected _updateMaskImage(): void {
     const nodePath = '__$style.maskImage'
     const maskImage = this.style.maskImage

@@ -475,4 +475,9 @@ export class Input extends Observable {
       this.setCursor(this.event.cursor)
     }
   }
+
+  override destroy(): void {
+    this.removeEventListeners()
+    super.destroy()
+  }
 }

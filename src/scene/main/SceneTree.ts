@@ -1,11 +1,12 @@
 import type { Fonts } from 'modern-font'
+import type { Hex8Color } from 'modern-idoc'
 import type {
-  ColorValue,
   MainLoopEvents,
-  WebGLRenderer,
+  MainLoopProperties, WebGLRenderer,
 } from '../../core'
 import type { Node } from './Node'
 import type { Viewport } from './Viewport'
+import { fonts } from 'modern-font'
 import { property } from 'modern-idoc'
 import { Color, Input, MainLoop } from '../../core'
 import { QuadUvGeometry } from '../resources'
@@ -29,26 +30,34 @@ export interface SceneTree {
   emit: <K extends keyof SceneTreeEvents & string>(event: K, ...args: Parameters<SceneTreeEvents[K]>) => this
 }
 
-export class SceneTree extends MainLoop {
-  @property({ internal: true, fallback: false }) declare processPaused: boolean
-  @property() declare backgroundColor: ColorValue | undefined
-  @property({ internal: true, fallback: false }) declare debug: boolean
+export interface SceneTreeProperties extends MainLoopProperties {
+  backgroundColor: Hex8Color
+  // internal
+  debug: boolean
+  processPaused: boolean
+  fonts: Fonts
+  timeline: Timeline
+}
 
-  fonts?: Fonts
+export class SceneTree extends MainLoop {
+  @property() declare backgroundColor?: Hex8Color
+  @property({ internal: true, fallback: false }) declare debug: boolean
+  @property({ internal: true, fallback: false }) declare processPaused: boolean
+  @property({ internal: true, fallback: fonts }) declare fonts: Fonts
+  @property({ internal: true, default: () => new Timeline() }) declare timeline: Timeline
+
   readonly input = new Input()
   readonly renderStack = new RenderStack()
   readonly root = new Window(true).setTree(this)
-  readonly timeline: Timeline
 
   protected _backgroundColor = new Color()
   protected _currentViewport?: Viewport
   getCurrentViewport(): Viewport | undefined { return this._currentViewport }
   setCurrentViewport(viewport: Viewport | undefined): void { this._currentViewport = viewport }
 
-  constructor(timeline = new Timeline()) {
+  constructor(properties?: Partial<SceneTreeProperties>) {
     super()
-
-    this.timeline = timeline.setTree(this)
+    this.setProperties(properties)
   }
 
   protected override _updateProperty(key: string, value: any, oldValue: any): void {
@@ -57,6 +66,9 @@ export class SceneTree extends MainLoop {
     switch (key) {
       case 'backgroundColor':
         this._backgroundColor.value = value
+        break
+      case 'timeline':
+        this.timeline.setTree(this)
         break
     }
   }
@@ -83,11 +95,16 @@ export class SceneTree extends MainLoop {
   }
 
   protected _renderScreen(renderer: WebGLRenderer): void {
+    if (this.root.msaa) {
+      renderer.framebuffer.finishRenderPass(
+        this.root._glFramebuffer(renderer),
+      )
+    }
     renderer.state.reset()
     renderer.framebuffer.bind(null)
+    renderer.gl.bindFramebuffer(renderer.gl.FRAMEBUFFER, null)
     renderer.viewport.bind({
-      x: 0,
-      y: 0,
+      x: 0, y: 0,
       width: this.root.width * renderer.pixelRatio,
       height: this.root.height * renderer.pixelRatio,
     })
@@ -105,8 +122,8 @@ export class SceneTree extends MainLoop {
   }
 
   override destroy(): void {
-    super.destroy()
     this.root.destroy()
-    this.input.removeEventListeners()
+    this.input.destroy()
+    super.destroy()
   }
 }
