@@ -7,10 +7,10 @@ export interface CoreObjectEvents extends ReactivableEvents {
 }
 
 export interface CoreObject {
-  on: <K extends keyof CoreObjectEvents & string>(event: K, listener: CoreObjectEvents[K]) => this
-  once: <K extends keyof CoreObjectEvents & string>(event: K, listener: CoreObjectEvents[K]) => this
-  off: <K extends keyof CoreObjectEvents & string>(event: K, listener: CoreObjectEvents[K]) => this
-  emit: <K extends keyof CoreObjectEvents & string>(event: K, ...args: Parameters<CoreObjectEvents[K]>) => this
+  on: <K extends keyof CoreObjectEvents & string>(event: K, listener: (...args: CoreObjectEvents[K]) => void) => this
+  once: <K extends keyof CoreObjectEvents & string>(event: K, listener: (...args: CoreObjectEvents[K]) => void) => this
+  off: <K extends keyof CoreObjectEvents & string>(event: K, listener: (...args: CoreObjectEvents[K]) => void) => this
+  emit: <K extends keyof CoreObjectEvents & string>(event: K, ...args: CoreObjectEvents[K]) => this
 }
 
 let IID = 0

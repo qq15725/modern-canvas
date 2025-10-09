@@ -1,33 +1,39 @@
 import type { Fonts } from 'modern-font'
 import type { Hex8Color } from 'modern-idoc'
 import type {
+  InputEvents,
   MainLoopEvents,
-  MainLoopProperties, WebGLRenderer,
+  MainLoopProperties,
+  WebGLRenderer,
 } from '../../core'
 import type { Node } from './Node'
 import type { Viewport } from './Viewport'
 import { fonts } from 'modern-font'
 import { property } from 'modern-idoc'
-import { Color, Input, MainLoop } from '../../core'
+import {
+  Color,
+  Input,
+  MainLoop,
+} from '../../core'
 import { QuadUvGeometry } from '../resources'
 import { RenderStack } from './RenderStack'
 import { Timeline } from './Timeline'
 import { Window } from './Window'
 
-export interface SceneTreeEvents extends MainLoopEvents {
-  processing: () => void
-  processed: () => void
-  rendering: () => void
-  rendered: () => void
-  nodeProcessing: (node: Node) => void
-  nodeProcessed: (node: Node) => void
+export interface SceneTreeEvents extends MainLoopEvents, InputEvents {
+  processing: []
+  processed: []
+  rendering: []
+  rendered: []
+  nodeProcessing: [node: Node]
+  nodeProcessed: [node: Node]
 }
 
 export interface SceneTree {
-  on: <K extends keyof SceneTreeEvents & string>(event: K, listener: SceneTreeEvents[K]) => this
-  once: <K extends keyof SceneTreeEvents & string>(event: K, listener: SceneTreeEvents[K]) => this
-  off: <K extends keyof SceneTreeEvents & string>(event: K, listener: SceneTreeEvents[K]) => this
-  emit: <K extends keyof SceneTreeEvents & string>(event: K, ...args: Parameters<SceneTreeEvents[K]>) => this
+  on: <K extends keyof SceneTreeEvents & string>(event: K, listener: (...args: SceneTreeEvents[K]) => void) => this
+  once: <K extends keyof SceneTreeEvents & string>(event: K, listener: (...args: SceneTreeEvents[K]) => void) => this
+  off: <K extends keyof SceneTreeEvents & string>(event: K, listener: (...args: SceneTreeEvents[K]) => void) => this
+  emit: <K extends keyof SceneTreeEvents & string>(event: K, ...args: SceneTreeEvents[K]) => this
 }
 
 export interface SceneTreeProperties extends MainLoopProperties {
@@ -43,7 +49,7 @@ export class SceneTree extends MainLoop {
   @property() declare backgroundColor?: Hex8Color
   @property({ internal: true, fallback: false }) declare debug: boolean
   @property({ internal: true, fallback: false }) declare processPaused: boolean
-  @property({ internal: true, fallback: fonts }) declare fonts: Fonts
+  @property({ internal: true, default: () => fonts }) declare fonts: Fonts | undefined
   @property({ internal: true, default: () => new Timeline() }) declare timeline: Timeline
 
   readonly input = new Input()

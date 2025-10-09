@@ -19,10 +19,10 @@ export interface Node2DEvents extends CanvasItemEvents {
 }
 
 export interface Node2D {
-  on: <K extends keyof Node2DEvents & string>(event: K, listener: Node2DEvents[K]) => this
-  once: <K extends keyof Node2DEvents & string>(event: K, listener: Node2DEvents[K]) => this
-  off: <K extends keyof Node2DEvents & string>(event: K, listener: Node2DEvents[K]) => this
-  emit: <K extends keyof Node2DEvents & string>(event: K, ...args: Parameters<Node2DEvents[K]>) => this
+  on: <K extends keyof Node2DEvents & string>(event: K, listener: (...args: Node2DEvents[K]) => void) => this
+  once: <K extends keyof Node2DEvents & string>(event: K, listener: (...args: Node2DEvents[K]) => void) => this
+  off: <K extends keyof Node2DEvents & string>(event: K, listener: (...args: Node2DEvents[K]) => void) => this
+  emit: <K extends keyof Node2DEvents & string>(event: K, ...args: Node2DEvents[K]) => this
 }
 
 @customNode('Node2D')

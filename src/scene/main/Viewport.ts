@@ -11,10 +11,10 @@ export interface ViewportEvents extends NodeEvents, RectangulableEvents {
 }
 
 export interface Viewport {
-  on: <K extends keyof ViewportEvents & string>(event: K, listener: ViewportEvents[K]) => this
-  once: <K extends keyof ViewportEvents & string>(event: K, listener: ViewportEvents[K]) => this
-  off: <K extends keyof ViewportEvents & string>(event: K, listener: ViewportEvents[K]) => this
-  emit: <K extends keyof ViewportEvents & string>(event: K, ...args: Parameters<ViewportEvents[K]>) => this
+  on: <K extends keyof ViewportEvents & string>(event: K, listener: (...args: ViewportEvents[K]) => void) => this
+  once: <K extends keyof ViewportEvents & string>(event: K, listener: (...args: ViewportEvents[K]) => void) => this
+  off: <K extends keyof ViewportEvents & string>(event: K, listener: (...args: ViewportEvents[K]) => void) => this
+  emit: <K extends keyof ViewportEvents & string>(event: K, ...args: ViewportEvents[K]) => this
 }
 
 export interface ViewportFramebuffer {

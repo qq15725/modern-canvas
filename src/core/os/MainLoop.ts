@@ -4,14 +4,14 @@ import { Ticker } from '../global'
 import { CoreObject } from '../object'
 
 export interface MainLoopEvents extends CoreObjectEvents {
-  process: (delta: number) => void
+  process: [delta: number]
 }
 
 export interface MainLoop {
-  on: <K extends keyof MainLoopEvents & string>(event: K, listener: MainLoopEvents[K]) => this
-  once: <K extends keyof MainLoopEvents & string>(event: K, listener: MainLoopEvents[K]) => this
-  off: <K extends keyof MainLoopEvents & string>(event: K, listener: MainLoopEvents[K]) => this
-  emit: <K extends keyof MainLoopEvents & string>(event: K, ...args: Parameters<MainLoopEvents[K]>) => this
+  on: <K extends keyof MainLoopEvents & string>(event: K, listener: (...args: MainLoopEvents[K]) => void) => this
+  once: <K extends keyof MainLoopEvents & string>(event: K, listener: (...args: MainLoopEvents[K]) => void) => this
+  off: <K extends keyof MainLoopEvents & string>(event: K, listener: (...args: MainLoopEvents[K]) => void) => this
+  emit: <K extends keyof MainLoopEvents & string>(event: K, ...args: MainLoopEvents[K]) => this
 }
 
 export interface MainLoopProperties {

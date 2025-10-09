@@ -17,14 +17,14 @@ export interface Camera2DProperties extends Node2DProperties {
 }
 
 export interface Camera2DEvents extends Node2DEvents {
-  updateCanvasTransform: () => void
+  updateCanvasTransform: []
 }
 
 export interface Camera2D {
-  on: <K extends keyof Camera2DEvents & string>(event: K, listener: Camera2DEvents[K]) => this
-  once: <K extends keyof Camera2DEvents & string>(event: K, listener: Camera2DEvents[K]) => this
-  off: <K extends keyof Camera2DEvents & string>(event: K, listener: Camera2DEvents[K]) => this
-  emit: <K extends keyof Camera2DEvents & string>(event: K, ...args: Parameters<Camera2DEvents[K]>) => this
+  on: <K extends keyof Camera2DEvents & string>(event: K, listener: (...args: Camera2DEvents[K]) => void) => this
+  once: <K extends keyof Camera2DEvents & string>(event: K, listener: (...args: Camera2DEvents[K]) => void) => this
+  off: <K extends keyof Camera2DEvents & string>(event: K, listener: (...args: Camera2DEvents[K]) => void) => this
+  emit: <K extends keyof Camera2DEvents & string>(event: K, ...args: Camera2DEvents[K]) => this
 }
 
 @customNode<Camera2D>('Camera2D', {

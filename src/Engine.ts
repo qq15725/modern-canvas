@@ -1,7 +1,3 @@
-import type {
-  PointerInputEvent,
-  WheelInputEvent,
-} from './core'
 import type { SceneTreeEvents, SceneTreeProperties } from './scene'
 import { property } from 'modern-idoc'
 import { assets } from './asset'
@@ -24,18 +20,14 @@ export interface EngineProperties extends WebGLContextAttributes, SceneTreePrope
 }
 
 interface EngineEvents extends SceneTreeEvents {
-  pointerdown: (ev: PointerInputEvent) => void
-  pointerover: (ev: PointerInputEvent) => void
-  pointermove: (ev: PointerInputEvent) => void
-  pointerup: (ev: PointerInputEvent) => void
-  wheel: (ev: WheelInputEvent) => void
+  //
 }
 
 export interface Engine {
-  on: <K extends keyof EngineEvents>(event: K, listener: EngineEvents[K]) => this
-  once: <K extends keyof EngineEvents>(event: K, listener: EngineEvents[K]) => this
-  off: <K extends keyof EngineEvents>(event: K, listener: EngineEvents[K]) => this
-  emit: <K extends keyof EngineEvents>(event: K, ...args: Parameters<EngineEvents[K]>) => this
+  on: <K extends keyof EngineEvents>(event: K, listener: (...args: EngineEvents[K]) => void) => this
+  once: <K extends keyof EngineEvents>(event: K, listener: (...args: EngineEvents[K]) => void) => this
+  off: <K extends keyof EngineEvents>(event: K, listener: (...args: EngineEvents[K]) => void) => this
+  emit: <K extends keyof EngineEvents>(event: K, ...args: EngineEvents[K]) => this
 }
 
 export const defaultOptions = {
@@ -140,14 +132,9 @@ export class Engine extends SceneTree {
       this.input.setTarget(this.view)
 
       ;[
-        'pointerdown',
-        'pointerover',
-        'pointermove',
-        'pointerup',
+        'pointerdown', 'pointerover', 'pointermove', 'pointerup',
         'wheel',
-        'keydown',
-        'keypress',
-        'keyup',
+        'keydown', 'keypress', 'keyup',
       ].forEach((key) => {
         this.input.on(key, (event: any) => {
           this.root.input(event, key as any)

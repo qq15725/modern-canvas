@@ -39,14 +39,14 @@ import { BaseElement2DStyle } from './BaseElement2DStyle'
 import { BaseElement2DText } from './BaseElement2DText'
 
 export interface BaseElement2DEvents extends Node2DEvents {
-  updateStyleProperty: (key: string, value: any, oldValue: any) => void
+  updateStyleProperty: [key: string, value: any, oldValue: any]
 }
 
 export interface BaseElement2D {
-  on: <K extends keyof BaseElement2DEvents & string>(event: K, listener: BaseElement2DEvents[K]) => this
-  once: <K extends keyof BaseElement2DEvents & string>(event: K, listener: BaseElement2DEvents[K]) => this
-  off: <K extends keyof BaseElement2DEvents & string>(event: K, listener: BaseElement2DEvents[K]) => this
-  emit: <K extends keyof BaseElement2DEvents & string>(event: K, ...args: Parameters<BaseElement2DEvents[K]>) => this
+  on: <K extends keyof BaseElement2DEvents & string>(event: K, listener: (...args: BaseElement2DEvents[K]) => void) => this
+  once: <K extends keyof BaseElement2DEvents & string>(event: K, listener: (...args: BaseElement2DEvents[K]) => void) => this
+  off: <K extends keyof BaseElement2DEvents & string>(event: K, listener: (...args: BaseElement2DEvents[K]) => void) => this
+  emit: <K extends keyof BaseElement2DEvents & string>(event: K, ...args: BaseElement2DEvents[K]) => this
 }
 
 export interface BaseElement2DProperties extends Node2DProperties {

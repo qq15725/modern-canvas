@@ -17,23 +17,23 @@ const TOUCH_TO_POINTER: Record<string, string> = {
 }
 
 export interface InputEvents extends ObservableEvents {
-  pointerdown: (ev: PointerInputEvent) => void
-  pointerover: (ev: PointerInputEvent) => void
-  pointermove: (ev: PointerInputEvent) => void
-  pointerup: (ev: PointerInputEvent) => void
-  wheel: (ev: WheelInputEvent) => void
-  keydown: (ev: KeyboardInputEvent) => void
-  keypress: (ev: KeyboardInputEvent) => void
-  keyup: (ev: KeyboardInputEvent) => void
+  pointerdown: [ev: PointerInputEvent]
+  pointerover: [ev: PointerInputEvent]
+  pointermove: [ev: PointerInputEvent]
+  pointerup: [ev: PointerInputEvent]
+  wheel: [ev: WheelInputEvent]
+  keydown: [ev: KeyboardInputEvent]
+  keypress: [ev: KeyboardInputEvent]
+  keyup: [ev: KeyboardInputEvent]
 }
 
 export type InputEventKey = keyof InputEvents
 
 export interface Input {
-  on: <K extends keyof InputEvents & string>(event: K, listener: InputEvents[K]) => this
-  once: <K extends keyof InputEvents & string>(event: K, listener: InputEvents[K]) => this
-  off: <K extends keyof InputEvents & string>(event: K, listener: InputEvents[K]) => this
-  emit: <K extends keyof InputEvents & string>(event: K, ...args: Parameters<InputEvents[K]>) => this
+  on: <K extends keyof InputEvents & string>(event: K, listener: (...args: InputEvents[K]) => void) => this
+  once: <K extends keyof InputEvents & string>(event: K, listener: (...args: InputEvents[K]) => void) => this
+  off: <K extends keyof InputEvents & string>(event: K, listener: (...args: InputEvents[K]) => void) => this
+  emit: <K extends keyof InputEvents & string>(event: K, ...args: InputEvents[K]) => this
 }
 
 export class Input extends Observable {

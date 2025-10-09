@@ -4,14 +4,14 @@ import { clamp, customNode } from '../../core'
 import { Node } from './Node'
 
 export interface TimelineEvents extends NodeEvents {
-  updateCurrentTime: (current: number, delta: number) => void
+  updateCurrentTime: [current: number, delta: number]
 }
 
 export interface Timeline {
-  on: <K extends keyof TimelineEvents & string>(event: K, listener: TimelineEvents[K]) => this
-  once: <K extends keyof TimelineEvents & string>(event: K, listener: TimelineEvents[K]) => this
-  off: <K extends keyof TimelineEvents & string>(event: K, listener: TimelineEvents[K]) => this
-  emit: <K extends keyof TimelineEvents & string>(event: K, ...args: Parameters<TimelineEvents[K]>) => this
+  on: <K extends keyof TimelineEvents & string>(event: K, listener: (...args: TimelineEvents[K]) => void) => this
+  once: <K extends keyof TimelineEvents & string>(event: K, listener: (...args: TimelineEvents[K]) => void) => this
+  off: <K extends keyof TimelineEvents & string>(event: K, listener: (...args: TimelineEvents[K]) => void) => this
+  emit: <K extends keyof TimelineEvents & string>(event: K, ...args: TimelineEvents[K]) => this
 }
 
 export interface TimelineProperties extends NodeProperties {

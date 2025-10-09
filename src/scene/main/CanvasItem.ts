@@ -17,14 +17,14 @@ export interface CanvasItemProperties extends TimelineNodeProperties {
 }
 
 export interface CanvasItemEvents extends TimelineNodeEvents {
-  draw: () => void
+  draw: []
 }
 
 export interface CanvasItem {
-  on: <K extends keyof CanvasItemEvents & string>(event: K, listener: CanvasItemEvents[K]) => this
-  once: <K extends keyof CanvasItemEvents & string>(event: K, listener: CanvasItemEvents[K]) => this
-  off: <K extends keyof CanvasItemEvents & string>(event: K, listener: CanvasItemEvents[K]) => this
-  emit: <K extends keyof CanvasItemEvents & string>(event: K, ...args: Parameters<CanvasItemEvents[K]>) => this
+  on: <K extends keyof CanvasItemEvents & string>(event: K, listener: (...args: CanvasItemEvents[K]) => void) => this
+  once: <K extends keyof CanvasItemEvents & string>(event: K, listener: (...args: CanvasItemEvents[K]) => void) => this
+  off: <K extends keyof CanvasItemEvents & string>(event: K, listener: (...args: CanvasItemEvents[K]) => void) => this
+  emit: <K extends keyof CanvasItemEvents & string>(event: K, ...args: CanvasItemEvents[K]) => this
 }
 
 @customNode('CanvasItem')

@@ -5,14 +5,14 @@ import { BaseElement2D, FlexElement2DStyle } from './element'
 import { directionMap, FlexLayout } from './FlexLayout'
 
 export interface FlexBaseElement2DEvents extends BaseElement2DEvents {
-  updateStyleProperty: (key: string, value: any, oldValue: any) => void
+  updateStyleProperty: [key: string, value: any, oldValue: any]
 }
 
 export interface FlexElement2D {
-  on: <K extends keyof FlexBaseElement2DEvents & string>(event: K, listener: FlexBaseElement2DEvents[K]) => this
-  once: <K extends keyof FlexBaseElement2DEvents & string>(event: K, listener: FlexBaseElement2DEvents[K]) => this
-  off: <K extends keyof FlexBaseElement2DEvents & string>(event: K, listener: FlexBaseElement2DEvents[K]) => this
-  emit: <K extends keyof FlexBaseElement2DEvents & string>(event: K, ...args: Parameters<FlexBaseElement2DEvents[K]>) => this
+  on: <K extends keyof FlexBaseElement2DEvents & string>(event: K, listener: (...args: FlexBaseElement2DEvents[K]) => void) => this
+  once: <K extends keyof FlexBaseElement2DEvents & string>(event: K, listener: (...args: FlexBaseElement2DEvents[K]) => void) => this
+  off: <K extends keyof FlexBaseElement2DEvents & string>(event: K, listener: (...args: FlexBaseElement2DEvents[K]) => void) => this
+  emit: <K extends keyof FlexBaseElement2DEvents & string>(event: K, ...args: FlexBaseElement2DEvents[K]) => this
 }
 
 export interface FlexElement2DProperties extends BaseElement2DProperties {

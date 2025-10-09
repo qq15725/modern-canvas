@@ -14,30 +14,30 @@ import { CoreObject, customNode, customNodes } from '../../core'
 import { Children } from './Children'
 
 export interface NodeEvents extends CoreObjectEvents, InputEvents {
-  treeEnter: (tree: SceneTree) => void
-  treeEntered: (tree: SceneTree) => void
-  treePostEnter: (tree: SceneTree) => void
-  treeExit: (oldTree: SceneTree) => void
-  treeExiting: (oldTree: SceneTree) => void
-  treeExited: (oldTree: SceneTree) => void
-  childExitingTree: (node: Node) => void
-  childEnteredTree: (node: Node) => void
-  ready: () => void
-  parented: (parent: Node) => void
-  unparented: (oldParent: Node) => void
-  processing: (delta?: number) => void
-  process: (delta?: number) => void
-  processed: (delta?: number) => void
-  appendChild: (child: Node) => void
-  removeChild: (child: Node, index: number) => void
-  moveChild: (child: Node, newIndex: number, oldIndex: number) => void
+  treeEnter: [tree: SceneTree]
+  treeEntered: [tree: SceneTree]
+  treePostEnter: [tree: SceneTree]
+  treeExit: [oldTree: SceneTree]
+  treeExiting: [oldTree: SceneTree]
+  treeExited: [oldTree: SceneTree]
+  childExitingTree: [node: Node]
+  childEnteredTree: [node: Node]
+  ready: []
+  parented: [parent: Node]
+  unparented: [oldParent: Node]
+  processing: [delta?: number]
+  process: [delta?: number]
+  processed: [delta?: number]
+  appendChild: [child: Node]
+  removeChild: [child: Node, index: number]
+  moveChild: [child: Node, newIndex: number, oldIndex: number]
 }
 
 export interface Node {
-  on: <K extends keyof NodeEvents & string>(event: K, listener: NodeEvents[K]) => this
-  once: <K extends keyof NodeEvents & string>(event: K, listener: NodeEvents[K]) => this
-  off: <K extends keyof NodeEvents & string>(event: K, listener: NodeEvents[K]) => this
-  emit: <K extends keyof NodeEvents & string>(event: K, ...args: Parameters<NodeEvents[K]>) => this
+  on: <K extends keyof NodeEvents & string>(event: K, listener: (...args: NodeEvents[K]) => void) => this
+  once: <K extends keyof NodeEvents & string>(event: K, listener: (...args: NodeEvents[K]) => void) => this
+  off: <K extends keyof NodeEvents & string>(event: K, listener: (...args: NodeEvents[K]) => void) => this
+  emit: <K extends keyof NodeEvents & string>(event: K, ...args: NodeEvents[K]) => this
 }
 
 export type ProcessMode = 'inherit' | 'pausable' | 'when_paused' | 'always' | 'disabled'

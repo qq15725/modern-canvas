@@ -14,14 +14,14 @@ export interface TimelineNodeProperties extends NodeProperties {
 }
 
 export interface TimelineNodeEvents extends NodeEvents {
-  updateCurrentTime: (currentTime: number) => void
+  updateCurrentTime: [currentTime: number]
 }
 
 export interface TimelineNode {
-  on: <K extends keyof TimelineNodeEvents & string>(event: K, listener: TimelineNodeEvents[K]) => this
-  once: <K extends keyof TimelineNodeEvents & string>(event: K, listener: TimelineNodeEvents[K]) => this
-  off: <K extends keyof TimelineNodeEvents & string>(event: K, listener: TimelineNodeEvents[K]) => this
-  emit: <K extends keyof TimelineNodeEvents & string>(event: K, ...args: Parameters<TimelineNodeEvents[K]>) => this
+  on: <K extends keyof TimelineNodeEvents & string>(event: K, listener: (...args: TimelineNodeEvents[K]) => void) => this
+  once: <K extends keyof TimelineNodeEvents & string>(event: K, listener: (...args: TimelineNodeEvents[K]) => void) => this
+  off: <K extends keyof TimelineNodeEvents & string>(event: K, listener: (...args: TimelineNodeEvents[K]) => void) => this
+  emit: <K extends keyof TimelineNodeEvents & string>(event: K, ...args: TimelineNodeEvents[K]) => this
 }
 
 @customNode('TimelineNode')

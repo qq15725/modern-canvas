@@ -8,10 +8,10 @@ export interface Element2DEvents extends BaseElement2DEvents {
 }
 
 export interface Element2D {
-  on: <K extends keyof Element2DEvents & string>(event: K, listener: Element2DEvents[K]) => this
-  once: <K extends keyof Element2DEvents & string>(event: K, listener: Element2DEvents[K]) => this
-  off: <K extends keyof Element2DEvents & string>(event: K, listener: Element2DEvents[K]) => this
-  emit: <K extends keyof Element2DEvents & string>(event: K, ...args: Parameters<Element2DEvents[K]>) => this
+  on: <K extends keyof Element2DEvents & string>(event: K, listener: (...args: Element2DEvents[K]) => void) => this
+  once: <K extends keyof Element2DEvents & string>(event: K, listener: (...args: Element2DEvents[K]) => void) => this
+  off: <K extends keyof Element2DEvents & string>(event: K, listener: (...args: Element2DEvents[K]) => void) => this
+  emit: <K extends keyof Element2DEvents & string>(event: K, ...args: Element2DEvents[K]) => this
 }
 
 export interface Element2DProperties extends BaseElement2DProperties {
