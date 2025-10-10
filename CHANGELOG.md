@@ -1,3 +1,12 @@
+## [0.10.1](https://github.com/qq15725/modern-canvas/compare/v0.10.0...v0.10.1) (2025-10-10)
+
+
+### Features
+
+* meta ([4d3d367](https://github.com/qq15725/modern-canvas/commit/4d3d36775f6ccdc358ffdeafb89592e2c4367208))
+
+
+
 # [0.10.0](https://github.com/qq15725/modern-canvas/compare/v0.9.6...v0.10.0) (2025-10-09)
 
 
