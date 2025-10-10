@@ -26,20 +26,20 @@ export class Meta extends CoreObject {
 
     return new Proxy(this, {
       get: (target, prop, receiver) => {
-        if (Reflect.has(target, prop)) {
+        if (Reflect.has(target, prop) || String(prop).startsWith('_')) {
           return Reflect.get(target, prop, receiver)
         }
         return target.getProperty(String(prop))
       },
       set: (target, prop, value, receiver) => {
-        if (Reflect.has(target, prop)) {
+        if (Reflect.has(target, prop) || String(prop).startsWith('_')) {
           return Reflect.set(target, prop, value, receiver)
         }
         target.setProperty(String(prop), value)
         return true
       },
       deleteProperty: (target, prop) => {
-        if (Reflect.has(target, prop)) {
+        if (Reflect.has(target, prop) || String(prop).startsWith('_')) {
           return Reflect.deleteProperty(target, prop)
         }
         target.setProperty(String(prop), undefined)
