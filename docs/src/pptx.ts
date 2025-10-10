@@ -14,6 +14,7 @@ const engine = new Engine({
 })
 
 engine.on('pointerdown', (e) => {
+  ;(window as any).$$0 = e.target
   console.warn(e.target?.toJSON())
 })
 

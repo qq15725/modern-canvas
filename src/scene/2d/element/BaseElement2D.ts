@@ -17,7 +17,7 @@ import type {
   Vector2Data,
   WebGLBlendMode,
 } from '../../../core'
-import type { CanvasBatchable, Node, Rectangulable } from '../../main'
+import type { CanvasBatchable, Node, Rectangulable, RectangulableEvents } from '../../main'
 import type { Node2DEvents, Node2DProperties } from '../Node2D'
 import { clearUndef } from 'modern-idoc'
 import {
@@ -38,7 +38,7 @@ import { BaseElement2DShape } from './BaseElement2DShape'
 import { BaseElement2DStyle } from './BaseElement2DStyle'
 import { BaseElement2DText } from './BaseElement2DText'
 
-export interface BaseElement2DEvents extends Node2DEvents {
+export interface BaseElement2DEvents extends Node2DEvents, RectangulableEvents {
   updateStyleProperty: [key: string, value: any, oldValue: any]
 }
 

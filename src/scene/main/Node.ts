@@ -12,6 +12,7 @@ import type { Window } from './Window'
 import { clearUndef, idGenerator, property } from 'modern-idoc'
 import { CoreObject, customNode, customNodes } from '../../core'
 import { Children } from './Children'
+import { Meta } from './Meta'
 
 export interface NodeEvents extends CoreObjectEvents, InputEvents {
   treeEnter: [tree: SceneTree]
@@ -72,7 +73,6 @@ export class Node extends CoreObject {
 
   @property({ fallback: idGenerator() }) declare id: string
   @property({ fallback: idGenerator() }) declare name: string
-  @property({ default: () => ({}) }) declare meta: Record<string, any>
 
   @property({ internal: true, fallback: 'inherit' }) declare processMode: ProcessMode
   @property({ internal: true, fallback: 'default' }) declare processSortMode: ProcessSortMode
@@ -80,6 +80,10 @@ export class Node extends CoreObject {
   @property({ internal: true, fallback: 'inherit' }) declare inputMode: InputMode
   @property({ internal: true, fallback: 'default' }) declare internalMode: InternalMode
   @property({ internal: true }) declare mask?: Maskable
+
+  protected _meta = new Meta(this)
+  get meta(): Meta { return this._meta }
+  set meta(value: Record<string, any>) { this._meta.resetProperties().setProperties(value) }
 
   protected _readyed = false
 
@@ -116,9 +120,7 @@ export class Node extends CoreObject {
       } = properties
 
       if (meta) {
-        for (const key in meta) {
-          this.meta[key] = meta[key]
-        }
+        this.meta = meta
       }
 
       super.setProperties(restProperties)
@@ -610,7 +612,7 @@ export class Node extends CoreObject {
         ? [...this.children.map(child => child.toJSON())]
         : undefined,
       meta: {
-        ...this.meta,
+        ...this.meta.toJSON(),
         inCanvasIs: this.is,
       },
     })
