@@ -1,3 +1,12 @@
+## [0.10.3](https://github.com/qq15725/modern-canvas/compare/v0.10.2...v0.10.3) (2025-10-13)
+
+
+### Bug Fixes
+
+* render method ([3b6793b](https://github.com/qq15725/modern-canvas/commit/3b6793b509faefcfc88de46de4812113af9bf0b3))
+
+
+
 ## [0.10.2](https://github.com/qq15725/modern-canvas/compare/v0.10.1...v0.10.2) (2025-10-10)
 
 
