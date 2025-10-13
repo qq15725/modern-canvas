@@ -41,6 +41,7 @@ async function start(sleep = 100): Promise<void> {
 async function task(options: RenderOptions): Promise<HTMLCanvasElement> {
   const { debug = false, fonts, width, height, time = 0, data } = options
   engine ??= new Engine({
+    pixelRatio: 1,
     width: 1,
     height: 1,
     preserveDrawingBuffer: true,
