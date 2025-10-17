@@ -1,3 +1,12 @@
+# [0.11.0](https://github.com/qq15725/modern-canvas/compare/v0.10.3...v0.11.0) (2025-10-17)
+
+
+### Features
+
+* DrawboardEffect ([d8dfd6b](https://github.com/qq15725/modern-canvas/commit/d8dfd6b3d42a1c846ae9562dc300add5e6cad368))
+
+
+
 ## [0.10.3](https://github.com/qq15725/modern-canvas/compare/v0.10.2...v0.10.3) (2025-10-13)
 
 
