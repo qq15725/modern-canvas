@@ -258,6 +258,15 @@ export class BaseElement2D extends Node2D implements Rectangulable {
     this._updateOverflow()
   }
 
+  protected override _relayout(batchables: CanvasBatchable[]): CanvasBatchable[] {
+    return super._relayout(batchables).map((batchable) => {
+      return {
+        ...batchable,
+        dimension: this.size.toFloat32Array(),
+      }
+    })
+  }
+
   getRect(): Rect2 {
     return this.getGlobalAabb()
   }

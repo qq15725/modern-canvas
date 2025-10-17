@@ -14,10 +14,10 @@ import { Viewport } from './Viewport'
 export type EffectMode = 'before' | 'parent' | 'children' | 'transition'
 
 export interface EffectProperties extends TimelineNodeProperties {
-  effectMode: EffectMode
-  glsl: string
-  glslSrc: string
-  material: Material
+  effectMode?: EffectMode
+  glsl?: string
+  glslSrc?: string
+  material?: Material
 }
 
 export interface EffectContext {
@@ -32,10 +32,10 @@ export interface EffectContext {
 
 @customNode('Effect')
 export class Effect extends TimelineNode {
-  @property({ internal: true }) material: Material | undefined
-  @property() declare effectMode: EffectMode | undefined
-  @property({ fallback: '' }) declare glsl: string
-  @property({ fallback: '' }) declare glslSrc: string
+  @property({ internal: true }) material?: Material
+  @property() declare effectMode?: EffectMode
+  @property() declare glsl?: string
+  @property() declare glslSrc?: string
 
   protected get _effectMode(): EffectMode { return this.effectMode ?? 'parent' }
 

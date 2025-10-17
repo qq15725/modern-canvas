@@ -8,6 +8,7 @@ export interface Batchable2D {
   vertices: Float32Array
   indices: Float32Array
   uvs?: Float32Array
+  dimension?: Float32Array
   texture?: WebGLTexture
   backgroundColor?: number[]
   modulate?: number[]
@@ -50,13 +51,14 @@ export class WebGLBatch2DModule extends WebGLModule {
   protected _attributes: Record<string, Partial<WebGLVertexAttrib>> = {
     aTextureId: { size: 1, normalized: true, type: 'float' }, // 1
     aPosition: { size: 2, normalized: false, type: 'float' }, // 2
+    aDimension: { size: 2, normalized: false, type: 'float' }, // 2
     aUv: { size: 2, normalized: false, type: 'float' }, // 2
     aModulate: { size: 4, normalized: true, type: 'unsigned_byte' }, // 1
     aBackgroundColor: { size: 4, normalized: true, type: 'unsigned_byte' }, // 1
     aDisableWrapMode: { size: 1, normalized: true, type: 'float' }, // 1
   }
 
-  protected _vertexSize = 1 + 2 + 2 + 1 + 1 + 1
+  protected _vertexSize = 1 + 2 + 2 + 2 + 1 + 1 + 1
 
   protected _getShader(maxTextureUnits: number): Shader {
     let shader = this._shaders.get(maxTextureUnits)
@@ -73,6 +75,7 @@ export class WebGLBatch2DModule extends WebGLModule {
       vert: `precision highp float;
 attribute float aTextureId;
 attribute vec2 aPosition;
+attribute vec2 aDimension;
 attribute vec2 aUv;
 attribute vec4 aModulate;
 attribute vec4 aBackgroundColor;
@@ -81,30 +84,20 @@ attribute float aDisableWrapMode;
 uniform mat3 projectionMatrix;
 uniform mat3 viewMatrix;
 uniform vec4 modulate;
-uniform float canvasWidth;
-uniform float canvasHeight;
 
 varying float vTextureId;
+varying vec2 vDimension;
 varying vec2 vUv;
 varying vec4 vModulate;
 varying vec4 vBackgroundColor;
 varying float vDisableWrapMode;
 
-vec2 roundPixels(vec2 position, vec2 targetSize) {
-  return (floor(((position * 0.5 + 0.5) * targetSize) + 0.5) / targetSize) * 2.0 - 1.0;
-}
-
 void main(void) {
-  mat3 modelMatrix = mat3(
-    1.0, 0.0, 0.0,
-    0.0, 1.0, 0.0,
-    0.0, 0.0, 1.0
-  );
-  vTextureId = aTextureId;
-  vec3 pos = projectionMatrix * viewMatrix * modelMatrix * vec3(aPosition, 1.0);
-  gl_Position = vec4(roundPixels(pos.xy, vec2(canvasWidth, canvasHeight)), 0.0, 1.0);
-  // gl_Position = vec4(pos.xy, 0.0, 1.0);
+  vec3 pos3 = projectionMatrix * viewMatrix * vec3(aPosition.xy, 1.0);
+  gl_Position = vec4(pos3.xy, 0.0, 1.0);
 
+  vTextureId = aTextureId;
+  vDimension = aDimension;
   vUv = aUv;
   vModulate = aModulate * modulate;
   vBackgroundColor = aBackgroundColor;
@@ -112,16 +105,27 @@ void main(void) {
 }`,
       frag: `precision highp float;
 varying float vTextureId;
+varying vec2 vDimension;
 varying vec2 vUv;
 varying vec4 vModulate;
 varying vec4 vBackgroundColor;
 varying float vDisableWrapMode;
 
+uniform mat3 viewMatrix;
 uniform sampler2D samplers[${maxTextureUnits}];
+uniform vec2 zoom;
+uniform vec2 translate;
 
 void main(void) {
+  vec2 uv = vUv;
+
+  if (vDimension.x > 0.0 && vDimension.y > 0.0) {
+    uv = floor(uv * vDimension);
+    uv = uv / vDimension;
+  }
+
   vec4 color = vec4(0.0, 0.0, 0.0, 0.0);
-  if (vDisableWrapMode > 0.0 && (vUv.x < 0.0 || vUv.y < 0.0 || vUv.x > 1.0 || vUv.y > 1.0))
+  if (vDisableWrapMode > 0.0 && (uv.x < 0.0 || uv.y < 0.0 || uv.x > 1.0 || uv.y > 1.0))
   {
     //
   }
@@ -137,7 +141,7 @@ void main(void) {
     if (i < maxTextureUnits - 1) {
       text += `\n  if (vTextureId < ${i}.5)`
     }
-    return `${text}\n  {\n    color = texture2D(samplers[${i}], vUv);\n  }`
+    return `${text}\n  {\n    color = texture2D(samplers[${i}], uv);\n  }`
   }).join('')}
 
   color += (1.0 - color.a) * vBackgroundColor;
@@ -189,11 +193,12 @@ void main(void) {
       draw: (options) => {
         const renderer = this._renderer
         renderer.program.bind(program)
+        const viewMatrix = renderer.program.uniforms.viewMatrix
         renderer.program.updateUniforms(program, {
           samplers,
           modulate: [1, 1, 1, 1],
-          canvasWidth: renderer.gl.drawingBufferWidth,
-          canvasHeight: renderer.gl.drawingBufferHeight,
+          zoom: [viewMatrix[0], viewMatrix[4]],
+          translate: [viewMatrix[6], viewMatrix[7]],
           ...renderer.program.uniforms,
         })
         renderer.vertexArray.bind(vao ?? vertexArray)
@@ -271,7 +276,8 @@ void main(void) {
           const {
             indices,
             vertices,
-            uvs = [],
+            uvs = new Float32Array(0),
+            dimension = new Float32Array(0),
             texture,
             modulate = this._defaultModulate,
             backgroundColor = this._defaultBackgroundColor,
@@ -297,6 +303,8 @@ void main(void) {
             float32View[aIndex++] = textureLocation
             float32View[aIndex++] = vertices[i]
             float32View[aIndex++] = vertices[i + 1]
+            float32View[aIndex++] = dimension[0]
+            float32View[aIndex++] = dimension[1]
             float32View[aIndex++] = uvs[i]
             float32View[aIndex++] = uvs[i + 1]
             if (modulate) {
@@ -364,11 +372,6 @@ void main(void) {
     }
   }
 
-  /**
-   * Fetches an attribute buffer from `this._attributeBuffer` that can hold atleast `size` floats.
-   * @param size - minimum capacity required
-   * @returns - buffer than can hold atleast `size` floats
-   */
   protected _getAttributeBuffer(size: number): ArrayBuffer {
     // 8 vertices is enough for 2 quads
     const roundedP2 = nextPow2(Math.ceil(size / 8))
@@ -388,12 +391,6 @@ void main(void) {
     return buffer
   }
 
-  /**
-   * Fetches an index buffer from `this._indexBuffers` that can
-   * have at least `size` capacity.
-   * @param size - minimum required capacity
-   * @returns - buffer that can fit `size` indices.
-   */
   protected _getIndexBuffer(size: number): Uint16Array<ArrayBuffer> {
     // 12 indices is enough for 2 quads
     const roundedP2 = nextPow2(Math.ceil(size / 12))
@@ -414,11 +411,6 @@ void main(void) {
   }
 }
 
-/**
- * Rounds to next power of two.
- * @param {number} v - input value
- * @returns {number} - next rounded power of two
- */
 export function nextPow2(v: number): number {
   v += v === 0 ? 1 : 0
   --v
@@ -431,11 +423,6 @@ export function nextPow2(v: number): number {
   return v + 1
 }
 
-/**
- * Computes ceil of log base 2
- * @param {number} v - input value
- * @returns {number} logarithm base 2
- */
 export function log2(v: number): number {
   let r = (v > 0xFFFF ? 1 : 0) << 4
 

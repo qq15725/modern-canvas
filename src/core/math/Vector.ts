@@ -178,6 +178,10 @@ export abstract class Vector extends Observable {
     return this._array.slice()
   }
 
+  toFloat32Array(): Float32Array {
+    return new Float32Array(this._array)
+  }
+
   toJSON(): number[] {
     return this.toArray()
   }

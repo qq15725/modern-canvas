@@ -4,7 +4,6 @@ import type {
   CanvasItemEvents,
   CanvasItemProperties,
   Node,
-  VertTransform,
 } from '../main'
 import { property } from 'modern-idoc'
 import { customNode, Transform2D, Vector2 } from '../../core'
@@ -107,15 +106,11 @@ export class Node2D extends CanvasItem {
     this.requestRelayout()
   }
 
-  protected _transformVertices(vertices: Float32Array, vertTransform?: VertTransform): Float32Array {
+  protected _transformVertices(vertices: Float32Array, vertTransform?: Transform2D): Float32Array {
     let a, c, tx, b, d, ty
     if (vertTransform) {
       const globalTransform = this.globalTransform.clone()
-      globalTransform.multiply(
-        typeof vertTransform === 'function'
-          ? vertTransform?.()
-          : vertTransform,
-      )
+      globalTransform.multiply(vertTransform)
       ;([a, c, tx, b, d, ty] = globalTransform.toArray())
     }
     else {

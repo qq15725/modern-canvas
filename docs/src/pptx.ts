@@ -1,6 +1,7 @@
 import { fonts } from 'modern-font'
 import {
   Camera2D,
+  DrawboardEffect,
   Engine,
   Node,
 } from '../../src'
@@ -8,7 +9,6 @@ import {
 const engine = new Engine({
   autoResize: true,
   autoStart: true,
-  backgroundColor: '#00FF00FF',
   // msaa: true,
   // antialias: true,
 })
@@ -18,12 +18,23 @@ engine.on('pointerdown', (e) => {
   console.warn(e.target?.toJSON())
 })
 
-const camera = new Camera2D()
-
 ;(window as any).engine = engine
-;(window as any).camera = camera
 
-engine.root.append(camera)
+engine.root.append(
+  new Camera2D({
+    internalMode: 'front',
+  }),
+)
+
+engine.root.append(
+  new DrawboardEffect({
+    internalMode: 'back',
+    effectMode: 'before',
+    pixelGrid: true,
+    checkerboard: true,
+  }),
+)
+
 document.body.append(engine.view!)
 
 async function init(): Promise<void> {

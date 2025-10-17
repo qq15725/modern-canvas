@@ -5,26 +5,24 @@ import { Path2D } from 'modern-path2d'
 import { Color } from '../../core'
 import { Texture2D } from '../resources'
 
-export type UvTransform = Transform2D | ((x: number, y: number) => [number, number])
-export type VertTransform = Transform2D | (() => Transform2D)
-
 export interface CanvasBatchable extends Batchable2D {
   type: 'stroke' | 'fill'
   texture?: Texture2D
-  vertTransform?: VertTransform
+  uvTransform?: Transform2D
+  vertTransform?: Transform2D
 }
 
 export interface StrokeDraw extends Partial<CanvasBatchable> {
   type: 'stroke'
   path: Path2D
   lineStyle: LineStyle
-  uvTransform?: UvTransform
+  uvTransform?: Transform2D
 }
 
 export interface FillDraw extends Partial<CanvasBatchable> {
   type: 'fill'
   path: Path2D
-  uvTransform?: UvTransform
+  uvTransform?: Transform2D
 }
 
 export class CanvasContext extends Path2D {
@@ -37,8 +35,8 @@ export class CanvasContext extends Path2D {
   miterLimit?: number
 
   // custom
-  uvTransform?: UvTransform
-  vertTransform?: VertTransform
+  uvTransform?: Transform2D
+  vertTransform?: Transform2D
 
   protected _draws: (StrokeDraw | FillDraw)[] = []
 
@@ -178,15 +176,9 @@ export class CanvasContext extends Path2D {
     vertices: number[],
     uvs: number[],
     texture?: Texture2D,
-    uvTransform?: UvTransform,
+    uvTransform?: Transform2D,
   ): void {
     if (texture) {
-      const _uvTransform = uvTransform
-        ? typeof uvTransform === 'function'
-          ? uvTransform
-          : (x: number, y: number) => uvTransform.apply({ x, y }).toArray()
-        : uvTransform
-
       const w = texture.width
       const h = texture.height
       for (let len = vertices.length, i = start; i < len; i += 2) {
@@ -194,8 +186,8 @@ export class CanvasContext extends Path2D {
         const y = vertices[i + 1]
         let uvX
         let uvY
-        if (_uvTransform) {
-          [uvX, uvY] = _uvTransform(x, y)
+        if (uvTransform) {
+          [uvX, uvY] = uvTransform.apply({ x, y }).toArray()
         }
         else {
           [uvX, uvY] = [x / w, y / h]
@@ -239,6 +231,8 @@ export class CanvasContext extends Path2D {
         this.buildUvs(0, vertices, uvs, current.texture, current.uvTransform)
       }
 
+      const box = current.path.getBoundingBox()
+
       batchables.push({
         vertices: new Float32Array(vertices),
         indices: new Float32Array(indices),
@@ -247,7 +241,9 @@ export class CanvasContext extends Path2D {
         backgroundColor: current.backgroundColor,
         type: current.type,
         disableWrapMode: current.disableWrapMode,
+        uvTransform: current.uvTransform,
         vertTransform: current.vertTransform,
+        dimension: new Float32Array([box.width, box.height]),
       })
     }
 

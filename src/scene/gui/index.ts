@@ -1,6 +1,0 @@
-export * from './Control'
-export * from './Range'
-export * from './Ruler'
-export * from './ScrollBar'
-export * from './XScrollBar'
-export * from './YScrollBar'

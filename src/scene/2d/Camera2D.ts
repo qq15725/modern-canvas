@@ -13,7 +13,10 @@ import { clamp, customNode, Vector2 } from '../../core'
 import { Node2D } from './Node2D'
 
 export interface Camera2DProperties extends Node2DProperties {
-  //
+  zoom?: Vector2Data
+  minZoom?: Vector2Data
+  maxZoom?: Vector2Data
+  wheelSensitivity?: number
 }
 
 export interface Camera2DEvents extends Node2DEvents {
@@ -32,13 +35,22 @@ export interface Camera2D {
   renderMode: 'disabled',
 })
 export class Camera2D extends Node2D {
-  readonly zoom = new Vector2(1, 1).on('update', () => this.updateCanvasTransform())
-  readonly maxZoom = new Vector2(6, 6)
-  readonly minZoom = new Vector2(0.1, 0.1)
-
+  @property({ fallback: 0.02 }) declare wheelSensitivity: number
   @property({ internal: true, fallback: false }) declare spaceKey: boolean
   @property({ internal: true, fallback: false }) declare grabbing: boolean
   protected _screenOffset = { x: 0, y: 0 }
+
+  protected _zoom = new Vector2(1, 1).on('update', () => this.updateCanvasTransform())
+  get zoom(): Vector2 { return this._zoom }
+  set zoom(val: Vector2Data) { this._zoom.set(val.x, val.y) }
+
+  protected _minZoom = new Vector2(0.02, 0.02)
+  get minZoom(): Vector2 { return this._minZoom }
+  set minZoom(val: Vector2Data) { this._minZoom.set(val.x, val.y) }
+
+  protected _maxZoom = new Vector2(256, 256)
+  get maxZoom(): Vector2 { return this._maxZoom }
+  set maxZoom(val: Vector2Data) { this._maxZoom.set(val.x, val.y) }
 
   constructor(properties?: Partial<Camera2DProperties>, nodes: Node[] = []) {
     super()
@@ -48,18 +60,38 @@ export class Camera2D extends Node2D {
       .append(nodes)
   }
 
-  addZoom(x: number, y = x): this {
-    this.zoom.set(
-      clamp(this.zoom.x + x, this.minZoom.x, this.maxZoom.x),
-      clamp(this.zoom.y + y, this.minZoom.y, this.maxZoom.y),
-    )
+  override setProperties(properties?: Record<string, any>): this {
+    if (properties) {
+      const {
+        zoom,
+        minZoom,
+        maxZoom,
+        ...restProperties
+      } = properties
+
+      if (zoom)
+        this.zoom = zoom
+      if (minZoom)
+        this.minZoom = minZoom
+      if (maxZoom)
+        this.maxZoom = maxZoom
+
+      super.setProperties(restProperties)
+    }
     return this
   }
 
+  addZoom(x: number, y = x): this {
+    return this.setZoom(
+      this._zoom.x + x,
+      this._zoom.y + y,
+    )
+  }
+
   setZoom(x: number, y = x): this {
-    this.zoom.set(
-      clamp(x, this.minZoom.x, this.maxZoom.x),
-      clamp(y, this.minZoom.y, this.maxZoom.y),
+    this._zoom.set(
+      clamp(x, this._minZoom.x, this._maxZoom.x),
+      clamp(y, this._minZoom.y, this._maxZoom.y),
     )
     return this
   }
@@ -125,9 +157,9 @@ export class Camera2D extends Node2D {
 
       if (!isTouchPad) {
         e.preventDefault()
-        const oldZoom = this.zoom.x
-        this.addZoom(e.deltaY * -0.015)
-        const ratio = 1 - this.zoom.x / oldZoom
+        const oldZoom = this._zoom.x
+        this.zoomWithWheel(e.deltaY)
+        const ratio = 1 - this._zoom.x / oldZoom
         this.position.add(
           (e.screenX - this.position.x) * ratio,
           (e.screenY - this.position.y) * ratio,
@@ -138,6 +170,13 @@ export class Camera2D extends Node2D {
       e.preventDefault()
       this.position.add(-e.deltaX, -e.deltaY)
     }
+  }
+
+  zoomWithWheel(wheelDeltaY: number): void {
+    const logCur = Math.log(this._zoom.x)
+    const logDelta = -wheelDeltaY * this.wheelSensitivity
+    const logNew = logCur + logDelta
+    this.setZoom(Math.exp(logNew))
   }
 
   override updateTransform(): void {
@@ -154,7 +193,7 @@ export class Camera2D extends Node2D {
     viewport
       .canvasTransform
       .identity()
-      .scale(this.zoom.x, this.zoom.y)
+      .scale(this._zoom.x, this._zoom.y)
       .translate(this.position.x, this.position.y)
 
     this.emit('updateCanvasTransform')
@@ -176,5 +215,14 @@ export class Camera2D extends Node2D {
       throw new Error('Failed to toScreen, viewport is empty')
 
     return viewport.toCanvasScreen(globalPos, newPos)
+  }
+
+  override toJSON(): Record<string, any> {
+    return {
+      zoom: this._zoom.toJSON(),
+      minZoom: this._minZoom.toJSON(),
+      maxZoom: this._maxZoom.toJSON(),
+      ...super.toJSON(),
+    }
   }
 }

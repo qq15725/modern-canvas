@@ -168,6 +168,10 @@ export abstract class Matrix extends Observable {
     return array.slice()
   }
 
+  toFloat32Array(transpose?: boolean): Float32Array<ArrayBuffer> {
+    return new Float32Array(this.toArray(transpose))
+  }
+
   toName(): string {
     return `Matrix${this.rows}(${this.rows}x${this.cols})`
   }
