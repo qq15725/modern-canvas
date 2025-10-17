@@ -7,8 +7,8 @@ import { Material, QuadUvGeometry } from '../resources'
 
 export interface DrawboardEffectProperties extends EffectProperties {
   checkerboard?: boolean
+  checkerboardScale?: number
   pixelGrid?: boolean
-  pixelGridData?: [number, number]
 }
 
 @customNode('DrawboardEffect')
