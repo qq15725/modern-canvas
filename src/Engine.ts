@@ -59,14 +59,14 @@ export class Engine extends SceneTree {
 
   protected _resizeObserver = SUPPORTS_RESIZE_OBSERVER
     ? new ResizeObserver((entries) => {
-      const entry = entries[0]
-      if (entry.target === this.view) {
-        const { inlineSize: width, blockSize: height } = Array.isArray(entry.contentBoxSize)
-          ? entry.contentBoxSize[0]
-          : entry.contentBoxSize
-        this.resize(width, height)
-      }
-    })
+        const entry = entries[0]
+        if (entry.target === this.view) {
+          const { inlineSize: width, blockSize: height } = Array.isArray(entry.contentBoxSize)
+            ? entry.contentBoxSize[0]
+            : entry.contentBoxSize
+          this.resize(width, height)
+        }
+      })
     : undefined
 
   constructor(properties: Partial<EngineProperties> = {}) {

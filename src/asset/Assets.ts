@@ -32,12 +32,12 @@ export class Assets {
   protected _handled = new Map<string, any | WeakRef<any>>()
   protected _gc = SUPPORTS_WEAK_REF
     ? new FinalizationRegistry<string>((id) => {
-      const ref = this.get<any>(id)
-      if (ref && 'destroy' in ref) {
-        ref.destroy()
-      }
-      this._handled.delete(id)
-    })
+        const ref = this.get<any>(id)
+        if (ref && 'destroy' in ref) {
+          ref.destroy()
+        }
+        this._handled.delete(id)
+      })
     : undefined
 
   constructor() {
