@@ -19,7 +19,7 @@ import type {
 } from '../../../core'
 import type { CanvasBatchable, Node, Rectangulable, RectangulableEvents } from '../../main'
 import type { Node2DEvents, Node2DProperties } from '../Node2D'
-import { clearUndef } from 'modern-idoc'
+import { clearUndef, getDefaultLayoutStyle, getDefaultTextStyle } from 'modern-idoc'
 import {
   customNode,
   DEG_TO_RAD,
@@ -61,6 +61,9 @@ export interface BaseElement2DProperties extends Node2DProperties {
   text: Text
   shadow: Shadow
 }
+
+const layoutStyle = new Set(Object.keys(getDefaultLayoutStyle()))
+const textStyles = new Set(Object.keys(getDefaultTextStyle()))
 
 @customNode('BaseElement2D')
 export class BaseElement2D extends Node2D implements Rectangulable {
@@ -206,6 +209,12 @@ export class BaseElement2D extends Node2D implements Rectangulable {
       default:
         this.requestRedraw()
         break
+    }
+
+    if (textStyles.has(key) || layoutStyle.has(key)) {
+      if (this.text.isValid()) {
+        this.text.update()
+      }
     }
   }
 
