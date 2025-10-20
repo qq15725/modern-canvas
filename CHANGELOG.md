@@ -1,3 +1,12 @@
+## [0.12.3](https://github.com/qq15725/modern-canvas/compare/v0.12.2...v0.12.3) (2025-10-20)
+
+
+### Bug Fixes
+
+* text ([4c921b4](https://github.com/qq15725/modern-canvas/commit/4c921b47cc03e2b6a7f42f3182da1c7001ddcb26))
+
+
+
 ## [0.12.2](https://github.com/qq15725/modern-canvas/compare/v0.12.1...v0.12.2) (2025-10-20)
 
 
