@@ -176,10 +176,6 @@ export class Node extends CoreObject {
     return this
   }
 
-  log(...args: any[]): void {
-    this._tree?.log(...args)
-  }
-
   /** Parent */
   protected _parent?: Node
   get parent(): Node | undefined { return this._parent }
@@ -554,26 +550,37 @@ export class Node extends CoreObject {
     this._parent?.removeChild(this)
   }
 
-  forEachChild(callbackfn: (value: Node, index: number, array: Node[]) => void): this {
-    this.children.forEach(callbackfn)
-    return this
-  }
-
-  forEachDescendant(callbackfn: (descendant: Node) => void): this {
-    this.children.forEach((child) => {
-      callbackfn(child)
-      child.forEachDescendant(callbackfn)
-    })
-    return this
-  }
-
-  forEachAncestor(callbackfn: (ancestor: Node) => void): this {
-    const parent = this.parent
-    if (parent) {
-      callbackfn(parent)
-      parent.forEachAncestor(callbackfn)
+  findOne<T extends Node = Node>(callbackfn: (value: Node) => boolean): T | undefined {
+    for (const child of this._children.default) {
+      const value = callbackfn(child) || child.findOne(callbackfn)
+      if (value) {
+        return value as T
+      }
     }
-    return this
+    return undefined
+  }
+
+  findAll<T extends Node = Node>(callbackfn: (value: Node) => boolean): T[] {
+    const items: any[] = []
+    for (const child of this._children.default) {
+      const value = callbackfn(child)
+      if (value) {
+        items.push(value)
+      }
+      items.push(...child.findAll(callbackfn))
+    }
+    return items
+  }
+
+  findAncestor<T extends Node = Node>(callbackfn: (value: Node) => Node | undefined): T | undefined {
+    const parent = this._parent
+    if (parent) {
+      const value = callbackfn(parent) ?? parent.findAncestor(callbackfn)
+      if (value) {
+        return value as T
+      }
+    }
+    return undefined
   }
 
   /** override */

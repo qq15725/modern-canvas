@@ -34,7 +34,6 @@ export class Texture2D<T extends Texture2DSource = Texture2DSource> extends Reso
   protected _isPowerOfTwo = false
   protected _needsUpload = false
 
-  get valid(): boolean { return Boolean(this.width && this.height) }
   get realWidth(): number { return Math.round(this.width * this.pixelRatio) }
   get realHeight(): number { return Math.round(this.height * this.pixelRatio) }
 
@@ -42,6 +41,10 @@ export class Texture2D<T extends Texture2DSource = Texture2DSource> extends Reso
     super()
     this.source = source
     this._updateSize()
+  }
+
+  isValid(): boolean {
+    return Boolean(this.width && this.height)
   }
 
   /** @internal */
@@ -111,7 +114,7 @@ export class Texture2D<T extends Texture2DSource = Texture2DSource> extends Reso
   }
 
   upload(renderer: WebGLRenderer, options?: Partial<WebGLTextureOptions>): boolean {
-    if (this._needsUpload && this.valid) {
+    if (this._needsUpload && this.isValid()) {
       this._needsUpload = false
       renderer.texture.update(
         this._glTexture(renderer, options),
@@ -123,7 +126,7 @@ export class Texture2D<T extends Texture2DSource = Texture2DSource> extends Reso
   }
 
   activate(renderer: WebGLRenderer, location = 0): boolean {
-    if (this.valid) {
+    if (this.isValid()) {
       renderer.texture.bind({
         target: 'texture_2d',
         value: this._glTexture(renderer, { location }),

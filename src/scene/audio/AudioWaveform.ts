@@ -115,7 +115,7 @@ export class AudioWaveform extends Element2D {
 
   protected _drawSrc(): void {
     const src = this._src
-    if (src?.valid) {
+    if (src?.isValid()) {
       this.context.fillStyle = src
       this.context.uvTransform = new Transform2D().scale(
         1 / this.style.width!,

@@ -134,7 +134,7 @@ export class Image2D extends Element2D {
 
   protected override _drawContent(): void {
     const texture = this.currentFrameTexture
-    if (texture?.valid) {
+    if (texture?.isValid()) {
       const { left = 0, top = 0, right = 0, bottom = 0 } = this.srcRect ?? {}
       const { width, height } = this.size
       this.context.fillStyle = texture

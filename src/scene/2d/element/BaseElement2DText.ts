@@ -1,5 +1,6 @@
 import type { NormalizedFill, NormalizedOutline, TextContent, Text as TextProperties } from 'modern-idoc'
 import type { MeasureResult } from 'modern-text'
+import type { CanvasContext } from '../../main'
 import type { Texture2D } from '../../resources'
 import type { BaseElement2D } from './BaseElement2D'
 import { isNone, normalizeText, normalizeTextContent, property } from 'modern-idoc'
@@ -7,7 +8,7 @@ import { BoundingBox } from 'modern-path2d'
 import { Character, Text } from 'modern-text'
 import { assets } from '../../../asset'
 import { CoreObject, Transform2D } from '../../../core'
-import { GradientTexture } from '../../resources'
+import { CanvasTexture, GradientTexture } from '../../resources'
 import { getDrawOptions } from './utils'
 
 export class BaseElement2DText extends CoreObject {
@@ -22,6 +23,7 @@ export class BaseElement2DText extends CoreObject {
 
   readonly base: Text
   measureResult?: MeasureResult
+  protected _texture = new CanvasTexture()
   protected _textureMap = new Map<string, {
     texture: Texture2D | undefined
     box: any
@@ -49,26 +51,30 @@ export class BaseElement2DText extends CoreObject {
 
     switch (key) {
       case 'enabled':
+        this.parent.requestRedraw()
+        break
       case 'effects':
       case 'measureDom':
       case 'fonts':
+        this.update()
         this.parent.requestRedraw()
         break
       case 'fill':
       case 'outline':
       case 'content':
+        this.update()
         this._updateTextureMap()
+        this.parent.requestRedraw()
         break
     }
   }
 
-  protected _updateBase(): void {
+  update(): void {
     this.base.fonts = this.base.fonts ?? this.parent.tree?.fonts
     this.base.update()
   }
 
   protected _updateTextureMap(): void {
-    this._updateBase()
     this._textureMap.clear()
     const pGlyphBoxs: BoundingBox[] = []
     this.base.paragraphs.forEach((p, pIndex) => {
@@ -95,7 +101,6 @@ export class BaseElement2DText extends CoreObject {
       this._updateTexture('fill', this.fill, glyphBox)
       this._updateTexture('outline', this.outline, glyphBox)
     }
-    this.parent.requestRedraw()
   }
 
   protected async _updateTexture(key: string, fill: NormalizedFill | undefined, box: any): Promise<void> {
@@ -130,7 +135,7 @@ export class BaseElement2DText extends CoreObject {
   }
 
   measure(): MeasureResult {
-    this._updateBase()
+    this.update()
     return this.base.measure()
   }
 
@@ -139,14 +144,14 @@ export class BaseElement2DText extends CoreObject {
     return this
   }
 
-  canDraw(): boolean {
+  isValid(): boolean {
     return Boolean(
       this.enabled
       && !/^\s*$/.test(this.base.toString()),
     )
   }
 
-  protected _getVertTransform(): Transform2D | undefined {
+  protected _createVertTransform(): Transform2D | undefined {
     const parent = this.parent
     if (parent.scale.x > 0 && parent.scale.y > 0) {
       return undefined
@@ -159,9 +164,14 @@ export class BaseElement2DText extends CoreObject {
       .translate(origin.x, origin.y)
   }
 
-  draw(): void {
-    const ctx = this.parent.context
-    this._updateBase()
+  protected _useDrawByTexture(): boolean {
+    return !!this.effects?.length
+      || this.content.some((p) => {
+        return p.fragments.some(f => !!f.highlightImage)
+      })
+  }
+
+  protected _drawByVertices(ctx: CanvasContext): void {
     this.base.pathSets.forEach((pathSet) => {
       pathSet.paths.forEach((path) => {
         const meta = path.getMeta()
@@ -193,14 +203,14 @@ export class BaseElement2DText extends CoreObject {
                 ctx.style = { ...path.style }
                 ctx.uvTransform = uvTransform
                 ctx.fillStyle = texture?.texture ?? fill.color
-                ctx.vertTransform = this._getVertTransform()
+                ctx.vertTransform = this._createVertTransform()
                 ctx.fill({ disableWrapMode })
               }
             }
             else {
               ctx.addPath(path)
               ctx.style = { ...path.style }
-              ctx.vertTransform = this._getVertTransform()
+              ctx.vertTransform = this._createVertTransform()
               ctx.fill()
             }
           }
@@ -231,14 +241,14 @@ export class BaseElement2DText extends CoreObject {
                 ctx.strokeStyle = texture?.texture ?? outline.color
                 ctx.lineCap = outline.lineCap
                 ctx.lineJoin = outline.lineJoin
-                ctx.vertTransform = this._getVertTransform()
+                ctx.vertTransform = this._createVertTransform()
                 ctx.stroke({ disableWrapMode })
               }
             }
             else {
               ctx.addPath(path)
               ctx.style = { ...path.style }
-              ctx.vertTransform = this._getVertTransform()
+              ctx.vertTransform = this._createVertTransform()
               ctx.stroke()
             }
           }
@@ -246,10 +256,29 @@ export class BaseElement2DText extends CoreObject {
         else {
           ctx.addPath(path)
           ctx.style = { ...path.style }
-          ctx.vertTransform = this._getVertTransform()
+          ctx.vertTransform = this._createVertTransform()
           ctx.fill()
         }
       })
     })
+  }
+
+  protected _drawByTexture(ctx: CanvasContext): void {
+    this._texture.width = Math.round(this.base.boundingBox.width)
+    this._texture.height = Math.round(this.base.boundingBox.height)
+    this.base.render({ view: this._texture.source })
+    ctx.fillStyle = this._texture
+    ctx.vertTransform = this._createVertTransform()
+    ctx.fill()
+  }
+
+  draw(): void {
+    const ctx = this.parent.context
+    if (this._useDrawByTexture()) {
+      this._drawByTexture(ctx)
+    }
+    else {
+      this._drawByVertices(ctx)
+    }
   }
 }

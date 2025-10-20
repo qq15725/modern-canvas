@@ -76,22 +76,22 @@
     "modern-font": "^0.4.4",
     "modern-idoc": "^0.10.1",
     "modern-path2d": "^1.4.10",
-    "modern-text": "^1.9.0"
+    "modern-text": "^1.9.1"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^5.4.1",
+    "@antfu/eslint-config": "^6.0.0",
     "@types/earcut": "^3.0.0",
-    "@types/node": "^24.7.0",
+    "@types/node": "^24.8.1",
     "bumpp": "^10.3.1",
     "conventional-changelog-cli": "^5.0.0",
-    "eslint": "^9.37.0",
-    "lint-staged": "^16.2.3",
+    "eslint": "^9.38.0",
+    "lint-staged": "^16.2.4",
     "lottie-web": "^5.13.0",
     "modern-gif": "^2.0.4",
     "simple-git-hooks": "^2.13.1",
     "typescript": "^5.9.3",
     "unbuild": "^3.6.1",
-    "vite": "^7.1.9",
+    "vite": "^7.1.11",
     "vitest": "^3.2.4",
     "yoga-layout": "^3.2.1"
   },

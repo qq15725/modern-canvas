@@ -8,6 +8,7 @@ import {
 import { Node } from './Node'
 
 export interface TimelineNodeProperties extends NodeProperties {
+  loop: boolean
   delay: number
   duration: number
   paused: boolean
@@ -26,6 +27,7 @@ export interface TimelineNode {
 
 @customNode('TimelineNode')
 export class TimelineNode extends Node {
+  @property({ fallback: false }) declare loop: boolean
   @property({ fallback: 0 }) declare delay: number
   @property({ fallback: 0 }) declare duration: number
   @property({ fallback: false }) declare paused: boolean
@@ -68,11 +70,17 @@ export class TimelineNode extends Node {
   protected _updateCurrentTime(force = false): void {
     if (force || !this.paused) {
       const parent = this._parent as TimelineNode
-      this._startTime = this.delay + this.parentStartTime
-      this.computedDuration = parent?.computedDuration
-        ? Math.min(this._startTime + this.duration, parent.endTime) - this._startTime
+      const startTime = this.delay + this.parentStartTime
+      const endTime = parent?.computedDuration
+        ? Math.min(startTime + this.duration, parent.endTime) - startTime
         : this.duration
-      this._currentTime = this.timelineCurrentTime - this._startTime
+      let currentTime = this.timelineCurrentTime - startTime
+      if (this.loop) {
+        currentTime = currentTime % endTime
+      }
+      this._startTime = startTime
+      this._currentTime = currentTime
+      this.computedDuration = endTime
       this.emit('updateCurrentTime', this._currentTime)
       this.insideTimeRange = this.isInsideTimeRange()
     }

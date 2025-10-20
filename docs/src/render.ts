@@ -15,16 +15,12 @@ async function init(): Promise<void> {
         src: '/example.jpg',
       },
       {
-        meta: {
-          inCanvasIs: 'Image2D',
-        },
+        meta: { inCanvasIs: 'Image2D' },
         style: { left: 100, top: 100, width: 100, height: 100 },
         src: '/example.jpg',
       },
       {
-        meta: {
-          inCanvasIs: 'Element2D',
-        },
+        meta: { inCanvasIs: 'Element2D' },
         style: { left: 200, top: 200, width: 100, height: 100 },
         content: '/example.jpg',
       },

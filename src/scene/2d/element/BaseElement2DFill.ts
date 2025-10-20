@@ -91,7 +91,7 @@ export class BaseElement2DFill extends CoreObject {
     this.parent.requestRedraw()
   }
 
-  canDraw(): boolean {
+  isValid(): boolean {
     return Boolean(
       this.enabled && (
         this._texture

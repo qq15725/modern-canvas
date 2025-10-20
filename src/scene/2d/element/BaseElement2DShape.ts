@@ -76,8 +76,8 @@ export class BaseElement2DShape extends CoreObject {
     })
   }
 
-  draw(): void {
-    if (this.enabled && this._path2DSet.paths.length) {
+  draw(rect = false): void {
+    if (!rect && this.enabled && this._path2DSet.paths.length) {
       const ctx = this.parent.context
       const { width, height } = this.parent.size
       this._path2DSet.paths.forEach((path) => {
@@ -85,11 +85,11 @@ export class BaseElement2DShape extends CoreObject {
       })
     }
     else {
-      this.drawRect()
+      this._drawRect()
     }
   }
 
-  drawRect(): void {
+  protected _drawRect(): void {
     const ctx = this.parent.context
     const { width, height } = this.parent.size
     const { borderRadius } = this.parent.style

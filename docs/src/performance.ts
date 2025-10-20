@@ -1,18 +1,17 @@
 import { fonts } from 'modern-font'
 import {
-  CanvasItemEditor,
   Element2D,
   Engine,
 } from '../../src'
 
-const editor = new CanvasItemEditor()
 const engine = new Engine({
   autoStart: true,
   autoResize: true,
   backgroundColor: '#F6F7F9',
 })
+
 ;(window as any).engine = engine
-engine.root.append(editor)
+
 document.body.append(engine.view!)
 
 async function init(): Promise<void> {
@@ -22,7 +21,7 @@ async function init(): Promise<void> {
   const size = 10
   const cols = Math.ceil(Math.sqrt(length))
   const gap = 2
-  editor.drawboard.append(
+  engine.root.append(
     Array.from({ length }, (_, i) => {
       const x = i % cols
       const y = Math.floor(i / cols)
@@ -38,7 +37,6 @@ async function init(): Promise<void> {
     }),
   )
 
-  console.warn(editor)
   console.warn(engine.root.toJSON())
 }
 

@@ -118,7 +118,6 @@ export interface AnimationProperties extends Omit<TimelineNodeProperties, 'rende
 })
 export class Animation extends TimelineNode {
   @property({ fallback: 'parent' }) declare effectMode: AnimationEffectMode
-  @property({ fallback: false }) declare loop: boolean
   @property({ default: () => [] }) declare keyframes: Keyframe[]
   @property() declare easing: Easing | undefined
 

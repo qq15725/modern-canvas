@@ -133,18 +133,18 @@ export class CanvasItem extends TimelineNode {
   }
 
   protected _redraw(): CanvasBatchable[] {
-    this.log(this.name, 'drawing')
+    this._tree?.log(this.name, 'drawing')
     this._draw()
     return this.context.toBatchables()
   }
 
   protected _relayout(batchables: CanvasBatchable[]): CanvasBatchable[] {
-    this.log(this.name, 'layouting')
+    this._tree?.log(this.name, 'layouting')
     return batchables
   }
 
   protected _repaint(batchables: CanvasBatchable[]): CanvasBatchable[] {
-    this.log(this.name, 'painting')
+    this._tree?.log(this.name, 'painting')
     const globalOpacity = this.globalOpacity
     return batchables.map((batchable) => {
       return {

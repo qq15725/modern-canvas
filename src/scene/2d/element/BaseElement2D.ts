@@ -151,13 +151,13 @@ export class BaseElement2D extends Node2D implements Rectangulable {
         break
       case 'scaleX':
         this.scale.x = this.style.scaleX
-        if (this.text.canDraw() && (value ^ oldValue) < 0) {
+        if (this.text.isValid() && (value ^ oldValue) < 0) {
           this.requestRedraw()
         }
         break
       case 'scaleY':
         this.scale.y = this.style.scaleY
-        if (this.text.canDraw() && (value ^ oldValue) < 0) {
+        if (this.text.isValid() && (value ^ oldValue) < 0) {
           this.requestRedraw()
         }
         break
@@ -383,46 +383,33 @@ export class BaseElement2D extends Node2D implements Rectangulable {
   protected _draw(): void {
     super._draw()
 
-    if (this._text.canDraw()) {
-      this._text.updateMeasure()
-    }
-
-    if (this._background.canDraw()) {
+    if (this._background.isValid()) {
       this._tree?.log(this.name, 'background drawing')
-      if (this._background.fillWithShape) {
-        this._shape.draw()
-      }
-      else {
-        this._shape.drawRect()
-      }
+      this._shape.draw(!this._background.fillWithShape)
       this._background.draw()
     }
 
-    if (this._fill.canDraw()) {
+    if (this._fill.isValid()) {
       this._tree?.log(this.name, 'fill drawing')
       this._shape.draw()
       this._fill.draw()
     }
 
-    if (this._outline.canDraw()) {
+    if (this._outline.isValid()) {
       this._tree?.log(this.name, 'outline drawing')
       this._shape.draw()
       this._outline.draw()
     }
 
-    if (this._foreground.canDraw()) {
+    if (this._foreground.isValid()) {
       this._tree?.log(this.name, 'foreground drawing')
-      if (this._foreground.fillWithShape) {
-        this._shape.draw()
-      }
-      else {
-        this._shape.drawRect()
-      }
+      this._shape.draw(!this._foreground.fillWithShape)
       this._foreground.draw()
     }
 
-    if (this._text.canDraw()) {
+    if (this._text.isValid()) {
       this._tree?.log(this.name, 'text drawing')
+      this._shape.draw(true)
       this._text.draw()
     }
 

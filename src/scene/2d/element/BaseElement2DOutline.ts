@@ -32,12 +32,12 @@ export class BaseElement2DOutline extends BaseElement2DFill {
     }
   }
 
-  canDraw(): boolean {
+  isValid(): boolean {
     return Boolean(
       this.enabled && (
         this.width
         || this.color
-        || super.canDraw()
+        || super.isValid()
       ),
     )
   }

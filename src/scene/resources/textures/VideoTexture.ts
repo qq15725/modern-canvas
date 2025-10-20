@@ -129,7 +129,7 @@ export class VideoTexture extends Texture2D<HTMLVideoElement> {
   }
 
   protected _onPlayStart = (): void => {
-    if (!this.valid) {
+    if (!this.isValid()) {
       this._onCanPlay()
     }
     this._setupAutoUpdate()
@@ -144,7 +144,7 @@ export class VideoTexture extends Texture2D<HTMLVideoElement> {
     source.removeEventListener('canplay', this._onCanPlay)
     source.removeEventListener('canplaythrough', this._onCanPlay)
 
-    const valid = this.valid
+    const valid = this.isValid()
 
     this._nextTime = 0
     this._updateSize()
@@ -270,7 +270,7 @@ export class VideoTexture extends Texture2D<HTMLVideoElement> {
       }
 
       this._sourceLoad = new Promise((resolve, reject) => {
-        if (this.valid) {
+        if (this.isValid()) {
           this._sourceLoad = undefined
           resolve(this)
         }
