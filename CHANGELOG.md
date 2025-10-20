@@ -1,3 +1,13 @@
+# [0.12.0](https://github.com/qq15725/modern-canvas/compare/v0.11.0...v0.12.0) (2025-10-20)
+
+
+### Features
+
+* rm interaction ([17d1939](https://github.com/qq15725/modern-canvas/commit/17d193957b0148b85a9898fe7e228cfd0638b735))
+* text ([e733ac6](https://github.com/qq15725/modern-canvas/commit/e733ac6d3c4e7ca07e13198fbdfcc30e017393e7))
+
+
+
 # [0.11.0](https://github.com/qq15725/modern-canvas/compare/v0.10.3...v0.11.0) (2025-10-17)
 
 
