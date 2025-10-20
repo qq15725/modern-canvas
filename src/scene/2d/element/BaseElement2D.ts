@@ -214,6 +214,7 @@ export class BaseElement2D extends Node2D implements Rectangulable {
     if (textStyles.has(key) || layoutStyle.has(key)) {
       if (this.text.isValid()) {
         this.text.update()
+        this.requestRedraw()
       }
     }
   }

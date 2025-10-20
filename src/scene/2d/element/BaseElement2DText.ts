@@ -22,7 +22,6 @@ export class BaseElement2DText extends CoreObject {
   @property({ alias: 'base.fonts' }) declare fonts: Text['fonts']
 
   readonly base: Text
-  measureResult?: MeasureResult
   protected _texture = new CanvasTexture()
   protected _textureMap = new Map<string, {
     texture: Texture2D | undefined
@@ -36,6 +35,7 @@ export class BaseElement2DText extends CoreObject {
 
     this.base = new Text()
     this.base.setPropertyAccessor(this)
+    this.update()
   }
 
   override setProperties(properties?: TextProperties): this {
@@ -137,11 +137,6 @@ export class BaseElement2DText extends CoreObject {
   measure(): MeasureResult {
     this.update()
     return this.base.measure()
-  }
-
-  updateMeasure(): this {
-    this.measureResult = this.measure()
-    return this
   }
 
   isValid(): boolean {
