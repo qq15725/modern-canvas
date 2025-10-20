@@ -409,7 +409,9 @@ export class BaseElement2D extends Node2D implements Rectangulable {
 
     if (this._text.isValid()) {
       this._tree?.log(this.name, 'text drawing')
-      this._shape.draw(true)
+      if (this._text.useTextureDraw()) {
+        this._shape.draw(true)
+      }
       this._text.draw()
     }
 

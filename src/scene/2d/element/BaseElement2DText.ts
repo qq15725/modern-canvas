@@ -164,14 +164,14 @@ export class BaseElement2DText extends CoreObject {
       .translate(origin.x, origin.y)
   }
 
-  protected _useDrawByTexture(): boolean {
+  useTextureDraw(): boolean {
     return !!this.effects?.length
       || this.content.some((p) => {
         return p.fragments.some(f => !!f.highlightImage)
       })
   }
 
-  protected _drawByVertices(ctx: CanvasContext): void {
+  protected _pathDraw(ctx: CanvasContext): void {
     this.base.pathSets.forEach((pathSet) => {
       pathSet.paths.forEach((path) => {
         const meta = path.getMeta()
@@ -263,7 +263,7 @@ export class BaseElement2DText extends CoreObject {
     })
   }
 
-  protected _drawByTexture(ctx: CanvasContext): void {
+  protected _textureDraw(ctx: CanvasContext): void {
     this._texture.width = Math.round(this.base.boundingBox.width)
     this._texture.height = Math.round(this.base.boundingBox.height)
     this.base.render({ view: this._texture.source })
@@ -274,11 +274,11 @@ export class BaseElement2DText extends CoreObject {
 
   draw(): void {
     const ctx = this.parent.context
-    if (this._useDrawByTexture()) {
-      this._drawByTexture(ctx)
+    if (this.useTextureDraw()) {
+      this._textureDraw(ctx)
     }
     else {
-      this._drawByVertices(ctx)
+      this._pathDraw(ctx)
     }
   }
 }
