@@ -17,7 +17,7 @@ import type {
   Vector2Data,
   WebGLBlendMode,
 } from '../../../core'
-import type { CanvasBatchable, Node, Rectangulable, RectangulableEvents } from '../../main'
+import type { CanvasBatchable, Node, Rectangulable, RectangulableEvents, SceneTree } from '../../main'
 import type { Node2DEvents, Node2DProperties } from '../Node2D'
 import { clearUndef, getDefaultLayoutStyle, getDefaultTextStyle } from 'modern-idoc'
 import {
@@ -121,6 +121,14 @@ export class BaseElement2D extends Node2D implements Rectangulable {
       .append(nodes)
   }
 
+  protected override _treeEnter(tree: SceneTree): void {
+    super._treeEnter(tree)
+
+    if (this._text.isValid()) {
+      this._text.update()
+    }
+  }
+
   override setProperties(properties?: Record<string, any>): this {
     if (properties) {
       const {
@@ -214,7 +222,6 @@ export class BaseElement2D extends Node2D implements Rectangulable {
     if (textStyles.has(key) || layoutStyle.has(key)) {
       if (this.text.isValid()) {
         this.text.update()
-        this.requestRedraw()
       }
     }
   }

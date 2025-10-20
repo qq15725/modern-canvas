@@ -35,7 +35,6 @@ export class BaseElement2DText extends CoreObject {
 
     this.base = new Text()
     this.base.setPropertyAccessor(this)
-    this.update()
   }
 
   override setProperties(properties?: TextProperties): this {
@@ -57,14 +56,12 @@ export class BaseElement2DText extends CoreObject {
       case 'measureDom':
       case 'fonts':
         this.update()
-        this.parent.requestRedraw()
         break
       case 'fill':
       case 'outline':
       case 'content':
         this.update()
         this._updateTextureMap()
-        this.parent.requestRedraw()
         break
     }
   }
@@ -72,6 +69,7 @@ export class BaseElement2DText extends CoreObject {
   update(): void {
     this.base.fonts = this.base.fonts ?? this.parent.tree?.fonts
     this.base.update()
+    this.parent.requestRedraw()
   }
 
   protected _updateTextureMap(): void {
