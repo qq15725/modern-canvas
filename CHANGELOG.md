@@ -1,3 +1,12 @@
+## [0.12.6](https://github.com/qq15725/modern-canvas/compare/v0.12.5...v0.12.6) (2025-10-23)
+
+
+### Features
+
+* text drawMode ([1ef2923](https://github.com/qq15725/modern-canvas/commit/1ef292387dbf8da1f71f67ce39a6e02e17fb72d6))
+
+
+
 ## [0.12.5](https://github.com/qq15725/modern-canvas/compare/v0.12.4...v0.12.5) (2025-10-23)
 
 
