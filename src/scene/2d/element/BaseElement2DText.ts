@@ -22,7 +22,7 @@ export class BaseElement2DText extends CoreObject {
   @property() declare outline: Text['outline']
   @property({ alias: 'base.measureDom' }) declare measureDom: Text['measureDom']
   @property({ alias: 'base.fonts' }) declare fonts: Text['fonts']
-  @property({ internal: true, fallback: 'auto' }) declare drawMode: TextDrawMode
+  @property({ fallback: 'auto' }) declare drawMode: TextDrawMode
 
   readonly base: Text
   protected _texture = new CanvasTexture()
