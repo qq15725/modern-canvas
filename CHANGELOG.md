@@ -1,3 +1,12 @@
+## [0.12.8](https://github.com/qq15725/modern-canvas/compare/v0.12.7...v0.12.8) (2025-10-23)
+
+
+### Features
+
+* add timeline.stoped ([98d6e97](https://github.com/qq15725/modern-canvas/commit/98d6e97f5783b5864016719c58b52f3c0833e947))
+
+
+
 ## [0.12.7](https://github.com/qq15725/modern-canvas/compare/v0.12.6...v0.12.7) (2025-10-23)
 
 
