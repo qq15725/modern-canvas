@@ -1,3 +1,12 @@
+## [0.12.7](https://github.com/qq15725/modern-canvas/compare/v0.12.6...v0.12.7) (2025-10-23)
+
+
+### Bug Fixes
+
+* useTextureDraw ([66801ca](https://github.com/qq15725/modern-canvas/commit/66801ca00bab7852953cb3db695c4de55bf48227))
+
+
+
 ## [0.12.6](https://github.com/qq15725/modern-canvas/compare/v0.12.5...v0.12.6) (2025-10-23)
 
 
