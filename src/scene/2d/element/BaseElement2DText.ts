@@ -22,7 +22,7 @@ export class BaseElement2DText extends CoreObject {
   @property() declare outline: Text['outline']
   @property({ alias: 'base.measureDom' }) declare measureDom: Text['measureDom']
   @property({ alias: 'base.fonts' }) declare fonts: Text['fonts']
-  @property({ internal: true, default: 'auto' }) declare drawMode: TextDrawMode
+  @property({ internal: true, fallback: 'auto' }) declare drawMode: TextDrawMode
 
   readonly base: Text
   protected _texture = new CanvasTexture()
@@ -161,10 +161,21 @@ export class BaseElement2DText extends CoreObject {
   }
 
   useTextureDraw(): boolean {
-    return !!this.effects?.length
-      || this.content.some((p) => {
-        return p.fragments.some(f => !!f.highlightImage)
-      })
+    let drawMode = this.drawMode
+    if (drawMode === 'auto') {
+      if (
+        !!this.effects?.length
+        || this.content.some((p) => {
+          return p.fragments.some(f => !!f.highlightImage)
+        })
+      ) {
+        drawMode = 'texture'
+      }
+      else {
+        drawMode = 'path'
+      }
+    }
+    return drawMode === 'texture'
   }
 
   protected _pathDraw(ctx: CanvasContext): void {
@@ -271,31 +282,11 @@ export class BaseElement2DText extends CoreObject {
   draw(): void {
     const ctx = this.parent.context
 
-    let drawMode: TextDrawMode
-    if (this.drawMode === 'auto') {
-      if (
-        !!this.effects?.length
-        || this.content.some((p) => {
-          return p.fragments.some(f => !!f.highlightImage)
-        })
-      ) {
-        drawMode = 'texture'
-      }
-      else {
-        drawMode = 'path'
-      }
+    if (this.useTextureDraw()) {
+      this._textureDraw(ctx)
     }
     else {
-      drawMode = this.drawMode
-    }
-
-    switch (drawMode) {
-      case 'texture':
-        this._textureDraw(ctx)
-        break
-      case 'path':
-        this._pathDraw(ctx)
-        break
+      this._pathDraw(ctx)
     }
   }
 }
