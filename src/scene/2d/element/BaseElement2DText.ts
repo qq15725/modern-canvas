@@ -11,6 +11,8 @@ import { CoreObject, Transform2D } from '../../../core'
 import { CanvasTexture, GradientTexture } from '../../resources'
 import { getDrawOptions } from './utils'
 
+export type TextDrawMode = 'auto' | 'texture' | 'path'
+
 export class BaseElement2DText extends CoreObject {
   @property({ fallback: true }) declare enabled: boolean
   @property({ fallback: () => [] }) declare content: Text['content']
@@ -20,6 +22,7 @@ export class BaseElement2DText extends CoreObject {
   @property() declare outline: Text['outline']
   @property({ alias: 'base.measureDom' }) declare measureDom: Text['measureDom']
   @property({ alias: 'base.fonts' }) declare fonts: Text['fonts']
+  @property({ internal: true, default: 'auto' }) declare drawMode: TextDrawMode
 
   readonly base: Text
   protected _texture = new CanvasTexture()
@@ -267,11 +270,32 @@ export class BaseElement2DText extends CoreObject {
 
   draw(): void {
     const ctx = this.parent.context
-    if (this.useTextureDraw()) {
-      this._textureDraw(ctx)
+
+    let drawMode: TextDrawMode
+    if (this.drawMode === 'auto') {
+      if (
+        !!this.effects?.length
+        || this.content.some((p) => {
+          return p.fragments.some(f => !!f.highlightImage)
+        })
+      ) {
+        drawMode = 'texture'
+      }
+      else {
+        drawMode = 'path'
+      }
     }
     else {
-      this._pathDraw(ctx)
+      drawMode = this.drawMode
+    }
+
+    switch (drawMode) {
+      case 'texture':
+        this._textureDraw(ctx)
+        break
+      case 'path':
+        this._pathDraw(ctx)
+        break
     }
   }
 }
