@@ -574,12 +574,15 @@ export class Node extends CoreObject {
     return items as T[]
   }
 
-  findAncestor<T extends Node = Node>(callbackfn: (value: Node) => Node | undefined): T | undefined {
+  findAncestor<T extends Node = Node>(callbackfn: (value: Node) => boolean): T | undefined {
     const parent = this._parent
     if (parent) {
-      const value = callbackfn(parent) ?? parent.findAncestor(callbackfn)
+      if (callbackfn(parent)) {
+        return parent as T
+      }
+      const value = parent.findAncestor<T>(callbackfn)
       if (value) {
-        return value as T
+        return value
       }
     }
     return undefined
