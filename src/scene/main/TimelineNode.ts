@@ -42,25 +42,25 @@ export class TimelineNode extends Node {
   }
 
   /** Timeline */
-  computedDuration = 0
   _currentTime = 0
-  _startTime = 0
+  _duration = 0
+  _globalStartTime = 0
   get timeline(): Timeline | undefined { return this._tree?.timeline }
-  get timelineCurrentTime(): number { return this.timeline?.currentTime ?? 0 }
-  get parentStartTime(): number { return (this._parent as TimelineNode)?.startTime ?? 0 }
-  get currentTime(): number { return clamp(this._currentTime, 0, this.computedDuration) }
-  get startTime(): number { return this._startTime }
-  set startTime(val: number) {
-    this.delay = val - this.parentStartTime
+  get globalCurrentTime(): number { return this.timeline?.currentTime ?? 0 }
+  get parentGlobalStartTime(): number { return (this._parent as TimelineNode)?.globalStartTime ?? 0 }
+  get currentTime(): number { return clamp(this._currentTime, 0, this._duration) }
+  get globalStartTime(): number { return this._globalStartTime }
+  set globalStartTime(val: number) {
+    this.delay = val - this.parentGlobalStartTime
     this._updateCurrentTime(true)
   }
 
-  get endTime(): number { return this._startTime + this.computedDuration }
-  get currentTimeProgress(): number { return this.computedDuration ? clamp(this._currentTime / this.computedDuration, 0, 1) : 0 }
+  get globalEndTime(): number { return this._globalStartTime + this._duration }
+  get currentTimeProgress(): number { return this._duration ? clamp(this._currentTime / this._duration, 0, 1) : 0 }
   isInsideTimeRange(): boolean {
     const current = this._currentTime
-    if (this.computedDuration) {
-      return current >= 0 && current <= this.computedDuration
+    if (this._duration) {
+      return current >= 0 && current <= this._duration
     }
     else {
       return current >= 0
@@ -70,17 +70,17 @@ export class TimelineNode extends Node {
   protected _updateCurrentTime(force = false): void {
     if (force || !this.paused) {
       const parent = this._parent as TimelineNode
-      const startTime = this.delay + this.parentStartTime
-      const endTime = parent?.computedDuration
-        ? Math.min(startTime + this.duration, parent.endTime) - startTime
+      const globalStartTime = this.parentGlobalStartTime + this.delay
+      const duration = parent?._duration
+        ? Math.min(globalStartTime + this.duration, parent.globalEndTime) - globalStartTime
         : this.duration
-      let currentTime = this.timelineCurrentTime - startTime
+      let currentTime = this.globalCurrentTime - globalStartTime
       if (this.loop) {
-        currentTime = currentTime % endTime
+        currentTime = currentTime % duration
       }
-      this._startTime = startTime
+      this._globalStartTime = globalStartTime
       this._currentTime = currentTime
-      this.computedDuration = endTime
+      this._duration = duration
       this.emit('updateCurrentTime', this._currentTime)
       this.insideTimeRange = this.isInsideTimeRange()
     }

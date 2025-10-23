@@ -1,4 +1,6 @@
+import type { ObservableEvents } from 'modern-idoc'
 import type { Loader } from './loaders'
+import { Observable } from 'modern-idoc'
 import { Ticker } from '../core'
 import {
   FontLoader,
@@ -25,7 +27,11 @@ export interface Assets {
   video: VideoLoader
 }
 
-export class Assets {
+export interface AssetsEvents extends ObservableEvents {
+  loaded: [id: string, value: any]
+}
+
+export class Assets extends Observable<AssetsEvents> {
   defaultHandler: AssetHandler = (url: string) => this.fetch(url)
   protected _handlers = new Map<string, AssetHandler>()
   protected _handleing = new Map<string, Promise<any>>()
@@ -41,6 +47,8 @@ export class Assets {
     : undefined
 
   constructor() {
+    super()
+
     if (!SUPPORTS_WEAK_REF) {
       Ticker.on(this.gc.bind(this), { sort: 2 })
     }
@@ -145,6 +153,7 @@ export class Assets {
     const promise = handler()
       .then((result) => {
         this.set(id, result)
+        this.emit('loaded', id, result)
         return result
       })
       .finally(() => {

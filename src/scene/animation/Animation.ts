@@ -410,10 +410,10 @@ export class Animation extends TimelineNode {
   play(): boolean {
     if (this._stoped) {
       this._stoped = false
-      this.startTime = this.timelineCurrentTime
+      this.globalStartTime = this.globalCurrentTime
     }
     else {
-      this.startTime = this.timelineCurrentTime - this.currentTime
+      this.globalStartTime = this.globalCurrentTime - this.currentTime
     }
     this.paused = false
     return true

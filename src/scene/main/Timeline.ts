@@ -19,6 +19,7 @@ export interface TimelineProperties extends NodeProperties {
   currentTime: number
   endTime: number
   loop: boolean
+  stoped: boolean
 }
 
 @customNode('Timeline')
@@ -27,6 +28,7 @@ export class Timeline extends Node {
   @property({ fallback: 0 }) declare currentTime: number
   @property({ fallback: Number.MAX_SAFE_INTEGER }) declare endTime: number
   @property({ fallback: false }) declare loop: boolean
+  @property({ fallback: false }) declare stoped: boolean
 
   static from(range: number | number[], loop = false): Timeline {
     const [startTime, endTime] = range
@@ -75,6 +77,8 @@ export class Timeline extends Node {
 
   protected _process(delta: number): void {
     super._process(delta)
-    this.addTime(delta)
+    if (!this.stoped) {
+      this.addTime(delta)
+    }
   }
 }
