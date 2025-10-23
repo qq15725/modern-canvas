@@ -552,24 +552,26 @@ export class Node extends CoreObject {
 
   findOne<T extends Node = Node>(callbackfn: (value: Node) => boolean): T | undefined {
     for (const child of this._children.default) {
-      const value = callbackfn(child) || child.findOne(callbackfn)
-      if (value) {
-        return value as T
+      if (callbackfn(child)) {
+        return child as T
+      }
+      const res = child.findOne<T>(callbackfn)
+      if (res) {
+        return res
       }
     }
     return undefined
   }
 
   findAll<T extends Node = Node>(callbackfn: (value: Node) => boolean): T[] {
-    const items: any[] = []
+    const items: Node[] = []
     for (const child of this._children.default) {
-      const value = callbackfn(child)
-      if (value) {
-        items.push(value)
+      if (callbackfn(child)) {
+        items.push(child)
       }
       items.push(...child.findAll(callbackfn))
     }
-    return items
+    return items as T[]
   }
 
   findAncestor<T extends Node = Node>(callbackfn: (value: Node) => Node | undefined): T | undefined {
