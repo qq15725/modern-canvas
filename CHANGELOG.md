@@ -1,3 +1,13 @@
+## [0.12.5](https://github.com/qq15725/modern-canvas/compare/v0.12.4...v0.12.5) (2025-10-23)
+
+
+### Bug Fixes
+
+* findAncestor ([9098de5](https://github.com/qq15725/modern-canvas/commit/9098de55729db89f619896809f7a98864b9e2a3f))
+* findOne / findAll ([28fa3f1](https://github.com/qq15725/modern-canvas/commit/28fa3f17afc7920ed48b4988d225ed2469b13223))
+
+
+
 ## [0.12.4](https://github.com/qq15725/modern-canvas/compare/v0.12.3...v0.12.4) (2025-10-20)
 
 
