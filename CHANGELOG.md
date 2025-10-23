@@ -1,3 +1,12 @@
+## [0.12.10](https://github.com/qq15725/modern-canvas/compare/v0.12.9...v0.12.10) (2025-10-23)
+
+
+### Features
+
+* Element2D.text.drawMode change to public prop ([daa53d1](https://github.com/qq15725/modern-canvas/commit/daa53d10989ae22a29aa1f89bdfec5176e25b2e0))
+
+
+
 ## [0.12.9](https://github.com/qq15725/modern-canvas/compare/v0.12.8...v0.12.9) (2025-10-23)
 
 
