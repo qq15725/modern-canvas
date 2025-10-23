@@ -1,3 +1,13 @@
+## [0.12.9](https://github.com/qq15725/modern-canvas/compare/v0.12.8...v0.12.9) (2025-10-23)
+
+
+### Features
+
+* add timeline.paused ([4f9d49e](https://github.com/qq15725/modern-canvas/commit/4f9d49e5cf8f2b390ac9c343070ddc65272387f8))
+* render support keyframes ([75f00f2](https://github.com/qq15725/modern-canvas/commit/75f00f257f5856e814047a33f0a0648a1072e41a))
+
+
+
 ## [0.12.8](https://github.com/qq15725/modern-canvas/compare/v0.12.7...v0.12.8) (2025-10-23)
 
 
