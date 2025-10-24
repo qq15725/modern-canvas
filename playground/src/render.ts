@@ -22,7 +22,6 @@ async function init(): Promise<void> {
     keyframes: [0, 100, 200, 300, 400, 500],
     onFrame: (frame, { progress }) => {
       ctx2d.putImageData(new ImageData(frame, width, height), 0, 0)
-      console.log(progress)
     },
   })
 }
