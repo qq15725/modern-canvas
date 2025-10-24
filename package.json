@@ -51,7 +51,7 @@
     "build:code": "vite build",
     "build:tsc": "NODE_ENV=production tsc --emitDeclarationOnly --project tsconfig.json",
     "build": "pnpm build:code && pnpm build:tsc",
-    "dev": "vite docs",
+    "dev": "vite playground",
     "lint": "eslint src",
     "version": "conventional-changelog -p angular -i CHANGELOG.md -s && git add CHANGELOG.md",
     "release": "bumpp package.json --commit \"release: v%s\" --push --all --tag",
