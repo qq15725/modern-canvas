@@ -24,8 +24,8 @@ export class BaseElement2DFill extends CoreObject {
   @property() declare tile: NormalizedFill['tile']
   @property() declare opacity: NormalizedFill['opacity']
 
-  protected _texture?: Texture2D
-  protected _animatedTexture?: AnimatedTexture
+  texture?: Texture2D
+  animatedTexture?: AnimatedTexture
 
   constructor(
     public parent: BaseElement2D,
@@ -69,7 +69,7 @@ export class BaseElement2DFill extends CoreObject {
 
   async loadTexture(): Promise<void> {
     if (this.linearGradient || this.radialGradient) {
-      this._texture = new GradientTexture(
+      this.texture = new GradientTexture(
         (this.linearGradient ?? this.radialGradient)!,
         this.parent.size.width,
         this.parent.size.height,
@@ -78,10 +78,10 @@ export class BaseElement2DFill extends CoreObject {
     else if (!isNone(this.image)) {
       this.parent.tree?.log(`load image ${this.image}`)
       if (this.image.split('?')[0].endsWith('.gif')) {
-        this._animatedTexture = await assets.gif.load(this.image)
+        this.animatedTexture = await assets.gif.load(this.image)
       }
       else {
-        this._texture = await assets.texture.load(this.image)
+        this.texture = await assets.texture.load(this.image)
       }
     }
   }
@@ -94,8 +94,8 @@ export class BaseElement2DFill extends CoreObject {
   isValid(): boolean {
     return Boolean(
       this.enabled && (
-        this._texture
-        || this._animatedTexture
+        this.texture
+        || this.animatedTexture
         || this.color
       ),
     )
@@ -110,8 +110,8 @@ export class BaseElement2DFill extends CoreObject {
       },
     )
     ctx.uvTransform = uvTransform
-    ctx.fillStyle = this._animatedTexture?.currentFrame.texture
-      ?? this._texture
+    ctx.fillStyle = this.animatedTexture?.currentFrame.texture
+      ?? this.texture
       ?? this.color
     ctx.fill({
       disableWrapMode,
@@ -119,7 +119,7 @@ export class BaseElement2DFill extends CoreObject {
   }
 
   protected _getFrameCurrentTime(): number {
-    const duration = this._animatedTexture?.duration ?? 0
+    const duration = this.animatedTexture?.duration ?? 0
     if (!duration)
       return 0
     const currentTime = this.parent._currentTime
@@ -129,12 +129,12 @@ export class BaseElement2DFill extends CoreObject {
   }
 
   updateFrameIndex(): this {
-    if (!this._animatedTexture)
+    if (!this.animatedTexture)
       return this
     const currentTime = this._getFrameCurrentTime()
-    const frames = this._animatedTexture.frames
+    const frames = this.animatedTexture.frames
     const len = frames.length
-    if (len <= 1 && this._animatedTexture.frameIndex === 0)
+    if (len <= 1 && this.animatedTexture.frameIndex === 0)
       return this
     let index = len - 1
     for (let time = 0, i = 0; i < len; i++) {
@@ -144,8 +144,8 @@ export class BaseElement2DFill extends CoreObject {
         break
       }
     }
-    if (this._animatedTexture.frameIndex !== index) {
-      this._animatedTexture.frameIndex = index
+    if (this.animatedTexture.frameIndex !== index) {
+      this.animatedTexture.frameIndex = index
       this.parent.requestRedraw()
     }
     return this
