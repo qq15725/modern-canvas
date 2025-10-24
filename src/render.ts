@@ -14,7 +14,7 @@ export interface RenderOptions {
     currentTime: number
     duration: number
     progress: number
-  }) => Promise<void>
+  }) => void | Promise<void>
 }
 
 let engine: Engine | undefined

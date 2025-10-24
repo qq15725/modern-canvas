@@ -20,6 +20,7 @@ export type AssetHandler = (url: string, options?: any) => any | Promise<any>
 export interface Assets {
   font: FontLoader
   gif: GifLoader
+  gifWorkerUrl?: string
   json: JsonLoader
   lottie: LottieLoader
   text: TextLoader
