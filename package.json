@@ -64,7 +64,7 @@
     "colord": "^2.9.3",
     "earcut": "^3.0.2",
     "modern-font": "^0.4.4",
-    "modern-idoc": "^0.10.3",
+    "modern-idoc": "^0.10.4",
     "modern-path2d": "^1.4.10",
     "modern-text": "^1.9.1"
   },
