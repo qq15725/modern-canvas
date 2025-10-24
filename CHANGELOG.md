@@ -1,3 +1,19 @@
+## [0.12.11](https://github.com/qq15725/modern-canvas/compare/v0.12.10...v0.12.11) (2025-10-24)
+
+
+### Bug Fixes
+
+* animation ([eaa4cd2](https://github.com/qq15725/modern-canvas/commit/eaa4cd24a7abcd1c6301cdc716abd2c0a44113b7))
+
+
+### Features
+
+* fill.animatedTexture change to public ([b8d46c2](https://github.com/qq15725/modern-canvas/commit/b8d46c2a883d34d77036f1dc53d69d4341dea969))
+* only esm ([4b435b2](https://github.com/qq15725/modern-canvas/commit/4b435b2535ecbc908589eb83e8dc6a296b1def8e))
+* up deps ([2979142](https://github.com/qq15725/modern-canvas/commit/29791425685df58aca7a691d0cd305baa33482b5))
+
+
+
 ## [0.12.10](https://github.com/qq15725/modern-canvas/compare/v0.12.9...v0.12.10) (2025-10-23)
 
 
