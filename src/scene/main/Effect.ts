@@ -261,6 +261,7 @@ export class Effect extends TimelineNode {
         ]
       }
     }
+    return undefined
   }
 
   protected override _render(renderer: WebGLRenderer): void {

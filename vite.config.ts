@@ -1,28 +1,20 @@
-import { basename, resolve } from 'node:path'
+import path from 'node:path'
 import { defineConfig } from 'vite'
-import { browser, name } from './package.json'
-
-const resolvePath = (str: string) => resolve(__dirname, str)
+import pkg from './package.json'
 
 export default defineConfig({
   build: {
+    minify: true,
     lib: {
-      entry: resolvePath('./src/index.ts'),
+      entry: path.resolve(__dirname, 'src/index.ts'),
+      fileName: () => `index.js`,
+      formats: ['es'],
     },
     rollupOptions: {
-      external: ['modern-gif', 'lottie-web', /^yoga-layout/],
-      output: [
-        {
-          format: 'umd',
-          entryFileNames: basename(browser),
-          name: name.replace(/-(\w)/g, (_, v) => v.toUpperCase()),
-          globals: {
-            'modern-gif': 'modernGif',
-            'lottie-web': 'lottie',
-            'yoga-layout': 'yogaLayout', // yoga-layout does not have umi
-          },
-        },
-      ],
+      external: [
+        ...Object.keys(pkg.dependencies || {}),
+        ...Object.keys(pkg.peerDependencies || {}),
+      ].map(v => new RegExp(`^${v}`)),
     },
   },
 })

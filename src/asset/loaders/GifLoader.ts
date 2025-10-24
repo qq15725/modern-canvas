@@ -7,10 +7,11 @@ export class GifLoader extends Loader {
 
   install(assets: Assets): this {
     const handler = async (url: string): Promise<AnimatedTexture> => {
+      const { default: workerUrl } = await import('modern-gif/worker?url')
       const { decodeFrames } = await import('modern-gif')
       return await assets.fetch(url)
         .then(res => res.arrayBuffer())
-        .then(buffer => decodeFrames(buffer))
+        .then(buffer => decodeFrames(buffer, { workerUrl }))
         .then(frames => new AnimatedTexture(
           frames.map((frame) => {
             return {

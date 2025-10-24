@@ -58,16 +58,6 @@ export class Audio extends TimelineNode {
     }
   }
 
-  /** Loop */
-  protected _loop = false
-  get loop(): boolean { return this._loop }
-  set loop(val: boolean) {
-    if (this._loop !== val) {
-      this._loop = val
-      this.refresh()
-    }
-  }
-
   /** PlaybackRate */
   protected _playbackRate = 1
   get playbackRate(): number { return this._playbackRate }
@@ -94,6 +84,9 @@ export class Audio extends TimelineNode {
   protected override _updateProperty(key: string, value: any, oldValue: any): void {
     super._updateProperty(key, value, oldValue)
     switch (key) {
+      case 'loop':
+        this.refresh()
+        break
       case 'paused':
         this.refreshPaused()
         break

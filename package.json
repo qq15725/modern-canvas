@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.12.10",
   "packageManager": "pnpm@10.18.1",
-  "description": "A JavaScript WebGL rendering engine.",
+  "description": "A JavaScript WebGL rendering engine. only the ESM.",
   "author": "wxm",
   "license": "MIT",
   "homepage": "https://github.com/qq15725/modern-canvas",
@@ -24,19 +24,23 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
-    }
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./*.mjs": "./*.js",
+    "./*": "./*"
   },
-  "main": "./dist/index.mjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
   "browser": "./dist/index.js",
+  "typings": "dist/index.d.ts",
+  "types": "dist/index.d.ts",
   "typesVersions": {
     "*": {
       "*": [
-        "./dist/*",
-        "./dist/index.d.ts"
+        "*",
+        "dist/*",
+        "dist/*.d.ts"
       ]
     }
   },
@@ -44,7 +48,9 @@
     "dist"
   ],
   "scripts": {
-    "build": "vite build && unbuild",
+    "build:code": "vite build",
+    "build:tsc": "NODE_ENV=production tsc --emitDeclarationOnly --project tsconfig.json",
+    "build": "pnpm build:code && pnpm build:tsc",
     "dev": "vite docs",
     "lint": "eslint src",
     "version": "conventional-changelog -p angular -i CHANGELOG.md -s && git add CHANGELOG.md",
@@ -53,6 +59,14 @@
     "test": "vitest",
     "typecheck": "tsc --noEmit",
     "prepare": "simple-git-hooks"
+  },
+  "dependencies": {
+    "colord": "^2.9.3",
+    "earcut": "^3.0.2",
+    "modern-font": "^0.4.4",
+    "modern-idoc": "^0.10.1",
+    "modern-path2d": "^1.4.10",
+    "modern-text": "^1.9.1"
   },
   "peerDependencies": {
     "lottie-web": "^5",
@@ -69,14 +83,6 @@
     "yoga-layout": {
       "optional": true
     }
-  },
-  "dependencies": {
-    "colord": "^2.9.3",
-    "earcut": "^3.0.2",
-    "modern-font": "^0.4.4",
-    "modern-idoc": "^0.10.1",
-    "modern-path2d": "^1.4.10",
-    "modern-text": "^1.9.1"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^6.0.0",
@@ -99,6 +105,6 @@
     "pre-commit": "pnpm lint-staged"
   },
   "lint-staged": {
-    "*": "eslint src --fix"
+    "*": ""
   }
 }
