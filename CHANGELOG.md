@@ -1,3 +1,12 @@
+## [0.12.12](https://github.com/qq15725/modern-canvas/compare/v0.12.11...v0.12.12) (2025-10-24)
+
+
+### Features
+
+* assets.gifWorkerUrl ([bbd4d88](https://github.com/qq15725/modern-canvas/commit/bbd4d88886c0769ebd67c4a1e6ef1303d9ca066b))
+
+
+
 ## [0.12.11](https://github.com/qq15725/modern-canvas/compare/v0.12.10...v0.12.11) (2025-10-24)
 
 
