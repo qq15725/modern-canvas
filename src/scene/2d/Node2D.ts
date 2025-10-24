@@ -30,6 +30,8 @@ export class Node2D extends CanvasItem {
   readonly position = new Vector2().on('update', () => this.updateGlobalTransform())
   readonly scale = new Vector2(1, 1).on('update', () => this.updateGlobalTransform())
   readonly skew = new Vector2().on('update', () => this.updateGlobalTransform())
+  readonly pivot = new Vector2().on('update', () => this.updateGlobalTransform())
+  readonly extraTransform = new Transform2D()
   readonly transform = new Transform2D()
   readonly globalPosition = new Vector2()
   @property({ internal: true, fallback: 0 }) declare globalRotation: number
@@ -57,25 +59,16 @@ export class Node2D extends CanvasItem {
     }
   }
 
-  getTransformOrigin(): Vector2 {
-    return new Vector2(0, 0)
-  }
-
-  updateTransform(cb?: (transform: Transform2D) => void): void {
-    const origin = this.getTransformOrigin()
-
-    const transform = this.transform
+  updateTransform(): void {
+    this.transform
       .identity()
-      .translate(-origin.x, -origin.y)
+      .translate(-this.pivot.x, -this.pivot.y)
       .scale(this.scale.x, this.scale.y)
       .skew(this.skew.x, this.skew.y)
       .rotate(this.rotation)
-
-    cb?.(transform)
-
-    transform
+      .multiply(this.extraTransform)
       .translate(this.position.x, this.position.y)
-      .translate(origin.x, origin.y)
+      .translate(this.pivot.x, this.pivot.y)
   }
 
   updateGlobalTransform(): void {

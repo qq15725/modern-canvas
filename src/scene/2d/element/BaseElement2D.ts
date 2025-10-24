@@ -13,13 +13,12 @@ import type {
   InputEvent,
   InputEventKey,
   PointerInputEvent,
-  Transform2D,
   Vector2Data,
   WebGLBlendMode,
 } from '../../../core'
 import type { CanvasBatchable, Node, Rectangulable, RectangulableEvents, SceneTree } from '../../main'
 import type { Node2DEvents, Node2DProperties } from '../Node2D'
-import { clearUndef, getDefaultLayoutStyle, getDefaultTextStyle } from 'modern-idoc'
+import { clearUndef, getDefaultLayoutStyle, getDefaultTextStyle, isNone } from 'modern-idoc'
 import {
   customNode,
   DEG_TO_RAD,
@@ -68,9 +67,14 @@ const textStyles = new Set(Object.keys(getDefaultTextStyle()))
 @customNode('BaseElement2D')
 export class BaseElement2D extends Node2D implements Rectangulable {
   readonly size = new Vector2().on('update', () => {
+    this.onUpdateStyleProperty('transform', this.style.transform, undefined)
+    this.onUpdateStyleProperty('transformOrigin', this.style.transformOrigin, undefined)
     this.updateGlobalTransform()
     this.requestRedraw()
   })
+
+  protected _allowPointerEvents = true
+  protected _overflowHidden = false
 
   protected _style = new BaseElement2DStyle().on('updateProperty', (...args: any[]) => {
     this.onUpdateStyleProperty(args[0], args[1], args[2])
@@ -178,10 +182,22 @@ export class BaseElement2D extends Node2D implements Rectangulable {
         this.skew.y = value
         break
       case 'transform':
-      case 'transformOrigin':
+        parseCSSTransform(
+          value ?? '',
+          this.size.width,
+          this.size.height,
+          this.extraTransform.identity(),
+        )
         this.updateGlobalTransform()
         break
-      /** draw */
+      case 'transformOrigin': {
+        const origin = parseCSSTransformOrigin(value ?? '')
+        this.pivot.set(
+          origin[0] * this.size.width,
+          origin[1] * this.size.height,
+        )
+        break
+      }
       case 'opacity':
         this.opacity = value
         break
@@ -192,7 +208,7 @@ export class BaseElement2D extends Node2D implements Rectangulable {
         this.requestRepaint()
         break
       case 'maskImage':
-        this._updateMaskImage()
+        this._updateMaskImage(value)
         break
       case 'backgroundColor':
         this.background.color = value
@@ -211,6 +227,12 @@ export class BaseElement2D extends Node2D implements Rectangulable {
       case 'borderColor':
       case 'outlineColor':
         this.outline.color = value
+        break
+      case 'overflow':
+        this._overflowHidden = value === 'hidden'
+        break
+      case 'pointerEvents':
+        this._allowPointerEvents = !isNone(value)
         break
       case 'borderRadius':
       default:
@@ -233,9 +255,8 @@ export class BaseElement2D extends Node2D implements Rectangulable {
     super._process(delta)
   }
 
-  protected _updateMaskImage(): void {
+  protected _updateMaskImage(maskImage?: string): void {
     const nodePath = '__$style.maskImage'
-    const maskImage = this.style.maskImage
     if (maskImage && maskImage !== 'none') {
       const node = this.getNode<MaskEffect>(nodePath)
       if (node) {
@@ -253,25 +274,9 @@ export class BaseElement2D extends Node2D implements Rectangulable {
     }
   }
 
-  override getTransformOrigin(): Vector2 {
-    const { width, height } = this.size
-    const [originX, originY] = parseCSSTransformOrigin(this.style.transformOrigin)
-    return new Vector2(originX * width, originY * height)
-  }
-
-  override updateTransform(cb?: (transform: Transform2D) => void): void {
-    const { width, height } = this.size
-
-    super.updateTransform((transform) => {
-      parseCSSTransform(this.style.transform ?? '', width, height, transform)
-
-      cb?.(transform)
-    })
-  }
-
   override updateGlobalTransform(): void {
     super.updateGlobalTransform()
-    this._updateOverflow()
+    this._updateMask()
   }
 
   protected override _relayout(batchables: CanvasBatchable[]): CanvasBatchable[] {
@@ -318,13 +323,13 @@ export class BaseElement2D extends Node2D implements Rectangulable {
   }
 
   getObb(): { rect: Rect2, rotation: number } {
-    const origin = this.getTransformOrigin()
-    const _origin = this.transform.apply(origin).sub(origin)
+    const pivot = this.pivot
+    const _pivot = this.transform.apply(pivot).sub(pivot)
     return {
       rect: new Rect2(
         this._getPointArray().map((p) => {
-          p.x += _origin.x
-          p.y += _origin.y
+          p.x += _pivot.x
+          p.y += _pivot.y
           return p
         }),
       ),
@@ -333,14 +338,14 @@ export class BaseElement2D extends Node2D implements Rectangulable {
   }
 
   getGlobalObb(): { rect: Rect2, rotation: number } {
-    const origin = this.getTransformOrigin()
-    const _origin = this.globalTransform.apply(origin).sub(origin)
+    const pivot = this.pivot
+    const _pivot = this.globalTransform.apply(pivot).sub(pivot)
 
     return {
       rect: new Rect2(
         this._getPointArray().map((p) => {
-          p.x += _origin.x
-          p.y += _origin.y
+          p.x += _pivot.x
+          p.y += _pivot.y
           return p
         }),
       ),
@@ -387,8 +392,8 @@ export class BaseElement2D extends Node2D implements Rectangulable {
   //   return super.isVisibleInTree()
   // }
 
-  protected _updateOverflow(): void {
-    if (this.style.overflow === 'hidden') {
+  protected _updateMask(): void {
+    if (this._overflowHidden) {
       this.mask = this.getRect().toJSON()
     }
     else {
@@ -450,10 +455,6 @@ export class BaseElement2D extends Node2D implements Rectangulable {
     })
   }
 
-  canPointerEvents(): boolean {
-    return this.style.pointerEvents !== 'none'
-  }
-
   override input(event: InputEvent, key: InputEventKey): void {
     const array = this.getChildren(true)
     for (let i = array.length - 1; i >= 0; i--) {
@@ -478,7 +479,7 @@ export class BaseElement2D extends Node2D implements Rectangulable {
       case 'pointerdown':
       case 'pointermove':
       case 'pointerup': {
-        if (this.canPointerEvents()) {
+        if (this._allowPointerEvents) {
           const { screenX, screenY } = event as PointerInputEvent
           if (screenX && screenY) {
             const pos = new Vector2(screenX, screenY)

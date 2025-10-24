@@ -153,11 +153,11 @@ export class BaseElement2DText extends CoreObject {
       return undefined
     }
     const scale = parent.scale.x * parent.scale.y
-    const origin = parent.getTransformOrigin()
+    const pivot = parent.pivot
     return new Transform2D()
-      .translate(-origin.x, -origin.y)
+      .translate(-pivot.x, -pivot.y)
       .scale(scale > 0 ? 1 : -1, 1)
-      .translate(origin.x, origin.y)
+      .translate(pivot.x, pivot.y)
   }
 
   useTextureDraw(): boolean {
@@ -275,6 +275,10 @@ export class BaseElement2DText extends CoreObject {
     this._texture.height = Math.round(this.base.boundingBox.height)
     this.base.render({ view: this._texture.source })
     ctx.fillStyle = this._texture
+    const { left = 0, top = 0, width, height } = this.base.boundingBox
+    ctx.uvTransform = new Transform2D()
+      .translate(-left, -top)
+      .scale(1 / width, 1 / height)
     ctx.vertTransform = this._createVertTransform()
     ctx.fill()
   }
