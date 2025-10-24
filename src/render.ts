@@ -10,7 +10,7 @@ export interface RenderOptions {
   fonts?: Fonts
   keyframes?: number[]
   onBefore?: (engine: Engine) => void | Promise<void>
-  onFrame?: (frame: Uint8ClampedArray, ctx: {
+  onFrame?: (frame: Uint8ClampedArray<ArrayBuffer>, ctx: {
     currentTime: number
     duration: number
     progress: number

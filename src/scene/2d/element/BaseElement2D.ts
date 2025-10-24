@@ -72,49 +72,43 @@ export class BaseElement2D extends Node2D implements Rectangulable {
     this.requestRedraw()
   })
 
-  protected declare _style: BaseElement2DStyle
+  protected _style = new BaseElement2DStyle().on('updateProperty', (...args: any[]) => {
+    this.onUpdateStyleProperty(args[0], args[1], args[2])
+  })
+
   get style(): BaseElement2DStyle { return this._style }
-  set style(style) {
-    const cb = (...args: any[]): void => {
-      this.emit('updateStyleProperty', args[0], args[1], args[2])
-      this._updateStyleProperty(args[0], args[1], args[2])
-    }
-    style.on('updateProperty', cb)
-    this._style?.off('updateProperty', cb)
-    this._style = style
-  }
+  set style(value: BaseElement2DProperties['style']) { this._style.resetProperties().setProperties(value) }
 
   protected _background = new BaseElement2DBackground(this)
   get background(): BaseElement2DBackground { return this._background }
-  set background(value: Background) { this._background.resetProperties().setProperties(value) }
+  set background(value: BaseElement2DProperties['background']) { this._background.resetProperties().setProperties(value) }
 
   protected _shape = new BaseElement2DShape(this)
   get shape(): BaseElement2DShape { return this._shape }
-  set shape(value: Shape) { this._shape.resetProperties().setProperties(value) }
+  set shape(value: BaseElement2DProperties['shape']) { this._shape.resetProperties().setProperties(value) }
 
   protected _fill = new BaseElement2DFill(this)
   get fill(): BaseElement2DFill { return this._fill }
-  set fill(value: Fill) { this._fill.resetProperties().setProperties(value) }
+  set fill(value: BaseElement2DProperties['fill']) { this._fill.resetProperties().setProperties(value) }
 
   protected _outline = new BaseElement2DOutline(this)
   get outline(): BaseElement2DOutline { return this._outline }
-  set outline(value: Outline) { this._outline.resetProperties().setProperties(value) }
+  set outline(value: BaseElement2DProperties['outline']) { this._outline.resetProperties().setProperties(value) }
 
   protected _foreground = new BaseElement2DForeground(this)
   get foreground(): BaseElement2DForeground { return this._foreground }
-  set foreground(value: Foreground) { this._foreground.resetProperties().setProperties(value) }
+  set foreground(value: BaseElement2DProperties['foreground']) { this._foreground.resetProperties().setProperties(value) }
 
   protected _text = new BaseElement2DText(this)
   get text(): BaseElement2DText { return this._text }
-  set text(value: Text) { this._text.resetProperties().setProperties(value) }
+  set text(value: BaseElement2DProperties['text']) { this._text.resetProperties().setProperties(value) }
 
   protected _shadow = new BaseElement2DShadow(this)
   get shadow(): BaseElement2DShadow { return this._shadow }
-  set shadow(value: Shadow) { this._shadow.resetProperties().setProperties(value) }
+  set shadow(value: BaseElement2DProperties['shadow']) { this._shadow.resetProperties().setProperties(value) }
 
   constructor(properties?: Partial<BaseElement2DProperties>, nodes: Node[] = []) {
     super()
-    this._updateStyleProperty = this._updateStyleProperty.bind(this)
     this.style = new BaseElement2DStyle()
     this
       .setProperties(properties)
@@ -155,28 +149,33 @@ export class BaseElement2D extends Node2D implements Rectangulable {
     return this
   }
 
+  onUpdateStyleProperty(key: string, value: any, oldValue: any): void {
+    this.emit('updateStyleProperty', key, value, oldValue)
+    this._updateStyleProperty(key, value, oldValue)
+  }
+
   protected _updateStyleProperty(key: string, value: any, oldValue: any): void {
     switch (key) {
       case 'rotate':
-        this.rotation = this.style.rotate * DEG_TO_RAD
+        this.rotation = value * DEG_TO_RAD
         break
       case 'scaleX':
-        this.scale.x = this.style.scaleX
+        this.scale.x = value
         if (this.text.isValid() && (value ^ oldValue) < 0) {
           this.requestRedraw()
         }
         break
       case 'scaleY':
-        this.scale.y = this.style.scaleY
+        this.scale.y = value
         if (this.text.isValid() && (value ^ oldValue) < 0) {
           this.requestRedraw()
         }
         break
       case 'skewX':
-        this.skew.x = this.style.skewX
+        this.skew.x = value
         break
       case 'skewY':
-        this.skew.y = this.style.skewY
+        this.skew.y = value
         break
       case 'transform':
       case 'transformOrigin':
@@ -184,10 +183,10 @@ export class BaseElement2D extends Node2D implements Rectangulable {
         break
       /** draw */
       case 'opacity':
-        this.opacity = this.style.opacity
+        this.opacity = value
         break
       case 'visibility':
-        this.visible = this.style.visibility === 'visible'
+        this.visible = value === 'visible'
         break
       case 'filter':
         this.requestRepaint()
@@ -196,10 +195,10 @@ export class BaseElement2D extends Node2D implements Rectangulable {
         this._updateMaskImage()
         break
       case 'backgroundColor':
-        this.background.color = this.style.backgroundColor
+        this.background.color = value
         break
       case 'backgroundImage':
-        this.background.image = this.style.backgroundImage
+        this.background.image = value
         break
       case 'borderStyle':
       case 'outlineStyle':

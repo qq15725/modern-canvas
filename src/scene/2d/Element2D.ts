@@ -20,22 +20,15 @@ export interface Element2DProperties extends BaseElement2DProperties {
 
 @customNode('Element2D')
 export class Element2D extends BaseElement2D {
-  protected declare _style: Element2DStyle
+  protected _style = new Element2DStyle().on('updateProperty', (...args: any[]) => {
+    this.onUpdateStyleProperty(args[0], args[1], args[2])
+  })
+
   get style(): Element2DStyle { return this._style }
-  set style(style) {
-    const cb = (...args: any[]): void => {
-      this.emit('updateStyleProperty', args[0], args[1], args[2])
-      this._updateStyleProperty(args[0], args[1], args[2])
-    }
-    style.on('updateProperty', cb)
-    this._style?.off('updateProperty', cb)
-    this._style = style
-  }
+  set style(value: Element2DProperties['style']) { this._style.resetProperties().setProperties(value) }
 
   constructor(properties?: Partial<Element2DProperties>, nodes: Node[] = []) {
     super()
-
-    this.style = new Element2DStyle()
 
     this
       .setProperties(properties)

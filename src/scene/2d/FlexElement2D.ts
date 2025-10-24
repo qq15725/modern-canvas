@@ -21,17 +21,12 @@ export interface FlexElement2DProperties extends BaseElement2DProperties {
 
 @customNode('FlexElement2D')
 export class FlexElement2D extends BaseElement2D implements Rectangulable {
-  protected declare _style: FlexElement2DStyle
-  override get style(): FlexElement2DStyle { return this._style }
-  set style(style) {
-    const cb = (...args: any[]): void => {
-      this.emit('updateStyleProperty', args[0], args[1], args[2])
-      this._updateStyleProperty(args[0], args[1], args[2])
-    }
-    style.on('updateProperty', cb)
-    this._style?.off('updateProperty', cb)
-    this._style = style
-  }
+  protected _style = new FlexElement2DStyle().on('updateProperty', (...args: any[]) => {
+    this.onUpdateStyleProperty(args[0], args[1], args[2])
+  })
+
+  get style(): FlexElement2DStyle { return this._style }
+  set style(value: FlexElement2DProperties['style']) { this._style.resetProperties().setProperties(value) }
 
   _layout = new FlexLayout(this)
 
@@ -53,8 +48,6 @@ export class FlexElement2D extends BaseElement2D implements Rectangulable {
 
   constructor(properties?: Partial<FlexElement2DProperties>, nodes: Node[] = []) {
     super()
-
-    this.style = new FlexElement2DStyle()
 
     this
       .setProperties(properties)

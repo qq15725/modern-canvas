@@ -1,8 +1,9 @@
 import type { CssFunction, CssFunctionArg } from '../../core'
 import type { Node, TimelineNodeProperties } from '../main'
 import { property, RawWeakMap } from 'modern-idoc'
+import { Element2D } from '../2d'
 import { clamp, customNode, getDefaultCssPropertyValue, lerp, parseCssProperty } from '../../core'
-import { CanvasItem, TimelineNode } from '../main'
+import { TimelineNode } from '../main'
 
 export const linear = (amount: number): number => amount
 export const ease = cubicBezier(0.25, 0.1, 0.25, 1)
@@ -161,18 +162,18 @@ export class Animation extends TimelineNode {
     }
   }
 
-  protected _getTargets(): any[] {
+  protected _getTargets(): Element2D[] {
     let targets
     switch (this.effectMode) {
       case 'sibling':
-        targets = this.getParent()?.getChildren(true).filter(val => val instanceof CanvasItem) ?? []
+        targets = this.getParent()?.getChildren(true) ?? []
         break
       case 'parent':
       default:
         targets = [this.getParent()].filter(Boolean)
         break
     }
-    return targets.map((target: any) => target.style)
+    return targets.filter(val => val instanceof Element2D)
   }
 
   protected _updateKeyframes(): void {
@@ -254,7 +255,7 @@ export class Animation extends TimelineNode {
       const keyframes = this._keyframes
       for (let len = keyframes.length, i = 0; i < len; i++) {
         Object.keys(keyframes[i].props).forEach((name) => {
-          startProps.set(name, (target as any)[name])
+          startProps.set(name, (target.style as any)[name])
         })
       }
       this._cachedProps.set(target, startProps)
@@ -304,7 +305,7 @@ export class Animation extends TimelineNode {
 
   protected _commitStyle(
     currentTime: number,
-    target: any,
+    target: Element2D,
     startProps: Map<string, any>,
     previous: NormalizedKeyframe,
     current: NormalizedKeyframe,
@@ -315,18 +316,22 @@ export class Animation extends TimelineNode {
     const total = offset - previousOffset
     const weight = easing((currentTime - previousOffset) / total)
     const context = {
-      width: target.width,
-      height: target.height,
-      fontSize: target.fontSize,
+      width: target.size.x,
+      height: target.size.y,
+      fontSize: target.style.fontSize,
     }
 
     startProps.forEach((_, name) => {
-      target[name] = this._getDiffValue(
+      target.onUpdateStyleProperty(
         name,
-        previousProps[name],
-        currentProps[name],
-        weight,
-        context,
+        this._getDiffValue(
+          name,
+          previousProps[name],
+          currentProps[name],
+          weight,
+          context,
+        ),
+        undefined,
       )
     })
   }
@@ -434,7 +439,7 @@ export class Animation extends TimelineNode {
   cancel(): void {
     this._getTargets().forEach((target) => {
       this._cachedProps.get(target)?.forEach((value, key) => {
-        (target as any)[key] = value
+        target.onUpdateStyleProperty(key, value, undefined)
       })
       this._cachedProps.delete(target)
     })
