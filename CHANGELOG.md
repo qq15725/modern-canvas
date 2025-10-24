@@ -1,3 +1,12 @@
+## [0.12.14](https://github.com/qq15725/modern-canvas/compare/v0.12.13...v0.12.14) (2025-10-24)
+
+
+### Features
+
+* add node2d.pivot / node2d.extraTransform ([d733792](https://github.com/qq15725/modern-canvas/commit/d73379254cc4e248c7b50691dbab63a20c47a561))
+
+
+
 ## [0.12.13](https://github.com/qq15725/modern-canvas/compare/v0.12.12...v0.12.13) (2025-10-24)
 
 
