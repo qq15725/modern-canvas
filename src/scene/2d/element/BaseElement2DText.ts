@@ -72,6 +72,12 @@ export class BaseElement2DText extends CoreObject {
   update(): void {
     this.base.fonts = this.base.fonts ?? this.parent.tree?.fonts
     this.base.update()
+    if (this.useTextureDraw()) {
+      this._texture.width = Math.round(this.base.boundingBox.width)
+      this._texture.height = Math.round(this.base.boundingBox.height)
+      this.base.render({ view: this._texture.source })
+      this._texture.requestUpload()
+    }
     this.parent.requestRedraw()
   }
 
@@ -271,9 +277,6 @@ export class BaseElement2DText extends CoreObject {
   }
 
   protected _textureDraw(ctx: CanvasContext): void {
-    this._texture.width = Math.round(this.base.boundingBox.width)
-    this._texture.height = Math.round(this.base.boundingBox.height)
-    this.base.render({ view: this._texture.source })
     ctx.fillStyle = this._texture
     const { left = 0, top = 0, width, height } = this.base.boundingBox
     ctx.uvTransform = new Transform2D()
