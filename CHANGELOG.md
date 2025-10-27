@@ -1,3 +1,12 @@
+## [0.12.15](https://github.com/qq15725/modern-canvas/compare/v0.12.14...v0.12.15) (2025-10-27)
+
+
+### Bug Fixes
+
+* text redraw ([0f69c32](https://github.com/qq15725/modern-canvas/commit/0f69c32b71876b0d6d549fe92d73fe7bd143ca45))
+
+
+
 ## [0.12.14](https://github.com/qq15725/modern-canvas/compare/v0.12.13...v0.12.14) (2025-10-24)
 
 
