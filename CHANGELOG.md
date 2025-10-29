@@ -1,3 +1,12 @@
+## [0.12.16](https://github.com/qq15725/modern-canvas/compare/v0.12.15...v0.12.16) (2025-10-29)
+
+
+### Bug Fixes
+
+* text rect ([8372f13](https://github.com/qq15725/modern-canvas/commit/8372f13aa5221afd3e2c92d6845ad8f42a69caa3))
+
+
+
 ## [0.12.15](https://github.com/qq15725/modern-canvas/compare/v0.12.14...v0.12.15) (2025-10-27)
 
 
