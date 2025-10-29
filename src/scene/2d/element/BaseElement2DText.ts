@@ -277,12 +277,13 @@ export class BaseElement2DText extends CoreObject {
   }
 
   protected _textureDraw(ctx: CanvasContext): void {
-    ctx.fillStyle = this._texture
     const { left = 0, top = 0, width, height } = this.base.boundingBox
+    ctx.fillStyle = this._texture
     ctx.uvTransform = new Transform2D()
       .translate(-left, -top)
       .scale(1 / width, 1 / height)
     ctx.vertTransform = this._createVertTransform()
+    ctx.rect(left, top, width, height)
     ctx.fill()
   }
 
