@@ -24,8 +24,8 @@ importers:
         specifier: ^1.4.10
         version: 1.4.10
       modern-text:
-        specifier: ^1.10.0
-        version: 1.10.0
+        specifier: ^1.10.1
+        version: 1.10.1
     devDependencies:
       '@antfu/eslint-config':
         specifier: ^6.1.0
@@ -1936,8 +1936,8 @@ packages:
   modern-path2d@1.4.10:
     resolution: {integrity: sha512-D9CI0rjmN7T4+yfchJ7HU7SqEjrdKyQHoFu7vilOePPyZcCuzdvyY+4jZo+ohfFASTAfSxUPs8SlxN6RI+OTRQ==}
 
-  modern-text@1.10.0:
-    resolution: {integrity: sha512-kKMRO9sUKuTPBPHR5MSGiMQGwag1THPqpaVMULVfY5G4B9f4EWfZqLe6hJgKJkKXj9PSYwt6Q8mBJz7qgQrjLA==}
+  modern-text@1.10.1:
+    resolution: {integrity: sha512-hRewTLvdZSfgZofjaOXmN9KFPcCzjJwhKxjJS0QZK7TwVgKmsidqcCOEqXNTZQGG/vBMob6YCKJ0TrD4Twy8vQ==}
 
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
@@ -4766,7 +4766,7 @@ snapshots:
     dependencies:
       earcut: 3.0.2
 
-  modern-text@1.10.0:
+  modern-text@1.10.1:
     dependencies:
       diff: 8.0.2
       modern-font: 0.4.4
