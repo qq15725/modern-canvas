@@ -24,8 +24,8 @@ importers:
         specifier: ^1.4.10
         version: 1.4.10
       modern-text:
-        specifier: ^1.9.2
-        version: 1.9.2
+        specifier: ^1.10.0
+        version: 1.10.0
     devDependencies:
       '@antfu/eslint-config':
         specifier: ^6.1.0
@@ -1162,8 +1162,8 @@ packages:
   earcut@3.0.2:
     resolution: {integrity: sha512-X7hshQbLyMJ/3RPhyObLARM2sNxxmRALLKx1+NVFFnQ9gKzmCrxm9+uLIAdBcvc8FNLpctqlQ2V6AE92Ol9UDQ==}
 
-  electron-to-chromium@1.5.242:
-    resolution: {integrity: sha512-msZ7SYGFpXkm/iUizlMrm/FPNeYo8uSltQccLVFO3fV4RN2JWGdG7Aatztxtw3uDWp3DkupfkrosLjUnhY+iOw==}
+  electron-to-chromium@1.5.243:
+    resolution: {integrity: sha512-ZCphxFW3Q1TVhcgS9blfut1PX8lusVi2SvXQgmEEnK4TCmE1JhH2JkjJN+DNt0pJJwfBri5AROBnz2b/C+YU9g==}
 
   emoji-regex@10.6.0:
     resolution: {integrity: sha512-toUI84YS5YmxW219erniWD0CIVOo46xGKColeNQRgOzDorgBi1v4D71/OFzgD9GO2UGKIv1C3Sp8DAn0+j5w7A==}
@@ -1936,8 +1936,8 @@ packages:
   modern-path2d@1.4.10:
     resolution: {integrity: sha512-D9CI0rjmN7T4+yfchJ7HU7SqEjrdKyQHoFu7vilOePPyZcCuzdvyY+4jZo+ohfFASTAfSxUPs8SlxN6RI+OTRQ==}
 
-  modern-text@1.9.2:
-    resolution: {integrity: sha512-I2g8wqHoHyTZzQq5oe4xLZJlV0+3n0KpT90NW5lC1Z4GU212mBjLUiPeY356ehhoH+WDC5/armi/X6t9cZHKzg==}
+  modern-text@1.10.0:
+    resolution: {integrity: sha512-kKMRO9sUKuTPBPHR5MSGiMQGwag1THPqpaVMULVfY5G4B9f4EWfZqLe6hJgKJkKXj9PSYwt6Q8mBJz7qgQrjLA==}
 
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
@@ -3418,7 +3418,7 @@ snapshots:
     dependencies:
       baseline-browser-mapping: 2.8.20
       caniuse-lite: 1.0.30001751
-      electron-to-chromium: 1.5.242
+      electron-to-chromium: 1.5.243
       node-releases: 2.0.26
       update-browserslist-db: 1.1.4(browserslist@4.27.0)
 
@@ -3750,7 +3750,7 @@ snapshots:
 
   earcut@3.0.2: {}
 
-  electron-to-chromium@1.5.242: {}
+  electron-to-chromium@1.5.243: {}
 
   emoji-regex@10.6.0: {}
 
@@ -4766,7 +4766,7 @@ snapshots:
     dependencies:
       earcut: 3.0.2
 
-  modern-text@1.9.2:
+  modern-text@1.10.0:
     dependencies:
       diff: 8.0.2
       modern-font: 0.4.4
