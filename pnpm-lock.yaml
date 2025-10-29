@@ -18,14 +18,14 @@ importers:
         specifier: ^0.4.4
         version: 0.4.4
       modern-idoc:
-        specifier: ^0.10.4
-        version: 0.10.4
+        specifier: ^0.10.5
+        version: 0.10.5
       modern-path2d:
         specifier: ^1.4.10
         version: 1.4.10
       modern-text:
-        specifier: ^1.9.1
-        version: 1.9.1
+        specifier: ^1.9.2
+        version: 1.9.2
     devDependencies:
       '@antfu/eslint-config':
         specifier: ^6.1.0
@@ -1162,8 +1162,8 @@ packages:
   earcut@3.0.2:
     resolution: {integrity: sha512-X7hshQbLyMJ/3RPhyObLARM2sNxxmRALLKx1+NVFFnQ9gKzmCrxm9+uLIAdBcvc8FNLpctqlQ2V6AE92Ol9UDQ==}
 
-  electron-to-chromium@1.5.241:
-    resolution: {integrity: sha512-ILMvKX/ZV5WIJzzdtuHg8xquk2y0BOGlFOxBVwTpbiXqWIH0hamG45ddU4R3PQ0gYu+xgo0vdHXHli9sHIGb4w==}
+  electron-to-chromium@1.5.242:
+    resolution: {integrity: sha512-msZ7SYGFpXkm/iUizlMrm/FPNeYo8uSltQccLVFO3fV4RN2JWGdG7Aatztxtw3uDWp3DkupfkrosLjUnhY+iOw==}
 
   emoji-regex@10.6.0:
     resolution: {integrity: sha512-toUI84YS5YmxW219erniWD0CIVOo46xGKColeNQRgOzDorgBi1v4D71/OFzgD9GO2UGKIv1C3Sp8DAn0+j5w7A==}
@@ -1927,8 +1927,8 @@ packages:
   modern-gif@2.0.4:
     resolution: {integrity: sha512-q3Nf6X3kpnGwiKLzTzOjsbvM16/kPcfy0JrrC79TmuKLCWiOkwb0ztuVhZnqGCizSr4o84gFOaBeGDVaE/Bcgw==}
 
-  modern-idoc@0.10.4:
-    resolution: {integrity: sha512-zgiz4xW7uAwHolmPFvDtQIU2EvoHGBL783NwihyEW1NnZo1qHo1XE+C6ZLy3x3VbCJfzvgNlZFBuA/rMMM2NEA==}
+  modern-idoc@0.10.5:
+    resolution: {integrity: sha512-k/2uwXP/XzjIua193E+9dihqFQPes70JWO99tZ2Wohaga7Sll9W1CtxmQC2N6gvr2NK3mDliJdxjwjbWd6DOlA==}
 
   modern-palette@2.0.0:
     resolution: {integrity: sha512-wKZcom2QzK6sS6h5RLYHEkd3V3maQLzgkI+ekDCimlk7dfXa63aekZcy+7KS+8JEqIDeY/yV1CAvA7l+7u6QHA==}
@@ -1936,8 +1936,8 @@ packages:
   modern-path2d@1.4.10:
     resolution: {integrity: sha512-D9CI0rjmN7T4+yfchJ7HU7SqEjrdKyQHoFu7vilOePPyZcCuzdvyY+4jZo+ohfFASTAfSxUPs8SlxN6RI+OTRQ==}
 
-  modern-text@1.9.1:
-    resolution: {integrity: sha512-lt8TUql0oquGP9SbHMUdsjNhjMnGTDx21uqKVHni+IhOY4UB1v4moLMDRFk0rEReXlKrlmtiICriLfpSn9Kyrw==}
+  modern-text@1.9.2:
+    resolution: {integrity: sha512-I2g8wqHoHyTZzQq5oe4xLZJlV0+3n0KpT90NW5lC1Z4GU212mBjLUiPeY356ehhoH+WDC5/armi/X6t9cZHKzg==}
 
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
@@ -3418,7 +3418,7 @@ snapshots:
     dependencies:
       baseline-browser-mapping: 2.8.20
       caniuse-lite: 1.0.30001751
-      electron-to-chromium: 1.5.241
+      electron-to-chromium: 1.5.242
       node-releases: 2.0.26
       update-browserslist-db: 1.1.4(browserslist@4.27.0)
 
@@ -3750,7 +3750,7 @@ snapshots:
 
   earcut@3.0.2: {}
 
-  electron-to-chromium@1.5.241: {}
+  electron-to-chromium@1.5.242: {}
 
   emoji-regex@10.6.0: {}
 
@@ -4755,7 +4755,7 @@ snapshots:
     dependencies:
       modern-palette: 2.0.0
 
-  modern-idoc@0.10.4:
+  modern-idoc@0.10.5:
     dependencies:
       colord: 2.9.3
       nanoid: 5.1.6
@@ -4766,11 +4766,11 @@ snapshots:
     dependencies:
       earcut: 3.0.2
 
-  modern-text@1.9.1:
+  modern-text@1.9.2:
     dependencies:
       diff: 8.0.2
       modern-font: 0.4.4
-      modern-idoc: 0.10.4
+      modern-idoc: 0.10.5
       modern-path2d: 1.4.10
 
   ms@2.1.3: {}
