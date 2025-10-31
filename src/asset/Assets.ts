@@ -118,13 +118,27 @@ export class Assets extends Observable<AssetsEvents> {
       }
       return new Promise<HTMLImageElement>((resolve) => {
         const img = new Image()
-        img.src = url
+        img.onerror = () => {
+          console.warn(`Failed load image error: ${url}`)
+          resolve(img)
+        }
         img.onload = () => {
           img.decode().finally(() => {
             resolve(img)
           })
         }
-      }).then(img => createImageBitmap(img, options))
+        img.src = url
+      }).then((img) => {
+        if (img.complete && img.naturalWidth && img.naturalHeight) {
+          return createImageBitmap(img, options)
+        }
+        else {
+          const canvas = document.createElement('canvas')
+          canvas.width = 1
+          canvas.height = 1
+          return createImageBitmap(canvas)
+        }
+      })
     }
   }
 
