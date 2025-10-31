@@ -1,3 +1,17 @@
+## [0.12.20](https://github.com/qq15725/modern-canvas/compare/v0.12.19...v0.12.20) (2025-10-31)
+
+
+### Bug Fixes
+
+* assets load ([1817194](https://github.com/qq15725/modern-canvas/commit/1817194addf95ae1ccda3350b271aee2458228c1))
+
+
+### Features
+
+* up deps ([9bb859b](https://github.com/qq15725/modern-canvas/commit/9bb859b8b85bba87f7ace74677629ea6b4e454c8))
+
+
+
 ## [0.12.19](https://github.com/qq15725/modern-canvas/compare/v0.12.18...v0.12.19) (2025-10-29)
 
 
