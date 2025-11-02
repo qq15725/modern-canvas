@@ -74,10 +74,13 @@ export class BaseElement2DText extends CoreObject {
     this.base.fonts = this.base.fonts ?? this.parent.tree?.fonts
     this.base.update()
     if (this.useTextureDraw()) {
+      this._texture.width = Math.round(this.base.boundingBox.width)
+      this._texture.height = Math.round(this.base.boundingBox.height)
       this.base.render({
         view: this._texture.source,
+        pixelRatio: this._texture.pixelRatio,
       })
-      this._texture.updateSize()
+      this._texture.requestUpload()
     }
     this.parent.requestRedraw()
   }
@@ -294,6 +297,7 @@ export class BaseElement2DText extends CoreObject {
         .scale(1 / width, 1 / height),
       vertTransform: this._createVertTransform(),
     })
+    console.log(width, height)
   }
 
   draw(): void {
