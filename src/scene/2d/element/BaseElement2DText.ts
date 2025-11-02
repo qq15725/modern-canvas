@@ -297,7 +297,6 @@ export class BaseElement2DText extends CoreObject {
         .scale(1 / width, 1 / height),
       vertTransform: this._createVertTransform(),
     })
-    console.log(width, height)
   }
 
   draw(): void {
