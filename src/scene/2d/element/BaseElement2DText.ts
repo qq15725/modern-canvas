@@ -1,4 +1,5 @@
-import type { NormalizedFill, NormalizedOutline, TextContent, Text as TextProperties } from 'modern-idoc'
+import type { Fonts } from 'modern-font'
+import type { NormalizedFill, NormalizedOutline, NormalizedText, TextContent, Text as TextProperties } from 'modern-idoc'
 import type { MeasureResult } from 'modern-text'
 import type { CanvasContext } from '../../main'
 import type { Texture2D } from '../../resources'
@@ -15,13 +16,13 @@ export type TextDrawMode = 'auto' | 'texture' | 'path'
 
 export class BaseElement2DText extends CoreObject {
   @property({ fallback: true }) declare enabled: boolean
-  @property({ fallback: () => [] }) declare content: Text['content']
-  @property({ alias: 'parent.style.json' }) declare style: Text['style']
-  @property() declare effects: Text['effects']
-  @property() declare fill: Text['fill']
-  @property() declare outline: Text['outline']
-  @property({ alias: 'base.measureDom' }) declare measureDom: Text['measureDom']
-  @property({ alias: 'base.fonts' }) declare fonts: Text['fonts']
+  @property({ fallback: () => [] }) declare content: NormalizedText['content']
+  @property({ alias: 'parent.style.json' }) declare style: NormalizedText['style']
+  @property() declare effects: NormalizedText['effects']
+  @property() declare fill: NormalizedText['fill']
+  @property() declare outline: NormalizedText['outline']
+  @property({ alias: 'base.measureDom' }) declare measureDom: HTMLElement
+  @property({ alias: 'base.fonts' }) declare fonts: Fonts
   @property({ fallback: 'auto' }) declare drawMode: TextDrawMode
 
   readonly base: Text
@@ -73,10 +74,10 @@ export class BaseElement2DText extends CoreObject {
     this.base.fonts = this.base.fonts ?? this.parent.tree?.fonts
     this.base.update()
     if (this.useTextureDraw()) {
-      this._texture.width = Math.round(this.base.boundingBox.width)
-      this._texture.height = Math.round(this.base.boundingBox.height)
-      this.base.render({ view: this._texture.source })
-      this._texture.requestUpload()
+      this.base.render({
+        view: this._texture.source,
+      })
+      this._texture.updateSize()
     }
     this.parent.requestRedraw()
   }
@@ -214,17 +215,20 @@ export class BaseElement2DText extends CoreObject {
                 )
                 ctx.addPath(path)
                 ctx.style = { ...path.style }
-                ctx.uvTransform = uvTransform
                 ctx.fillStyle = texture?.texture ?? fill.color
-                ctx.vertTransform = this._createVertTransform()
-                ctx.fill({ disableWrapMode })
+                ctx.fill({
+                  uvTransform,
+                  vertTransform: this._createVertTransform(),
+                  disableWrapMode,
+                })
               }
             }
             else {
               ctx.addPath(path)
               ctx.style = { ...path.style }
-              ctx.vertTransform = this._createVertTransform()
-              ctx.fill()
+              ctx.fill({
+                vertTransform: this._createVertTransform(),
+              })
             }
           }
 
@@ -250,27 +254,31 @@ export class BaseElement2DText extends CoreObject {
                 ctx.addPath(path)
                 ctx.style = { ...path.style }
                 ctx.lineWidth = outline.width || 1
-                ctx.uvTransform = uvTransform
                 ctx.strokeStyle = texture?.texture ?? outline.color
                 ctx.lineCap = outline.lineCap
                 ctx.lineJoin = outline.lineJoin
-                ctx.vertTransform = this._createVertTransform()
-                ctx.stroke({ disableWrapMode })
+                ctx.stroke({
+                  uvTransform,
+                  vertTransform: this._createVertTransform(),
+                  disableWrapMode,
+                })
               }
             }
             else {
               ctx.addPath(path)
               ctx.style = { ...path.style }
-              ctx.vertTransform = this._createVertTransform()
-              ctx.stroke()
+              ctx.stroke({
+                vertTransform: this._createVertTransform(),
+              })
             }
           }
         }
         else {
           ctx.addPath(path)
           ctx.style = { ...path.style }
-          ctx.vertTransform = this._createVertTransform()
-          ctx.fill()
+          ctx.fill({
+            vertTransform: this._createVertTransform(),
+          })
         }
       })
     })
@@ -279,12 +287,13 @@ export class BaseElement2DText extends CoreObject {
   protected _textureDraw(ctx: CanvasContext): void {
     const { left = 0, top = 0, width, height } = this.base.boundingBox
     ctx.fillStyle = this._texture
-    ctx.uvTransform = new Transform2D()
-      .translate(-left, -top)
-      .scale(1 / width, 1 / height)
-    ctx.vertTransform = this._createVertTransform()
     ctx.rect(left, top, width, height)
-    ctx.fill()
+    ctx.fill({
+      uvTransform: new Transform2D()
+        .translate(-left, -top)
+        .scale(1 / width, 1 / height),
+      vertTransform: this._createVertTransform(),
+    })
   }
 
   draw(): void {

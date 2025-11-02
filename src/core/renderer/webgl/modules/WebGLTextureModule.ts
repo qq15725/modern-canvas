@@ -9,6 +9,7 @@ export class WebGLTextureModule extends WebGLModule {
     renderer.texture = this
   }
 
+  maxTextureSize = 0
   maxUnits = 0
   boundLocation: WebGLTextureLocation = 0
   boundTarget: WebGLTextureTarget = 'texture_2d'
@@ -22,6 +23,7 @@ export class WebGLTextureModule extends WebGLModule {
     super.onUpdateContext()
     const gl = this.gl
 
+    this.maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE)
     this.maxUnits = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS)
     for (let i = 0; i < this.maxUnits; i++) {
       this.boundTextures[i] = { texture_2d: null, texture_cube_map: null }

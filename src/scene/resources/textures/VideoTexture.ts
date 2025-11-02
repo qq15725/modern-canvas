@@ -147,7 +147,7 @@ export class VideoTexture extends Texture2D<HTMLVideoElement> {
     const valid = this.isValid()
 
     this._nextTime = 0
-    this._updateSize()
+    this.updateSize()
     this.requestUpload()
     this._nextTime = 0
 

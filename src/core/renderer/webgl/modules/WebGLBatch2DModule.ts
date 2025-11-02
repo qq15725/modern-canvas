@@ -8,7 +8,7 @@ export interface Batchable2D {
   vertices: Float32Array
   indices: Float32Array
   uvs?: Float32Array
-  dimension?: Float32Array
+  size?: Float32Array
   texture?: WebGLTexture
   backgroundColor?: number[]
   modulate?: number[]
@@ -51,7 +51,7 @@ export class WebGLBatch2DModule extends WebGLModule {
   protected _attributes: Record<string, Partial<WebGLVertexAttrib>> = {
     aTextureId: { size: 1, normalized: true, type: 'float' }, // 1
     aPosition: { size: 2, normalized: false, type: 'float' }, // 2
-    aDimension: { size: 2, normalized: false, type: 'float' }, // 2
+    aSize: { size: 2, normalized: false, type: 'float' }, // 2
     aUv: { size: 2, normalized: false, type: 'float' }, // 2
     aModulate: { size: 4, normalized: true, type: 'unsigned_byte' }, // 1
     aBackgroundColor: { size: 4, normalized: true, type: 'unsigned_byte' }, // 1
@@ -75,7 +75,7 @@ export class WebGLBatch2DModule extends WebGLModule {
       vert: `precision highp float;
 attribute float aTextureId;
 attribute vec2 aPosition;
-attribute vec2 aDimension;
+attribute vec2 aSize;
 attribute vec2 aUv;
 attribute vec4 aModulate;
 attribute vec4 aBackgroundColor;
@@ -86,7 +86,7 @@ uniform mat3 viewMatrix;
 uniform vec4 modulate;
 
 varying float vTextureId;
-varying vec2 vDimension;
+varying vec2 vSize;
 varying vec2 vUv;
 varying vec4 vModulate;
 varying vec4 vBackgroundColor;
@@ -97,7 +97,7 @@ void main(void) {
   gl_Position = vec4(pos3.xy, 0.0, 1.0);
 
   vTextureId = aTextureId;
-  vDimension = aDimension;
+  vSize = aSize;
   vUv = aUv;
   vModulate = aModulate * modulate;
   vBackgroundColor = aBackgroundColor;
@@ -105,7 +105,7 @@ void main(void) {
 }`,
       frag: `precision highp float;
 varying float vTextureId;
-varying vec2 vDimension;
+varying vec2 vSize;
 varying vec2 vUv;
 varying vec4 vModulate;
 varying vec4 vBackgroundColor;
@@ -119,9 +119,9 @@ uniform vec2 translate;
 void main(void) {
   vec2 uv = vUv;
 
-  if (vDimension.x > 0.0 && vDimension.y > 0.0) {
-    uv = floor(uv * vDimension);
-    uv = uv / vDimension;
+  if (vSize.x > 0.0 && vSize.y > 0.0) {
+    uv = floor(uv * vSize);
+    uv = uv / vSize;
   }
 
   vec4 color = vec4(0.0, 0.0, 0.0, 0.0);
@@ -277,13 +277,16 @@ void main(void) {
             indices,
             vertices,
             uvs = new Float32Array(0),
-            dimension = new Float32Array(0),
+            size = new Float32Array(0),
             texture,
             modulate = this._defaultModulate,
             backgroundColor = this._defaultBackgroundColor,
             blendMode = WebGLBlendMode.NORMAL,
             disableWrapMode = false,
           } = batchables[i]
+
+          const width = size[0] || 0
+          const height = size[1] || 0
 
           if (start < i && drawCall.blendMode !== blendMode) {
             drawCall.count = iIndex - drawCall.first
@@ -303,8 +306,8 @@ void main(void) {
             float32View[aIndex++] = textureLocation
             float32View[aIndex++] = vertices[i]
             float32View[aIndex++] = vertices[i + 1]
-            float32View[aIndex++] = dimension[0]
-            float32View[aIndex++] = dimension[1]
+            float32View[aIndex++] = width
+            float32View[aIndex++] = height
             float32View[aIndex++] = uvs[i]
             float32View[aIndex++] = uvs[i + 1]
             if (modulate) {

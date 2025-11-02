@@ -126,12 +126,12 @@ export class CanvasContext extends Path2D {
     }
 
     this._draws.push({
+      uvTransform: this.uvTransform,
+      vertTransform: this.vertTransform,
       ...options,
       ...this._parseDrawStyle(fillStyle),
       type: 'fill',
       path: new Path2D(this),
-      uvTransform: this.uvTransform,
-      vertTransform: this.vertTransform,
     })
 
     this.resetStatus()
@@ -231,8 +231,6 @@ export class CanvasContext extends Path2D {
         this.buildUvs(0, vertices, uvs, current.texture, current.uvTransform)
       }
 
-      const box = current.path.getBoundingBox()
-
       batchables.push({
         vertices: new Float32Array(vertices),
         indices: new Float32Array(indices),
@@ -243,7 +241,6 @@ export class CanvasContext extends Path2D {
         disableWrapMode: current.disableWrapMode,
         uvTransform: current.uvTransform,
         vertTransform: current.vertTransform,
-        dimension: new Float32Array([box.width, box.height]),
       })
     }
 

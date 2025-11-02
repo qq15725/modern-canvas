@@ -40,7 +40,7 @@ export class Texture2D<T extends Texture2DSource = Texture2DSource> extends Reso
   constructor(source: T) {
     super()
     this.source = source
-    this._updateSize()
+    this.updateSize()
   }
 
   isValid(): boolean {
@@ -81,7 +81,7 @@ export class Texture2D<T extends Texture2DSource = Texture2DSource> extends Reso
         this._updatePOT()
         break
       case 'source':
-        this._updateSize()
+        this.updateSize()
         break
       case 'filterMode':
       case 'wrapMode':
@@ -96,7 +96,7 @@ export class Texture2D<T extends Texture2DSource = Texture2DSource> extends Reso
     this.requestUpload()
   }
 
-  protected _updateSize(): void {
+  updateSize(): void {
     const source = this.source as any
     if ('pixels' in source) {
       this.width = source.width / this.pixelRatio

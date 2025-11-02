@@ -102,19 +102,18 @@ export class BaseElement2DFill extends CoreObject {
   }
 
   draw(): void {
+    const { width, height } = this.parent.size
     const ctx = this.parent.context
     const { uvTransform, disableWrapMode } = getDrawOptions(
-      this, {
-        width: this.parent.size.width,
-        height: this.parent.size.height,
-      },
+      this, { width, height },
     )
-    ctx.uvTransform = uvTransform
     ctx.fillStyle = this.animatedTexture?.currentFrame.texture
       ?? this.texture
       ?? this.color
     ctx.fill({
+      uvTransform,
       disableWrapMode,
+      size: new Float32Array([width, height]),
     })
   }
 
