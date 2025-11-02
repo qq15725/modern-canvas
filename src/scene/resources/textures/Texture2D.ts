@@ -103,8 +103,8 @@ export class Texture2D<T extends Texture2DSource = Texture2DSource> extends Reso
       this.height = source.height / this.pixelRatio
     }
     else {
-      this.width = Math.round((source.naturalWidth || source.videoWidth || source.width || 0) / this.pixelRatio)
-      this.height = Math.round((source.naturalHeight || source.videoHeight || source.height || 0) / this.pixelRatio)
+      this.width = Number(source.naturalWidth || source.videoWidth || source.width || 0) / this.pixelRatio
+      this.height = Number(source.naturalHeight || source.videoHeight || source.height || 0) / this.pixelRatio
     }
     this.requestUpload()
   }
