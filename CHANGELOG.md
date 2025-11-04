@@ -1,3 +1,12 @@
+## [0.12.22](https://github.com/qq15725/modern-canvas/compare/v0.12.21...v0.12.22) (2025-11-04)
+
+
+### Features
+
+* up deps ([ae408fb](https://github.com/qq15725/modern-canvas/commit/ae408fbf1081d6136a0e4be29f7230ec38f5d841))
+
+
+
 ## [0.12.21](https://github.com/qq15725/modern-canvas/compare/v0.12.20...v0.12.21) (2025-11-02)
 
 
