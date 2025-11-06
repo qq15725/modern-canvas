@@ -16,12 +16,15 @@ export class LottieLoader extends Loader {
         },
         loop: false,
         autoplay: false,
-        animationData: await assets.fetch(url).then(rep => rep.json()),
+        animationData: await assets.loadBy(
+          url,
+          () => assets.fetch(url).then(rep => rep.json()),
+        ),
       })
     }
 
     this.load = (url, canvas) => {
-      return assets.loadBy(url, () => handler(url, canvas))
+      return handler(url, canvas)
     }
 
     [

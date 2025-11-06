@@ -10,7 +10,7 @@ export interface RenderOptions {
   fonts?: Fonts
   keyframes?: number[]
   onBefore?: (engine: Engine) => void | Promise<void>
-  onFrame?: (frame: Uint8ClampedArray<ArrayBuffer>, ctx: {
+  onKeyframe?: (frame: Uint8ClampedArray<ArrayBuffer>, ctx: {
     currentTime: number
     duration: number
     progress: number
@@ -52,7 +52,7 @@ async function task(options: RenderOptions): Promise<HTMLCanvasElement> {
     data,
     keyframes = [],
     onBefore,
-    onFrame,
+    onKeyframe,
   } = options
 
   engine ??= new Engine({
@@ -81,27 +81,30 @@ async function task(options: RenderOptions): Promise<HTMLCanvasElement> {
   // render
   await onBefore?.(engine)
   await engine.waitAndRender()
-  await new Promise<void>((resolve) => {
-    let i = 0
-    const len = keyframes.length
-    const last = keyframes[len - 1]
-    async function handle(): Promise<void> {
-      if (i === len)
-        return resolve()
-      const currentTime = keyframes[i++]
-      const next = keyframes[i] || currentTime
-      const duration = next - currentTime
-      engine!.timeline.currentTime = currentTime
-      engine!.render()
-      await onFrame?.(engine!.toPixels(), {
-        currentTime,
-        duration,
-        progress: currentTime / last,
-      })
-      requestAnimationFrame(handle)
-    }
-    handle()
-  })
+
+  if (keyframes.length) {
+    await new Promise<void>((resolve) => {
+      let i = 0
+      const len = keyframes.length
+      const last = keyframes[len - 1]
+      async function handle(): Promise<void> {
+        if (i === len)
+          return resolve()
+        const currentTime = keyframes[i++]
+        const next = keyframes[i] || currentTime
+        const duration = next - currentTime
+        engine!.timeline.currentTime = currentTime
+        engine!.render()
+        await onKeyframe?.(engine!.toPixels(), {
+          currentTime,
+          duration,
+          progress: last !== 0 ? currentTime / last : 1,
+        })
+        requestAnimationFrame(handle)
+      }
+      handle()
+    })
+  }
 
   return engine.toCanvas2D()
 }
