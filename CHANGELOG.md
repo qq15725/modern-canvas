@@ -1,3 +1,18 @@
+# [0.13.0](https://github.com/qq15725/modern-canvas/compare/v0.12.22...v0.13.0) (2025-11-06)
+
+
+### Bug Fixes
+
+* lottie loader ([ac508bf](https://github.com/qq15725/modern-canvas/commit/ac508bfe6ea9cad24b6503f68369900aeb8dba5c))
+* position compensation after camera zoom ([f9f8c33](https://github.com/qq15725/modern-canvas/commit/f9f8c33fab80dc800e65c139a55acbd1246f11e9))
+
+
+### Features
+
+* up deps ([5d0fc07](https://github.com/qq15725/modern-canvas/commit/5d0fc078d04c239b8e829fe29cc1d23eddb7896f))
+
+
+
 ## [0.12.22](https://github.com/qq15725/modern-canvas/compare/v0.12.21...v0.12.22) (2025-11-04)
 
 
