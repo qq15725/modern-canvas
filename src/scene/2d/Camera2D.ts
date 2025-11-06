@@ -9,7 +9,7 @@ import type {
 import type { Node } from '../main'
 import type { Node2DEvents, Node2DProperties } from './Node2D'
 import { property } from 'modern-idoc'
-import { clamp, customNode, Vector2 } from '../../core'
+import { clamp, customNode, Transform2D, Vector2 } from '../../core'
 import { Node2D } from './Node2D'
 
 export interface Camera2DProperties extends Node2DProperties {
@@ -38,9 +38,10 @@ export class Camera2D extends Node2D {
   @property({ fallback: 0.02 }) declare wheelSensitivity: number
   @property({ internal: true, fallback: false }) declare spaceKey: boolean
   @property({ internal: true, fallback: false }) declare grabbing: boolean
+  readonly canvasTransform = new Transform2D()
   protected _screenOffset = { x: 0, y: 0 }
 
-  protected _zoom = new Vector2(1, 1).on('update', () => this.updateCanvasTransform())
+  protected _zoom = new Vector2(1, 1).on('update', () => this.updateTransform())
   get zoom(): Vector2 { return this._zoom }
   set zoom(val: Vector2Data) { this._zoom.set(val.x, val.y) }
 
@@ -126,8 +127,8 @@ export class Camera2D extends Node2D {
       const e = event as PointerInputEvent
       if (this.grabbing) {
         this.position.add(
-          -(this._screenOffset.x - e.screenX),
-          -(this._screenOffset.y - e.screenY),
+          this._screenOffset.x - e.screenX,
+          this._screenOffset.y - e.screenY,
         )
         this._screenOffset = { x: e.screenX, y: e.screenY }
       }
@@ -157,18 +158,19 @@ export class Camera2D extends Node2D {
 
       if (!isTouchPad) {
         e.preventDefault()
-        const oldZoom = this._zoom.x
+        const oldScreen = { x: e.screenX, y: e.screenY }
+        const oldGlobal = this.toGlobal(oldScreen)
         this.zoomWithWheel(e.deltaY)
-        const ratio = 1 - this._zoom.x / oldZoom
+        const newScreen = this.toScreen(oldGlobal)
         this.position.add(
-          (e.screenX - this.position.x) * ratio,
-          (e.screenY - this.position.y) * ratio,
+          newScreen.x - oldScreen.x,
+          newScreen.y - oldScreen.y,
         )
       }
     }
     else {
       e.preventDefault()
-      this.position.add(-e.deltaX, -e.deltaY)
+      this.position.add(e.deltaX, e.deltaY)
     }
   }
 
@@ -185,36 +187,22 @@ export class Camera2D extends Node2D {
   }
 
   updateCanvasTransform(): void {
-    const viewport = this.getViewport()
-
-    if (!viewport)
-      return
-
-    viewport
-      .canvasTransform
+    this.canvasTransform
       .identity()
       .scale(this._zoom.x, this._zoom.y)
-      .translate(this.position.x, this.position.y)
+      .premultiply(this.transform.affineInverse())
+
+    this.getViewport()?.canvasTransform.copy(this.canvasTransform)
 
     this.emit('updateCanvasTransform')
   }
 
   toGlobal<P extends Vector2Data = Vector2>(screenPos: Vector2Data, newPos?: P): P {
-    const viewport = this.getViewport()
-
-    if (!viewport)
-      throw new Error('Failed to toGlobal, viewport is empty')
-
-    return viewport.toCanvasGlobal(screenPos, newPos)
+    return this.canvasTransform.applyAffineInverse(screenPos, newPos)
   }
 
   toScreen<P extends Vector2Data = Vector2>(globalPos: Vector2Data, newPos?: P): P {
-    const viewport = this.getViewport()
-
-    if (!viewport)
-      throw new Error('Failed to toScreen, viewport is empty')
-
-    return viewport.toCanvasScreen(globalPos, newPos)
+    return this.canvasTransform.apply(globalPos, newPos)
   }
 
   override toJSON(): Record<string, any> {

@@ -16,13 +16,14 @@ engine.on('pointerdown', (e) => {
   console.warn(e.target?.toJSON())
 })
 
+const camera = new Camera2D({
+  internalMode: 'front',
+})
+
+;(window as any).camera = camera
 ;(window as any).engine = engine
 
-engine.root.append(
-  new Camera2D({
-    internalMode: 'front',
-  }),
-)
+engine.root.append(camera)
 
 engine.root.append(
   new DrawboardEffect({
