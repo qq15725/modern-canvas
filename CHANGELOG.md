@@ -1,3 +1,19 @@
+## [0.13.1](https://github.com/qq15725/modern-canvas/compare/v0.13.0...v0.13.1) (2025-11-11)
+
+
+### Bug Fixes
+
+* wheel zoom ([2a44c10](https://github.com/qq15725/modern-canvas/commit/2a44c105cf664c79fe953c9f83c81996b7104fc4))
+
+
+### Features
+
+* pixelate ([cd9744f](https://github.com/qq15725/modern-canvas/commit/cd9744fc43a594517d0832538ee6f2c020cb2ac6))
+* watermark ([9e10015](https://github.com/qq15725/modern-canvas/commit/9e1001566fa89880c468b89d7d8d9fe169444a8e))
+* watermark / checkerboardStyle ([5966c4c](https://github.com/qq15725/modern-canvas/commit/5966c4c8add0e93cba804cfdbedfa14636f530f5))
+
+
+
 # [0.13.0](https://github.com/qq15725/modern-canvas/compare/v0.12.22...v0.13.0) (2025-11-06)
 
 
