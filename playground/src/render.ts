@@ -1,5 +1,5 @@
 import { fonts } from 'modern-font'
-import { render } from '../../src'
+import { DrawboardEffect, render } from '../../src'
 
 async function init(): Promise<void> {
   await fonts.loadFallbackFont({ family: 'fallbackFont', src: '/fonts/AaHouDiHei.woff' })
@@ -24,6 +24,15 @@ async function init(): Promise<void> {
     onKeyframe: (frame, { progress }) => {
       ctx2d.putImageData(new ImageData(frame, width, height), 0, 0)
       console.warn(progress)
+    },
+    onBefore: (engine) => {
+      engine.root.append(
+        new DrawboardEffect({
+          internalMode: 'back',
+          effectMode: 'before',
+          watermark: '/example.jpg',
+        }),
+      )
     },
   })
 }

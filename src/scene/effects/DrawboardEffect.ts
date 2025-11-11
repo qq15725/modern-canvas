@@ -17,6 +17,7 @@ export interface DrawboardEffectProperties extends EffectProperties {
   watermark?: string
   watermarkWidth?: number
   watermarkAlpha?: number
+  watermarkRotation?: number
 }
 
 @customNode('DrawboardEffect')
