@@ -4,19 +4,17 @@ import type {
   KeyboardInputEvent,
   PointerInputEvent,
   Vector2Data,
-  WheelInputEvent,
-} from '../../core'
+  WheelInputEvent } from '../../core'
 import type { Node } from '../main'
 import type { Node2DEvents, Node2DProperties } from './Node2D'
 import { property } from 'modern-idoc'
-import { clamp, customNode, Transform2D, Vector2 } from '../../core'
+import { clamp, customNode, IN_MAC_OS, Transform2D, Vector2 } from '../../core'
 import { Node2D } from './Node2D'
 
 export interface Camera2DProperties extends Node2DProperties {
   zoom?: Vector2Data
   minZoom?: Vector2Data
   maxZoom?: Vector2Data
-  wheelSensitivity?: number
 }
 
 export interface Camera2DEvents extends Node2DEvents {
@@ -35,7 +33,6 @@ export interface Camera2D {
   renderMode: 'disabled',
 })
 export class Camera2D extends Node2D {
-  @property({ fallback: 0.02 }) declare wheelSensitivity: number
   @property({ internal: true, fallback: false }) declare spaceKey: boolean
   @property({ internal: true, fallback: false }) declare grabbing: boolean
   readonly canvasTransform = new Transform2D()
@@ -151,22 +148,18 @@ export class Camera2D extends Node2D {
   }
 
   protected _onWheel(e: WheelInputEvent): void {
-    if (e.ctrlKey) {
-      const isTouchPad = (e as any).wheelDeltaY
-        ? Math.abs(Math.abs((e as any).wheelDeltaY) - Math.abs(3 * e.deltaY)) < 3
-        : e.deltaMode === 0
-
-      if (!isTouchPad) {
-        e.preventDefault()
-        const oldScreen = { x: e.screenX, y: e.screenY }
-        const oldGlobal = this.toGlobal(oldScreen)
-        this.zoomWithWheel(e.deltaY)
-        const newScreen = this.toScreen(oldGlobal)
-        this.position.add(
-          newScreen.x - oldScreen.x,
-          newScreen.y - oldScreen.y,
-        )
-      }
+    if (e.ctrlKey || e.metaKey) {
+      e.preventDefault()
+      const oldScreen = { x: e.screenX, y: e.screenY }
+      const oldGlobal = this.toGlobal(oldScreen)
+      const factor = e.ctrlKey && IN_MAC_OS ? 10 : 1
+      const delta = -e.deltaY * (e.deltaMode === 1 ? 0.05 : e.deltaMode ? 1 : 0.002) * factor
+      this.zoomWithWheel(delta)
+      const newScreen = this.toScreen(oldGlobal)
+      this.position.add(
+        newScreen.x - oldScreen.x,
+        newScreen.y - oldScreen.y,
+      )
     }
     else {
       e.preventDefault()
@@ -174,10 +167,9 @@ export class Camera2D extends Node2D {
     }
   }
 
-  zoomWithWheel(wheelDeltaY: number): void {
+  zoomWithWheel(delta: number): void {
     const logCur = Math.log(this._zoom.x)
-    const logDelta = -wheelDeltaY * this.wheelSensitivity
-    const logNew = logCur + logDelta
+    const logNew = logCur + delta
     this.setZoom(Math.exp(logNew))
   }
 

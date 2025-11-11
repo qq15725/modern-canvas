@@ -14,6 +14,7 @@ export const SUPPORTS_WEBKIT_OFFLINE_AUDIO_CONTEXT = 'webkitOfflineAudioContext'
 export const SUPPORTS_WEB_AUDIO = SUPPORTS_AUDIO_CONTEXT || SUPPORTS_WEBKIT_AUDIO_CONTEXT
 
 export const IN_BROWSER = typeof window !== 'undefined'
+export const IN_MAC_OS = typeof navigator !== 'undefined' && navigator?.userAgent?.indexOf('Mac') >= 0
 export const DEVICE_PIXEL_RATIO = globalThis.devicePixelRatio || 1
 
 export const isElementNode = (node: unknown): node is Element => node !== null && typeof node === 'object' && (node as any).nodeType === 1 // Node.ELEMENT_NODE
