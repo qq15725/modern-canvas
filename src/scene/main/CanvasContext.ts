@@ -235,6 +235,7 @@ export class CanvasContext extends Path2D {
         vertices: new Float32Array(vertices),
         indices: new Float32Array(indices),
         uvs: new Float32Array(uvs),
+        size: current.size,
         texture: current.texture,
         backgroundColor: current.backgroundColor,
         type: current.type,

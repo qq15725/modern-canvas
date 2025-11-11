@@ -203,11 +203,14 @@ export class CanvasItem extends TimelineNode {
   protected override _render(renderer: WebGLRenderer): void {
     this._updateBatchables()
 
+    const pixelate = this._tree?.pixelate
+
     this._batchables.forEach((batchable) => {
       batchable.texture?.upload(renderer)
 
       renderer.batch2D.render({
         ...batchable,
+        size: pixelate ? batchable.size : undefined,
         texture: batchable.texture?._glTexture(renderer),
       })
     })

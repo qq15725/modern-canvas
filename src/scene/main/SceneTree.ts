@@ -37,6 +37,7 @@ export interface SceneTree {
 }
 
 export interface SceneTreeProperties extends MainLoopProperties {
+  pixelate: boolean
   backgroundColor: Hex8Color
   // internal
   debug: boolean
@@ -46,6 +47,7 @@ export interface SceneTreeProperties extends MainLoopProperties {
 }
 
 export class SceneTree extends MainLoop {
+  @property({ fallback: true }) declare pixelate: boolean
   @property() declare backgroundColor?: Hex8Color
   @property({ internal: true, fallback: false }) declare debug: boolean
   @property({ internal: true, fallback: false }) declare processPaused: boolean
