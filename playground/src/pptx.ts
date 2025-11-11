@@ -31,6 +31,7 @@ engine.root.append(
     effectMode: 'before',
     pixelGrid: true,
     checkerboard: true,
+    watermark: '/example.jpg',
   }),
 )
 
