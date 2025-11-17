@@ -15,7 +15,7 @@ import { parseMimeType } from './parseMimeType'
 
 const SUPPORTS_WEAK_REF = 'WeakRef' in globalThis
 
-export type AssetHandler = (url: string, options?: any) => any | Promise<any>
+export type AssetHandler = (blob: Blob, options?: any) => any | Promise<any>
 
 export interface Assets {
   font: FontLoader
@@ -33,7 +33,7 @@ export interface AssetsEvents extends ObservableEvents {
 }
 
 export class Assets extends Observable<AssetsEvents> {
-  defaultHandler: AssetHandler = (url: string) => this.fetch(url)
+  defaultHandler: AssetHandler = (blob: Blob) => blob
   protected _handlers = new Map<string, AssetHandler>()
   protected _handleing = new Map<string, Promise<any>>()
   protected _handled = new Map<string, any | WeakRef<any>>()
@@ -95,22 +95,24 @@ export class Assets extends Observable<AssetsEvents> {
     return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg.outerHTML)}`
   }
 
-  async fetchImageBitmap(url: string, options?: ImageBitmapOptions): Promise<ImageBitmap> {
-    if (url.startsWith('http')) {
-      return await this.fetch(url)
-        .then(rep => rep.blob())
-        .then((blob) => {
-          if (blob.type === 'image/svg+xml') {
-            return blob.text()
-              .then((xml) => {
-                return this.fetchImageBitmap(
-                  this._fixSVG(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(xml)}`),
-                  options,
-                )
-              })
-          }
-          return createImageBitmap(blob, options)
-        })
+  async fetchImageBitmap(url: string | Blob, options?: ImageBitmapOptions): Promise<ImageBitmap> {
+    if (
+      url instanceof Blob
+      || (typeof url === 'string' && url.startsWith('http'))
+    ) {
+      const blob = url instanceof Blob
+        ? url
+        : await this.fetch(url).then(rep => rep.blob())
+      if (blob.type === 'image/svg+xml') {
+        return blob.text()
+          .then((xml) => {
+            return this.fetchImageBitmap(
+              this._fixSVG(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(xml)}`),
+              options,
+            )
+          })
+      }
+      return createImageBitmap(blob, options)
     }
     else {
       if (url.startsWith('data:image/svg+xml;')) {
@@ -127,7 +129,7 @@ export class Assets extends Observable<AssetsEvents> {
             resolve(img)
           })
         }
-        img.src = url
+        img.src = url as string
       }).then((img) => {
         if (img.complete && img.naturalWidth && img.naturalHeight) {
           return createImageBitmap(img, options)
@@ -161,7 +163,10 @@ export class Assets extends Observable<AssetsEvents> {
     this._handled.set(id, handled)
   }
 
-  async loadBy<T>(id: string, handler: () => Promise<T>): Promise<T> {
+  async loadBy<T = Blob>(
+    id: string,
+    handler: () => Promise<T> = () => this.fetch(id).then(rep => rep.blob()) as any,
+  ): Promise<T> {
     const result = this.get<T>(id) ?? this._handleing.get(id)
     if (result)
       return result
@@ -179,11 +184,17 @@ export class Assets extends Observable<AssetsEvents> {
   }
 
   async load<T>(url: string, options?: any): Promise<T> {
-    return this.loadBy(url, async () => {
-      const mimeType = await parseMimeType(url)
-      const handler = this._handlers.get(mimeType) ?? this.defaultHandler
-      return handler(url, options)
-    })
+    const blob = await this.loadBy(url)
+    let mimeType = parseMimeType(url)
+    if (mimeType === undefined) {
+      mimeType = blob.type?.split(';')[0] ?? undefined
+    }
+    const handler = (
+      mimeType
+        ? this._handlers.get(mimeType)
+        : undefined
+    ) ?? this.defaultHandler
+    return handler(blob, options)
   }
 
   async waitUntilLoad(): Promise<void> {

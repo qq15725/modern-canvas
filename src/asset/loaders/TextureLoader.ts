@@ -3,20 +3,22 @@ import { Texture2D } from '../../scene'
 import { Loader } from './Loader'
 
 export class TextureLoader extends Loader {
-  declare load: (url: string) => Promise<Texture2D<ImageBitmap>>
+  declare load: (url: string | Blob) => Promise<Texture2D<ImageBitmap>>
 
   install(assets: Assets): this {
-    const handler = (url: string): Promise<Texture2D<ImageBitmap>> => {
-      return assets.fetchImageBitmap(url, { premultiplyAlpha: 'premultiply' })
+    const handler = (blob: Blob): Promise<Texture2D<ImageBitmap>> => {
+      return assets.fetchImageBitmap(blob, { premultiplyAlpha: 'premultiply' })
         .then(bitmap => new Texture2D(bitmap))
     }
 
     this.load = (url) => {
-      return assets.loadBy(url, () => handler(url))
+      if (typeof url === 'string') {
+        return assets.loadBy(url).then(handler)
+      }
+      return handler(url)
     }
 
     [
-      'image/gif',
       'image/jpeg',
       'image/png',
       'image/tiff',

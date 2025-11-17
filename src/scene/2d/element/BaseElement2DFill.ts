@@ -77,11 +77,17 @@ export class BaseElement2DFill extends CoreObject {
     }
     else if (!isNone(this.image)) {
       this.parent.tree?.log(`load image ${this.image}`)
-      if (this.image.split('?')[0].endsWith('.gif')) {
-        this.animatedTexture = await assets.gif.load(this.image)
+
+      let isGif = this.image.split('?')[0].endsWith('.gif')
+      const blob = await assets.loadBy(this.image)
+      if (!isGif) {
+        isGif = blob.type.startsWith('image/gif') ?? false
+      }
+      if (isGif) {
+        this.animatedTexture = await assets.gif.load(blob)
       }
       else {
-        this.texture = await assets.texture.load(this.image)
+        this.texture = await assets.texture.load(blob)
       }
     }
   }

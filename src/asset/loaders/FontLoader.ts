@@ -3,24 +3,26 @@ import type { Assets } from '../Assets'
 import { Loader } from './Loader'
 
 export class FontLoader extends Loader {
-  declare load: (url: string) => Promise<Font>
+  declare load: (url: string | Blob) => Promise<Font>
 
   install(assets: Assets): this {
-    const handler = async (url: string): Promise<Font> => {
+    const handler = async (blob: Blob): Promise<Font> => {
       const { parseFont } = await import('modern-font')
-      return await assets.fetch(url)
-        .then(res => res.arrayBuffer())
+      return await blob.arrayBuffer()
         .then(buffer => parseFont(buffer))
     }
 
     this.load = (url) => {
-      return assets.loadBy(url, () => handler(url))
+      if (typeof url === 'string') {
+        return assets.loadBy(url).then(handler)
+      }
+      return handler(url)
     }
 
     [
-      'woff',
-      'ttf',
-      'otf',
+      'font/woff',
+      'font/ttf',
+      'font/otf',
     ].forEach((mimeType) => {
       assets.register(mimeType, handler)
     })

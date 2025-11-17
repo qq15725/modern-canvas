@@ -66,7 +66,7 @@
     "modern-font": "^0.4.4",
     "modern-idoc": "^0.10.5",
     "modern-path2d": "^1.4.11",
-    "modern-text": "^1.10.3"
+    "modern-text": "^1.10.4"
   },
   "peerDependencies": {
     "lottie-web": "^5",
@@ -87,7 +87,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^6.2.0",
     "@types/earcut": "^3.0.0",
-    "@types/node": "^24.10.0",
+    "@types/node": "^24.10.1",
     "bumpp": "^10.3.1",
     "conventional-changelog-cli": "^5.0.0",
     "eslint": "^9.39.1",
@@ -97,8 +97,8 @@
     "simple-git-hooks": "^2.13.1",
     "typescript": "^5.9.3",
     "unbuild": "^3.6.1",
-    "vite": "^7.2.1",
-    "vitest": "^4.0.7",
+    "vite": "^7.2.2",
+    "vitest": "^4.0.9",
     "yoga-layout": "^3.2.1"
   },
   "simple-git-hooks": {

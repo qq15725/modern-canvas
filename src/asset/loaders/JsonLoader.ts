@@ -2,19 +2,22 @@ import type { Assets } from '../Assets'
 import { Loader } from './Loader'
 
 export class JsonLoader extends Loader {
-  declare load: (url: string) => Promise<Record<string, any>>
+  declare load: (url: string | Blob) => Promise<Record<string, any>>
 
   install(assets: Assets): this {
-    const handler = (url: string): Promise<Record<string, any>> => {
-      return assets.fetch(url).then(rep => rep.json())
+    const handler = async (blob: Blob): Promise<Record<string, any>> => {
+      return JSON.parse(await blob.text())
     }
 
     this.load = (url) => {
-      return assets.loadBy(url, () => handler(url))
+      if (typeof url === 'string') {
+        return assets.loadBy(url).then(handler)
+      }
+      return handler(url)
     }
 
     [
-      'json',
+      'application/json',
     ].forEach((mimeType) => {
       assets.register(mimeType, handler)
     })

@@ -3,13 +3,12 @@ import { AnimatedTexture, PixelsTexture } from '../../scene'
 import { Loader } from './Loader'
 
 export class GifLoader extends Loader {
-  declare load: (url: string) => Promise<AnimatedTexture>
+  declare load: (url: string | Blob) => Promise<AnimatedTexture>
 
   install(assets: Assets): this {
-    const handler = async (url: string): Promise<AnimatedTexture> => {
+    const handler = async (blob: Blob): Promise<AnimatedTexture> => {
       const { decodeFrames } = await import('modern-gif')
-      return await assets.fetch(url)
-        .then(res => res.arrayBuffer())
+      return await blob.arrayBuffer()
         .then(buffer => decodeFrames(
           buffer,
           assets.gifWorkerUrl
@@ -27,7 +26,10 @@ export class GifLoader extends Loader {
     }
 
     this.load = (url) => {
-      return assets.loadBy(url, () => handler(url))
+      if (typeof url === 'string') {
+        return assets.loadBy(url).then(handler)
+      }
+      return handler(url)
     }
 
     [

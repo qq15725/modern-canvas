@@ -6,7 +6,7 @@ export class LottieLoader extends Loader {
   declare load: (url: string, canvas: HTMLCanvasElement) => Promise<AnimationItem>
 
   install(assets: Assets): this {
-    const handler = async (url: string, canvas: HTMLCanvasElement): Promise<AnimationItem> => {
+    this.load = async (url, canvas) => {
       const lottie = await import('lottie-web').then(pkg => pkg.default)
       return lottie.loadAnimation<'canvas'>({
         container: null as any,
@@ -22,16 +22,6 @@ export class LottieLoader extends Loader {
         ),
       })
     }
-
-    this.load = (url, canvas) => {
-      return handler(url, canvas)
-    }
-
-    [
-      'lottie',
-    ].forEach((mimeType) => {
-      assets.register(mimeType, handler)
-    })
 
     assets.lottie = this
 
