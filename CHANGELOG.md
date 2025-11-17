@@ -1,3 +1,12 @@
+## [0.13.2](https://github.com/qq15725/modern-canvas/compare/v0.13.1...v0.13.2) (2025-11-17)
+
+
+### Bug Fixes
+
+* assets ([722f90b](https://github.com/qq15725/modern-canvas/commit/722f90b438ee1f9dc5a7d60809391865f93a21ef))
+
+
+
 ## [0.13.1](https://github.com/qq15725/modern-canvas/compare/v0.13.0...v0.13.1) (2025-11-11)
 
 
