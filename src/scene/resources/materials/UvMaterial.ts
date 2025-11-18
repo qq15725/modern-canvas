@@ -6,8 +6,7 @@ export class UvMaterial extends Material {
 
   constructor() {
     super({
-      vert: `precision highp float;
-attribute vec2 position;
+      vert: `attribute vec2 position;
 attribute vec2 uv;
 uniform mat3 projectionMatrix;
 uniform mat3 modelViewMatrix;

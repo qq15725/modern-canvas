@@ -1,3 +1,5 @@
+precision highp float;
+
 varying vec2 vUv;
 uniform sampler2D texture;
 uniform vec2 inputSize;

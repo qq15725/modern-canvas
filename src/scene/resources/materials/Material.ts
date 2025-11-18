@@ -17,8 +17,7 @@ export class Material extends Resource {
   constructor(options: MaterialOptions = {}) {
     super()
 
-    this.vert = options.vert ?? `precision highp float;
-attribute vec2 position;
+    this.vert = options.vert ?? `attribute vec2 position;
 uniform mat3 projectionMatrix;
 uniform mat3 modelViewMatrix;
 void main(void) {

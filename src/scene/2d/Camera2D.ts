@@ -124,8 +124,8 @@ export class Camera2D extends Node2D {
       const e = event as PointerInputEvent
       if (this.grabbing) {
         this.position.add(
-          this._screenOffset.x - e.screenX,
-          this._screenOffset.y - e.screenY,
+          Math.round(this._screenOffset.x - e.screenX),
+          Math.round(this._screenOffset.y - e.screenY),
         )
         this._screenOffset = { x: e.screenX, y: e.screenY }
       }
@@ -157,20 +157,24 @@ export class Camera2D extends Node2D {
       this.zoomWithWheel(delta)
       const newScreen = this.toScreen(oldGlobal)
       this.position.add(
-        newScreen.x - oldScreen.x,
-        newScreen.y - oldScreen.y,
+        Math.round(newScreen.x - oldScreen.x),
+        Math.round(newScreen.y - oldScreen.y),
       )
     }
     else {
       e.preventDefault()
-      this.position.add(e.deltaX, e.deltaY)
+      this.position.add(
+        Math.round(e.deltaX),
+        Math.round(e.deltaY),
+      )
     }
   }
 
   zoomWithWheel(delta: number): void {
     const logCur = Math.log(this._zoom.x)
     const logNew = logCur + delta
-    this.setZoom(Math.exp(logNew))
+    const zoom = Math.exp(logNew)
+    this.setZoom(Math.round(zoom * 10_000) / 10_000)
   }
 
   override updateTransform(): void {

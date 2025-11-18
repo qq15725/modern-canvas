@@ -33,8 +33,7 @@ export class DrawboardEffect extends Effect {
   protected _watermark?: Texture2D
 
   static material = new Material({
-    vert: `precision mediump float;
-attribute vec2 position;
+    vert: `attribute vec2 position;
 attribute vec2 uv;
 uniform mat3 projectionMatrix;
 uniform mat3 viewMatrix;

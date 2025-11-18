@@ -37,6 +37,7 @@ export interface SceneTree {
 }
 
 export interface SceneTreeProperties extends MainLoopProperties {
+  msaa: boolean
   pixelate: boolean
   backgroundColor: Hex8Color
   // internal
@@ -47,7 +48,8 @@ export interface SceneTreeProperties extends MainLoopProperties {
 }
 
 export class SceneTree extends MainLoop {
-  @property({ fallback: true }) declare pixelate: boolean
+  @property({ alias: 'root.msaa' }) declare msaa: boolean
+  @property({ fallback: false }) declare pixelate: boolean
   @property() declare backgroundColor?: Hex8Color
   @property({ internal: true, fallback: false }) declare debug: boolean
   @property({ internal: true, fallback: false }) declare processPaused: boolean
@@ -103,11 +105,7 @@ export class SceneTree extends MainLoop {
   }
 
   protected _renderScreen(renderer: WebGLRenderer): void {
-    if (this.root.msaa) {
-      renderer.framebuffer.finishRenderPass(
-        this.root._glFramebuffer(renderer),
-      )
-    }
+    this.root.finish(renderer)
     renderer.state.reset()
     renderer.framebuffer.bind(null)
     renderer.gl.bindFramebuffer(renderer.gl.FRAMEBUFFER, null)

@@ -16,7 +16,6 @@ export interface EngineProperties extends WebGLContextAttributes, SceneTreePrope
   pixelRatio?: number
   autoResize: boolean
   autoStart: boolean
-  msaa: boolean
 }
 
 interface EngineEvents extends SceneTreeEvents {
@@ -40,7 +39,6 @@ export const defaultOptions = {
 } as const
 
 export class Engine extends SceneTree {
-  @property({ alias: 'root.msaa' }) declare msaa: boolean
   @property({ fallback: false }) declare autoResize: boolean
   @property({ fallback: false }) declare autoStart: boolean
 

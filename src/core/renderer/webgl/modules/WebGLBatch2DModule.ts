@@ -120,11 +120,10 @@ void main(void) {
   vec2 uv = vUv;
 
   if (vSize.x > 0.0 && vSize.y > 0.0) {
-    uv = floor(uv * vSize);
-    uv = uv / vSize;
+    uv = floor(uv * vSize + vec2(0.5)) / vSize;
   }
 
-  vec4 color = vec4(0.0, 0.0, 0.0, 0.0);
+  vec4 color = vec4(0.0);
   if (vDisableWrapMode > 0.0 && (uv.x < 0.0 || uv.y < 0.0 || uv.x > 1.0 || uv.y > 1.0))
   {
     //
@@ -145,9 +144,11 @@ void main(void) {
   }).join('')}
 
   color += (1.0 - color.a) * vBackgroundColor;
+
   if (color.a > 0.0) {
     color *= vModulate;
   }
+
   gl_FragColor = color;
 }`,
     })
@@ -298,7 +299,6 @@ void main(void) {
           }
 
           const iIndexStart = aIndex / this._vertexSize
-
           const textureLocation = (texture ? textureLocationMap.get(texture) : -1) ?? -1
           const disableWrapModeInt = disableWrapMode ? 1 : 0
 

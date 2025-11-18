@@ -139,9 +139,13 @@ export class Viewport extends Node implements Rectangulable {
     return false
   }
 
+  flush(renderer: WebGLRenderer): void {
+    renderer.flush()
+  }
+
   redraw(renderer: WebGLRenderer, cb: () => void): boolean {
     if (this.valid) {
-      renderer.flush()
+      this.flush(renderer)
       const texture = this.framebuffer.texture
       this._framebufferIndex = (this._framebufferIndex + 1) % this._framebuffers.length
       this.activate(renderer)

@@ -9,6 +9,7 @@ import {
 const engine = new Engine({
   autoResize: true,
   autoStart: true,
+  msaa: true,
 })
 
 engine.on('pointerdown', (e) => {

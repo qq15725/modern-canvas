@@ -1,8 +1,9 @@
 import type { Fonts } from 'modern-font'
+import type { EngineProperties } from './Engine'
 import { Engine } from './Engine'
 import { Node } from './scene'
 
-export interface RenderOptions {
+export interface RenderOptions extends Partial<EngineProperties> {
   data: Record<string, any> | Node | (Node | Record<string, any>)[]
   width: number
   height: number
@@ -53,6 +54,7 @@ async function task(options: RenderOptions): Promise<HTMLCanvasElement> {
     keyframes = [],
     onBefore,
     onKeyframe,
+    ...properties
   } = options
 
   engine ??= new Engine({
@@ -63,6 +65,8 @@ async function task(options: RenderOptions): Promise<HTMLCanvasElement> {
   })
 
   // reset
+  engine.resetProperties()
+  engine.setProperties(properties)
   engine.debug = debug
   engine.fonts = fonts
   engine.timeline.currentTime = 0
