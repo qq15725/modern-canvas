@@ -1,3 +1,12 @@
+## [0.13.3](https://github.com/qq15725/modern-canvas/compare/v0.13.2...v0.13.3) (2025-11-18)
+
+
+### Bug Fixes
+
+* msaa ([3809e8e](https://github.com/qq15725/modern-canvas/commit/3809e8ea036e056baa64ce656f1554edb3df2e0f))
+
+
+
 ## [0.13.2](https://github.com/qq15725/modern-canvas/compare/v0.13.1...v0.13.2) (2025-11-17)
 
 
