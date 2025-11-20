@@ -223,7 +223,7 @@ export class CanvasContext extends Path2D {
           indices,
           lineStyle: current.lineStyle,
           flipAlignment: false,
-          closed: true,
+          closed: false,
         })
       }
 
