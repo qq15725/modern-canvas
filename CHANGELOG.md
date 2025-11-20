@@ -1,3 +1,12 @@
+## [0.13.4](https://github.com/qq15725/modern-canvas/compare/v0.13.3...v0.13.4) (2025-11-20)
+
+
+### Bug Fixes
+
+* stroke ([f0ff54a](https://github.com/qq15725/modern-canvas/commit/f0ff54aed619a8b7ac97ee191d3d684da198a911))
+
+
+
 ## [0.13.3](https://github.com/qq15725/modern-canvas/compare/v0.13.2...v0.13.3) (2025-11-18)
 
 
