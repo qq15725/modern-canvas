@@ -49,16 +49,13 @@ export class BaseElement2DOutline extends BaseElement2DFill {
     let uvTransform
     let disableWrapMode = false
     if (this.image === 'viewport') {
-      ctx.fillStyle = new ViewportTexture()
+      ctx.strokeStyle = new ViewportTexture()
     }
     else {
       ({ uvTransform, disableWrapMode } = getDrawOptions(this, { width, height }))
-      ctx.fillStyle = this.animatedTexture?.currentFrame.texture
-        ?? this.texture
-        ?? this.color
+      ctx.strokeStyle = this.texture ?? this.color
     }
     ctx.lineWidth = this.width || 1
-    ctx.strokeStyle = this.texture ?? this.color
     ctx.lineCap = this.lineCap
     ctx.lineJoin = this.lineJoin
     ctx.stroke({
