@@ -1,13 +1,11 @@
-import type {
-  ColorValue,
-  WebGLBlendMode,
-  WebGLRenderer,
-} from '../../core'
+import type { Batchable2D, ColorValue, WebGLBlendMode, WebGLRenderer } from '../../core'
+import type { Texture2D } from '../resources'
 import type { CanvasBatchable } from './CanvasContext'
 import type { Node } from './Node'
 import type { TimelineNodeEvents, TimelineNodeProperties } from './TimelineNode'
 import { property } from 'modern-idoc'
-import { clamp, Color, customNode } from '../../core'
+import { clamp, Color, customNode, Transform2D } from '../../core'
+import { ViewportTexture } from '../resources'
 import { CanvasContext } from './CanvasContext'
 import { TimelineNode } from './TimelineNode'
 
@@ -200,18 +198,49 @@ export class CanvasItem extends TimelineNode {
     }
   }
 
+  protected _handleViewportTexture(batchable: Batchable2D): Texture2D | undefined {
+    const viewport = this.tree?.getPreviousViewport()
+    if (viewport) {
+      if ('getRect' in this) {
+        const { a, d, tx, ty } = viewport.canvasTransform.toObject()
+        const { vertices } = batchable
+        const uvTransform = new Transform2D()
+          .scale(1 / viewport.width * a, -1 / viewport.height * d)
+          .translate(
+            -(-tx) / viewport.width,
+            1 + (-ty) / viewport.height,
+          )
+        const uvs = new Float32Array(vertices.length)
+        for (let len = vertices.length, i = 0; i < len; i += 2) {
+          const { x, y } = uvTransform.apply({ x: vertices[i], y: vertices[i + 1] })
+          uvs[i] = x
+          uvs[i + 1] = y
+        }
+        batchable.uvs = uvs
+        return viewport.texture
+      }
+    }
+    return undefined
+  }
+
   protected override _render(renderer: WebGLRenderer): void {
     this._updateBatchables()
 
     const pixelate = this._tree?.pixelate
 
     this._batchables.forEach((batchable) => {
-      batchable.texture?.upload(renderer)
+      let texture = batchable.texture
+      if (texture instanceof ViewportTexture) {
+        texture = this._handleViewportTexture(batchable)
+      }
+      else {
+        texture?.upload(renderer)
+      }
 
       renderer.batch2D.render({
         ...batchable,
         size: pixelate ? batchable.size : undefined,
-        texture: batchable.texture?._glTexture(renderer),
+        texture: texture?._glTexture(renderer),
       })
     })
 

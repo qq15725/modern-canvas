@@ -12,40 +12,23 @@ export interface PixelateEffectProperties extends EffectProperties {
 @customNode('PixelateEffect')
 export class PixelateEffect extends Effect {
   static material = new Material({
-    vert: `precision mediump float;
-attribute vec2 position;
+    vert: `attribute vec2 position;
 attribute vec2 uv;
 varying vec2 vUv;
 void main() {
   gl_Position = vec4(position, 0.0, 1.0);
   vUv = uv;
 }`,
-    frag: `varying vec2 vUv;
+    frag: `precision highp float;
+varying vec2 vUv;
 uniform sampler2D sampler;
-uniform vec2 uSize;
-uniform vec4 uInputSize;
-
-vec2 mapCoord(vec2 coord) {
-  coord *= uInputSize.xy;
-  coord += uInputSize.zw;
-  return coord;
-}
-
-vec2 unmapCoord(vec2 coord) {
-  coord -= uInputSize.zw;
-  coord /= uInputSize.xy;
-  return coord;
-}
-
-vec2 pixelate(vec2 coord, vec2 size) {
-  return floor(coord / size) * size;
-}
+uniform vec2 offset;
+uniform vec2 step;
 
 void main(void) {
-  vec2 coord = mapCoord(vUv);
-  coord = pixelate(coord, uSize);
-  coord = unmapCoord(coord);
-  gl_FragColor = texture2D(sampler, coord);
+  vec2 uv = vUv;
+  uv = floor((uv - offset) / step) * step + offset + step / 2.0;
+  gl_FragColor = texture2D(sampler, uv);
 }`,
   })
 
@@ -61,11 +44,21 @@ void main(void) {
 
   override apply(renderer: WebGLRenderer, source: Viewport): void {
     source.redraw(renderer, () => {
-      QuadUvGeometry.draw(renderer, PixelateEffect.material, {
+      const viewMatrix = renderer.program.uniforms.viewMatrix
+      const zoom = [viewMatrix[0], viewMatrix[4]]
+      const translate = [viewMatrix[6], viewMatrix[7]]
+      const params = {
         sampler: 0,
-        uSize: [this.strength, this.strength],
-        uInputSize: [source.width, source.height, 1 / source.width, 1 / source.height],
-      })
+        offset: [
+          (zoom[0] + translate[0]) / source.width,
+          1 - (zoom[1] + translate[1]) / source.height,
+        ],
+        step: [
+          (this.strength * zoom[0]) / source.width,
+          (this.strength * zoom[1]) / source.height,
+        ],
+      }
+      QuadUvGeometry.draw(renderer, PixelateEffect.material, params)
     })
   }
 }

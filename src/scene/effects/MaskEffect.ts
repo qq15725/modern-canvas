@@ -15,8 +15,7 @@ export interface MaskEffectProperties extends EffectProperties {
 @customNode('MaskEffect')
 export class MaskEffect extends Effect {
   static material = new Material({
-    vert: `precision mediump float;
-attribute vec2 position;
+    vert: `attribute vec2 position;
 attribute vec2 uv;
 varying vec2 vUv;
 void main() {

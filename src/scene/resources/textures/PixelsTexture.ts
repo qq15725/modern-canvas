@@ -28,14 +28,14 @@ export class PixelsTexture extends Texture2D<Texture2DPixelsSource> {
   protected override _updateProperty(key: string, value: any, oldValue: any): void {
     switch (key) {
       case 'width':
-        this.source.width = Math.round(this.width * this.pixelRatio)
+        this.source.width = this.realWidth
         break
       case 'height':
-        this.source.height = Math.round(this.height * this.pixelRatio)
+        this.source.height = this.realHeight
         break
       case 'pixelRatio':
-        this.source.width = Math.round(this.width * this.pixelRatio)
-        this.source.height = Math.round(this.height * this.pixelRatio)
+        this.source.width = this.realWidth
+        this.source.height = this.realHeight
         break
     }
 

@@ -61,9 +61,16 @@ export class SceneTree extends MainLoop {
   readonly root = new Window(true).setTree(this)
 
   protected _backgroundColor = new Color()
+  protected _previousViewport?: Viewport
   protected _currentViewport?: Viewport
   getCurrentViewport(): Viewport | undefined { return this._currentViewport }
-  setCurrentViewport(viewport: Viewport | undefined): void { this._currentViewport = viewport }
+  getPreviousViewport(): Viewport | undefined { return this._previousViewport }
+  setCurrentViewport(viewport: Viewport | undefined): void {
+    if (this._currentViewport && !this._currentViewport.equal(viewport)) {
+      this._previousViewport = this._currentViewport
+    }
+    this._currentViewport = viewport
+  }
 
   constructor(properties?: Partial<SceneTreeProperties>) {
     super()

@@ -4,7 +4,7 @@ import type { BaseElement2D } from './BaseElement2D'
 import { isNone, normalizeFill, property } from 'modern-idoc'
 import { assets } from '../../../asset'
 import { CoreObject } from '../../../core'
-import { GradientTexture } from '../../resources'
+import { GradientTexture, ViewportTexture } from '../../resources'
 import { getDrawOptions } from './utils'
 
 export interface BaseElement2DFill extends NormalizedFill {
@@ -78,16 +78,21 @@ export class BaseElement2DFill extends CoreObject {
     else if (!isNone(this.image)) {
       this.parent.tree?.log(`load image ${this.image}`)
 
-      let isGif = this.image.split('?')[0].endsWith('.gif')
-      const blob = await assets.loadBy(this.image)
-      if (!isGif) {
-        isGif = blob.type.startsWith('image/gif') ?? false
-      }
-      if (isGif) {
-        this.animatedTexture = await assets.gif.load(blob)
+      if (this.image === 'viewport') {
+        // skip
       }
       else {
-        this.texture = await assets.texture.load(blob)
+        let isGif = this.image.split('?')[0].endsWith('.gif')
+        const blob = await assets.loadBy(this.image)
+        if (!isGif) {
+          isGif = blob.type.startsWith('image/gif') ?? false
+        }
+        if (isGif) {
+          this.animatedTexture = await assets.gif.load(blob)
+        }
+        else {
+          this.texture = await assets.texture.load(blob)
+        }
       }
     }
   }
@@ -103,6 +108,7 @@ export class BaseElement2DFill extends CoreObject {
         this.texture
         || this.animatedTexture
         || this.color
+        || this.image === 'viewport'
       ),
     )
   }
@@ -110,12 +116,17 @@ export class BaseElement2DFill extends CoreObject {
   draw(): void {
     const { width, height } = this.parent.size
     const ctx = this.parent.context
-    const { uvTransform, disableWrapMode } = getDrawOptions(
-      this, { width, height },
-    )
-    ctx.fillStyle = this.animatedTexture?.currentFrame.texture
-      ?? this.texture
-      ?? this.color
+    let uvTransform
+    let disableWrapMode = false
+    if (this.image === 'viewport') {
+      ctx.fillStyle = new ViewportTexture()
+    }
+    else {
+      ({ uvTransform, disableWrapMode } = getDrawOptions(this, { width, height }))
+      ctx.fillStyle = this.animatedTexture?.currentFrame.texture
+        ?? this.texture
+        ?? this.color
+    }
     ctx.fill({
       uvTransform,
       disableWrapMode,

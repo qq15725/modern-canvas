@@ -1,5 +1,6 @@
 import type { NormalizedOutline, Outline } from 'modern-idoc'
 import { isNone, normalizeOutline, property } from 'modern-idoc'
+import { ViewportTexture } from '../../resources'
 import { BaseElement2DFill } from './BaseElement2DFill'
 import { getDrawOptions } from './utils'
 
@@ -43,13 +44,19 @@ export class BaseElement2DOutline extends BaseElement2DFill {
   }
 
   draw(): void {
+    const { width, height } = this.parent.size
     const ctx = this.parent.context
-    const { uvTransform, disableWrapMode } = getDrawOptions(
-      this, {
-        width: this.parent.size.width,
-        height: this.parent.size.height,
-      },
-    )
+    let uvTransform
+    let disableWrapMode = false
+    if (this.image === 'viewport') {
+      ctx.fillStyle = new ViewportTexture()
+    }
+    else {
+      ({ uvTransform, disableWrapMode } = getDrawOptions(this, { width, height }))
+      ctx.fillStyle = this.animatedTexture?.currentFrame.texture
+        ?? this.texture
+        ?? this.color
+    }
     ctx.lineWidth = this.width || 1
     ctx.strokeStyle = this.texture ?? this.color
     ctx.lineCap = this.lineCap
