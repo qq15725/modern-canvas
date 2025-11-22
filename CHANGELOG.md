@@ -1,3 +1,12 @@
+## [0.13.5](https://github.com/qq15725/modern-canvas/compare/v0.13.4...v0.13.5) (2025-11-22)
+
+
+### Features
+
+* ViewportTexture ([e347d89](https://github.com/qq15725/modern-canvas/commit/e347d89e0a0325182bfcf0da45b596d76b44e3c1))
+
+
+
 ## [0.13.4](https://github.com/qq15725/modern-canvas/compare/v0.13.3...v0.13.4) (2025-11-20)
 
 
