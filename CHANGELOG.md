@@ -1,3 +1,12 @@
+## [0.13.6](https://github.com/qq15725/modern-canvas/compare/v0.13.5...v0.13.6) (2025-11-22)
+
+
+### Bug Fixes
+
+* outline viewport ([f2dab5d](https://github.com/qq15725/modern-canvas/commit/f2dab5d8675d9db68266e26cb045c175eb258677))
+
+
+
 ## [0.13.5](https://github.com/qq15725/modern-canvas/compare/v0.13.4...v0.13.5) (2025-11-22)
 
 
