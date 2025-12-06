@@ -1,3 +1,12 @@
+## [0.14.1](https://github.com/qq15725/modern-canvas/compare/v0.14.0...v0.14.1) (2025-12-06)
+
+
+### Bug Fixes
+
+* viewport resize ([3ce0dd0](https://github.com/qq15725/modern-canvas/commit/3ce0dd08514b282ce689cd104e9f62ecb7e02705))
+
+
+
 # [0.14.0](https://github.com/qq15725/modern-canvas/compare/v0.13.6...v0.14.0) (2025-12-06)
 
 
