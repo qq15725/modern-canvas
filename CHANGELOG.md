@@ -1,3 +1,12 @@
+## [0.14.2](https://github.com/qq15725/modern-canvas/compare/v0.14.1...v0.14.2) (2025-12-06)
+
+
+### Bug Fixes
+
+* texSubImage2D ([0af45e8](https://github.com/qq15725/modern-canvas/commit/0af45e8bba655b9bf679d32b1d2c8ff49f006ab0))
+
+
+
 ## [0.14.1](https://github.com/qq15725/modern-canvas/compare/v0.14.0...v0.14.1) (2025-12-06)
 
 
