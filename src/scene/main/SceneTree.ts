@@ -38,6 +38,7 @@ export interface SceneTree {
 
 export interface SceneTreeProperties extends MainLoopProperties {
   msaa: boolean
+  pixelate: boolean
   roundPixels: boolean
   backgroundColor: Hex8Color
   // internal
@@ -49,6 +50,7 @@ export interface SceneTreeProperties extends MainLoopProperties {
 
 export class SceneTree extends MainLoop {
   @property({ alias: 'root.msaa' }) declare msaa: boolean
+  @property({ fallback: false }) declare pixelate: boolean
   @property({ fallback: false }) declare roundPixels: boolean
   @property() declare backgroundColor?: Hex8Color
   @property({ internal: true, fallback: false }) declare debug: boolean

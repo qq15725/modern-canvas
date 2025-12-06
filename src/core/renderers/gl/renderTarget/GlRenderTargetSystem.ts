@@ -69,8 +69,6 @@ export class GlRenderTargetSystem extends GlSystem {
         || pixelHeight !== glRenderTarget.height
       ) {
         this.resizeGpuRenderTarget(renderTarget)
-        glRenderTarget.width = pixelWidth
-        glRenderTarget.height = pixelHeight
       }
 
       renderTarget.colorTextures.forEach((texture) => {
@@ -153,6 +151,10 @@ export class GlRenderTargetSystem extends GlSystem {
       if ('on' in renderTarget) {
         renderTarget.on('updateProperty', (key) => {
           switch (key) {
+            case 'width':
+            case 'height':
+              this.resizeGpuRenderTarget(renderTarget)
+              break
             case 'msaa':
               glRenderTarget.msaa = !!renderTarget.msaa
               this._init(renderTarget)
@@ -240,9 +242,12 @@ export class GlRenderTargetSystem extends GlSystem {
   }
 
   resizeGpuRenderTarget(renderTarget: RenderTargetLike): void {
-    if (renderTarget.isRoot)
-      return
+    const texture = renderTarget.colorTextures[0]
+    const pixelWidth = texture.pixelWidth ?? texture.width
+    const pixelHeight = texture.pixelHeight ?? texture.height
     const glRenderTarget = this.getGlRenderTarget(renderTarget)
+    glRenderTarget.width = pixelWidth
+    glRenderTarget.height = pixelHeight
     this._resizeColorTextures(renderTarget, glRenderTarget)
     if (renderTarget.stencil || renderTarget.depth) {
       this._resizeStencil(glRenderTarget)
@@ -301,17 +306,10 @@ export class GlRenderTargetSystem extends GlSystem {
   }
 
   protected _resizeColorTextures(renderTarget: RenderTargetLike, glRenderTarget: GlRenderTarget): void {
-    const texture = renderTarget.colorTextures[0]
-    const width = texture.pixelWidth ?? texture.width
-    const height = texture.pixelHeight ?? texture.height
-    glRenderTarget.width = width
-    glRenderTarget.height = height
-    renderTarget.colorTextures.forEach((_texture, i) => {
-      if (i === 0)
-        return
-      _texture.width = width
-      _texture.height = height
-      _texture.pixelRatio = texture.pixelRatio
+    renderTarget.colorTextures.forEach((texture) => {
+      texture.pixelRatio = this._renderer.pixelRatio
+      texture.width = renderTarget.width
+      texture.height = renderTarget.height
     })
 
     if (glRenderTarget.msaa) {
@@ -328,8 +326,8 @@ export class GlRenderTargetSystem extends GlSystem {
           gl.RENDERBUFFER,
           4,
           glInternalFormat,
-          texture.pixelWidth ?? texture.width,
-          texture.pixelHeight ?? texture.height,
+          glRenderTarget.width,
+          glRenderTarget.height,
         )
         gl.framebufferRenderbuffer(
           gl.FRAMEBUFFER,

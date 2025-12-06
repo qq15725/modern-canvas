@@ -239,6 +239,8 @@ export class CanvasItem extends TimelineNode {
   protected override _render(renderer: GlRenderer): void {
     this._updateBatchables()
 
+    const pixelate = this._tree?.pixelate
+
     this._batchables.forEach((batchable) => {
       let texture = batchable.texture
       if (texture instanceof ViewportTexture) {
@@ -248,6 +250,7 @@ export class CanvasItem extends TimelineNode {
       renderer.batch2D.render({
         ...batchable,
         roundPixels: this._tree?.roundPixels,
+        size: pixelate ? batchable.size : undefined,
         texture,
       })
     })

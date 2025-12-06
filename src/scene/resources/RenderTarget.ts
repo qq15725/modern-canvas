@@ -36,25 +36,6 @@ export class RenderTarget extends Resource implements RenderTargetLikeReactiveOb
   get valid(): boolean { return Boolean(this.width && this.height) }
   get colorTexture(): Texture2D<null> { return this.colorTextures[0] }
 
-  protected _updateProperty(key: string, value: any, oldValue: any): void {
-    super._updateProperty(key, value, oldValue)
-
-    switch (key) {
-      case 'width':
-      case 'height':
-        this.colorTextures.forEach((texture) => {
-          texture.width = this.width
-          texture.height = this.height
-        })
-        break
-    }
-  }
-
-  resize(width: number, height: number): void {
-    this.width = width
-    this.height = height
-  }
-
   activate(renderer: GlRenderer, frame?: RectangleLike): boolean {
     if (this.valid) {
       renderer.renderTarget.bind(this, frame)

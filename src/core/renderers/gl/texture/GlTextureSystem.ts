@@ -82,7 +82,7 @@ export class GlTextureSystem extends GlSystem {
             case 'pixelRatio':
             case 'alphaMode':
             case 'source':
-              this.updateSource(texture)
+              this.updateGpuTexture(texture)
               break
             case 'addressModeU':
             case 'addressModeV':
@@ -108,7 +108,7 @@ export class GlTextureSystem extends GlSystem {
       }
       this.textures.set(texture.instanceId, texture)
     }
-    this.updateSource(texture)
+    this.updateGpuTexture(texture)
     this.updateStyle(texture)
     return glTexture
   }
@@ -184,7 +184,7 @@ export class GlTextureSystem extends GlSystem {
     )
   }
 
-  updateSource(texture: TextureLike): void {
+  updateGpuTexture(texture: TextureLike): void {
     this.bind(texture)
     const glTexture = this.getGlTexture(texture)
     const gl = this._gl

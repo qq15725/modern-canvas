@@ -254,6 +254,7 @@ ${Array.from({ length: maxTextureUnits }, (_, i) => {
             indices,
             vertices,
             uvs = new Float32Array(0),
+            size = { width: 0, height: 0 },
             texture,
             blendMode = GlBlendMode.normal,
             clipOutsideUv,
@@ -269,16 +270,24 @@ ${Array.from({ length: maxTextureUnits }, (_, i) => {
             drawCall.start = iIndex
           }
 
+          const { width, height } = size
           const iIndexStart = aIndex / this._vertexSize
           const textureLocation = (texture ? textureLocationMap.get(texture) : 255) ?? 255
           const roundPixelsInt = roundPixels ? 1 : 0
           const clipOutsideUvInt = clipOutsideUv ? 1 : 0
 
+          let uvX, uvY
           for (let len = vertices.length, i = 0; i < len; i += 2) {
+            uvX = uvs[i]
+            uvY = uvs[i + 1]
+            if (width > 0 && height > 0) {
+              uvX = Math.ceil(uvX * width) / width
+              uvY = Math.ceil(uvY * height) / height
+            }
             float32View[aIndex++] = vertices[i]
             float32View[aIndex++] = vertices[i + 1]
-            float32View[aIndex++] = uvs[i]
-            float32View[aIndex++] = uvs[i + 1]
+            float32View[aIndex++] = uvX
+            float32View[aIndex++] = uvY
             const aU8Index = aIndex * 4
             uint8View[aU8Index] = textureLocation
             uint8View[aU8Index + 1] = clipOutsideUvInt
