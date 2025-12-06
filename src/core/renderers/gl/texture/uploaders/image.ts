@@ -5,18 +5,18 @@ export const image: GlTextureUploader = {
   upload: (source, glTexture, gl, webGLVersion) => {
     const glWidth = glTexture.width
     const glHeight = glTexture.height
-    const textureWidth = source.pixelWidth ?? source.width
-    const textureHeight = source.pixelHeight ?? source.width
-    const sourceWidth = source.sourceWidth ?? textureWidth
-    const sourceHeight = source.sourceHeight ?? sourceWidth
-    if (sourceWidth < textureWidth || sourceHeight < textureHeight) {
-      if (glWidth !== textureWidth || glHeight !== textureHeight) {
+    const pixelWidth = source.pixelWidth ?? source.width
+    const pixelHeight = source.pixelHeight ?? source.height
+    const sourceWidth = source.sourceWidth ?? pixelWidth
+    const sourceHeight = source.sourceHeight ?? pixelHeight
+    if (sourceWidth < pixelWidth || sourceHeight < pixelHeight) {
+      if (glWidth !== pixelWidth || glHeight !== pixelHeight) {
         gl.texImage2D(
           glTexture.target,
           0,
           glTexture.internalFormat,
-          textureWidth,
-          textureHeight,
+          pixelWidth,
+          pixelHeight,
           0,
           glTexture.format,
           glTexture.type,
@@ -49,7 +49,7 @@ export const image: GlTextureUploader = {
         )
       }
     }
-    else if (glWidth === textureWidth && glHeight === textureHeight) {
+    else if (glWidth === pixelWidth && glHeight === pixelHeight) {
       gl.texSubImage2D(
         gl.TEXTURE_2D,
         0,
@@ -65,8 +65,8 @@ export const image: GlTextureUploader = {
         glTexture.target,
         0,
         glTexture.internalFormat,
-        textureWidth,
-        textureHeight,
+        pixelWidth,
+        pixelHeight,
         0,
         glTexture.format,
         glTexture.type,
@@ -84,7 +84,7 @@ export const image: GlTextureUploader = {
       )
     }
 
-    glTexture.width = textureWidth
-    glTexture.height = textureHeight
+    glTexture.width = pixelWidth
+    glTexture.height = pixelHeight
   },
 }
