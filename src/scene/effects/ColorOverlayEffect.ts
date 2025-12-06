@@ -1,4 +1,4 @@
-import type { ColorValue, WebGLRenderer } from '../../core'
+import type { ColorValue, GlRenderer } from '../../core'
 import type { EffectProperties, Node, Viewport } from '../main'
 import { property } from 'modern-idoc'
 import { Color, customNode } from '../../core'
@@ -15,7 +15,8 @@ const MAX_COLORS = 50
 @customNode('ColorOverlayEffect')
 export class ColorOverlayEffect extends Effect {
   static material = new Material({
-    vert: `precision mediump float;
+    gl: {
+      vertex: `precision mediump float;
 attribute vec2 position;
 attribute vec2 uv;
 varying vec2 vUv;
@@ -23,7 +24,7 @@ void main() {
   gl_Position = vec4(position, 0.0, 1.0);
   vUv = uv;
 }`,
-    frag: `precision mediump float;
+      fragment: `precision mediump float;
 uniform sampler2D sampler;
 uniform vec4 colors[${MAX_COLORS}];
 varying vec2 vUv;
@@ -60,6 +61,7 @@ void main(void) {
   vec4 mask = calcColor(vUv.x);
   gl_FragColor = vec4(mix(color.rgb, mask.rgb, color.a * mask.a), color.a);
 }`,
+    },
   })
 
   @property({ default: () => ([]) }) declare colors: ColorValue[]
@@ -75,7 +77,7 @@ void main(void) {
       .append(children)
   }
 
-  override apply(renderer: WebGLRenderer, source: Viewport): void {
+  override apply(renderer: GlRenderer, source: Viewport): void {
     source.redraw(renderer, () => {
       const colors = this.colors.map((val) => {
         this._color.value = val

@@ -1,7 +1,7 @@
-import type { Keyframe } from '../../src'
+import type {
+  Keyframe,
+} from '../../src'
 import {
-  Animation,
-  Element2D,
   Engine,
   Timeline,
 } from '../../src'
@@ -9,7 +9,6 @@ import {
 const engine = new Engine({
   autoStart: true,
   autoResize: true,
-  backgroundColor: '#F6F7F9',
   timeline: Timeline.from([0, 5000], true),
 })
 
@@ -17,53 +16,34 @@ const engine = new Engine({
 
 document.body.append(engine.view!)
 
-function testAnimation(keyframes: Keyframe[], left = 100, top = 100): Element2D {
-  const el = new Element2D({
-    style: {
-      left,
-      top,
-      width: 100,
-      height: 100,
-      backgroundColor: '#00FF00',
-    },
-  }, [
-    new Animation({
-      loop: true,
-      keyframes,
-    }),
-  ])
-
-  setTimeout(() => {
-    el.removeChildren()
-    el.append(
-      new Animation({
-        loop: true,
-        keyframes,
-      }),
-    )
-  }, 1000)
-
-  return el
+function testcase(left = 100, top = 100, keyframes: Keyframe[]): any {
+  return {
+    is: 'Element2D',
+    style: { left, top, width: 100, height: 100, backgroundColor: '#00FF00' },
+    children: [
+      { is: 'Animation', loop: true, keyframes },
+    ],
+  }
 }
 
 async function init(): Promise<void> {
   engine.root.append([
-    testAnimation([
+    testcase(100, 100, [
       { opacity: 0, rotate: 180 },
-    ], 100, 100),
+    ]),
 
-    testAnimation([
+    testcase(200, 100, [
       { opacity: 0, transform: 'rotate(-200deg)' },
-    ], 200, 100),
+    ]),
 
-    testAnimation([
+    testcase(300, 100, [
       { opacity: 0, transform: 'translate3d(0, -100%, 0)' },
       { opacity: 1 },
-    ], 300, 100),
+    ]),
 
-    testAnimation([
+    testcase(400, 100, [
       { opacity: 0, transform: 'translate3d(100%, 0, 0) rotate3d(0, 0, 1, -120deg)' },
-    ], 400, 100),
+    ]),
   ])
 }
 

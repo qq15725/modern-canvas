@@ -165,8 +165,7 @@ export class Transform2D extends Matrix3 {
   apply<P extends Vector2Data = Vector2>(pos: Vector2Data, newPos?: P): P {
     newPos = (newPos || new Vector2()) as P
     const { a, c, tx, b, d, ty } = this.toObject()
-    const x = pos.x
-    const y = pos.y
+    const { x, y } = pos
     newPos.x = (a * x) + (c * y) + tx
     newPos.y = (b * x) + (d * y) + ty
     return newPos

@@ -1,4 +1,4 @@
-import type { ColorValue, WebGLRenderer } from '../../core'
+import type { ColorValue, GlRenderer } from '../../core'
 import type { EffectProperties, Node, Viewport } from '../main'
 import { property } from 'modern-idoc'
 import { Color, customNode } from '../../core'
@@ -83,7 +83,8 @@ export class OutlineEffect extends Effect {
       .append(children)
 
     this.material = new Material({
-      vert: `precision mediump float;
+      gl: {
+        vertex: `precision mediump float;
 attribute vec2 position;
 attribute vec2 uv;
 varying vec2 vUv;
@@ -91,14 +92,15 @@ void main() {
   gl_Position = vec4(position, 0.0, 1.0);
   vUv = uv;
 }`,
-      frag: frag.replace(
-        /\{ANGLE_STEP\}/,
-        OutlineEffect.getAngleStep(this.quality).toFixed(7),
-      ),
+        fragment: frag.replace(
+          /\{ANGLE_STEP\}/,
+          OutlineEffect.getAngleStep(this.quality).toFixed(7),
+        ),
+      },
     })
   }
 
-  override apply(renderer: WebGLRenderer, source: Viewport): void {
+  override apply(renderer: GlRenderer, source: Viewport): void {
     source.redraw(renderer, () => {
       this._color.value = this.color
 

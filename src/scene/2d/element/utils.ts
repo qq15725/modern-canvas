@@ -1,16 +1,17 @@
 import type { NormalizedFill } from 'modern-idoc'
+import type { RectangleLike } from '../../../core'
+import type { CanvasBatchable } from '../../main'
 import { Transform2D } from '../../../core'
 
-export function getDrawOptions(
+export function getFillDrawOptions(
   fill: NormalizedFill,
-  box: any,
-): { disableWrapMode: boolean, uvTransform: Transform2D } {
-  let disableWrapMode = false
+  rect: RectangleLike,
+): Partial<Omit<CanvasBatchable, 'type'>> {
+  const { x, y, width, height } = rect
 
-  const { left = 0, top = 0, width, height } = box
-
+  let clipOutsideUv = false
   const uvTransform = new Transform2D()
-    .translate(-left, -top)
+    .translate(-x, -y)
     .scale(1 / width, 1 / height)
 
   if (fill.cropRect) {
@@ -22,16 +23,15 @@ export function getDrawOptions(
     } = fill.cropRect
 
     uvTransform
-      .scale(
-        Math.abs(1 - (left + right)),
-        Math.abs(1 - (top + bottom)),
-      )
       .translate(left, top)
+      .scale(
+        1 / Math.abs(1 + (left + right)),
+        1 / Math.abs(1 + (top + bottom)),
+      )
 
-    disableWrapMode = true
+    clipOutsideUv = true
   }
-
-  if (fill.tile) {
+  else if (fill.tile) {
     const {
       translateX = 0,
       translateY = 0,
@@ -42,10 +42,8 @@ export function getDrawOptions(
     } = fill.tile
 
     uvTransform
-      .translate(-translateX / width, -translateY / height)
+      .translate(-translateX, -translateY)
       .scale(1 / scaleX, 1 / scaleY)
-
-    disableWrapMode = true
   }
   else if (fill.stretchRect) {
     const {
@@ -56,14 +54,25 @@ export function getDrawOptions(
     } = fill.stretchRect
 
     uvTransform
-      .scale(
-        Math.abs(1 - (-left + -right)),
-        Math.abs(1 - (-top + -bottom)),
-      )
       .translate(-left, -top)
+      .scale(
+        1 / Math.abs(1 + (-left - right)),
+        1 / Math.abs(1 + (-top - bottom)),
+      )
 
-    disableWrapMode = true
+    clipOutsideUv = true
   }
 
-  return { disableWrapMode, uvTransform }
+  const { a, c, tx, b, d, ty } = uvTransform.toObject()
+
+  let _x, _y
+  return {
+    clipOutsideUv,
+    transformUv: (uvs, i) => {
+      _x = uvs[i]
+      _y = uvs[i + 1]
+      uvs[i] = (a * _x) + (c * _y) + tx
+      uvs[i + 1] = (b * _x) + (d * _y) + ty
+    },
+  }
 }

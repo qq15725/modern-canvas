@@ -1,3 +1,3 @@
-export * from './parseCSSFilter'
-export * from './parseCSSTransform'
-export * from './parseCSSTransformOrigin'
+export * from './parseCssFilter'
+export * from './parseCssTransform'
+export * from './parseCssTransformOrigin'

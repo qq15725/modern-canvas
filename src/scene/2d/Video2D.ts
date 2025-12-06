@@ -42,7 +42,7 @@ export class Video2D extends TextureRect2D<VideoTexture> {
       this.style.width = this.texture!.width
       this.style.height = this.texture!.height
     }
-    this.requestRedraw()
+    this.requestRender()
   }
 
   protected _updateVideoCurrentTime(): void {

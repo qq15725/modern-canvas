@@ -1,4 +1,4 @@
-import type { WebGLRenderer } from '../../core'
+import type { GlRenderer } from '../../core'
 import type { Viewport } from '../main'
 import { customNode } from '../../core'
 import { Transition } from '../main/Transition'
@@ -10,14 +10,15 @@ export class KawaseTransition extends Transition {
   quality = 10
 
   static material = new Material({
-    vert: `attribute vec2 position;
+    gl: {
+      vertex: `attribute vec2 position;
 attribute vec2 uv;
 varying vec2 vUv;
 void main() {
   gl_Position = vec4(position, 0.0, 1.0);
   vUv = uv;
 }`,
-    frag: `precision highp float;
+      fragment: `precision highp float;
 varying vec2 vUv;
 uniform sampler2D sampler;
 uniform vec2 offset;
@@ -33,9 +34,10 @@ void main(void) {
   color *= 0.25;
   gl_FragColor = color;
 }`,
+    },
   })
 
-  override apply(renderer: WebGLRenderer, target: Viewport): void {
+  override apply(renderer: GlRenderer, target: Viewport): void {
     const currentTimeProgress = this.currentTimeProgress
     let sampler: number
     let progress: number

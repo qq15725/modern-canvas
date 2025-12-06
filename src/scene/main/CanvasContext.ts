@@ -1,28 +1,29 @@
 import type { LineCap, LineJoin, LineStyle } from 'modern-path2d'
-import type { Batchable2D, ColorValue, Transform2D } from '../../core'
+import type { Batchable2D, ColorValue } from '../../core'
 import { isColorFillObject } from 'modern-idoc'
 import { Path2D } from 'modern-path2d'
-import { Color } from '../../core'
-import { Texture2D } from '../resources'
+import { ColorTexture, Texture2D } from '../resources'
+
+export type TransformUv = (uvs: Float32Array, index: number) => void
+export type TransformVertex = (vertices: Float32Array, index: number) => void
 
 export interface CanvasBatchable extends Batchable2D {
   type: 'stroke' | 'fill'
   texture?: Texture2D
-  uvTransform?: Transform2D
-  vertTransform?: Transform2D
+  transformUv?: TransformUv
+  transformVertex?: TransformVertex
+  size?: { width: number, height: number }
 }
 
 export interface StrokeDraw extends Partial<CanvasBatchable> {
   type: 'stroke'
   path: Path2D
   lineStyle: LineStyle
-  uvTransform?: Transform2D
 }
 
 export interface FillDraw extends Partial<CanvasBatchable> {
   type: 'fill'
   path: Path2D
-  uvTransform?: Transform2D
 }
 
 export class CanvasContext extends Path2D {
@@ -35,12 +36,12 @@ export class CanvasContext extends Path2D {
   miterLimit?: number
 
   // custom
-  uvTransform?: Transform2D
-  vertTransform?: Transform2D
+  transformUv?: TransformUv
+  transformVertex?: TransformVertex
 
   protected _draws: (StrokeDraw | FillDraw)[] = []
 
-  protected _parseDrawStyle(source?: ColorValue | Texture2D): { texture?: Texture2D, backgroundColor?: number[] } {
+  protected _parseDrawStyle(source?: ColorValue | Texture2D): { texture?: Texture2D } {
     if (source) {
       if (source instanceof Texture2D) {
         return {
@@ -49,7 +50,7 @@ export class CanvasContext extends Path2D {
       }
       else {
         return {
-          backgroundColor: new Color(source).toInt8Array(),
+          texture: ColorTexture.get(source),
         }
       }
     }
@@ -80,8 +81,8 @@ export class CanvasContext extends Path2D {
       ...this._parseDrawStyle(strokeStyle),
       type: 'stroke',
       path: new Path2D(this),
-      uvTransform: this.uvTransform,
-      vertTransform: this.vertTransform,
+      transformUv: this.transformUv,
+      transformVertex: this.transformVertex,
       lineStyle: {
         alignment: this.strokeAlignment ?? 0.5,
         cap: this.lineCap ?? 'butt',
@@ -126,8 +127,8 @@ export class CanvasContext extends Path2D {
     }
 
     this._draws.push({
-      uvTransform: this.uvTransform,
-      vertTransform: this.vertTransform,
+      transformUv: this.transformUv,
+      transformVertex: this.transformVertex,
       ...options,
       ...this._parseDrawStyle(fillStyle),
       type: 'fill',
@@ -141,8 +142,8 @@ export class CanvasContext extends Path2D {
     super.copy(source)
     this.strokeStyle = source.strokeStyle
     this.fillStyle = source.fillStyle
-    this.uvTransform = source.uvTransform
-    this.vertTransform = source.vertTransform
+    this.transformUv = source.transformUv
+    this.transformVertex = source.transformVertex
     this.strokeAlignment = source.strokeAlignment
     this.lineCap = source.lineCap
     this.lineJoin = source.lineJoin
@@ -156,8 +157,8 @@ export class CanvasContext extends Path2D {
     super.reset()
     this.strokeStyle = undefined
     this.fillStyle = undefined
-    this.uvTransform = undefined
-    this.vertTransform = undefined
+    this.transformUv = undefined
+    this.transformVertex = undefined
     this.strokeAlignment = undefined
     this.lineCap = undefined
     this.lineJoin = undefined
@@ -171,37 +172,6 @@ export class CanvasContext extends Path2D {
     return this
   }
 
-  buildUvs(
-    start: number,
-    vertices: number[],
-    uvs: number[],
-    texture?: Texture2D,
-    uvTransform?: Transform2D,
-  ): void {
-    if (texture) {
-      const w = texture.width
-      const h = texture.height
-      for (let len = vertices.length, i = start; i < len; i += 2) {
-        const x = vertices[i]
-        const y = vertices[i + 1]
-        let uvX
-        let uvY
-        if (uvTransform) {
-          [uvX, uvY] = uvTransform.apply({ x, y }).toArray()
-        }
-        else {
-          [uvX, uvY] = [x / w, y / h]
-        }
-        uvs.push(uvX, uvY)
-      }
-    }
-    else {
-      for (let len = vertices.length, i = start; i < len; i += 2) {
-        uvs.push(0, 0)
-      }
-    }
-  }
-
   toBatchables(): CanvasBatchable[] {
     const batchables: CanvasBatchable[] = []
 
@@ -209,39 +179,29 @@ export class CanvasContext extends Path2D {
       const current = this._draws[i]
       const vertices: number[] = []
       const indices: number[] = []
-      const uvs: number[] = []
 
-      if (current.type === 'fill') {
-        current.path.fillTriangulate({
+      const { path, ...batchable } = current
+
+      if (batchable.type === 'fill') {
+        path.fillTriangulate({
           vertices,
           indices,
         })
       }
       else {
-        current.path.strokeTriangulate({
+        path.strokeTriangulate({
           vertices,
           indices,
-          lineStyle: current.lineStyle,
+          lineStyle: batchable.lineStyle,
           flipAlignment: false,
-          closed: false,
+          closed: path.getPoint(0).equals(path.getPoint(1)),
         })
       }
 
-      if (current.texture) {
-        this.buildUvs(0, vertices, uvs, current.texture, current.uvTransform)
-      }
-
       batchables.push({
+        ...batchable,
         vertices: new Float32Array(vertices),
-        indices: new Float32Array(indices),
-        uvs: new Float32Array(uvs),
-        size: current.size,
-        texture: current.texture,
-        backgroundColor: current.backgroundColor,
-        type: current.type,
-        disableWrapMode: current.disableWrapMode,
-        uvTransform: current.uvTransform,
-        vertTransform: current.vertTransform,
+        indices: new Uint32Array(indices),
       })
     }
 

@@ -1,7 +1,7 @@
 import { fonts } from 'modern-font'
 import {
-  Element2D,
-  Engine,
+  Camera2D,
+  Element2D, Engine,
 } from '../../src'
 
 const engine = new Engine({
@@ -9,6 +9,10 @@ const engine = new Engine({
   autoStart: true,
   autoResize: true,
 })
+
+engine.root.append(
+  new Camera2D({ internalMode: 'front' }),
+)
 
 ;(window as any).engine = engine
 

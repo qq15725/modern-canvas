@@ -1,62 +1,53 @@
-import type { WebGLRenderer } from '../../../core'
-import { Resource } from '../../../core'
+import type { GlProgramOptions, GlRenderer, ShaderLikeReactiveObject } from '../../../core'
+import { property } from 'modern-idoc'
+import { GlProgram, Resource } from '../../../core'
 
-export interface MaterialOptions {
-  vert?: string
-  frag?: string
+export interface MaterialProperties {
+  gl?: Partial<GlProgramOptions>
   uniforms?: Record<string, any>
 }
 
-export class Material extends Resource {
+function getDefaultUniforms(): Record<string, any> {
+  return {
+    projectionMatrix: new Float32Array([1, 0, 0, 0, 1, 0, 0, 0, 1]),
+    modelViewMatrix: new Float32Array([1, 0, 0, 0, 1, 0, 0, 0, 1]),
+    tint: new Float32Array([1, 1, 1, 1]),
+  }
+}
+
+export class Material extends Resource implements ShaderLikeReactiveObject {
   static instance = new this()
 
-  vert: string
-  frag: string
-  readonly uniforms: Map<string, any>
+  readonly glProgram: GlProgram
+  @property({ default: getDefaultUniforms }) declare uniforms: Record<string, any>
 
-  constructor(options: MaterialOptions = {}) {
+  constructor(properties: MaterialProperties = {}) {
     super()
-
-    this.vert = options.vert ?? `attribute vec2 position;
+    const { uniforms, gl } = properties
+    if (uniforms) {
+      this.uniforms = uniforms
+    }
+    this.glProgram = new GlProgram({
+      vertex: `in vec2 position;
 uniform mat3 projectionMatrix;
 uniform mat3 modelViewMatrix;
 void main(void) {
   gl_Position = vec4((projectionMatrix * modelViewMatrix * vec3(position, 1.0)).xy, 0.0, 1.0);
-}`
-
-    this.frag = options.frag ?? `uniform vec4 tint;
+}`,
+      fragment: `uniform vec4 tint;
 void main(void) {
   gl_FragColor = tint;
-}`
-
-    this.uniforms = new Map(Object.entries(options.uniforms ?? {
-      projectionMatrix: new Float32Array([1, 0, 0, 0, 1, 0, 0, 0, 1]),
-      modelViewMatrix: new Float32Array([1, 0, 0, 0, 1, 0, 0, 0, 1]),
-      tint: new Float32Array([1, 1, 1, 1]),
-    }))
-  }
-
-  /** @internal */
-  _glProgram(renderer: WebGLRenderer): WebGLProgram {
-    return renderer.getRelated(this, () => {
-      let vert = this.vert
-      let frag = this.frag
-      if (!frag.includes('precision'))
-        frag = `precision mediump float;\n${frag}`
-      if (!vert.includes('precision'))
-        vert = `precision mediump float;\n${vert}`
-      return renderer.program.create({ vert, frag })
+}`,
+      ...gl,
     })
   }
 
-  activate(renderer: WebGLRenderer, uniforms?: Record<string, any>): void {
-    renderer.program.bind(this._glProgram(renderer))
-
-    if (uniforms || this.uniforms.size > 0) {
-      renderer.program.updateUniforms({
-        ...Object.fromEntries(this.uniforms.entries()),
-        ...uniforms,
-      })
+  activate(renderer: GlRenderer, uniforms: Record<string, any> = {}): void {
+    renderer.shader.bind(this)
+    this.uniforms = {
+      ...this.uniforms,
+      ...uniforms,
     }
+    renderer.shader.updateUniforms(this)
   }
 }

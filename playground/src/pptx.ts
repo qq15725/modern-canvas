@@ -1,10 +1,14 @@
 import { fonts } from 'modern-font'
+import gifWorkerUrl from 'modern-gif/worker?url'
 import {
+  assets,
   Camera2D,
   DrawboardEffect,
   Engine,
   Node,
 } from '../../src'
+
+assets.gifWorkerUrl = gifWorkerUrl
 
 const engine = new Engine({
   autoResize: true,

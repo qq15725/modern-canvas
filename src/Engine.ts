@@ -1,13 +1,15 @@
-import type { SceneTreeEvents, SceneTreeProperties } from './scene'
+import type { Node, SceneTreeEvents, SceneTreeProperties } from './scene'
 import { property } from 'modern-idoc'
 import { assets } from './asset'
 import {
   DEVICE_PIXEL_RATIO,
+  GlRenderer,
   nextTick,
   SUPPORTS_RESIZE_OBSERVER,
-  WebGLRenderer,
 } from './core'
 import { SceneTree } from './scene'
+
+export type EngineData = Record<string, any> | Node | (Node | Record<string, any>)[]
 
 export interface EngineProperties extends WebGLContextAttributes, SceneTreeProperties {
   view?: HTMLCanvasElement | WebGLRenderingContext | WebGL2RenderingContext
@@ -16,6 +18,7 @@ export interface EngineProperties extends WebGLContextAttributes, SceneTreePrope
   pixelRatio?: number
   autoResize: boolean
   autoStart: boolean
+  data?: EngineData
 }
 
 interface EngineEvents extends SceneTreeEvents {
@@ -42,7 +45,7 @@ export class Engine extends SceneTree {
   @property({ fallback: false }) declare autoResize: boolean
   @property({ fallback: false }) declare autoStart: boolean
 
-  readonly renderer: WebGLRenderer
+  readonly renderer: GlRenderer
   get view(): HTMLCanvasElement | undefined { return this.renderer.view }
   get gl(): WebGLRenderingContext | WebGL2RenderingContext { return this.renderer.gl }
   get screen(): { x: number, y: number, width: number, height: number } { return this.renderer.screen }
@@ -74,10 +77,11 @@ export class Engine extends SceneTree {
       height,
       pixelRatio = DEVICE_PIXEL_RATIO,
       autoResize,
+      data,
     } = properties
 
     super()
-    this.renderer = new WebGLRenderer(view, {
+    this.renderer = new GlRenderer(view, {
       alpha: defaultOptions.alpha ?? properties.alpha,
       stencil: defaultOptions.stencil ?? properties.stencil,
       antialias: defaultOptions.antialias ?? properties.antialias,
@@ -100,7 +104,12 @@ export class Engine extends SceneTree {
         !view,
       )
     }
+
     this.setProperties(properties)
+
+    if (data) {
+      this.root.append(data)
+    }
   }
 
   protected override _updateProperty(key: string, value: any, oldValue: any): void {
@@ -148,7 +157,6 @@ export class Engine extends SceneTree {
     this.renderer.resize(width, height, updateCss)
     this.root.width = width
     this.root.height = height
-    this.root.requestUpload()
     this.render()
     return this
   }

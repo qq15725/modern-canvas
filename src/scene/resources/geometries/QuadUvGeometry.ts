@@ -1,4 +1,4 @@
-import type { WebGLRenderer } from '../../../core'
+import type { GlRenderer } from '../../../core'
 import type { Material } from '../materials'
 import { UvMaterial } from '../materials'
 import { Geometry } from './Geometry'
@@ -11,7 +11,7 @@ export class QuadUvGeometry extends Geometry {
   static get instance(): QuadUvGeometry { return this._instance ??= new this() }
 
   static draw(
-    renderer: WebGLRenderer,
+    renderer: GlRenderer,
     material: Material = UvMaterial.instance,
     uniforms?: Record<string, any>,
   ): void {
@@ -20,29 +20,22 @@ export class QuadUvGeometry extends Geometry {
 
   constructor() {
     super({
-      vertexAttributes: {
+      attributes: {
         position: new VertexAttribute({
+          format: 'float32x2',
           buffer: new VertexBuffer({
             data: new Float32Array([-1, -1, 1, -1, 1, 1, -1, 1]),
-            dynamic: false,
           }),
-          size: 2,
-          normalized: false,
-          type: 'float',
         }),
         uv: new VertexAttribute({
+          format: 'float32x2',
           buffer: new VertexBuffer({
             data: new Float32Array([0, 0, 1, 0, 1, 1, 0, 1]),
-            dynamic: false,
           }),
-          size: 2,
-          normalized: false,
-          type: 'float',
         }),
       },
       indexBuffer: new IndexBuffer({
-        data: new Uint16Array([0, 1, 2, 0, 2, 3]),
-        dynamic: false,
+        data: new Uint32Array([0, 1, 2, 0, 2, 3]),
       }),
     })
   }

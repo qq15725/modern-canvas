@@ -1,4 +1,5 @@
 import type { ObservableEvents } from 'modern-idoc'
+import type { Resource } from '../core'
 import type { Loader } from './loaders'
 import { Observable } from 'modern-idoc'
 import { Ticker } from '../core'
@@ -209,9 +210,9 @@ export class Assets extends Observable<AssetsEvents> {
 
   gc(): void {
     this._handled.forEach((_, id) => {
-      const ref = this.get<any>(id)
-      if (ref && 'destroy' in ref) {
-        ref.destroy()
+      const resource = this.get<Resource>(id)
+      if (resource && 'destroy' in resource) {
+        resource.destroy()
       }
     })
     this._handled.clear()

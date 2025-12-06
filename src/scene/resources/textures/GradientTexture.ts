@@ -1,5 +1,5 @@
 import type { LinearGradient, RadialGradient } from 'modern-idoc'
-import type { Texture2DPixelsSource } from './Texture2D'
+import type { Texture2DProperties } from './Texture2D'
 import { isGradient } from 'modern-idoc'
 import { Texture2D } from './Texture2D'
 
@@ -8,7 +8,7 @@ export class GradientTexture extends Texture2D {
     return isGradient(value)
   }
 
-  static linearGradient(linearGradient: LinearGradient, width: number, height: number): Texture2DPixelsSource {
+  static linearGradient(linearGradient: LinearGradient, width: number, height: number): Texture2DProperties {
     width = width || 1
     height = height || 1
     const canvas = document.createElement('canvas')
@@ -39,7 +39,8 @@ export class GradientTexture extends Texture2D {
     return {
       width: imageData.width,
       height: imageData.height,
-      pixels: new Uint8Array(imageData.data.buffer),
+      source: new Uint8Array(imageData.data.buffer),
+      uploadMethodId: 'buffer',
     }
   }
 

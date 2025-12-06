@@ -1,4 +1,4 @@
-import type { WebGLRenderer } from '../../core'
+import type { GlRenderer } from '../../core'
 import type { EffectProperties, Node, Viewport } from '../main'
 import { property } from 'modern-idoc'
 import { customNode } from '../../core'
@@ -12,14 +12,15 @@ export interface PixelateEffectProperties extends EffectProperties {
 @customNode('PixelateEffect')
 export class PixelateEffect extends Effect {
   static material = new Material({
-    vert: `attribute vec2 position;
+    gl: {
+      vertex: `attribute vec2 position;
 attribute vec2 uv;
 varying vec2 vUv;
 void main() {
   gl_Position = vec4(position, 0.0, 1.0);
   vUv = uv;
 }`,
-    frag: `precision highp float;
+      fragment: `precision highp float;
 varying vec2 vUv;
 uniform sampler2D sampler;
 uniform vec2 offset;
@@ -30,6 +31,7 @@ void main(void) {
   uv = floor((uv - offset) / step) * step + offset + step / 2.0;
   gl_FragColor = texture2D(sampler, uv);
 }`,
+    },
   })
 
   @property({ fallback: 10 }) declare strength: number
@@ -42,9 +44,9 @@ void main(void) {
       .append(children)
   }
 
-  override apply(renderer: WebGLRenderer, source: Viewport): void {
+  override apply(renderer: GlRenderer, source: Viewport): void {
     source.redraw(renderer, () => {
-      const viewMatrix = renderer.program.uniforms.viewMatrix
+      const viewMatrix = renderer.shader.uniforms.viewMatrix
       const zoom = [viewMatrix[0], viewMatrix[4]]
       const translate = [viewMatrix[6], viewMatrix[7]]
       const params = {

@@ -1,4 +1,4 @@
-import type { ColorValue, WebGLRenderer } from '../../core'
+import type { ColorValue, GlRenderer } from '../../core'
 import type { EffectProperties, Node, Viewport } from '../main'
 import { property } from 'modern-idoc'
 import { Color, customNode } from '../../core'
@@ -15,7 +15,8 @@ export interface ColorReplaceEffectProperties extends EffectProperties {
 @customNode('ColorReplaceEffect')
 export class ColorReplaceEffect extends Effect {
   static material = new Material({
-    vert: `precision mediump float;
+    gl: {
+      vertex: `precision mediump float;
 attribute vec2 position;
 attribute vec2 uv;
 varying vec2 vUv;
@@ -23,7 +24,7 @@ void main() {
   gl_Position = vec4(position, 0.0, 1.0);
   vUv = uv;
 }`,
-    frag: `varying vec2 vUv;
+      fragment: `varying vec2 vUv;
 uniform sampler2D sampler;
 uniform float epsilon;
 const int MAX_COLORS = ${MAX_COLORS};
@@ -53,6 +54,7 @@ void main(void) {
     }
   }
 }`,
+    },
   })
 
   @property({ default: () => ([]) }) declare colors: ColorValue[][]
@@ -68,7 +70,7 @@ void main(void) {
       .append(children)
   }
 
-  override apply(renderer: WebGLRenderer, source: Viewport): void {
+  override apply(renderer: GlRenderer, source: Viewport): void {
     const colors = this.colors.map((val) => {
       this._color.value = val[0]
       const color0 = this._color.toArray().slice(0, 3)

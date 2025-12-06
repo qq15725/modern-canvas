@@ -29,21 +29,6 @@ function parseVal(val: string): number | number[] {
 }
 
 export class EffectMaterial extends Material {
-  override vert = `attribute vec2 position;
-attribute vec2 uv;
-varying vec2 vUv;
-void main() {
-  gl_Position = vec4(position, 0.0, 1.0);
-  vUv = uv;
-}`
-
-  override readonly uniforms = new Map<string, any>([
-    ['ratio', 0],
-    ['from', 0],
-    ['to', 1],
-    ['progress', 0],
-  ])
-
   static RE = {
     getColor: /\sgetColor\s*\(/,
     getFromColor: /\sgetFromColor\s*\(/,
@@ -52,24 +37,37 @@ void main() {
     transition: /\stransition\s*\(/,
   }
 
-  has = {
-    getColor: false,
-    getFromColor: false,
-    getToColor: false,
-    transform: false,
-    transition: false,
+  has: {
+    getColor: boolean
+    getFromColor: boolean
+    getToColor: boolean
+    transform: boolean
+    transition: boolean
   }
 
   constructor(glsl: string) {
-    super()
-
-    const has = this.has
+    const has = {
+      getColor: false,
+      getFromColor: false,
+      getToColor: false,
+      transform: false,
+      transition: false,
+    }
     for (const key in EffectMaterial.RE) {
       (has as any)[key] = (EffectMaterial.RE as any)[key].test(glsl)
     }
 
-    this.frag = `precision highp float;
-varying vec2 vUv;
+    super({
+      gl: {
+        vertex: `attribute vec2 position;
+in vec2 uv;
+out vec2 vUv;
+void main() {
+  gl_Position = vec4(position, 0.0, 1.0);
+  vUv = uv;
+}`,
+        fragment: `precision highp float;
+in vec2 vUv;
 uniform float ratio;
 uniform float progress;
 ${
@@ -96,14 +94,24 @@ ${glsl}${
     : has.transition
       ? '\nvoid main(void) { gl_FragColor = transition(vUv); }'
       : ''
-}`
+}`,
+      },
+      uniforms: {
+        ratio: 0,
+        from: 0,
+        to: 1,
+        progress: 0,
+      },
+    })
+
+    this.has = has
 
     const matched = glsl.matchAll(DEFAULT_VALUE_RE)
 
     for (const item of matched) {
       if (item[1] && item[2]) {
         item[1].split(',').forEach((val) => {
-          this.uniforms.set(val.trim(), parseVal(item[2]))
+          this.uniforms[val.trim()] = parseVal(item[2])
         })
       }
     }

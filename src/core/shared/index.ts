@@ -1,4 +1,4 @@
 export * from './css'
 export * from './dom'
-export * from './RawWeakMap'
+export * from './id'
 export * from './utils'

@@ -1,10 +1,10 @@
 import type { Fonts } from 'modern-font'
 import type { Hex8Color } from 'modern-idoc'
 import type {
+  GlRenderer,
   InputEvents,
   MainLoopEvents,
   MainLoopProperties,
-  WebGLRenderer,
 } from '../../core'
 import type { Node } from './Node'
 import type { Viewport } from './Viewport'
@@ -38,7 +38,7 @@ export interface SceneTree {
 
 export interface SceneTreeProperties extends MainLoopProperties {
   msaa: boolean
-  pixelate: boolean
+  roundPixels: boolean
   backgroundColor: Hex8Color
   // internal
   debug: boolean
@@ -49,7 +49,7 @@ export interface SceneTreeProperties extends MainLoopProperties {
 
 export class SceneTree extends MainLoop {
   @property({ alias: 'root.msaa' }) declare msaa: boolean
-  @property({ fallback: false }) declare pixelate: boolean
+  @property({ fallback: false }) declare roundPixels: boolean
   @property() declare backgroundColor?: Hex8Color
   @property({ internal: true, fallback: false }) declare debug: boolean
   @property({ internal: true, fallback: false }) declare processPaused: boolean
@@ -58,13 +58,13 @@ export class SceneTree extends MainLoop {
 
   readonly input = new Input()
   readonly renderStack = new RenderStack()
-  readonly root = new Window(true).setTree(this)
+  readonly root = new Window().setTree(this)
 
   protected _backgroundColor = new Color()
   protected _previousViewport?: Viewport
   protected _currentViewport?: Viewport
-  getCurrentViewport(): Viewport | undefined { return this._currentViewport }
   getPreviousViewport(): Viewport | undefined { return this._previousViewport }
+  getCurrentViewport(): Viewport | undefined { return this._currentViewport }
   setCurrentViewport(viewport: Viewport | undefined): void {
     if (this._currentViewport && !this._currentViewport.equal(viewport)) {
       this._previousViewport = this._currentViewport
@@ -104,23 +104,17 @@ export class SceneTree extends MainLoop {
     this.emit('processed')
   }
 
-  protected _render(renderer: WebGLRenderer): void {
+  protected _render(renderer: GlRenderer): void {
     this.emit('rendering')
     this.renderStack.render(renderer)
     this._renderScreen(renderer)
     this.emit('rendered')
   }
 
-  protected _renderScreen(renderer: WebGLRenderer): void {
+  protected _renderScreen(renderer: GlRenderer): void {
     this.root.finish(renderer)
     renderer.state.reset()
-    renderer.framebuffer.bind(null)
-    renderer.gl.bindFramebuffer(renderer.gl.FRAMEBUFFER, null)
-    renderer.viewport.bind({
-      x: 0, y: 0,
-      width: this.root.width * renderer.pixelRatio,
-      height: this.root.height * renderer.pixelRatio,
-    })
+    renderer.renderTarget.unbind()
     if (this.backgroundColor) {
       renderer.gl.clearColor(...this._backgroundColor.toArray())
     }
@@ -131,7 +125,7 @@ export class SceneTree extends MainLoop {
     const texture = this.root.texture
     texture.activate(renderer, 0)
     QuadUvGeometry.draw(renderer)
-    renderer.texture.unbind(texture)
+    texture.inactivate(renderer)
   }
 
   override destroy(): void {

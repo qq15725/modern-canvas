@@ -1,4 +1,4 @@
-import type { WebGLRenderer } from '../../core'
+import type { GlRenderer } from '../../core'
 import type { EffectProperties, Node, Viewport } from '../main'
 import { property } from 'modern-idoc'
 import { customNode } from '../../core'
@@ -53,7 +53,8 @@ export class KawaseBlurEffect extends Effect {
     super()
 
     this.material = new Material({
-      vert: `precision mediump float;
+      gl: {
+        vertex: `precision mediump float;
 attribute vec2 position;
 attribute vec2 uv;
 varying vec2 vUv;
@@ -61,7 +62,8 @@ void main() {
   gl_Position = vec4(position, 0.0, 1.0);
   vUv = uv;
 }`,
-      frag: properties?.clamp ? clampFrag : frag,
+        fragment: properties?.clamp ? clampFrag : frag,
+      },
     })
 
     this
@@ -98,12 +100,12 @@ void main() {
     this._kernels = kernels
   }
 
-  override apply(renderer: WebGLRenderer, source: Viewport): void {
-    const uvX = this.pixelSize[0] / source.width
-    const uvY = this.pixelSize[1] / source.height
+  override apply(renderer: GlRenderer, viewport: Viewport): void {
+    const uvX = this.pixelSize[0] / viewport.width
+    const uvY = this.pixelSize[1] / viewport.height
     this._kernels.forEach((kernel) => {
       const offset = kernel + 0.5
-      source.redraw(renderer, () => {
+      viewport.redraw(renderer, () => {
         QuadUvGeometry.draw(renderer, this.material, {
           sampler: 0,
           uOffset: [

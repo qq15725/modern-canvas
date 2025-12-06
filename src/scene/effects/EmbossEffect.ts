@@ -1,4 +1,4 @@
-import type { WebGLRenderer } from '../../core'
+import type { GlRenderer } from '../../core'
 import type { EffectProperties, Node, Viewport } from '../main'
 import { property } from 'modern-idoc'
 import { customNode } from '../../core'
@@ -12,7 +12,8 @@ export interface EmbossEffectProperties extends EffectProperties {
 @customNode('EmbossEffect')
 export class EmbossEffect extends Effect {
   static material = new Material({
-    vert: `precision mediump float;
+    gl: {
+      vertex: `precision mediump float;
 attribute vec2 position;
 attribute vec2 uv;
 varying vec2 vUv;
@@ -20,7 +21,7 @@ void main() {
   gl_Position = vec4(position, 0.0, 1.0);
   vUv = uv;
 }`,
-    frag: `precision mediump float;
+      fragment: `precision mediump float;
 uniform sampler2D sampler;
 uniform vec4 inputSize;
 uniform float strength;
@@ -36,6 +37,7 @@ void main(void) {
     float alpha = texture2D(sampler, vUv).a;
     gl_FragColor = vec4(color.rgb * alpha, alpha);
 }`,
+    },
   })
 
   @property({ fallback: 5 }) declare strength: number
@@ -48,7 +50,7 @@ void main(void) {
       .append(children)
   }
 
-  override apply(renderer: WebGLRenderer, source: Viewport): void {
+  override apply(renderer: GlRenderer, source: Viewport): void {
     source.redraw(renderer, () => {
       QuadUvGeometry.draw(renderer, EmbossEffect.material, {
         sampler: 0,

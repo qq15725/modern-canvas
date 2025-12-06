@@ -5,7 +5,7 @@ import type {
   PointerInputEvent,
   Vector2Data,
   WheelInputEvent } from '../../core'
-import type { Node } from '../main'
+import type { Node, SceneTree } from '../main'
 import type { Node2DEvents, Node2DProperties } from './Node2D'
 import { property } from 'modern-idoc'
 import { clamp, customNode, IN_MAC_OS, Transform2D, Vector2 } from '../../core'
@@ -148,21 +148,17 @@ export class Camera2D extends Node2D {
   }
 
   protected _onWheel(e: WheelInputEvent): void {
+    e.preventDefault()
     if (e.ctrlKey || e.metaKey) {
-      e.preventDefault()
       const oldScreen = { x: e.screenX, y: e.screenY }
       const oldGlobal = this.toGlobal(oldScreen)
       const factor = e.ctrlKey && IN_MAC_OS ? 10 : 1
       const delta = -e.deltaY * (e.deltaMode === 1 ? 0.05 : e.deltaMode ? 1 : 0.002) * factor
       this.zoomWithWheel(delta)
       const newScreen = this.toScreen(oldGlobal)
-      this.position.add(
-        Math.round(newScreen.x - oldScreen.x),
-        Math.round(newScreen.y - oldScreen.y),
-      )
+      this.position.add(newScreen.x - oldScreen.x, newScreen.y - oldScreen.y)
     }
     else {
-      e.preventDefault()
       this.position.add(
         Math.round(e.deltaX),
         Math.round(e.deltaY),
@@ -188,9 +184,18 @@ export class Camera2D extends Node2D {
       .scale(this._zoom.x, this._zoom.y)
       .premultiply(this.transform.affineInverse())
 
-    this.getViewport()?.canvasTransform.copy(this.canvasTransform)
+    this.syncCanvasTransform()
 
     this.emit('updateCanvasTransform')
+  }
+
+  syncCanvasTransform(): void {
+    this.getViewport()?.canvasTransform.copy(this.canvasTransform)
+  }
+
+  protected override _treeEnter(tree: SceneTree): void {
+    super._treeEnter(tree)
+    this.syncCanvasTransform()
   }
 
   toGlobal<P extends Vector2Data = Vector2>(screenPos: Vector2Data, newPos?: P): P {

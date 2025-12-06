@@ -1,59 +1,17 @@
-import type { WebGLBufferOptions, WebGLRenderer } from '../../../core'
+import type { BufferLikeObject, BufferLikeReactiveObject } from '../../../core'
 import { property } from 'modern-idoc'
-import { Resource } from '../../../core'
+import { BufferUsage, Resource } from '../../../core'
 
-export interface IndexBufferOptions {
-  data?: Uint16Array<ArrayBuffer> | null
-  dynamic?: boolean
+export interface IndexBufferProperties extends Partial<Omit<BufferLikeObject, 'instanceId'>> {
+  //
 }
 
-export class IndexBuffer extends Resource {
-  @property({ internal: true, fallback: null }) declare data: Uint16Array<ArrayBuffer> | null
-  @property({ internal: true, fallback: false }) declare dynamic: boolean
+export class IndexBuffer extends Resource implements BufferLikeReactiveObject {
+  @property({ fallback: BufferUsage.index }) declare usage: BufferUsage
+  @property({ default: () => new Uint32Array() }) declare data: BufferLikeObject['data']
 
-  needsUpload = false
-
-  constructor(options?: IndexBufferOptions) {
+  constructor(properties?: IndexBufferProperties) {
     super()
-    this.setProperties(options)
-  }
-
-  /** @internal */
-  _glBufferOptions(): WebGLBufferOptions {
-    return {
-      target: 'element_array_buffer',
-      data: this.data,
-      usage: this.dynamic ? 'dynamic_draw' : 'static_draw',
-    }
-  }
-
-  /** @internal */
-  _glBuffer(renderer: WebGLRenderer): WebGLBuffer {
-    return renderer.getRelated(this, () => {
-      return renderer.buffer.create(this._glBufferOptions())
-    })
-  }
-
-  protected override _updateProperty(key: string, value: any, oldValue: any): void {
-    super._updateProperty(key, value, oldValue)
-
-    switch (key) {
-      case 'data':
-      case 'dynamic':
-        this.needsUpload = true
-        break
-    }
-  }
-
-  upload(renderer: WebGLRenderer): boolean {
-    const result = this.needsUpload
-    if (result) {
-      this.needsUpload = false
-      renderer.buffer.update(
-        this._glBuffer(renderer),
-        this._glBufferOptions(),
-      )
-    }
-    return result
+    this.setProperties(properties)
   }
 }

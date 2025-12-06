@@ -96,27 +96,22 @@ export class Node2D extends CanvasItem {
       this.globalRotation = this.rotation
       this.globalTransform.copy(this.transform)
     }
-    this.requestRelayout()
+    this.requestLayout()
   }
 
-  protected _transformVertices(vertices: Float32Array, vertTransform?: Transform2D): Float32Array {
-    let a, c, tx, b, d, ty
-    if (vertTransform) {
-      const globalTransform = this.globalTransform.clone()
-      globalTransform.multiply(vertTransform)
-      ;([a, c, tx, b, d, ty] = globalTransform.toArray())
-    }
-    else {
-      ;([a, c, tx, b, d, ty] = this.globalTransform.toArray())
-    }
-    const newVertices = vertices.slice()
+  protected _transformVertices(batchable: CanvasBatchable): Float32Array {
+    const { a, c, tx, b, d, ty } = this.globalTransform.toObject()
+    const vertices = batchable.vertices.slice()
+    const transform = batchable.transformVertex ?? (() => {})
+    let x, y
     for (let len = vertices.length, i = 0; i < len; i += 2) {
-      const x = vertices[i]
-      const y = vertices[i + 1]
-      newVertices[i] = (a * x) + (c * y) + tx
-      newVertices[i + 1] = (b * x) + (d * y) + ty
+      x = vertices[i]
+      y = vertices[i + 1]
+      vertices[i] = (a * x) + (c * y) + tx
+      vertices[i + 1] = (b * x) + (d * y) + ty
+      transform(vertices, i)
     }
-    return newVertices
+    return vertices
   }
 
   protected override _relayout(batchables: CanvasBatchable[]): CanvasBatchable[] {
@@ -125,7 +120,7 @@ export class Node2D extends CanvasItem {
     return batchables.map((batchable) => {
       return {
         ...batchable,
-        vertices: this._transformVertices(batchable.vertices, batchable.vertTransform),
+        vertices: this._transformVertices(batchable),
       }
     })
   }
@@ -137,7 +132,7 @@ export class Node2D extends CanvasItem {
       parent?.globalTransform
       && this._parentTransformDirtyId !== parent?.globalTransform?.dirtyId
     ) {
-      this.requestRelayout()
+      this.requestLayout()
     }
   }
 

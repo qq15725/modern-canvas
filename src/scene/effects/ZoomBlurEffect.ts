@@ -1,5 +1,5 @@
-import type { WebGLRenderer } from '../../core'
-import type { EffectContext, EffectProperties, Node, Viewport } from '../main'
+import type { GlRenderer } from '../../core'
+import type { EffectProperties, Node, Viewport } from '../main'
 import { property } from 'modern-idoc'
 import { customNode } from '../../core'
 import { Effect } from '../main/Effect'
@@ -15,14 +15,15 @@ export interface ZoomBlurEffectProperties extends EffectProperties {
 @customNode('ZoomBlurEffect')
 export class ZoomBlurEffect extends Effect {
   static material = new Material({
-    vert: `attribute vec2 position;
+    gl: {
+      vertex: `attribute vec2 position;
 attribute vec2 uv;
 varying vec2 vUv;
 void main() {
   gl_Position = vec4(position, 0.0, 1.0);
   vUv = uv;
 }`,
-    frag: `varying vec2 vUv;
+      fragment: `varying vec2 vUv;
 uniform sampler2D sampler;
 uniform vec4 uInputSize;
 
@@ -97,6 +98,7 @@ void main() {
 
   gl_FragColor = color;
 }`,
+    },
   })
 
   @property() declare center?: number[]
@@ -112,18 +114,11 @@ void main() {
       .append(children)
   }
 
-  override apply(renderer: WebGLRenderer, source: Viewport, context: EffectContext): void {
-    let center = this.center
-    if (context.targetArea) {
-      center = [
-        (context.targetArea[0] + context.targetArea[2] / 2) * source.width,
-        (context.targetArea[1] + context.targetArea[3] / 2) * source.height,
-      ]
-    }
+  override apply(renderer: GlRenderer, source: Viewport): void {
     source.redraw(renderer, () => {
       QuadUvGeometry.draw(renderer, ZoomBlurEffect.material, {
         sampler: 0,
-        uCenter: center ?? [source.width / 2, source.height / 2],
+        uCenter: [source.width / 2, source.height / 2],
         uInnerRadius: this.innerRadius,
         uRadius: this.radius,
         uStrength: this.strength,

@@ -1,4 +1,4 @@
-import type { WebGLRenderer } from '../../core'
+import type { GlRenderer, RectangleLike } from '../../core'
 import type { Material } from '../resources'
 import type { Rectangulable } from './interfaces'
 import type { Node } from './Node'
@@ -24,7 +24,6 @@ export interface EffectContext {
   redraw?: boolean
   /** parent redraw */
   target?: Node
-  targetArea?: [number, number, number, number]
   /** transition */
   from?: Viewport
   to?: Viewport
@@ -36,6 +35,8 @@ export class Effect extends TimelineNode {
   @property() declare effectMode?: EffectMode
   @property() declare glsl?: string
   @property() declare glslSrc?: string
+
+  needsRender = true
 
   protected get _effectMode(): EffectMode { return this.effectMode ?? 'parent' }
 
@@ -148,15 +149,27 @@ export class Effect extends TimelineNode {
     let start: number | undefined
     let end: number | undefined
     calls.forEach((call, index) => {
-      if (call.renderable.equal(this._parent) || call.renderable.parent?.equal(this._parent)) {
+      const renderable = call.renderable
+      if (
+        renderable.equal(this._parent)
+        || renderable.parent?.equal(this._parent)
+      ) {
+        if (renderable.needsRender) {
+          this.needsRender = true
+        }
         start = start ?? index
         end = index
       }
     })
     if (start === undefined || end === undefined)
       return
-    calls.splice(end + 1, 0, renderStack.createCall(this))
-    calls.splice(start, 0, renderStack.createCall(this))
+    if (this.needsRender) {
+      calls.splice(end + 1, 0, renderStack.createCall(this))
+      calls.splice(start, 0, renderStack.createCall(this))
+    }
+    else {
+      calls.splice(start, end + 1, renderStack.createCall(this))
+    }
   }
 
   protected _processChildren(): void {
@@ -186,85 +199,107 @@ export class Effect extends TimelineNode {
     }
   }
 
-  protected _renderBefore(renderer: WebGLRenderer): void {
-    const viewport1 = this._tree?.getCurrentViewport()
-    if (viewport1) {
-      this.apply(renderer, viewport1, { redraw: true })
+  protected _renderBefore(renderer: GlRenderer): void {
+    const currentViewport = this._tree?.getCurrentViewport()
+    if (currentViewport) {
+      this.apply(renderer, currentViewport, { redraw: true })
     }
   }
 
-  protected _renderTransition(renderer: WebGLRenderer): void {
+  protected _renderTransition(renderer: GlRenderer): void {
     if (this._renderId % 2 === 0) {
-      this._renderViewport = this._tree?.getCurrentViewport()
-      if (this._renderViewport) {
-        this.viewport1.activateWithCopy(renderer, this._renderViewport)
-        this.viewport2.resize(this._renderViewport.width, this._renderViewport.height)
+      const currentViewport = this._tree?.getCurrentViewport()
+      if (currentViewport) {
+        this.viewport1.activateWithCopy(renderer, currentViewport)
+        this.viewport2.resize(currentViewport.width, currentViewport.height)
       }
       this.viewport2.activate(renderer)
       renderer.clear()
     }
     else {
-      const oldViewport = this._renderViewport
-      this._renderViewport = undefined
-      if (oldViewport) {
-        oldViewport.activate(renderer)
-        renderer.clear()
-        this.viewport1.texture.activate(renderer, 0)
-        this.viewport2.texture.activate(renderer, 1)
-        this.apply(renderer, oldViewport, {
-          from: this.viewport1,
-          to: this.viewport2,
-        })
-        renderer.texture.unbind(0)
-        renderer.texture.unbind(1)
+      if (this._tree?.getCurrentViewport()?.equal(this.viewport2)) {
+        const previousViewport = this._tree?.getPreviousViewport()
+        if (previousViewport) {
+          previousViewport.activate(renderer)
+          renderer.clear()
+          this.viewport1.texture.activate(renderer, 0)
+          this.viewport2.texture.activate(renderer, 1)
+          this.apply(renderer, previousViewport, {
+            from: this.viewport1,
+            to: this.viewport2,
+          })
+          renderer.texture.unbind(0)
+          renderer.texture.unbind(1)
+        }
       }
     }
   }
 
-  protected _renderParentOrChildren(renderer: WebGLRenderer): void {
-    if (this._renderId % 2 === 0) {
-      this._renderViewport = this._tree?.getCurrentViewport()
-      if (this._renderViewport) {
-        this.viewport1.resize(this._renderViewport.width, this._renderViewport.height)
+  protected _renderParentOrChildren(renderer: GlRenderer): void {
+    const currentViewport = this._tree?.getCurrentViewport()
+    let rect: RectangleLike = { x: 0, y: 0, width: 0, height: 0 }
+    if (this._parent && 'getRect' in this._parent) {
+      rect = (this._parent as Rectangulable).getRect()
+    }
+    else if (currentViewport) {
+      rect.width = currentViewport.width
+      rect.height = currentViewport.height
+    }
+    if (this.needsRender) {
+      if (this._renderId % 2 === 0) {
+        this._renderViewport = currentViewport
+        if (rect.width && rect.height) {
+          this.viewport1.resize(rect.width, rect.height)
+        }
+        this.viewport1.canvasTransform.identity().translate(-rect.x, -rect.y)
+        this.viewport1.renderStart(renderer)
       }
-      this.viewport1.activate(renderer)
-      renderer.clear()
+      else {
+        if (
+          currentViewport
+          && currentViewport.equal(this.viewport1)
+          && this._renderViewport
+          && !this._renderViewport.equal(this.viewport1)
+        ) {
+          this.apply(renderer, this.viewport1, {
+            redraw: true,
+            target: this._effectMode === 'parent'
+              ? (this._parent ?? undefined)
+              : undefined,
+          })
+          this._renderViewport.activate(renderer)
+          this._renderViewport = undefined
+          renderer.batch2D.render({
+            vertices: new Float32Array([
+              rect.x, rect.y,
+              rect.x + rect.width, rect.y,
+              rect.x + rect.width, rect.y + rect.height,
+              rect.x, rect.y + rect.height,
+            ]),
+            uvs: new Float32Array([0, 0, 1, 0, 1, 1, 0, 1]),
+            indices: new Uint32Array([0, 1, 2, 0, 2, 3]),
+            texture: this.viewport1.texture,
+          })
+          this.needsRender = false
+        }
+      }
     }
     else {
-      const oldViewport = this._renderViewport
-      this._renderViewport = undefined
-      if (oldViewport) {
-        this.viewport1.activate(renderer)
-        this.apply(renderer, this.viewport1, {
-          redraw: true,
-          target: this._effectMode === 'parent'
-            ? (this._parent ?? undefined)
-            : undefined,
-          targetArea: this._parseTargetArea() as any,
-        })
-        oldViewport.activate(renderer)
-        this.viewport1.texture.activate(renderer, 0)
-        QuadUvGeometry.draw(renderer)
-      }
+      renderer.batch2D.render({
+        vertices: new Float32Array([
+          rect.x, rect.y,
+          rect.x + rect.width, rect.y,
+          rect.x + rect.width, rect.y + rect.height,
+          rect.x, rect.y + rect.height,
+        ]),
+        uvs: new Float32Array([0, 0, 1, 0, 1, 1, 0, 1]),
+        indices: new Uint32Array([0, 1, 2, 0, 2, 3]),
+        texture: this.viewport1.texture,
+      })
     }
   }
 
-  protected _parseTargetArea(): number[] | undefined {
-    if (this._effectMode === 'parent' && this._parent && 'getRect' in this._parent) {
-      const rect = (this._parent as Rectangulable).getRect()
-      if (rect) {
-        return [
-          rect.left / this.viewport1.width,
-          rect.top / this.viewport1.height,
-          rect.width / this.viewport1.width,
-          rect.height / this.viewport1.height,
-        ]
-      }
-    }
-    return undefined
-  }
-
-  protected override _render(renderer: WebGLRenderer): void {
+  protected override _render(renderer: GlRenderer): void {
     switch (this._effectMode) {
       case 'before':
         this._renderBefore(renderer)
@@ -278,10 +313,12 @@ export class Effect extends TimelineNode {
         this._renderParentOrChildren(renderer)
         break
     }
-    this._renderId++
+    if (this.needsRender) {
+      this._renderId++
+    }
   }
 
-  apply(renderer: WebGLRenderer, viewport: Viewport, context?: EffectContext): void {
+  apply(renderer: GlRenderer, viewport: Viewport, context?: EffectContext): void {
     if (!this.material) {
       return
     }

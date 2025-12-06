@@ -6,22 +6,18 @@ import { VertexBuffer } from './VertexBuffer'
 export class QuadGeometry extends Geometry {
   constructor() {
     super({
-      vertexAttributes: {
+      topology: 'triangle-strip',
+      attributes: {
         position: new VertexAttribute({
+          format: 'float32x2',
           buffer: new VertexBuffer({
             data: new Float32Array([0, 0, 1, 0, 1, 1, 0, 1]),
-            dynamic: false,
           }),
-          size: 2,
-          normalized: false,
-          type: 'float',
         }),
       },
       indexBuffer: new IndexBuffer({
-        data: new Uint16Array([0, 1, 3, 2]),
-        dynamic: false,
+        data: new Uint32Array([0, 1, 3, 2]),
       }),
-      mode: 'triangle_strip',
     })
   }
 }

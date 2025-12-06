@@ -19,7 +19,11 @@ export class GifLoader extends Loader {
           frames.map((frame) => {
             return {
               duration: frame.delay,
-              texture: new PixelsTexture(frame.data, frame.width, frame.height),
+              texture: new PixelsTexture({
+                source: frame.data,
+                width: frame.width,
+                height: frame.height,
+              }),
             }
           }),
         ))
@@ -27,7 +31,10 @@ export class GifLoader extends Loader {
 
     this.load = (url) => {
       if (typeof url === 'string') {
-        return assets.loadBy(url).then(handler)
+        return assets.loadBy(
+          url,
+          () => assets.fetch(url).then(rep => rep.blob()).then(handler),
+        )
       }
       return handler(url)
     }

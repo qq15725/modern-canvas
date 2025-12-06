@@ -1,128 +1,79 @@
-import type { Element2DStyleProperties } from '../../src'
+import type { Style } from 'modern-idoc'
 import { fonts } from 'modern-font'
 import {
-  Element2D,
-
-  Engine, Image2D, Timeline,
+  Engine,
+  Timeline,
 } from '../../src'
 
-const engine = new Engine({
-  debug: true,
-  autoStart: true,
-  autoResize: true,
-  backgroundColor: '#101217',
-  timeline: Timeline.from([0, 5000], true),
-})
-;(window as any).engine = engine
-document.body.append(engine.view!)
-
-function createTestcase(style: Partial<Element2DStyleProperties> = {}): any {
+function testcase(style: Style = {}): any {
   return [
     // base
-    new Image2D({
-      style: {
-        left: 0,
-        top: 0,
-        width: 100,
-        height: 100,
-        borderRadius: 10,
-        ...style,
-      },
-      src: '/example.gif',
-    }),
-
+    {
+      is: 'Element2D',
+      style: { left: 0, top: 0, width: 100, height: 100, borderRadius: 10, ...style },
+      foreground: { image: '/example.gif' },
+    },
     // crop
-    new Image2D({
-      style: {
-        left: 100,
-        top: 0,
-        width: 100,
-        height: 100,
-        ...style,
-      },
-      src: '/example.gif',
-      srcRect: {
-        left: 0.5,
-        right: 0.5,
-        top: 0.5,
-        bottom: 0.5,
-      },
-    }),
-
+    {
+      is: 'Element2D',
+      style: { left: 100, top: 0, width: 100, height: 100, ...style },
+      foreground: { image: '/example.gif', cropRect: { left: 0.2, right: 0.2, top: 0.2, bottom: 0.2 } },
+    },
     // mask
-    new Image2D({
-      style: {
-        left: 200,
-        top: 0,
-        width: 100,
-        height: 100,
-        maskImage: '/mask1.png',
-        ...style,
-      },
-      src: '/example.gif',
-    }),
-
+    {
+      is: 'Element2D',
+      style: { left: 200, top: 0, width: 100, height: 100, maskImage: '/mask1.png', ...style },
+      foreground: { image: '/example.gif' },
+    },
     // filter
-    new Image2D({
-      style: {
-        left: 300,
-        top: 0,
-        width: 100,
-        height: 100,
-        filter: 'brightness(52%) contrast(90%) saturate(128%) sepia(18%)',
-        ...style,
-      },
-      src: '/example.gif',
-    }),
+    {
+      is: 'Element2D',
+      style: { left: 300, top: 0, width: 100, height: 100, filter: 'brightness(52%) contrast(90%) saturate(128%) sepia(18%)', ...style },
+      foreground: { image: '/example.gif' },
+    },
   ]
 }
 
 async function init(): Promise<void> {
   await fonts.loadFallbackFont({ family: 'fallbackFont', src: '/fonts/AaHouDiHei.woff' })
 
-  engine.root.append([
-    new Element2D({
-      style: {
-        top: 100,
-        width: 1000,
-        height: 100,
+  const engine = new Engine({
+    autoStart: true,
+    autoResize: true,
+    timeline: Timeline.from([0, 5000], true),
+    data: [
+      { is: 'Camera2D' },
+      {
+        is: 'Element2D',
+        style: { top: 100, width: 1000, height: 100 },
+        children: testcase(),
       },
-    }, [
-      ...createTestcase(),
-    ]),
+      {
+        is: 'Element2D',
+        style: { top: 200 },
+        children: testcase({ opacity: 0.5 }),
+      },
+      {
+        is: 'Element2D',
+        style: { top: 300 },
+        children: testcase({ rotate: 4 }),
+      },
+      {
+        is: 'Element2D',
+        style: { top: 400 },
+        children: testcase({ rotate: 60 }),
+      },
+      {
+        is: 'Element2D',
+        style: { top: 500 },
+        children: testcase({ rotate: 60, scaleX: 0.5, scaleY: 0.5 }),
+      },
+    ],
+  })
 
-    new Element2D({
-      style: {
-        top: 200,
-      },
-    }, [
-      ...createTestcase({ opacity: 0.5 }),
-    ]),
+  ;(window as any).engine = engine
 
-    new Element2D({
-      style: {
-        top: 300,
-      },
-    }, [
-      ...createTestcase({ rotate: 4 }),
-    ]),
-
-    new Element2D({
-      style: {
-        top: 400,
-      },
-    }, [
-      ...createTestcase({ rotate: 60 }),
-    ]),
-
-    new Element2D({
-      style: {
-        top: 500,
-      },
-    }, [
-      ...createTestcase({ rotate: 60, scaleX: 0.5, scaleY: 0.5 }),
-    ]),
-  ])
+  document.body.append(engine.view!)
 }
 
 init()

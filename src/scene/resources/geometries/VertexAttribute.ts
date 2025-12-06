@@ -1,57 +1,23 @@
+import type { GeometryAttributeLike, VertexFormat } from '../../../core'
 import { property } from 'modern-idoc'
 import { Resource } from '../../../core'
 import { VertexBuffer } from './VertexBuffer'
 
-export interface VertexAttributeOptions {
-  buffer?: VertexBuffer
-  size?: number
-  normalized?: boolean
-  type?: 'float' | 'unsigned_byte' | 'unsigned_short'
-  stride?: number
-  offset?: number
-  divisor?: number
+export interface VertexAttributeProperties extends Partial<GeometryAttributeLike> {
+  //
 }
 
-export class VertexAttribute extends Resource {
-  @property({ internal: true }) declare buffer: VertexBuffer
-  @property({ fallback: 0 }) declare size: number
-  @property({ fallback: false }) declare normalized: boolean
-  @property({ fallback: 'float' }) declare type: 'float' | 'unsigned_byte' | 'unsigned_short'
-  @property() declare stride: number | undefined
-  @property() declare offset: number | undefined
-  @property() declare divisor: number | undefined
+export class VertexAttribute extends Resource implements GeometryAttributeLike {
+  @property({ default: () => new VertexBuffer() }) declare buffer: VertexBuffer
+  @property({ fallback: 'float32' }) declare format: VertexFormat
+  @property() declare instance?: boolean
+  @property() declare stride?: number
+  @property() declare offset?: number
+  @property() declare start?: number
+  @property() declare divisor?: number
 
-  needsUpload = false
-
-  constructor(options?: VertexAttributeOptions) {
+  constructor(properties?: VertexAttributeProperties) {
     super()
-    this.setProperties({
-      buffer: new VertexBuffer(),
-      ...options,
-    })
-  }
-
-  protected override _updateProperty(key: string, value: any, oldValue: any): void {
-    super._updateProperty(key, value, oldValue)
-
-    switch (key) {
-      case 'buffer':
-      case 'size':
-      case 'normalized':
-      case 'type':
-      case 'stride':
-      case 'offset':
-      case 'divisor':
-        this.needsUpload = true
-        break
-    }
-  }
-
-  upload(): boolean {
-    const result = this.needsUpload
-    if (result) {
-      this.needsUpload = false
-    }
-    return result
+    this.setProperties(properties)
   }
 }

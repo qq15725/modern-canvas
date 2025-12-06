@@ -1,27 +1,26 @@
-import type { WebGLRenderer } from '../../core'
-import type { Node, Viewport } from '../main'
+import type { GlRenderer } from '../../core'
+import type { EffectProperties, Node, Viewport } from '../main'
 import { property } from 'modern-idoc'
 import { ColorMatrix, customNode, parseCssFunctions, PI_2 } from '../../core'
 import { Effect } from '../main/Effect'
 import { Material, QuadUvGeometry } from '../resources'
 
-export interface ColorFilterEffectProperties {
+export interface ColorFilterEffectProperties extends EffectProperties {
   filter?: string
 }
 
 @customNode('ColorFilterEffect')
 export class ColorFilterEffect extends Effect {
   static material = new Material({
-    vert: `precision mediump float;
-attribute vec2 position;
+    gl: {
+      vertex: `attribute vec2 position;
 attribute vec2 uv;
-varying vec2 vUv;
+out vec2 vUv;
 void main() {
   gl_Position = vec4(position, 0.0, 1.0);
   vUv = uv;
 }`,
-    frag: `precision highp float;
-varying vec2 vUv;
+      fragment: `in vec2 vUv;
 uniform sampler2D sampler;
 uniform float m[20];
 
@@ -37,6 +36,7 @@ void main(void) {
     m[15] * c.r + m[16] * c.g + m[17] * c.b + m[18] * c.a + m[19] / 255.0
   );
 }`,
+    },
   })
 
   @property() declare filter?: string
@@ -51,7 +51,17 @@ void main(void) {
       .append(children)
   }
 
-  override apply(renderer: WebGLRenderer, source: Viewport): void {
+  protected override _updateProperty(key: string, value: any, oldValue: any): void {
+    super._updateProperty(key, value, oldValue)
+
+    switch (key) {
+      case 'filter':
+        this.renderMode = this.filter ? 'inherit' : 'disabled'
+        break
+    }
+  }
+
+  override apply(renderer: GlRenderer, source: Viewport): void {
     if (!this.filter)
       return
 

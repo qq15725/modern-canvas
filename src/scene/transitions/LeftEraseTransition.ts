@@ -1,4 +1,4 @@
-import type { WebGLRenderer } from '../../core'
+import type { GlRenderer } from '../../core'
 import { customNode } from '../../core'
 import { Transition } from '../main/Transition'
 import { Material, QuadUvGeometry } from '../resources'
@@ -6,14 +6,15 @@ import { Material, QuadUvGeometry } from '../resources'
 @customNode('LeftEraseTransition')
 export class LeftEraseTransition extends Transition {
   static material = new Material({
-    vert: `attribute vec2 position;
+    gl: {
+      vertex: `attribute vec2 position;
 attribute vec2 uv;
 varying vec2 vUv;
 void main() {
   gl_Position = vec4(position, 0.0, 1.0);
   vUv = uv;
 }`,
-    frag: `precision highp float;
+      fragment: `precision highp float;
 varying vec2 vUv;
 uniform float progress;
 uniform sampler2D previous;
@@ -33,9 +34,10 @@ void main() {
   }
   gl_FragColor = mix(src2Color, src1Color, mixPercent);
 }`,
+    },
   })
 
-  override apply(renderer: WebGLRenderer): void {
+  override apply(renderer: GlRenderer): void {
     QuadUvGeometry.draw(renderer, LeftEraseTransition.material, {
       previous: 0,
       next: 1,

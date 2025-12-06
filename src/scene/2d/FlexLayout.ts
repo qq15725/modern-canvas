@@ -1,6 +1,6 @@
 import type { Node as YogaNode } from 'yoga-layout/load'
-import type { FlexElement2DStyle } from './element'
-import type { FlexElement2D } from './FlexElement2D'
+import type { Element2DStyle } from './element'
+import type { Element2D } from './Element2D'
 
 export const edgeMap = {
   left: 0, // Edge.Left
@@ -99,217 +99,203 @@ export class FlexLayout {
     this._yoga = await loadYoga()
   }
 
-  _node: YogaNode = FlexLayout._yoga!.Node.create()
+  _node: YogaNode | undefined = FlexLayout._yoga?.Node.create()
 
-  protected get _style(): FlexElement2DStyle {
+  protected get _style(): Element2DStyle {
     return this._element.style
   }
 
-  get offsetLeft(): number {
-    return this._node.getComputedLeft()
-  }
-
-  get offsetTop(): number {
-    return this._node.getComputedTop()
-  }
-
-  get offsetWidth(): number {
-    return this._node.getComputedWidth()
-  }
-
-  get offsetHeight(): number {
-    return this._node.getComputedHeight()
-  }
-
   constructor(
-    protected _element: FlexElement2D,
+    protected _element: Element2D,
   ) {
     //
   }
 
   calculateLayout(width?: number | 'auto', height?: number | 'auto', direction?: typeof displayMap[keyof typeof displayMap]): void {
-    return this._node.calculateLayout(width, height, direction)
-  }
-
-  getComputedLayout(): ComputedLayout {
-    return this._node.getComputedLayout()
+    this._node?.calculateLayout(width, height, direction)
   }
 
   // eslint-disable-next-line unused-imports/no-unused-vars
   updateStyleProperty(key: string, value: any, oldValue: any): void {
+    const node = this._node
+
+    if (!node) {
+      return
+    }
+
     switch (key) {
       case 'alignContent':
-        this._node.setAlignContent(
+        node.setAlignContent(
           value
             ? alignMap[value as keyof typeof alignMap]
             : alignMap['flex-start'],
         )
         break
       case 'alignItems':
-        this._node.setAlignItems(
+        node.setAlignItems(
           value
             ? alignMap[value as keyof typeof alignMap]
             : alignMap['flex-start'],
         )
         break
       case 'alignSelf':
-        this._node.setAlignSelf(
+        node.setAlignSelf(
           value
             ? alignMap[value as keyof typeof alignMap]
             : alignMap['flex-start'],
         )
         break
       case 'aspectRatio':
-        // this._node.setIsReferenceBaseline(this._style.isReferenceBaseline)
-        this._node.setAspectRatio(value)
+        // node.setIsReferenceBaseline(this._style.isReferenceBaseline)
+        node.setAspectRatio(value)
         break
       case 'borderTop':
-        this._node.setBorder(edgeMap.top, this._style.borderWidth)
+        node.setBorder(edgeMap.top, this._style.borderWidth)
         break
       case 'borderBottom':
-        this._node.setBorder(edgeMap.bottom, this._style.borderWidth)
+        node.setBorder(edgeMap.bottom, this._style.borderWidth)
         break
       case 'borderLeft':
-        this._node.setBorder(edgeMap.left, this._style.borderWidth)
+        node.setBorder(edgeMap.left, this._style.borderWidth)
         break
       case 'borderRight':
-        this._node.setBorder(edgeMap.right, this._style.borderWidth)
+        node.setBorder(edgeMap.right, this._style.borderWidth)
         break
       case 'border':
-        this._node.setBorder(edgeMap.all, this._style.borderWidth)
+        node.setBorder(edgeMap.all, this._style.borderWidth)
         break
       case 'direction':
-        this._node.setDirection(
+        node.setDirection(
           value
             ? directionMap[value as keyof typeof directionMap]
             : directionMap.inherit,
         )
         break
       case 'display':
-        this._node.setDisplay(
+        node.setDisplay(
           value
             ? displayMap[value as keyof typeof displayMap]
             : displayMap.flex,
         )
         break
       case 'flex':
-        this._node.setFlex(this._style.flex)
+        node.setFlex(this._style.flex)
         break
       case 'flexBasis':
-        this._node.setFlexBasis(this._style.flexBasis)
+        node.setFlexBasis(this._style.flexBasis)
         break
       case 'flexDirection':
-        this._node.setFlexDirection(
+        node.setFlexDirection(
           value
             ? flexDirectionMap[value as keyof typeof flexDirectionMap]
             : flexDirectionMap.row,
         )
         break
       case 'flexGrow':
-        this._node.setFlexGrow(this._style.flexGrow)
+        node.setFlexGrow(this._style.flexGrow)
         break
       case 'flexShrink':
-        this._node.setFlexShrink(this._style.flexShrink)
+        node.setFlexShrink(this._style.flexShrink)
         break
       case 'flexWrap':
-        this._node.setFlexWrap(
+        node.setFlexWrap(
           value
             ? flexWrapMap[value as keyof typeof flexWrapMap]
             : flexWrapMap.wrap,
         )
         break
       case 'height':
-        this._node.setHeight(this._style.height)
+        node.setHeight(this._style.height)
         break
       case 'justifyContent':
-        this._node.setJustifyContent(
+        node.setJustifyContent(
           value
             ? justifyMap[value as keyof typeof justifyMap]
             : justifyMap['flex-start'],
         )
         break
       case 'gap':
-        value !== undefined && this._node.setGap(gutterMap.all, value)
+        value !== undefined && node.setGap(gutterMap.all, value)
         break
       case 'marginTop':
-        this._node.setMargin(edgeMap.top, value)
+        node.setMargin(edgeMap.top, value)
         break
       case 'marginBottom':
-        this._node.setMargin(edgeMap.bottom, value)
+        node.setMargin(edgeMap.bottom, value)
         break
       case 'marginLeft':
-        this._node.setMargin(edgeMap.left, value)
+        node.setMargin(edgeMap.left, value)
         break
       case 'marginRight':
-        this._node.setMargin(edgeMap.right, value)
+        node.setMargin(edgeMap.right, value)
         break
       case 'margin':
-        this._node.setMargin(edgeMap.all, value)
+        node.setMargin(edgeMap.all, value)
         break
       case 'maxHeight':
-        this._node.setMaxHeight(value)
+        node.setMaxHeight(value)
         break
       case 'maxWidth':
-        this._node.setMaxWidth(value)
+        node.setMaxWidth(value)
         break
       //   setDirtiedFunc(dirtiedFunc: DirtiedFunction | null): void;
       //   setMeasureFunc(measureFunc: MeasureFunction | null): void;
       case 'minHeight':
-        this._node.setMinHeight(this._style.minHeight)
+        node.setMinHeight(this._style.minHeight)
         break
       case 'minWidth':
-        this._node.setMinWidth(this._style.minWidth)
+        node.setMinWidth(this._style.minWidth)
         break
       case 'overflow':
-        this._node.setOverflow(
+        node.setOverflow(
           value
             ? overflowMap[value as keyof typeof overflowMap]
             : overflowMap.visible,
         )
         break
       case 'paddingTop':
-        this._node.setPadding(edgeMap.top, this._style.paddingTop)
+        node.setPadding(edgeMap.top, this._style.paddingTop)
         break
       case 'paddingBottom':
-        this._node.setPadding(edgeMap.bottom, this._style.paddingBottom)
+        node.setPadding(edgeMap.bottom, this._style.paddingBottom)
         break
       case 'paddingLeft':
-        this._node.setPadding(edgeMap.left, this._style.paddingLeft)
+        node.setPadding(edgeMap.left, this._style.paddingLeft)
         break
       case 'paddingRight':
-        this._node.setPadding(edgeMap.right, this._style.paddingRight)
+        node.setPadding(edgeMap.right, this._style.paddingRight)
         break
       case 'padding':
-        this._node.setPadding(edgeMap.all, this._style.padding)
+        node.setPadding(edgeMap.all, this._style.padding)
         break
       case 'top':
-        this._node.setPosition(edgeMap.top, this._style.top)
+        node.setPosition(edgeMap.top, this._style.top)
         break
       case 'bottom':
-        this._node.setPosition(edgeMap.bottom, this._style.bottom)
+        node.setPosition(edgeMap.bottom, this._style.bottom)
         break
       case 'left':
-        this._node.setPosition(edgeMap.left, this._style.left)
+        node.setPosition(edgeMap.left, this._style.left)
         break
       case 'right':
-        this._node.setPosition(edgeMap.right, this._style.right)
+        node.setPosition(edgeMap.right, this._style.right)
         break
       case 'position':
-        this._node.setPositionType(
+        node.setPositionType(
           value
             ? positionTypeMap[value as keyof typeof positionTypeMap]
             : positionTypeMap.static,
         )
         break
       case 'boxSizing':
-        this._node.setBoxSizing(
+        node.setBoxSizing(
           value
             ? boxSizingMap[value as keyof typeof boxSizingMap]
             : boxSizingMap['content-box'],
         )
         break
       case 'width':
-        this._node.setWidth(this._style.width)
+        node.setWidth(this._style.width)
         break
     }
   }

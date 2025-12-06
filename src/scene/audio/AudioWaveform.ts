@@ -1,7 +1,7 @@
 import type { Element2DProperties } from '../2d'
 import { property } from 'modern-idoc'
 import { Element2D } from '../2d'
-import { customNode, IN_BROWSER, Transform2D } from '../../core'
+import { customNode, IN_BROWSER } from '../../core'
 import { Texture2D } from '../resources'
 import { WebAudioContext } from './web'
 
@@ -19,7 +19,9 @@ export class AudioWaveform extends Element2D {
 
   protected _audioBuffer?: AudioBuffer
   protected _src = IN_BROWSER
-    ? new Texture2D(document.createElement('canvas'))
+    ? new Texture2D({
+        source: document.createElement('canvas'),
+      })
     : undefined
 
   protected _needsUpdateTexture = false
@@ -104,23 +106,12 @@ export class AudioWaveform extends Element2D {
       }
     }
 
-    this._src?.requestUpload()
-    this.requestRedraw()
+    this._src?.requestUpdate('source')
+    this.requestRender()
   }
 
   protected override _process(delta: number): void {
     this.syncTexture()
     super._process(delta)
-  }
-
-  protected _drawSrc(): void {
-    const src = this._src
-    if (src?.isValid()) {
-      this.context.fillStyle = src
-      this.context.uvTransform = new Transform2D().scale(
-        1 / this.style.width!,
-        1 / this.style.height!,
-      )
-    }
   }
 }

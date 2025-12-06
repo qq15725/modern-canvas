@@ -6,21 +6,23 @@ export class UvMaterial extends Material {
 
   constructor() {
     super({
-      vert: `attribute vec2 position;
-attribute vec2 uv;
+      gl: {
+        vertex: `in vec2 position;
+in vec2 uv;
 uniform mat3 projectionMatrix;
 uniform mat3 modelViewMatrix;
-varying vec2 vUv;
+out vec2 vUv;
 void main(void) {
   gl_Position = vec4((projectionMatrix * modelViewMatrix * vec3(position, 1.0)).xy, 0.0, 1.0);
   vUv = uv;
 }`,
-      frag: `varying vec2 vUv;
+        fragment: `in vec2 vUv;
 uniform sampler2D sampler;
 uniform vec4 tint;
 void main(void) {
   gl_FragColor = texture2D(sampler, vUv) * tint;
 }`,
+      },
       uniforms: {
         sampler: 0,
         projectionMatrix: new Float32Array([1, 0, 0, 0, 1, 0, 0, 0, 1]),

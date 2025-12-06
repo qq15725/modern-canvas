@@ -1,10 +1,9 @@
 import type { Fonts } from 'modern-font'
-import type { EngineProperties } from './Engine'
+import type { EngineData, EngineProperties } from './Engine'
 import { Engine } from './Engine'
-import { Node } from './scene'
 
 export interface RenderOptions extends Partial<EngineProperties> {
-  data: Record<string, any> | Node | (Node | Record<string, any>)[]
+  data: EngineData
   width: number
   height: number
   debug?: boolean
@@ -70,17 +69,9 @@ async function task(options: RenderOptions): Promise<HTMLCanvasElement> {
   engine.debug = debug
   engine.fonts = fonts
   engine.timeline.currentTime = 0
-  engine.root.removeChildren()
   engine.resize(width, height, true)
-  ;(Array.isArray(data) ? data : [data]).forEach((v) => {
-    if (v instanceof Node) {
-      v.parent = undefined
-      engine!.root.appendChild(v)
-    }
-    else {
-      engine!.root.appendChild(Node.parse(v) as unknown as Node)
-    }
-  })
+  engine.root.removeChildren()
+  engine.root.append(data)
 
   // render
   await onBefore?.(engine)

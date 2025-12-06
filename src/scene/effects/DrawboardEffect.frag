@@ -1,7 +1,7 @@
 precision highp float;
 
-varying vec2 vUv;
-uniform sampler2D texture;
+in vec2 vUv;
+uniform sampler2D uTexture;
 uniform vec2 inputSize;
 uniform vec2 zoom;
 uniform vec2 translate;
@@ -125,7 +125,7 @@ vec4 renderWatermark(vec2 coord, vec4 color) {
   );
   if (inv.x >= -hw && inv.x <= hw && inv.y >= -hh && inv.y <= hh) {
     vec2 wmUV = (inv + vec2(hw, hh)) / watermarkSize;
-    vec4 wmColor = texture2D(watermarkTexture, wmUV);
+    vec4 wmColor = texture(watermarkTexture, wmUV);
     float alpha = wmColor.a * watermarkAlpha;
     return mix(color, wmColor, alpha);
   } else {
@@ -134,7 +134,7 @@ vec4 renderWatermark(vec2 coord, vec4 color) {
 }
 
 void main(void) {
-  vec4 color = texture2D(texture, vUv);
+  vec4 color = texture(uTexture, vUv);
   vec2 coord = vec2(vUv.x, 1.0 - vUv.y);
   coord = (coord * inputSize - translate) / zoom;
   if (checkerboard > 0) {

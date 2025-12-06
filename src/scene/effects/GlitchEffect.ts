@@ -1,4 +1,4 @@
-import type { WebGLRenderer } from '../../core'
+import type { GlRenderer } from '../../core'
 import type { EffectProperties, Node, Viewport } from '../main'
 import { property } from 'modern-idoc'
 import { customNode } from '../../core'
@@ -20,17 +20,16 @@ export interface GlitchEffectProperties extends EffectProperties {
 @customNode('GlitchEffect')
 export class GlitchEffect extends Effect {
   static material = new Material({
-    vert: `precision mediump float;
-attribute vec2 position;
-attribute vec2 uv;
-varying vec2 vUv;
+    gl: {
+      vertex: `in vec2 position;
+in vec2 uv;
+out vec2 vUv;
 void main() {
   gl_Position = vec4(position, 0.0, 1.0);
   vUv = uv;
 }`,
-    frag: `precision mediump float;
-
-varying vec2 vUv;
+      fragment: `
+in vec2 vUv;
 uniform sampler2D sampler;
 
 uniform vec4 filterArea;
@@ -72,7 +71,7 @@ void main(void) {
   // displacementMap: mirror
   ny = ny > 1.0 ? 2.0 - ny : (ny < 0.0 ? -ny : ny);
 
-  vec4 dc = texture2D(displacementMap, vec2(0.5, ny));
+  vec4 dc = texture(displacementMap, vec2(0.5, ny));
 
   float displacement = (dc.r - dc.g) * (offset / filterArea.x);
 
@@ -118,11 +117,12 @@ void main(void) {
     }
   }
 
-  gl_FragColor.r = texture2D(sampler, coord + red * (1.0 - seed * 0.4) / filterArea.xy).r;
-  gl_FragColor.g = texture2D(sampler, coord + green * (1.0 - seed * 0.3) / filterArea.xy).g;
-  gl_FragColor.b = texture2D(sampler, coord + blue * (1.0 - seed * 0.2) / filterArea.xy).b;
-  gl_FragColor.a = texture2D(sampler, coord).a;
+  gl_FragColor.r = texture(sampler, coord + red * (1.0 - seed * 0.4) / filterArea.xy).r;
+  gl_FragColor.g = texture(sampler, coord + green * (1.0 - seed * 0.3) / filterArea.xy).g;
+  gl_FragColor.b = texture(sampler, coord + blue * (1.0 - seed * 0.2) / filterArea.xy).b;
+  gl_FragColor.a = texture(sampler, coord).a;
 }`,
+    },
   })
 
   protected _canvas: HTMLCanvasElement
@@ -172,10 +172,10 @@ void main(void) {
       ctx.fillRect(0, y >> 0, size, height + 1 >> 0)
       y += height
     }
-    texture.requestUpload()
+    texture.requestUpdate('source')
   }
 
-  override apply(renderer: WebGLRenderer, source: Viewport): void {
+  override apply(renderer: GlRenderer, source: Viewport): void {
     if (!this._needsRedraw) {
       this._needsRedraw = true
       this.redraw()

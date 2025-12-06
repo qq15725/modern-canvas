@@ -1,4 +1,4 @@
-import type { WebGLRenderer } from '../../core'
+import type { GlRenderer } from '../../core'
 import type { EffectProperties, Node, Viewport } from '../main'
 import { property } from 'modern-idoc'
 import { customNode } from '../../core'
@@ -10,7 +10,7 @@ export interface GaussianBlurEffectProperties extends EffectProperties {
   quality: number
 }
 
-const frag = `varying vec2 vUv[9];
+const fragment = `varying vec2 vUv[9];
 uniform sampler2D sampler;
 
 void main(void) {
@@ -49,7 +49,8 @@ void main(void) {
 @customNode('GaussianBlurEffect')
 export class GaussianBlurEffect extends Effect {
   static materialX = new Material({
-    vert: `attribute vec2 position;
+    gl: {
+      vertex: `attribute vec2 position;
 attribute vec2 uv;
 uniform float uStrength;
 varying vec2 vUv[9];
@@ -66,11 +67,13 @@ void main(void) {
   vUv[7] = uv + vec2(3.0 * uStrength, 0.0);
   vUv[8] = uv + vec2(4.0 * uStrength, 0.0);
 }`,
-    frag,
+      fragment,
+    },
   })
 
   static materialY = new Material({
-    vert: `attribute vec2 position;
+    gl: {
+      vertex: `attribute vec2 position;
 attribute vec2 uv;
 uniform float uStrength;
 varying vec2 vUv[9];
@@ -87,7 +90,8 @@ void main(void) {
   vUv[7] = uv + vec2(0.0, 3.0 * uStrength);
   vUv[8] = uv + vec2(0.0, 4.0 * uStrength);
 }`,
-    frag,
+      fragment,
+    },
   })
 
   @property({ fallback: 4 }) declare strength: number
@@ -101,7 +105,7 @@ void main(void) {
       .append(children)
   }
 
-  override apply(renderer: WebGLRenderer, source: Viewport): void {
+  override apply(renderer: GlRenderer, source: Viewport): void {
     const sx = (1 / source.width)
     const sy = (1 / source.height)
     const quality = Math.max(this.quality, 1)

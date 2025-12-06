@@ -1,19 +1,20 @@
-import type { WebGLRenderer } from '../../core'
-import { property } from 'modern-idoc'
+import type { GlRenderer } from '../../core'
 import { customNode } from '../../core'
 import { Viewport } from './Viewport'
 
 @customNode('Window')
 export class Window extends Viewport {
-  @property({ fallback: false }) declare msaa: boolean
+  constructor() {
+    super()
 
-  finish(renderer: WebGLRenderer): void {
-    renderer.framebuffer.finishRenderPass(
-      this._glFramebuffer(renderer),
-    )
+    this.renderTargets.forEach(r => r.isRoot = true)
   }
 
-  override flush(renderer: WebGLRenderer): void {
+  finish(renderer: GlRenderer): void {
+    renderer.renderTarget.finishRenderPass(this.renderTarget)
+  }
+
+  override flush(renderer: GlRenderer): void {
     this.finish(renderer)
     super.flush(renderer)
   }

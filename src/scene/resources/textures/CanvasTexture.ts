@@ -1,11 +1,18 @@
-import { property } from 'modern-idoc'
+import type { Texture2DProperties } from './Texture2D'
 import { Texture2D } from './Texture2D'
 
-export class CanvasTexture extends Texture2D<HTMLCanvasElement> {
-  @property({ fallback: 2 }) declare pixelRatio: number
+export interface CanvasTextureProperties extends Texture2DProperties<HTMLCanvasElement> {
+  //
+}
 
-  constructor(source = document.createElement('canvas')) {
-    super(source)
+export class CanvasTexture extends Texture2D<HTMLCanvasElement> {
+  constructor(properties: CanvasTextureProperties = {}) {
+    super({
+      pixelRatio: 2,
+      ...properties,
+      source: properties.source ?? document.createElement('canvas'),
+      uploadMethodId: 'image',
+    })
   }
 
   protected override _updateProperty(key: string, value: any, oldValue: any): void {

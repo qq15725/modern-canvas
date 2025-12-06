@@ -9,33 +9,31 @@ import type {
   Text,
 } from 'modern-idoc'
 import type {
-  ColorValue,
+  GlRenderer,
   InputEvent,
   InputEventKey,
-  PointerInputEvent,
-  Vector2Data,
-  WebGLBlendMode,
+  PointerInputEvent, Vector2Data,
 } from '../../../core'
-import type { CanvasBatchable, Node, Rectangulable, RectangulableEvents, SceneTree } from '../../main'
+import type { Node, Rectangulable, RectangulableEvents, SceneTree } from '../../main'
 import type { Node2DEvents, Node2DProperties } from '../Node2D'
 import { clearUndef, getDefaultLayoutStyle, getDefaultTextStyle, isNone } from 'modern-idoc'
 import {
   customNode,
   DEG_TO_RAD,
-  Rect2,
+  Rectangle,
   Vector2,
 } from '../../../core'
-import { parseCSSTransform, parseCSSTransformOrigin } from '../../../css'
-import { MaskEffect } from '../../effects'
+import { parseCssTransform, parseCssTransformOrigin } from '../../../css'
+import { ColorFilterEffect, MaskEffect } from '../../effects'
 import { Node2D } from '../Node2D'
-import { BaseElement2DBackground } from './BaseElement2DBackground'
-import { BaseElement2DFill } from './BaseElement2DFill'
-import { BaseElement2DForeground } from './BaseElement2DForeground'
-import { BaseElement2DOutline } from './BaseElement2DOutline'
-import { BaseElement2DShadow } from './BaseElement2DShadow'
-import { BaseElement2DShape } from './BaseElement2DShape'
-import { BaseElement2DStyle } from './BaseElement2DStyle'
-import { BaseElement2DText } from './BaseElement2DText'
+import { Element2DBackground } from './Element2DBackground'
+import { Element2DFill } from './Element2DFill'
+import { Element2DForeground } from './Element2DForeground'
+import { Element2DOutline } from './Element2DOutline'
+import { Element2DShadow } from './Element2DShadow'
+import { Element2DShape } from './Element2DShape'
+import { Element2DStyle } from './Element2DStyle'
+import { Element2DText } from './Element2DText'
 
 export interface BaseElement2DEvents extends Node2DEvents, RectangulableEvents {
   updateStyleProperty: [key: string, value: any, oldValue: any]
@@ -49,8 +47,6 @@ export interface BaseElement2D {
 }
 
 export interface BaseElement2DProperties extends Node2DProperties {
-  modulate: ColorValue
-  blendMode: WebGLBlendMode
   style: Style
   background: Background
   shape: Shape
@@ -70,50 +66,52 @@ export class BaseElement2D extends Node2D implements Rectangulable {
     this.onUpdateStyleProperty('transform', this.style.transform, undefined)
     this.onUpdateStyleProperty('transformOrigin', this.style.transformOrigin, undefined)
     this.updateGlobalTransform()
-    this.requestRedraw()
+    this.requestRender()
   })
 
   protected _allowPointerEvents = true
   protected _overflowHidden = false
 
-  protected _style = new BaseElement2DStyle().on('updateProperty', (...args: any[]) => {
+  protected _style = new Element2DStyle().on('updateProperty', (...args: any[]) => {
     this.onUpdateStyleProperty(args[0], args[1], args[2])
   })
 
-  get style(): BaseElement2DStyle { return this._style }
+  get style(): Element2DStyle { return this._style }
   set style(value: BaseElement2DProperties['style']) { this._style.resetProperties().setProperties(value) }
 
-  protected _background = new BaseElement2DBackground(this)
-  get background(): BaseElement2DBackground { return this._background }
+  protected _background = new Element2DBackground(this)
+  get background(): Element2DBackground { return this._background }
   set background(value: BaseElement2DProperties['background']) { this._background.resetProperties().setProperties(value) }
 
-  protected _shape = new BaseElement2DShape(this)
-  get shape(): BaseElement2DShape { return this._shape }
+  protected _shape = new Element2DShape(this)
+  get shape(): Element2DShape { return this._shape }
   set shape(value: BaseElement2DProperties['shape']) { this._shape.resetProperties().setProperties(value) }
 
-  protected _fill = new BaseElement2DFill(this)
-  get fill(): BaseElement2DFill { return this._fill }
+  protected _fill = new Element2DFill(this)
+  get fill(): Element2DFill { return this._fill }
   set fill(value: BaseElement2DProperties['fill']) { this._fill.resetProperties().setProperties(value) }
 
-  protected _outline = new BaseElement2DOutline(this)
-  get outline(): BaseElement2DOutline { return this._outline }
+  protected _outline = new Element2DOutline(this)
+  get outline(): Element2DOutline { return this._outline }
   set outline(value: BaseElement2DProperties['outline']) { this._outline.resetProperties().setProperties(value) }
 
-  protected _foreground = new BaseElement2DForeground(this)
-  get foreground(): BaseElement2DForeground { return this._foreground }
+  protected _foreground = new Element2DForeground(this)
+  get foreground(): Element2DForeground { return this._foreground }
   set foreground(value: BaseElement2DProperties['foreground']) { this._foreground.resetProperties().setProperties(value) }
 
-  protected _text = new BaseElement2DText(this)
-  get text(): BaseElement2DText { return this._text }
+  protected _text = new Element2DText(this)
+  get text(): Element2DText { return this._text }
   set text(value: BaseElement2DProperties['text']) { this._text.resetProperties().setProperties(value) }
 
-  protected _shadow = new BaseElement2DShadow(this)
-  get shadow(): BaseElement2DShadow { return this._shadow }
+  protected _shadow = new Element2DShadow(this)
+  get shadow(): Element2DShadow { return this._shadow }
   set shadow(value: BaseElement2DProperties['shadow']) { this._shadow.resetProperties().setProperties(value) }
+
+  protected _styleFilter?: ColorFilterEffect
 
   constructor(properties?: Partial<BaseElement2DProperties>, nodes: Node[] = []) {
     super()
-    this.style = new BaseElement2DStyle()
+    this.style = new Element2DStyle()
     this
       .setProperties(properties)
       .append(nodes)
@@ -166,13 +164,13 @@ export class BaseElement2D extends Node2D implements Rectangulable {
       case 'scaleX':
         this.scale.x = value
         if (this.text.isValid() && (value ^ oldValue) < 0) {
-          this.requestRedraw()
+          this.requestRender()
         }
         break
       case 'scaleY':
         this.scale.y = value
         if (this.text.isValid() && (value ^ oldValue) < 0) {
-          this.requestRedraw()
+          this.requestRender()
         }
         break
       case 'skewX':
@@ -182,7 +180,7 @@ export class BaseElement2D extends Node2D implements Rectangulable {
         this.skew.y = value
         break
       case 'transform':
-        parseCSSTransform(
+        parseCssTransform(
           value ?? '',
           this.size.width,
           this.size.height,
@@ -191,7 +189,7 @@ export class BaseElement2D extends Node2D implements Rectangulable {
         this.updateGlobalTransform()
         break
       case 'transformOrigin': {
-        const origin = parseCSSTransformOrigin(value ?? '')
+        const origin = parseCssTransformOrigin(value ?? '')
         this.pivot.set(
           origin[0] * this.size.width,
           origin[1] * this.size.height,
@@ -205,7 +203,14 @@ export class BaseElement2D extends Node2D implements Rectangulable {
         this.visible = value === 'visible'
         break
       case 'filter':
-        this.requestRepaint()
+        if (value) {
+          this._getStyleFilter().filter = value
+        }
+        else {
+          this._styleFilter?.remove()
+          this._styleFilter = undefined
+        }
+        this.requestPaint()
         break
       case 'maskImage':
         this._updateMaskImage(value)
@@ -236,7 +241,7 @@ export class BaseElement2D extends Node2D implements Rectangulable {
         break
       case 'borderRadius':
       default:
-        this.requestRedraw()
+        this.requestRender()
         break
     }
 
@@ -248,11 +253,20 @@ export class BaseElement2D extends Node2D implements Rectangulable {
   }
 
   protected override _process(delta: number): void {
-    this.foreground.updateFrameIndex()
-    this.fill.updateFrameIndex()
-    this.outline.updateFrameIndex()
-    this.background.updateFrameIndex()
+    this.foreground.process(delta)
+    this.fill.process(delta)
+    this.text.process(delta)
+    this.outline.process(delta)
+    this.background.process(delta)
     super._process(delta)
+  }
+
+  protected _getStyleFilter(): ColorFilterEffect {
+    if (!this._styleFilter) {
+      this._styleFilter = new ColorFilterEffect({ internalMode: 'front' })
+      this.append(this._styleFilter)
+    }
+    return this._styleFilter
   }
 
   protected _updateMaskImage(maskImage?: string): void {
@@ -279,7 +293,7 @@ export class BaseElement2D extends Node2D implements Rectangulable {
     this._updateMask()
   }
 
-  getRect(): Rect2 {
+  getRect(): Rectangle {
     return this.getGlobalAabb()
   }
 
@@ -297,27 +311,27 @@ export class BaseElement2D extends Node2D implements Rectangulable {
     ]
   }
 
-  getAabb(): Rect2 {
-    return new Rect2(
+  getAabb(): Rectangle {
+    return new Rectangle(
       this._getPointArray().map((p) => {
         return this.transform.apply(p)
       }),
     )
   }
 
-  getGlobalAabb(): Rect2 {
-    return new Rect2(
+  getGlobalAabb(): Rectangle {
+    return new Rectangle(
       this._getPointArray().map((p) => {
         return this.globalTransform.apply(p)
       }),
     )
   }
 
-  getObb(): { rect: Rect2, rotation: number } {
+  getObb(): { rect: Rectangle, rotation: number } {
     const pivot = this.pivot
     const _pivot = this.transform.apply(pivot).sub(pivot)
     return {
-      rect: new Rect2(
+      rect: new Rectangle(
         this._getPointArray().map((p) => {
           p.x += _pivot.x
           p.y += _pivot.y
@@ -328,12 +342,12 @@ export class BaseElement2D extends Node2D implements Rectangulable {
     }
   }
 
-  getGlobalObb(): { rect: Rect2, rotation: number } {
+  getGlobalObb(): { rect: Rectangle, rotation: number } {
     const pivot = this.pivot
     const _pivot = this.globalTransform.apply(pivot).sub(pivot)
 
     return {
-      rect: new Rect2(
+      rect: new Rectangle(
         this._getPointArray().map((p) => {
           p.x += _pivot.x
           p.y += _pivot.y
@@ -385,7 +399,20 @@ export class BaseElement2D extends Node2D implements Rectangulable {
 
   protected _updateMask(): void {
     if (this._overflowHidden) {
-      this.mask = this.getRect().toJSON()
+      this.mask = {
+        render: (renderer: GlRenderer) => {
+          const rect = this.getRect()
+          renderer.batch2D.render({
+            vertices: new Float32Array([
+              rect.x, rect.y,
+              rect.x + rect.width, rect.y,
+              rect.x + rect.width, rect.y + rect.height,
+              rect.x, rect.y + rect.height,
+            ]),
+            indices: new Uint32Array([0, 1, 2, 0, 2, 3]),
+          })
+        },
+      }
     }
     else {
       this.mask = undefined
@@ -429,18 +456,6 @@ export class BaseElement2D extends Node2D implements Rectangulable {
 
   protected _drawContent(): void {
     //
-  }
-
-  protected _repaint(batchables: CanvasBatchable[]): CanvasBatchable[] {
-    // TODO style.filter 支持
-    // const colorMatrix = parseCSSFilter(this.style.filter)
-    return super._repaint(batchables).map((batchable) => {
-      return {
-        ...batchable,
-        // colorMatrix: colorMatrix.toMatrix4().toArray(true),
-        // colorMatrixOffset: colorMatrix.toVector4().toArray(),
-      }
-    })
   }
 
   override input(event: InputEvent, key: InputEventKey): void {

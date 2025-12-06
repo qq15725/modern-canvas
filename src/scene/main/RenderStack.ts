@@ -1,9 +1,13 @@
-import type { WebGLRenderer } from '../../core'
+import type { GlRenderer } from '../../core'
 import type { Node } from './Node'
 
+export type Renderable = Node & {
+  needsRender?: boolean
+}
+
 export interface RenderCall {
-  renderable: Node
-  fn: (renderer: WebGLRenderer, next: () => void) => void
+  renderable: Renderable
+  fn: (renderer: GlRenderer, next: () => void) => void
   parentCall: RenderCall | undefined
   calls: RenderCall[]
 }
@@ -12,7 +16,7 @@ export class RenderStack {
   currentCall?: RenderCall
   calls: RenderCall[] = []
 
-  createCall(renderable: Node): RenderCall {
+  createCall(renderable: Renderable): RenderCall {
     return {
       renderable,
       parentCall: this.currentCall,
@@ -21,13 +25,13 @@ export class RenderStack {
     }
   }
 
-  push(renderable: Node): RenderCall {
+  push(renderable: Renderable): RenderCall {
     const call = this.createCall(renderable)
     ;(this.currentCall?.calls ?? this.calls).push(call)
     return call
   }
 
-  render(renderer: WebGLRenderer): void {
+  render(renderer: GlRenderer): void {
     this.calls.forEach(function render(call: RenderCall) {
       call.fn(renderer, () => {
         call.calls.forEach(render)

@@ -1,17 +1,16 @@
-import type { Batchable2D, ColorValue, WebGLBlendMode, WebGLRenderer } from '../../core'
+import type { Batchable2D, GlBlendMode, GlRenderer } from '../../core'
 import type { Texture2D } from '../resources'
 import type { CanvasBatchable } from './CanvasContext'
 import type { Node } from './Node'
 import type { TimelineNodeEvents, TimelineNodeProperties } from './TimelineNode'
 import { property } from 'modern-idoc'
-import { clamp, Color, customNode, Transform2D } from '../../core'
+import { clamp, customNode, Transform2D } from '../../core'
 import { ViewportTexture } from '../resources'
 import { CanvasContext } from './CanvasContext'
 import { TimelineNode } from './TimelineNode'
 
 export interface CanvasItemProperties extends TimelineNodeProperties {
-  modulate: ColorValue
-  blendMode: WebGLBlendMode
+  blendMode: GlBlendMode
 }
 
 export interface CanvasItemEvents extends TimelineNodeEvents {
@@ -27,8 +26,7 @@ export interface CanvasItem {
 
 @customNode('CanvasItem')
 export class CanvasItem extends TimelineNode {
-  @property() declare modulate: ColorValue | undefined
-  @property() declare blendMode: WebGLBlendMode | undefined
+  @property() declare blendMode: GlBlendMode | undefined
   @property({ internal: true, fallback: true }) declare visible: boolean
   @property({ internal: true, fallback: 1 }) declare opacity: number
 
@@ -40,16 +38,14 @@ export class CanvasItem extends TimelineNode {
   protected _globalOpacity?: number
   get globalOpacity(): number { return this._globalOpacity ?? 1 }
 
-  protected _modulate = new Color(0xFFFFFFFF)
-
   // Batch render
   context = new CanvasContext()
   protected _resetContext = true
-  protected _redrawing = true
-  protected _relayouting = false
-  protected _repainting = false
-  protected _originalBatchables: CanvasBatchable[] = []
-  protected _layoutedBatchables: CanvasBatchable[] = []
+  needsRender = true
+  needsLayout = false
+  needsPaint = false
+  protected _rawBatchables: CanvasBatchable[] = []
+  protected _layoutBatchables: CanvasBatchable[] = []
   protected _batchables: CanvasBatchable[] = []
 
   constructor(properties?: Partial<CanvasItemProperties>, nodes: Node[] = []) {
@@ -64,12 +60,8 @@ export class CanvasItem extends TimelineNode {
     super._updateProperty(key, value, oldValue)
 
     switch (key) {
-      case 'modulate':
-        this._modulate.value = value
-        this.requestRepaint()
-        break
       case 'blendMode':
-        this.requestRepaint()
+        this.requestPaint()
         break
       case 'opacity':
         this._updateGlobalOpacity()
@@ -97,16 +89,16 @@ export class CanvasItem extends TimelineNode {
     return super.canRender() && this.isVisibleInTree()
   }
 
-  requestRedraw(): void {
-    this._redrawing = true
+  requestRender(): void {
+    this.needsRender = true
   }
 
-  requestRelayout(): void {
-    this._relayouting = true
+  requestLayout(): void {
+    this.needsLayout = true
   }
 
-  requestRepaint(): void {
-    this._repainting = true
+  requestPaint(): void {
+    this.needsPaint = true
   }
 
   protected _updateGlobalVisible(): void {
@@ -122,7 +114,7 @@ export class CanvasItem extends TimelineNode {
       * (this._parentGlobalOpacity ?? 1)
     if (this._globalOpacity !== globalOpacity) {
       this._globalOpacity = globalOpacity
-      this.requestRepaint()
+      this.requestPaint()
     }
   }
 
@@ -130,10 +122,33 @@ export class CanvasItem extends TimelineNode {
     this.emit('draw')
   }
 
+  protected _transformUvs(batchable: CanvasBatchable): Float32Array | undefined {
+    const { texture, vertices, transformUv } = batchable
+    if (!texture) {
+      return undefined
+    }
+    const { width, height } = texture
+    const transform = transformUv
+      ?? ((uvs, i) => {
+        uvs[i] = uvs[i] / width
+        uvs[i + 1] = uvs[i + 1] / height
+      })
+    const uvs = vertices.slice()
+    for (let len = uvs.length, i = 0; i < len; i += 2) {
+      transform(uvs, i)
+    }
+    return uvs
+  }
+
   protected _redraw(): CanvasBatchable[] {
     this._tree?.log(this.name, 'drawing')
     this._draw()
-    return this.context.toBatchables()
+    return this.context.toBatchables().map((batchable) => {
+      return {
+        ...batchable,
+        uvs: this._transformUvs(batchable),
+      }
+    })
   }
 
   protected _relayout(batchables: CanvasBatchable[]): CanvasBatchable[] {
@@ -143,11 +158,9 @@ export class CanvasItem extends TimelineNode {
 
   protected _repaint(batchables: CanvasBatchable[]): CanvasBatchable[] {
     this._tree?.log(this.name, 'painting')
-    const globalOpacity = this.globalOpacity
     return batchables.map((batchable) => {
       return {
         ...batchable,
-        modulate: this._modulate.toInt8Array().map(v => v * globalOpacity),
         blendMode: this.blendMode,
       }
     })
@@ -165,26 +178,26 @@ export class CanvasItem extends TimelineNode {
   }
 
   protected _updateBatchables(): void {
-    const redrawing = this._redrawing
-    let relayouting = this._relayouting
-    let repainting = this._repainting
+    const needsRender = this.needsRender
+    let needsLayout = this.needsLayout
+    let needsPaint = this.needsPaint
 
     let batchables: CanvasBatchable[] | undefined
-    if (redrawing) {
-      this._originalBatchables = this._redraw()
-      relayouting = true
+    if (needsRender) {
+      this._rawBatchables = this._redraw()
+      needsLayout = true
     }
 
-    if (relayouting) {
-      this._layoutedBatchables = this._relayout(this._originalBatchables)
-      repainting = true
+    if (needsLayout) {
+      this._layoutBatchables = this._relayout(this._rawBatchables)
+      needsPaint = true
     }
 
-    if (repainting) {
-      batchables = this._repaint(this._layoutedBatchables)
+    if (needsPaint) {
+      batchables = this._repaint(this._layoutBatchables)
     }
 
-    if (redrawing) {
+    if (needsRender) {
       if (this._resetContext) {
         this.context.reset()
       }
@@ -192,9 +205,9 @@ export class CanvasItem extends TimelineNode {
 
     if (batchables) {
       this._batchables = batchables
-      this._redrawing = false
-      this._relayouting = false
-      this._repainting = false
+      this.needsRender = false
+      this.needsLayout = false
+      this.needsPaint = false
     }
   }
 
@@ -223,24 +236,19 @@ export class CanvasItem extends TimelineNode {
     return undefined
   }
 
-  protected override _render(renderer: WebGLRenderer): void {
+  protected override _render(renderer: GlRenderer): void {
     this._updateBatchables()
-
-    const pixelate = this._tree?.pixelate
 
     this._batchables.forEach((batchable) => {
       let texture = batchable.texture
       if (texture instanceof ViewportTexture) {
         texture = this._handleViewportTexture(batchable)
       }
-      else {
-        texture?.upload(renderer)
-      }
 
       renderer.batch2D.render({
         ...batchable,
-        size: pixelate ? batchable.size : undefined,
-        texture: texture?._glTexture(renderer),
+        roundPixels: this._tree?.roundPixels,
+        texture,
       })
     })
 

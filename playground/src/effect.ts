@@ -1,68 +1,58 @@
 import {
-  DropShadowEffect,
-  EmbossEffect,
   Engine,
-  GaussianBlurEffect,
-  GlitchEffect,
-  Image2D,
-  KawaseBlurEffect,
-  Node,
-  OutlineEffect,
-  PixelateEffect,
-  Timeline,
-  ZoomBlurEffect,
 } from '../../src'
 
-const engine = new Engine({
-  autoStart: true,
-  autoResize: true,
-  backgroundColor: '#F6F7F9',
-  timeline: Timeline.from([0, 5000], true),
-})
-
-;(window as any).engine = engine
-
-document.body.append(engine.view!)
-
-function testEffect(left: number, top: number, effect: Node): Node[] {
-  const size = 100
+function testcase(left: number, top: number, children: Record<string, any>[] = []): any {
   return [
-    new Image2D({
-      style: { left, top, width: size, height: size },
-      src: '/example.jpg',
-    }, [
-      effect.clone(),
-    ]),
-    new Image2D({
-      style: { left: left + 100, top, width: size, height: size },
-      src: '/example.png',
-    }, [
-      effect.clone(),
-    ]),
-    new Image2D({
-      style: { left: left + 200, top, width: size, height: size },
-      src: '/mask1.png',
-    }, [
-      effect.clone(),
-    ]),
+    {
+      is: 'Element2D',
+      style: { left, top, width: 100, height: 100 },
+      foreground: { image: '/example.jpg' },
+      children,
+    },
+    {
+      is: 'Element2D',
+      style: { left: left + 100, top, width: 100, height: 100 },
+      foreground: { image: '/example.png' },
+      children,
+    },
+    {
+      is: 'Element2D',
+      style: { left: left + 200, top, width: 100, height: 100 },
+      foreground: { image: '/mask1.png' },
+      children,
+    },
   ]
 }
 
 async function init(): Promise<void> {
-  engine.root.append([
-    ...testEffect(100, 10, new Node()),
+  const engine = new Engine({
+    autoStart: true,
+    autoResize: true,
+    data: [
+      { is: 'Camera2D' },
+      ...testcase(100, 10, [{ is: 'Node' }]),
+      ...testcase(100, 120, [{ is: 'GaussianBlurEffect' }]),
+      ...testcase(100, 230, [{ is: 'KawaseBlurEffect' }]),
+      ...testcase(100, 340, [{ is: 'ZoomBlurEffect' }]),
+      ...testcase(100, 450, [{ is: 'DropShadowEffect' }]),
+      ...testcase(100, 560, [{ is: 'OutlineEffect' }]),
+      ...testcase(500, 10, [{ is: 'MaskEffect', src: '/mask1.png' }]),
+      ...testcase(500, 120, [{ is: 'EmbossEffect' }]),
+      ...testcase(500, 230, [{ is: 'PixelateEffect' }]),
+      ...testcase(500, 340, [{ is: 'GlitchEffect' }]),
+      ...testcase(500, 450, [{ is: 'GodrayEffect' }]),
+    ],
+  })
 
-    ...testEffect(100, 120, new GaussianBlurEffect()),
-    ...testEffect(100, 230, new KawaseBlurEffect()),
-    ...testEffect(100, 340, new ZoomBlurEffect()),
-    ...testEffect(100, 450, new DropShadowEffect()),
-    ...testEffect(100, 560, new OutlineEffect()),
+  engine.on('pointerdown', (e) => {
+    ;(window as any).$$0 = e.target
+    console.warn(e.target?.toJSON())
+  })
 
-    ...testEffect(500, 120, new EmbossEffect()),
-    ...testEffect(500, 230, new PixelateEffect()),
-    ...testEffect(500, 340, new GlitchEffect()),
-    // ...testEffect(500, 450, new GodrayEffect()),
-  ])
+  ;(window as any).engine = engine
+
+  document.body.append(engine.view!)
 }
 
 init()

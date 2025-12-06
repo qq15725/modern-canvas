@@ -114,7 +114,7 @@ export interface AnimationProperties extends Omit<TimelineNodeProperties, 'rende
 @customNode<TimelineNodeProperties>('Animation', {
   renderMode: 'disabled',
   processMode: 'pausable',
-  processSortMode: 'parent_before',
+  processSortMode: 'parent-before',
   duration: 2000,
 })
 export class Animation extends TimelineNode {

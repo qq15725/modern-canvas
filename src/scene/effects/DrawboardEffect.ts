@@ -1,4 +1,4 @@
-import type { WebGLRenderer } from '../../core'
+import type { GlRenderer } from '../../core'
 import type { EffectProperties, Node, Viewport } from '../main'
 import type { Texture2D } from '../resources'
 import { property } from 'modern-idoc'
@@ -6,7 +6,7 @@ import { assets } from '../../asset'
 import { customNode } from '../../core'
 import { Effect } from '../main/Effect'
 import { Material, QuadUvGeometry } from '../resources'
-import frag from './DrawboardEffect.frag?raw'
+import fragment from './DrawboardEffect.frag?raw'
 
 export type CheckerboardStyle = 'grid' | 'gridDark' | 'dot'
 
@@ -33,16 +33,18 @@ export class DrawboardEffect extends Effect {
   protected _watermark?: Texture2D
 
   static material = new Material({
-    vert: `attribute vec2 position;
-attribute vec2 uv;
+    gl: {
+      vertex: `attribute vec2 position;
+in vec2 uv;
 uniform mat3 projectionMatrix;
 uniform mat3 viewMatrix;
-varying vec2 vUv;
+out vec2 vUv;
 void main() {
   gl_Position = vec4(position.xy, 0.0, 1.0);
   vUv = uv;
 }`,
-    frag,
+      fragment,
+    },
   })
 
   constructor(properties?: Partial<DrawboardEffectProperties>, children: Node[] = []) {
@@ -78,10 +80,15 @@ void main() {
     dot: 3,
   }
 
-  override apply(renderer: WebGLRenderer, source: Viewport): void {
+  override apply(renderer: GlRenderer, source: Viewport): void {
     source.redraw(renderer, () => {
-      this._watermark?.activate(renderer, 1)
-      const viewMatrix = renderer.program.uniforms.viewMatrix
+      if (this._watermark) {
+        this._watermark.activate(renderer, 1)
+      }
+      else {
+        renderer.texture.unbind(1)
+      }
+      const viewMatrix = renderer.shader.uniforms.viewMatrix
       const watermarkSize = this._watermark
         ? [
             this.watermarkWidth,
@@ -91,7 +98,7 @@ void main() {
       const watermarkMaxWh = Math.max(watermarkSize[0], watermarkSize[1])
 
       QuadUvGeometry.draw(renderer, DrawboardEffect.material, {
-        texture: 0,
+        uTexture: 0,
         inputSize: [source.width, source.height],
         zoom: [viewMatrix[0], viewMatrix[4]],
         translate: [viewMatrix[6], viewMatrix[7]],

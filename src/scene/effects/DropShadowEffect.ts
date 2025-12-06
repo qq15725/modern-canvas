@@ -1,4 +1,4 @@
-import type { ColorValue, WebGLRenderer } from '../../core'
+import type { ColorValue, GlRenderer } from '../../core'
 import type { EffectProperties, Node } from '../main'
 import { property } from 'modern-idoc'
 import { Color, customNode } from '../../core'
@@ -18,7 +18,8 @@ export interface DropShadowEffectProperties extends EffectProperties {
 @customNode('DropShadowEffect')
 export class DropShadowEffect extends Effect {
   static material = new Material({
-    vert: `precision mediump float;
+    gl: {
+      vertex: `precision mediump float;
 attribute vec2 position;
 attribute vec2 uv;
 varying vec2 vUv;
@@ -26,7 +27,7 @@ void main() {
   gl_Position = vec4(position, 0.0, 1.0);
   vUv = uv;
 }`,
-    frag: `precision highp float;
+      fragment: `precision highp float;
 varying vec2 vUv;
 uniform sampler2D sampler;
 uniform float uAlpha;
@@ -40,6 +41,7 @@ void main(void) {
   sample *= uAlpha;
   gl_FragColor = sample;
 }`,
+    },
   })
 
   @property({ fallback: '#000000FF' }) declare color: ColorValue
@@ -61,7 +63,7 @@ void main(void) {
       .append(children)
   }
 
-  apply(renderer: WebGLRenderer, source: Viewport): void {
+  apply(renderer: GlRenderer, source: Viewport): void {
     this.viewport3.activateWithCopy(renderer, source)
 
     this.viewport3.redraw(renderer, () => {

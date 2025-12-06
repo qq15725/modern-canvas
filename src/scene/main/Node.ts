@@ -1,16 +1,20 @@
 import type {
   CoreObjectEvents,
+  GlRenderer,
   InputEvent,
   InputEventKey,
   InputEvents,
-  Maskable,
-  WebGLRenderer,
+  MaskLike,
 } from '../../core'
 import type { SceneTree } from './SceneTree'
 import type { Viewport } from './Viewport'
 import type { Window } from './Window'
 import { clearUndef, idGenerator, property } from 'modern-idoc'
-import { CoreObject, customNode, customNodes } from '../../core'
+import {
+  CoreObject,
+  customNode,
+  customNodes,
+} from '../../core'
 import { Children } from './Children'
 import { Meta } from './Meta'
 
@@ -41,8 +45,8 @@ export interface Node {
   emit: <K extends keyof NodeEvents & string>(event: K, ...args: NodeEvents[K]) => this
 }
 
-export type ProcessMode = 'inherit' | 'pausable' | 'when_paused' | 'always' | 'disabled'
-export type ProcessSortMode = 'default' | 'parent_before'
+export type ProcessMode = 'inherit' | 'pausable' | 'when-paused' | 'always' | 'disabled'
+export type ProcessSortMode = 'default' | 'parent-before'
 export type RenderMode = 'inherit' | 'always' | 'disabled'
 export type InputMode = 'inherit' | 'always' | 'disabled'
 export type InternalMode = 'default' | 'front' | 'back'
@@ -50,12 +54,22 @@ export type InternalMode = 'default' | 'front' | 'back'
 export interface NodeProperties {
   id: string
   name: string
-  mask: Maskable
+  mask: MaskLike
   processMode: ProcessMode
   processSortMode: ProcessSortMode
   renderMode: RenderMode
   internalMode: InternalMode
   meta: Record<string, any>
+}
+
+export interface SerializedNode {
+  [key: string]: any
+  is?: string
+  children?: SerializedNode[]
+  meta?: {
+    [key: string]: any
+    inCanvasIs?: string
+  }
 }
 
 const iidMap: Record<string, number> = {}
@@ -74,12 +88,12 @@ export class Node extends CoreObject {
   @property({ fallback: idGenerator() }) declare id: string
   @property({ fallback: idGenerator() }) declare name: string
 
-  @property({ internal: true, fallback: 'inherit' }) declare processMode: ProcessMode
-  @property({ internal: true, fallback: 'default' }) declare processSortMode: ProcessSortMode
-  @property({ internal: true, fallback: 'inherit' }) declare renderMode: RenderMode
-  @property({ internal: true, fallback: 'inherit' }) declare inputMode: InputMode
-  @property({ internal: true, fallback: 'default' }) declare internalMode: InternalMode
-  @property({ internal: true }) declare mask?: Maskable
+  @property({ fallback: 'inherit' }) declare processMode: ProcessMode
+  @property({ fallback: 'default' }) declare processSortMode: ProcessSortMode
+  @property({ fallback: 'inherit' }) declare renderMode: RenderMode
+  @property({ fallback: 'inherit' }) declare inputMode: InputMode
+  @property({ fallback: 'default' }) declare internalMode: InternalMode
+  @property({ internal: true }) declare mask?: MaskLike
 
   protected _meta = new Meta(this)
   get meta(): Meta { return this._meta }
@@ -221,7 +235,7 @@ export class Node extends CoreObject {
         return this._parent?.canProcess() ?? true
       case 'pausable':
         return !this._tree.processPaused
-      case 'when_paused':
+      case 'when-paused':
         return this._tree.processPaused
       case 'always':
         return true
@@ -294,7 +308,7 @@ export class Node extends CoreObject {
         case 'default':
           childrenInAfter.push(child)
           break
-        case 'parent_before':
+        case 'parent-before':
           childrenInBefore.push(child)
           break
       }
@@ -317,20 +331,6 @@ export class Node extends CoreObject {
       tree!.renderStack.currentCall = renderCall
     }
 
-    // mask
-    if (this.mask instanceof Node) {
-      if (!this.getNode('__$mask')) {
-        this.mask.processMode = 'disabled'
-        this.appendChild(this.mask, 'front')
-      }
-    }
-    else {
-      const mask = this.getNode('__$mask')
-      if (mask) {
-        this.removeChild(mask)
-      }
-    }
-
     childrenInAfter.forEach((child) => {
       child.emit('process', delta)
     })
@@ -345,7 +345,7 @@ export class Node extends CoreObject {
     }
   }
 
-  render(renderer: WebGLRenderer, next?: () => void): void {
+  render(renderer: GlRenderer, next?: () => void): void {
     const mask = this.mask
 
     if (mask) {
@@ -418,8 +418,8 @@ export class Node extends CoreObject {
     })
   }
 
-  append<T extends Node>(nodes: T[]): void
-  append<T extends Node>(...nodes: T[]): void
+  append<T extends Node | SerializedNode>(nodes: T[]): void
+  append<T extends Node | SerializedNode>(...nodes: T[]): void
   append(...nodes: any[]): void {
     let _nodes
     if (Array.isArray(nodes[0])) {
@@ -429,7 +429,12 @@ export class Node extends CoreObject {
       _nodes = nodes
     }
     _nodes.forEach((node) => {
-      this.appendChild(node)
+      if (node instanceof Node) {
+        this.appendChild(node)
+      }
+      else {
+        this.appendChild(Node.parse(node))
+      }
     })
   }
 
@@ -603,7 +608,7 @@ export class Node extends CoreObject {
   // eslint-disable-next-line unused-imports/no-unused-vars
   protected _input(event: InputEvent, key: InputEventKey): void {}
   // eslint-disable-next-line unused-imports/no-unused-vars
-  protected _render(renderer: WebGLRenderer): void {}
+  protected _render(renderer: GlRenderer): void {}
 
   override destroy(): void {
     super.destroy()
@@ -620,23 +625,20 @@ export class Node extends CoreObject {
   override toJSON(): Record<string, any> {
     return clearUndef({
       ...super.toJSON(),
+      is: this.meta.inCanvasIs ? undefined : this.is,
       children: this.children.length
         ? [...this.children.map(child => child.toJSON())]
         : undefined,
-      meta: {
-        ...this.meta.toJSON(),
-        inCanvasIs: this.is,
-      },
+      meta: this.meta.toJSON(),
     })
   }
 
-  static parse(value: any): any {
+  static parse(value: SerializedNode | SerializedNode[]): any {
     if (Array.isArray(value)) {
       return value.map(val => this.parse(val))
     }
-    const { meta = {}, children, ...props } = value
-    const { inCanvasIs = 'Node' } = meta
-    const Class = (customNodes.get(inCanvasIs) ?? Node) as any
+    const { is, meta = {}, children, ...props } = value
+    const Class = (customNodes.get(is ?? meta.inCanvasIs ?? 'Node') ?? Node) as any
     const node = new Class({ ...props, meta }) as Node
     children?.forEach((child: Record<string, any>) => node.appendChild(this.parse(child)))
     return node

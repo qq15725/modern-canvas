@@ -1,4 +1,4 @@
-import type { Rect2 } from '../../../core'
+import type { Rectangle } from '../../../core'
 
 export interface RectangulableEvents {
   updateRect: []
@@ -12,5 +12,5 @@ export interface Rectangulable {
 }
 
 export interface Rectangulable {
-  getRect: () => Rect2
+  getRect: () => Rectangle
 }

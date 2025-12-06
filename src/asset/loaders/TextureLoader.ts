@@ -7,13 +7,23 @@ export class TextureLoader extends Loader {
 
   install(assets: Assets): this {
     const handler = (blob: Blob): Promise<Texture2D<ImageBitmap>> => {
+      // premultiply-alpha-on-upload
       return assets.fetchImageBitmap(blob, { premultiplyAlpha: 'premultiply' })
-        .then(bitmap => new Texture2D(bitmap))
+        .then((bitmap) => {
+          return new Texture2D({
+            source: bitmap,
+            uploadMethodId: 'image',
+            mipmap: true,
+          })
+        })
     }
 
     this.load = (url) => {
       if (typeof url === 'string') {
-        return assets.loadBy(url).then(handler)
+        return assets.loadBy(
+          url,
+          () => assets.fetch(url).then(rep => rep.blob()).then(handler),
+        )
       }
       return handler(url)
     }

@@ -12,7 +12,7 @@ export interface VideoTextureOptions {
   playsinline?: boolean
 }
 
-export interface VideoTextureSource {
+export interface VideoTextureLike {
   src: string
   mime: string
 }
@@ -57,7 +57,7 @@ export class VideoTexture extends Texture2D<HTMLVideoElement> {
 
   constructor(
     source: HTMLVideoElement
-      | (string | VideoTextureSource)[]
+      | (string | VideoTextureLike)[]
       | string,
     options?: VideoTextureOptions,
   ) {
@@ -67,7 +67,7 @@ export class VideoTexture extends Texture2D<HTMLVideoElement> {
       if (typeof source === 'string') {
         source = [source]
       }
-      const firstSrc = (source[0] as VideoTextureSource).src || source[0] as string
+      const firstSrc = (source[0] as VideoTextureLike).src || source[0] as string
 
       const videoElement = document.createElement('video')
       resolved.autoLoad && videoElement.setAttribute('preload', 'auto')
@@ -83,7 +83,7 @@ export class VideoTexture extends Texture2D<HTMLVideoElement> {
       resolved.autoPlay && videoElement.setAttribute('autoplay', '')
       crossOrigin(videoElement, firstSrc, resolved.crossorigin)
       for (let i = 0; i < source.length; ++i) {
-        let { src, mime } = source[i] as VideoTextureSource
+        let { src, mime } = source[i] as VideoTextureLike
         src = src || source[i] as string
         if (src.startsWith('data:')) {
           mime = src.slice(5, src.indexOf(';'))
@@ -232,11 +232,11 @@ export class VideoTexture extends Texture2D<HTMLVideoElement> {
     this._requestId = this.source.requestVideoFrameCallback(this._videoFrameRequestCallback)
   }
 
-  override requestUpload = (): void => {
+  requestUpload = (): void => {
     const elapsed = Math.floor(Ticker.elapsed * this.source.playbackRate)
     this._nextTime -= elapsed
     if (!this._spf || this._nextTime <= 0) {
-      super.requestUpload()
+      this.requestUpdate('source')
       this._nextTime = this._spf || 0
     }
   }

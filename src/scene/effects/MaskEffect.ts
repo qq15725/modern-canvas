@@ -1,5 +1,5 @@
 import type { Node2D } from '../2d'
-import type { WebGLRenderer } from '../../core'
+import type { GlRenderer } from '../../core'
 import type { EffectContext, EffectProperties, Node, Viewport } from '../main'
 import type { Texture2D } from '../resources'
 import { property } from 'modern-idoc'
@@ -15,50 +15,39 @@ export interface MaskEffectProperties extends EffectProperties {
 @customNode('MaskEffect')
 export class MaskEffect extends Effect {
   static material = new Material({
-    vert: `attribute vec2 position;
-attribute vec2 uv;
-varying vec2 vUv;
+    gl: {
+      vertex: `attribute vec2 position;
+in vec2 uv;
+out vec2 vUv;
 void main() {
   gl_Position = vec4(position, 0.0, 1.0);
   vUv = uv;
 }`,
-    frag: `varying vec2 vUv;
+      fragment: `in vec2 vUv;
+
 uniform sampler2D sampler;
 uniform sampler2D mask;
-uniform float area[4];
 uniform float rotation;
 
 vec2 rotateUV(vec2 uv, float angle) {
-    uv -= 0.5;
-    float cosAngle = cos(angle);
-    float sinAngle = sin(angle);
-    mat2 rotationMatrix = mat2(
-        cosAngle, -sinAngle,
-        sinAngle,  cosAngle
-    );
-    uv = rotationMatrix * uv;
-    uv += 0.5;
-    return uv;
+  uv -= 0.5;
+  float cosAngle = cos(angle);
+  float sinAngle = sin(angle);
+  mat2 rotationMatrix = mat2(
+    cosAngle, -sinAngle,
+    sinAngle,  cosAngle
+  );
+  uv = rotationMatrix * uv;
+  uv += 0.5;
+  return uv;
 }
 
 void main(void) {
-  if (
-    vUv.x > area[0]
-    && vUv.x < (area[0] + area[2])
-    && (1.0 - vUv.y) > area[1]
-    && (1.0 - vUv.y) < (area[1] + area[3])
-  ) {
-    vec4 color = texture2D(sampler, vUv);
-    vec2 uv = vec2(
-      (vUv.x - area[0]) / area[2],
-      ((1.0 - vUv.y) - area[1]) / area[3]
-    );
-    vec4 maskColor = texture2D(mask, rotateUV(uv, rotation));
-    gl_FragColor = mix(vec4(0.), color, maskColor.a);
-  } else {
-    gl_FragColor = vec4(0.);
-  }
+  vec4 color = texture(sampler, vUv);
+  vec4 maskColor = texture(mask, rotateUV(vUv, rotation));
+  gl_FragColor = mix(vec4(0.), color, maskColor.a);
 }`,
+    },
   })
 
   @property({ internal: true }) declare texture?: Texture2D<ImageBitmap>
@@ -92,14 +81,13 @@ void main(void) {
     }
   }
 
-  override apply(renderer: WebGLRenderer, source: Viewport, context: EffectContext): void {
-    if (this.texture && context.targetArea) {
+  override apply(renderer: GlRenderer, source: Viewport, context: EffectContext): void {
+    if (this.texture) {
       source.redraw(renderer, () => {
         this.texture!.activate(renderer, 1)
         QuadUvGeometry.draw(renderer, MaskEffect.material, {
           sampler: 0,
           mask: 1,
-          area: context.targetArea,
           rotation: (context.target as Node2D)?.globalRotation ?? 0,
         })
         renderer.texture.unbind(1)

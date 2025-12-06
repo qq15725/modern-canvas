@@ -1,4 +1,4 @@
-import type { WebGLRenderer } from '../../core'
+import type { GlRenderer } from '../../core'
 import type { Viewport } from '../main'
 import { customNode } from '../../core'
 import { Transition } from '../main/Transition'
@@ -12,14 +12,15 @@ export class TwistTransition extends Transition {
   offset?: number
 
   static material = new Material({
-    vert: `attribute vec2 position;
+    gl: {
+      vertex: `attribute vec2 position;
 attribute vec2 uv;
 varying vec2 vUv;
 void main() {
   gl_Position = vec4(position, 0.0, 1.0);
   vUv = uv;
 }`,
-    frag: `precision highp float;
+      fragment: `precision highp float;
 varying vec2 vUv;
 uniform sampler2D sampler;
 uniform float radius;
@@ -60,9 +61,10 @@ void main(void) {
   coord = unmapCoord(coord);
   gl_FragColor = texture2D(sampler, coord);
 }`,
+    },
   })
 
-  override apply(renderer: WebGLRenderer, source: Viewport): void {
+  override apply(renderer: GlRenderer, source: Viewport): void {
     const currentTimeProgress = this.currentTimeProgress
     let sampler: number
     let progress: number

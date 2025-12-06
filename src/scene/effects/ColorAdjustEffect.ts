@@ -1,4 +1,4 @@
-import type { WebGLRenderer } from '../../core'
+import type { GlRenderer } from '../../core'
 import type { EffectProperties, Node, Viewport } from '../main'
 import { property } from 'modern-idoc'
 import { customNode } from '../../core'
@@ -19,7 +19,8 @@ export interface ColorAdjustEffectProperties extends EffectProperties {
 @customNode('ColorAdjustEffect')
 export class ColorAdjustEffect extends Effect {
   static material = new Material({
-    vert: `precision mediump float;
+    gl: {
+      vertex: `precision mediump float;
 attribute vec2 position;
 attribute vec2 uv;
 varying vec2 vUv;
@@ -27,7 +28,7 @@ void main() {
   gl_Position = vec4(position, 0.0, 1.0);
   vUv = uv;
 }`,
-    frag: `varying vec2 vUv;
+      fragment: `varying vec2 vUv;
 uniform sampler2D sampler;
 uniform float gamma;
 uniform float contrast;
@@ -52,6 +53,7 @@ void main(void) {
   }
   gl_FragColor = c * alpha;
 }`,
+    },
   })
 
   @property({ fallback: 1 }) declare saturation: number
@@ -71,7 +73,7 @@ void main(void) {
       .append(children)
   }
 
-  override apply(renderer: WebGLRenderer, source: Viewport): void {
+  override apply(renderer: GlRenderer, source: Viewport): void {
     source.redraw(renderer, () => {
       QuadUvGeometry.draw(renderer, ColorAdjustEffect.material, {
         sampler: 0,
