@@ -1,3 +1,12 @@
+# [0.14.0](https://github.com/qq15725/modern-canvas/compare/v0.13.6...v0.14.0) (2025-12-06)
+
+
+### Features
+
+* upgrade WebGL render pipe ([f9eef2a](https://github.com/qq15725/modern-canvas/commit/f9eef2a2524e64173b63770296b13a4f76440efa))
+
+
+
 ## [0.13.6](https://github.com/qq15725/modern-canvas/compare/v0.13.5...v0.13.6) (2025-11-22)
 
 
