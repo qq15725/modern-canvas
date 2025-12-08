@@ -1,3 +1,12 @@
+## [0.14.4](https://github.com/qq15725/modern-canvas/compare/v0.14.3...v0.14.4) (2025-12-08)
+
+
+### Bug Fixes
+
+* scissor ([abf2d32](https://github.com/qq15725/modern-canvas/commit/abf2d32bb04e0872731ebc796c0e3c25713b2f96))
+
+
+
 ## [0.14.3](https://github.com/qq15725/modern-canvas/compare/v0.14.2...v0.14.3) (2025-12-08)
 
 
