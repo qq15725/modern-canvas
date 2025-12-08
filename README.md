@@ -129,8 +129,12 @@ import bounceGLSL from 'gl-transitions/transitions/Bounce.glsl?raw'
 import { Element2D, Transition } from 'modern-canvas'
 
 engine.root.appendChild(
-  new Element2D({ foreground: { image: '/example.png' } }),
+  new Element2D({
+    foreground: { image: '/example.png' },
+  }),
   new Transition({ glsl: bounceGLSL }),
-  new Element2D({ foreground: { image: '/example.gif' } }),
+  new Element2D({
+    foreground: { image: '/example.gif' },
+  }),
 )
 ```
