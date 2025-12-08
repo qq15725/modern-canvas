@@ -65,7 +65,7 @@
     "earcut": "^3.0.2",
     "modern-font": "^0.4.4",
     "modern-idoc": "^0.10.6",
-    "modern-path2d": "^1.4.11",
+    "modern-path2d": "^1.4.14",
     "modern-text": "^1.10.4"
   },
   "peerDependencies": {
@@ -85,7 +85,7 @@
     }
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^6.4.2",
+    "@antfu/eslint-config": "^6.5.1",
     "@types/earcut": "^3.0.0",
     "@types/node": "^24.10.1",
     "bumpp": "^10.3.2",
@@ -97,7 +97,7 @@
     "simple-git-hooks": "^2.13.1",
     "typescript": "^5.9.3",
     "unbuild": "^3.6.1",
-    "vite": "^7.2.6",
+    "vite": "^7.2.7",
     "vitest": "^4.0.15",
     "yoga-layout": "^3.2.1"
   },

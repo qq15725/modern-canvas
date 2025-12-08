@@ -1,4 +1,5 @@
 import type { RectangleLike } from '../../math'
+import type { RenderTargetLike } from '../shared'
 import type { GlRenderer } from './GlRenderer'
 import { GlSystem } from './system'
 
@@ -32,42 +33,71 @@ function transformRectToAABB(m: number[], rect: RectangleLike): RectangleLike {
 }
 
 export class GlScissorSystem extends GlSystem {
-  scissorCounter = 0
-
   override install(renderer: GlRenderer): void {
     super.install(renderer)
     renderer.scissor = this
   }
 
+  current: Record<number, { refCount: number, rect?: RectangleLike }> = {
+    [-1]: {
+      refCount: 0,
+    },
+  }
+
+  onRenderTargetChange(renderTarget: RenderTargetLike | null): void {
+    if (renderTarget) {
+      let current = this.current[renderTarget.instanceId]
+      if (!current) {
+        current = this.current[renderTarget.instanceId] = {
+          refCount: 0,
+        }
+      }
+      if (current.rect && current.refCount > 0) {
+        this.bind(current.rect)
+      }
+      else {
+        this.bind(null)
+      }
+    }
+  }
+
   push(rect: RectangleLike): void {
     const gl = this._gl
     gl.enable(gl.SCISSOR_TEST)
-    this.scissorCounter++
+    const current = this.current[this._renderer.renderTarget.current?.instanceId ?? -1]
+    current.refCount++
+    current.rect = rect
     this.bind(rect)
   }
 
   pop(): void {
-    if (this.scissorCounter > 0) {
-      this.scissorCounter--
+    const current = this.current[this._renderer.renderTarget.current?.instanceId ?? -1]
+    if (current.refCount > 0) {
+      current.refCount--
     }
-    if (this.scissorCounter <= 0) {
-      const gl = this._gl
-      gl.disable(gl.SCISSOR_TEST)
+    if (current.refCount <= 0) {
+      this.bind(null)
     }
   }
 
-  bind(rect: RectangleLike): void {
-    const { pixelRatio, viewport } = this._renderer
-    const { viewMatrix } = this._renderer.shader.uniforms
+  bind(rect?: RectangleLike | null): void {
+    const gl = this._gl
+    if (rect) {
+      const { pixelRatio, viewport } = this._renderer
+      const { viewMatrix } = this._renderer.shader.uniforms
 
-    const { x, y, width, height } = transformRectToAABB(viewMatrix, rect)
-    const scissorY = viewport.current.height / pixelRatio - (y + height)
+      const { x, y, width, height } = transformRectToAABB(viewMatrix, rect)
+      const scissorY = viewport.current.height / pixelRatio - (y + height)
 
-    this._renderer.gl.scissor(
-      x * pixelRatio,
-      scissorY * pixelRatio,
-      width * pixelRatio,
-      height * pixelRatio,
-    )
+      gl.scissor(
+        x * pixelRatio,
+        scissorY * pixelRatio,
+        width * pixelRatio,
+        height * pixelRatio,
+      )
+    }
+    else {
+      gl.disable(gl.SCISSOR_TEST)
+    }
   }
 }

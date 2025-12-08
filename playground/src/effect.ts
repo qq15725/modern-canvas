@@ -30,18 +30,25 @@ async function init(): Promise<void> {
     autoStart: true,
     autoResize: true,
     data: [
+
       { is: 'Camera2D' },
-      ...testcase(100, 10, [{ is: 'Node' }]),
-      ...testcase(100, 120, [{ is: 'GaussianBlurEffect' }]),
-      ...testcase(100, 230, [{ is: 'KawaseBlurEffect' }]),
-      ...testcase(100, 340, [{ is: 'ZoomBlurEffect' }]),
-      ...testcase(100, 450, [{ is: 'DropShadowEffect' }]),
-      ...testcase(100, 560, [{ is: 'OutlineEffect' }]),
-      ...testcase(500, 10, [{ is: 'MaskEffect', src: '/mask1.png' }]),
-      ...testcase(500, 120, [{ is: 'EmbossEffect' }]),
-      ...testcase(500, 230, [{ is: 'PixelateEffect' }]),
-      ...testcase(500, 340, [{ is: 'GlitchEffect' }]),
-      ...testcase(500, 450, [{ is: 'GodrayEffect' }]),
+      {
+        is: 'Element2D',
+        style: { width: 1000, height: 200, overflow: 'hidden' },
+        children: [
+          ...testcase(100, 10, [{ is: 'Node' }]),
+          ...testcase(100, 120, [{ is: 'GaussianBlurEffect' }]),
+          ...testcase(100, 230, [{ is: 'KawaseBlurEffect' }]),
+          ...testcase(100, 340, [{ is: 'ZoomBlurEffect' }]),
+          ...testcase(100, 450, [{ is: 'DropShadowEffect' }]),
+          ...testcase(100, 560, [{ is: 'OutlineEffect' }]),
+          ...testcase(500, 10, [{ is: 'MaskEffect', src: '/mask1.png' }]),
+          ...testcase(500, 120, [{ is: 'EmbossEffect' }]),
+          ...testcase(500, 230, [{ is: 'PixelateEffect' }]),
+          ...testcase(500, 340, [{ is: 'GlitchEffect' }]),
+          ...testcase(500, 450, [{ is: 'GodrayEffect' }]),
+        ],
+      },
     ],
   })
 

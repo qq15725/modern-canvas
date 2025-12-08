@@ -120,6 +120,7 @@ export class GlRenderTargetSystem extends GlSystem {
 
     // TODO
     if (didChange) {
+      this._renderer.scissor.onRenderTargetChange(this.current)
       this._renderer.stencil.onRenderTargetChange(this.current)
     }
   }

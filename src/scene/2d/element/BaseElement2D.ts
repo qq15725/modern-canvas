@@ -239,7 +239,6 @@ export class BaseElement2D extends Node2D implements Rectangulable {
         this._allowPointerEvents = !isNone(value)
         break
       case 'borderRadius':
-      default:
         this.requestRender()
         break
     }

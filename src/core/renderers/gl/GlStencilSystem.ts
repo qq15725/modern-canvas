@@ -79,7 +79,12 @@ export class GlStencilSystem extends GlSystem {
     refCount: 0,
   }
 
-  current: Record<number, { stencilMode: StencilMode, refCount: number }> = Object.create(null)
+  current: Record<number, { stencilMode: StencilMode, refCount: number }> = {
+    [-1]: {
+      stencilMode: StencilMode.disabled,
+      refCount: 0,
+    },
+  }
 
   protected _passOpMap!: {
     'keep': number
@@ -137,14 +142,7 @@ export class GlStencilSystem extends GlSystem {
     this._cache.refCount = 0
   }
 
-  protected _activeRenderTarget: RenderTargetLike | null = null
-
   onRenderTargetChange(renderTarget: RenderTargetLike | null): void {
-    if (this._activeRenderTarget === renderTarget)
-      return
-
-    this._activeRenderTarget = renderTarget
-
     if (renderTarget) {
       let stencilState = this.current[renderTarget.instanceId]
       if (!stencilState) {
@@ -158,12 +156,7 @@ export class GlStencilSystem extends GlSystem {
   }
 
   bind(stencilMode: StencilMode, refCount: number): void {
-    const stencilState = this._activeRenderTarget
-      ? this.current[this._activeRenderTarget.instanceId]
-      : {
-          stencilMode: StencilMode.disabled,
-          refCount: 0,
-        }
+    const stencilState = this.current[this._renderer.renderTarget.current?.instanceId ?? -1]
     const gl = this._gl
     const mode = stencilModeMap[stencilMode]
     const _cache = this._cache
