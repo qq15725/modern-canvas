@@ -39,7 +39,7 @@ npm i modern-canvas
 ## 🦄 Usage
 
 ```javascript
-import { Animation, Element2D, Engine, Image2D, Video2D } from 'modern-canvas'
+import { Animation, Element2D, Engine } from 'modern-canvas'
 import { fonts } from 'modern-font'
 
 async function loadFallbackFont() {
@@ -50,7 +50,7 @@ loadFallbackFont().then(() => {
   const engine = new Engine({ width: 500, height: 500 }).start()
 
   engine.root.appendChild(
-    new Image2D({
+    new Element2D({
       style: {
         left: 100,
         top: 100,
@@ -61,7 +61,7 @@ loadFallbackFont().then(() => {
         backgroundColor: '#00FF00',
         filter: 'brightness(102%) contrast(90%) saturate(128%) sepia(18%)',
       },
-      src: '/example.png',
+      foreground: { image: '/example.png' },
     }, [
       new Animation({
         duration: 3000,
@@ -79,16 +79,6 @@ loadFallbackFont().then(() => {
           content: '/example.png',
         },
       }),
-      new Video2D({
-        style: {
-          left: 200,
-          top: 200,
-          width: 100,
-          height: 100,
-          maskImage: '/example.png',
-        },
-        src: '/example.mp4',
-      }),
     ])
   )
 
@@ -103,11 +93,11 @@ loadFallbackFont().then(() => {
 See all [preset special effects](./src/scene/effects)
 
 ```typescript
-import { EmbossEffect, Image2D } from 'modern-canvas'
+import { EmbossEffect, Element2D } from 'modern-canvas'
 
 engine.root.appendChild(
-  new Image2D({
-    src: '/example.png',
+  new Element2D({
+    foreground: { image: '/example.png' },
   }, [
     new EmbossEffect(),
   ])
@@ -119,15 +109,15 @@ engine.root.appendChild(
 See all [preset transitions](./src/scene/transitions)
 
 ```typescript
-import { Image2D, TiltShiftTransition } from 'modern-canvas'
+import { Element2D, TiltShiftTransition } from 'modern-canvas'
 
 engine.root.appendChild(
-  new Image2D({
-    src: '/example.png',
+  new Element2D({
+    foreground: { image: '/example.png' },
   }),
   new TiltShiftTransition(),
-  new Image2D({
-    src: '/example.gif',
+  new Element2D({
+    foreground: { image: '/example.gif' },
   }),
 )
 ```
@@ -136,15 +126,11 @@ Use https://github.com/gl-transitions/gl-transitions with `vite`
 
 ```ts
 import bounceGLSL from 'gl-transitions/transitions/Bounce.glsl?raw'
-import { Image2D, Transition } from 'modern-canvas'
+import { Element2D, Transition } from 'modern-canvas'
 
 engine.root.appendChild(
-  new Image2D({
-    src: '/example.png',
-  }),
+  new Element2D({ foreground: { image: '/example.png' } }),
   new Transition({ glsl: bounceGLSL }),
-  new Image2D({
-    src: '/example.gif',
-  }),
+  new Element2D({ foreground: { image: '/example.gif' } }),
 )
 ```
