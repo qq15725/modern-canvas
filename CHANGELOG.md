@@ -1,3 +1,12 @@
+## [0.14.3](https://github.com/qq15725/modern-canvas/compare/v0.14.2...v0.14.3) (2025-12-08)
+
+
+### Bug Fixes
+
+* mask / texture ([57d52db](https://github.com/qq15725/modern-canvas/commit/57d52dbd3172a9848f9eba738e01ee68c002363a))
+
+
+
 ## [0.14.2](https://github.com/qq15725/modern-canvas/compare/v0.14.1...v0.14.2) (2025-12-06)
 
 
