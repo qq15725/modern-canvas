@@ -9,7 +9,6 @@ import type {
   Text,
 } from 'modern-idoc'
 import type {
-  GlRenderer,
   InputEvent,
   InputEventKey,
   PointerInputEvent, Vector2Data,
@@ -399,20 +398,7 @@ export class BaseElement2D extends Node2D implements Rectangulable {
 
   protected _updateMask(): void {
     if (this._overflowHidden) {
-      this.mask = {
-        render: (renderer: GlRenderer) => {
-          const rect = this.getRect()
-          renderer.batch2D.render({
-            vertices: new Float32Array([
-              rect.x, rect.y,
-              rect.x + rect.width, rect.y,
-              rect.x + rect.width, rect.y + rect.height,
-              rect.x, rect.y + rect.height,
-            ]),
-            indices: new Uint32Array([0, 1, 2, 0, 2, 3]),
-          })
-        },
-      }
+      this.mask = this.getRect()
     }
     else {
       this.mask = undefined

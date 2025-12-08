@@ -5,7 +5,6 @@ import {
   Camera2D,
   DrawboardEffect,
   Engine,
-  Node,
 } from '../../src'
 
 assets.gifWorkerUrl = gifWorkerUrl
@@ -44,7 +43,7 @@ document.body.append(engine.view!)
 async function init(): Promise<void> {
   await fonts.loadFallbackFont({ family: 'fallbackFont', src: '/fonts/fallback.woff' })
   const data = await fetch('/pptx.json').then(rep => rep.json())
-  engine.root.append(Node.parse(data))
+  engine.root.append(data)
   console.warn(data)
 }
 

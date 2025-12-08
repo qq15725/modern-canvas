@@ -1,9 +1,12 @@
+import type { RectangleLike } from '../../math'
 import type { GlRenderer } from './GlRenderer'
 import type { GlRenderable } from './types'
 import { Clear, StencilMode } from './const'
 import { GlSystem } from './system'
 
-export type MaskLike = GlRenderable
+export type MaskLike
+  = | GlRenderable
+    | RectangleLike
 
 export interface MaskStackItem {
   source: GlRenderable
@@ -29,7 +32,10 @@ export class GlMaskSystem extends GlSystem {
     const instanceId = this._renderer.renderTarget.current?.instanceId ?? -1
     let index = this._maskStackHash[instanceId] ?? 0
 
-    if ('render' in mask) {
+    if ('x' in mask) {
+      this._renderer.scissor.push(mask)
+    }
+    else if ('render' in mask) {
       // pushMaskBegin
       this._renderer.flush()
       this._renderer.renderTarget.ensureDepthStencil()
@@ -60,6 +66,9 @@ export class GlMaskSystem extends GlSystem {
     const instanceId = this._renderer.renderTarget.current?.instanceId ?? -1
     let index = this._maskStackHash[instanceId] ?? 0
 
+    if ('x' in mask) {
+      this._renderer.scissor.pop()
+    }
     if ('render' in mask) {
       // popMaskBegin
       this._renderer.flush()

@@ -80,8 +80,8 @@ export class Element2DText extends CoreObject {
   update(): void {
     this.base.fonts = this.base.fonts ?? this.parent.tree?.fonts
     this.base.update()
-    this._texture.width = Math.round(this.base.boundingBox.width)
-    this._texture.height = Math.round(this.base.boundingBox.height)
+    this._texture.width = Math.ceil(this.base.boundingBox.width)
+    this._texture.height = Math.ceil(this.base.boundingBox.height)
     this.base.render({
       view: this._texture.source,
       pixelRatio: this._texture.pixelRatio,

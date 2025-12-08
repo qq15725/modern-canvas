@@ -2,15 +2,15 @@ import type { GlTextureUploader } from '../GlTextureUploader'
 
 export const image: GlTextureUploader = {
   id: 'image',
-  upload: (source, glTexture, gl, webGLVersion) => {
-    const glWidth = glTexture.width
-    const glHeight = glTexture.height
-    const pixelWidth = source.pixelWidth ?? source.width
-    const pixelHeight = source.pixelHeight ?? source.height
-    const sourceWidth = source.sourceWidth ?? pixelWidth
-    const sourceHeight = source.sourceHeight ?? pixelHeight
+  upload: (texture, glTexture, gl, webGLVersion) => {
+    const glPixelWidth = glTexture.width
+    const glPixelHeight = glTexture.height
+    const pixelWidth = texture.pixelWidth ?? texture.width
+    const pixelHeight = texture.pixelHeight ?? texture.height
+    const sourceWidth = texture.sourceWidth ?? pixelWidth
+    const sourceHeight = texture.sourceHeight ?? pixelHeight
     if (sourceWidth < pixelWidth || sourceHeight < pixelHeight) {
-      if (glWidth !== pixelWidth || glHeight !== pixelHeight) {
+      if (glPixelWidth !== pixelWidth || glPixelHeight !== pixelHeight) {
         gl.texImage2D(
           glTexture.target,
           0,
@@ -34,7 +34,7 @@ export const image: GlTextureUploader = {
           sourceHeight,
           glTexture.format,
           glTexture.type,
-          source.source as TexImageSource,
+          texture.source as TexImageSource,
         )
       }
       else {
@@ -45,11 +45,11 @@ export const image: GlTextureUploader = {
           0,
           glTexture.format,
           glTexture.type,
-          source.source as TexImageSource,
+          texture.source as TexImageSource,
         )
       }
     }
-    else if (glWidth === pixelWidth && glHeight === pixelHeight) {
+    else if (glPixelWidth === pixelWidth && glPixelHeight === pixelHeight) {
       gl.texSubImage2D(
         gl.TEXTURE_2D,
         0,
@@ -57,7 +57,7 @@ export const image: GlTextureUploader = {
         0,
         glTexture.format,
         glTexture.type,
-        source.source as TexImageSource,
+        texture.source as TexImageSource,
       )
     }
     else if (webGLVersion === 2) {
@@ -70,7 +70,7 @@ export const image: GlTextureUploader = {
         0,
         glTexture.format,
         glTexture.type,
-        source.source as TexImageSource,
+        texture.source as TexImageSource,
       )
     }
     else {
@@ -80,7 +80,7 @@ export const image: GlTextureUploader = {
         glTexture.internalFormat,
         glTexture.format,
         glTexture.type,
-        source.source as TexImageSource,
+        texture.source as TexImageSource,
       )
     }
 

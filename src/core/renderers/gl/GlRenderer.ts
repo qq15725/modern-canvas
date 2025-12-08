@@ -12,6 +12,7 @@ import { GlGeometrySystem } from './geometry'
 import { GlBatch2DSystem } from './GlBatch2DSystem'
 import { GlColorMaskSystem } from './GlColorMaskSystem'
 import { GlMaskSystem } from './GlMaskSystem'
+import { GlScissorSystem } from './GlScissorSystem'
 import { GlStencilSystem } from './GlStencilSystem'
 import { GlViewportSystem } from './GlViewportSystem'
 import { GlRenderTargetSystem } from './renderTarget'
@@ -29,6 +30,7 @@ export interface GlRenderer {
   mask: GlMaskSystem
   colorMask: GlColorMaskSystem
   stencil: GlStencilSystem
+  scissor: GlScissorSystem
   batch2D: GlBatch2DSystem
   viewport: GlViewportSystem
 }
@@ -50,6 +52,7 @@ export class GlRenderer extends Renderer {
     new GlMaskSystem(),
     new GlColorMaskSystem(),
     new GlStencilSystem(),
+    new GlScissorSystem(),
     new GlBatch2DSystem(),
     new GlViewportSystem(),
   ]
