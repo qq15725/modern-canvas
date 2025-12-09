@@ -1,4 +1,4 @@
-import type { Vector2Data } from '../../core'
+import type { Vector2Like } from '../../core'
 import type {
   CanvasBatchable,
   CanvasItemEvents,
@@ -136,11 +136,11 @@ export class Node2D extends CanvasItem {
     }
   }
 
-  toLocal<P extends Vector2Data = Vector2>(globalPos: Vector2Data, newPos?: P): P {
+  toLocal<P extends Vector2Like = Vector2>(globalPos: Vector2Like, newPos?: P): P {
     return this.globalTransform.applyAffineInverse(globalPos, newPos)
   }
 
-  toGlobal<P extends Vector2Data = Vector2>(localPos: Vector2Data, newPos?: P): P {
+  toGlobal<P extends Vector2Like = Vector2>(localPos: Vector2Like, newPos?: P): P {
     return this.globalTransform.apply(localPos, newPos)
   }
 }

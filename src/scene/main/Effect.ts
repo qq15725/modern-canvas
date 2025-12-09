@@ -1,11 +1,12 @@
 import type { GlRenderer, RectangleLike } from '../../core'
 import type { Material } from '../resources'
+import type { Rectangulable } from './interfaces'
 import type { Node } from './Node'
 import type { SceneTree } from './SceneTree'
-import type { TimelineNodeProperties } from './TimelineNode'
+import type { TimelineNodeEvents, TimelineNodeProperties } from './TimelineNode'
 import { property } from 'modern-idoc'
 import { assets } from '../../asset'
-import { customNode } from '../../core'
+import { customNode, Rectangle } from '../../core'
 import { EffectMaterial, QuadUvGeometry } from '../resources'
 import { TimelineNode } from './TimelineNode'
 import { Viewport } from './Viewport'
@@ -28,8 +29,19 @@ export interface EffectContext {
   to?: Viewport
 }
 
+export interface EffectEvents extends TimelineNodeEvents {
+  updateRect: []
+}
+
+export interface Effect {
+  on: <K extends keyof EffectEvents & string>(event: K, listener: (...args: EffectEvents[K]) => void) => this
+  once: <K extends keyof EffectEvents & string>(event: K, listener: (...args: EffectEvents[K]) => void) => this
+  off: <K extends keyof EffectEvents & string>(event: K, listener: (...args: EffectEvents[K]) => void) => this
+  emit: <K extends keyof EffectEvents & string>(event: K, ...args: EffectEvents[K]) => this
+}
+
 @customNode('Effect')
-export class Effect extends TimelineNode {
+export class Effect extends TimelineNode implements Rectangulable {
   @property({ internal: true }) material?: Material
   @property() declare effectMode?: EffectMode
   @property() declare glsl?: string
@@ -50,6 +62,8 @@ export class Effect extends TimelineNode {
   /** Temporary nodes for transition */
   protected _previousSibling?: Node
   protected _nextSibling?: Node
+
+  protected _rect: RectangleLike = { x: 0, y: 0, width: 0, height: 0 }
 
   constructor(properties?: Partial<EffectProperties>, children: Node[] = []) {
     super()
@@ -137,7 +151,9 @@ export class Effect extends TimelineNode {
     }
   }
 
-  protected _rect: RectangleLike = { x: 0, y: 0, width: 0, height: 0 }
+  getRect(): Rectangle {
+    return new Rectangle(this._rect)
+  }
 
   protected _processParent(): void {
     const renderStack = this._tree?.renderStack
@@ -214,7 +230,16 @@ export class Effect extends TimelineNode {
     else {
       calls.splice(start, end + 1, renderStack.createCall(this))
     }
-    this._rect = rect
+
+    if (
+      this._rect.x !== rect.x
+      || this._rect.y !== rect.y
+      || this._rect.width !== rect.width
+      || this._rect.height !== rect.height
+    ) {
+      this._rect = rect
+      this.emit('updateRect')
+    }
   }
 
   protected _processChildren(): void {

@@ -1,7 +1,7 @@
 import type { VectorLike } from './Vector'
 import { Vector } from './Vector'
 
-export interface Vector2Data {
+export interface Vector2Like {
   x: number
   y: number
 }
@@ -61,7 +61,7 @@ export class Vector2 extends Vector {
     return Math.atan2(-x, -y) + Math.PI
   }
 
-  distanceTo(point: Vector2Data): number {
+  distanceTo(point: Vector2Like): number {
     return Math.hypot(point.x - this.x, point.y - this.y)
   }
 

@@ -3,7 +3,7 @@ import type {
   InputEventKey,
   KeyboardInputEvent,
   PointerInputEvent,
-  Vector2Data,
+  Vector2Like,
   WheelInputEvent } from '../../core'
 import type { Node, SceneTree } from '../main'
 import type { Node2DEvents, Node2DProperties } from './Node2D'
@@ -12,9 +12,9 @@ import { clamp, customNode, IN_MAC_OS, Transform2D, Vector2 } from '../../core'
 import { Node2D } from './Node2D'
 
 export interface Camera2DProperties extends Node2DProperties {
-  zoom?: Vector2Data
-  minZoom?: Vector2Data
-  maxZoom?: Vector2Data
+  zoom?: Vector2Like
+  minZoom?: Vector2Like
+  maxZoom?: Vector2Like
 }
 
 export interface Camera2DEvents extends Node2DEvents {
@@ -40,15 +40,15 @@ export class Camera2D extends Node2D {
 
   protected _zoom = new Vector2(1, 1).on('update', () => this.updateTransform())
   get zoom(): Vector2 { return this._zoom }
-  set zoom(val: Vector2Data) { this._zoom.set(val.x, val.y) }
+  set zoom(val: Vector2Like) { this._zoom.set(val.x, val.y) }
 
   protected _minZoom = new Vector2(0.02, 0.02)
   get minZoom(): Vector2 { return this._minZoom }
-  set minZoom(val: Vector2Data) { this._minZoom.set(val.x, val.y) }
+  set minZoom(val: Vector2Like) { this._minZoom.set(val.x, val.y) }
 
   protected _maxZoom = new Vector2(256, 256)
   get maxZoom(): Vector2 { return this._maxZoom }
-  set maxZoom(val: Vector2Data) { this._maxZoom.set(val.x, val.y) }
+  set maxZoom(val: Vector2Like) { this._maxZoom.set(val.x, val.y) }
 
   constructor(properties?: Partial<Camera2DProperties>, nodes: Node[] = []) {
     super()
@@ -198,11 +198,11 @@ export class Camera2D extends Node2D {
     this.syncCanvasTransform()
   }
 
-  toGlobal<P extends Vector2Data = Vector2>(screenPos: Vector2Data, newPos?: P): P {
+  toGlobal<P extends Vector2Like = Vector2>(screenPos: Vector2Like, newPos?: P): P {
     return this.canvasTransform.applyAffineInverse(screenPos, newPos)
   }
 
-  toScreen<P extends Vector2Data = Vector2>(globalPos: Vector2Data, newPos?: P): P {
+  toScreen<P extends Vector2Like = Vector2>(globalPos: Vector2Like, newPos?: P): P {
     return this.canvasTransform.apply(globalPos, newPos)
   }
 

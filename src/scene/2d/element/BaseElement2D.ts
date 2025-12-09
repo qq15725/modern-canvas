@@ -11,7 +11,8 @@ import type {
 import type {
   InputEvent,
   InputEventKey,
-  PointerInputEvent, Vector2Data,
+  PointerInputEvent,
+  Vector2Like,
 } from '../../../core'
 import type { Node, Rectangulable, RectangulableEvents, SceneTree } from '../../main'
 import type { Node2DEvents, Node2DProperties } from '../Node2D'
@@ -295,7 +296,7 @@ export class BaseElement2D extends Node2D implements Rectangulable {
     return this.getGlobalAabb()
   }
 
-  protected _getPointArray(): Vector2Data[] {
+  protected _getPointArray(): Vector2Like[] {
     const { width, height } = this.size
     const x1 = 0
     const y1 = 0
@@ -454,7 +455,7 @@ export class BaseElement2D extends Node2D implements Rectangulable {
   }
 
   // eslint-disable-next-line unused-imports/no-unused-vars
-  protected _positionInput(localPos: Vector2Data, key: InputEventKey): boolean {
+  protected _positionInput(localPos: Vector2Like, key: InputEventKey): boolean {
     const { width, height } = this.size
     return localPos.x >= 0
       && localPos.x < width

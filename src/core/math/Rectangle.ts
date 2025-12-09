@@ -1,4 +1,4 @@
-import type { Vector2Data } from './Vector2'
+import type { Vector2Like } from './Vector2'
 import { Vector2 } from './Vector2'
 
 export interface RectangleLike {
@@ -38,8 +38,8 @@ export class Rectangle implements RectangleLike {
   readonly size: Vector2
 
   constructor(from: RectangleLike)
-  constructor(pointArray: Vector2Data[])
-  constructor(position: Vector2Data, size: Vector2Data)
+  constructor(pointArray: Vector2Like[])
+  constructor(position: Vector2Like, size: Vector2Like)
   constructor(x: number, y: number, width: number, height: number)
   constructor(...args: any[]) {
     const position = new Vector2()
@@ -50,8 +50,8 @@ export class Rectangle implements RectangleLike {
       case 1: {
         const arg = args[0]
         if (Array.isArray(arg)) {
-          const xx = arg.map((p: Vector2Data) => p.x)
-          const yy = arg.map((p: Vector2Data) => p.y)
+          const xx = arg.map((p: Vector2Like) => p.x)
+          const yy = arg.map((p: Vector2Like) => p.y)
           const minX = Math.min(...xx)
           const maxX = Math.max(...xx)
           const minY = Math.min(...yy)

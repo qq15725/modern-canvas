@@ -5,10 +5,7 @@ import type {
   ResourceEvents,
 } from '../../core'
 import { property } from 'modern-idoc'
-import {
-  customNode,
-  Resource,
-} from '../../core'
+import { Resource } from '../../core'
 import { Texture2D } from '../resources'
 
 export interface RenderTargetEvents extends ResourceEvents {
@@ -22,7 +19,6 @@ export interface RenderTarget {
   emit: <K extends keyof RenderTargetEvents & string>(event: K, ...args: RenderTargetEvents[K]) => this
 }
 
-@customNode('RenderTarget')
 export class RenderTarget extends Resource implements RenderTargetLikeReactiveObject {
   @property({ fallback: false }) declare isRoot: boolean
   @property({ fallback: 0 }) declare x: number

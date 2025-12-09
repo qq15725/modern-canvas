@@ -33,7 +33,7 @@ async function init(): Promise<void> {
       { is: 'Camera2D' },
       {
         is: 'Element2D',
-        style: { width: 1000, height: 200, overflow: 'hidden' },
+        style: { width: 1000, height: 600, overflow: 'hidden' },
         children: [
           ...testcase(100, 10, [{ is: 'Node' }]),
           ...testcase(100, 120, [{ is: 'GaussianBlurEffect' }]),

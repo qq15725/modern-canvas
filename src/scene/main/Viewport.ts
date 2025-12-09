@@ -1,7 +1,7 @@
 import type {
   GlRenderer,
   RectangleLike,
-  Vector2, Vector2Data,
+  Vector2, Vector2Like,
 } from '../../core'
 import type { Texture2D } from '../resources'
 import type { Rectangulable, RectangulableEvents } from './interfaces'
@@ -138,11 +138,11 @@ export class Viewport extends Node implements Rectangulable {
     return new Rectangle(this.x, this.y, this.width, this.height)
   }
 
-  toCanvasGlobal<P extends Vector2Data = Vector2>(screenPos: Vector2Data, newPos?: P): P {
+  toCanvasGlobal<P extends Vector2Like = Vector2>(screenPos: Vector2Like, newPos?: P): P {
     return this.canvasTransform.applyAffineInverse(screenPos, newPos)
   }
 
-  toCanvasScreen<P extends Vector2Data = Vector2>(globalPos: Vector2Data, newPos?: P): P {
+  toCanvasScreen<P extends Vector2Like = Vector2>(globalPos: Vector2Like, newPos?: P): P {
     return this.canvasTransform.apply(globalPos, newPos)
   }
 }
