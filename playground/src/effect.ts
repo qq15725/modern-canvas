@@ -30,7 +30,6 @@ async function init(): Promise<void> {
     autoStart: true,
     autoResize: true,
     data: [
-
       { is: 'Camera2D' },
       {
         is: 'Element2D',

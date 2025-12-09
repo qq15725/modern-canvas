@@ -1,9 +1,22 @@
 import type { RectangleLike } from '../../../math'
 import type { RenderTargetLike, TextureLike } from '../../shared'
 import type { GlRenderer } from '../GlRenderer'
+import type { GlSystemEvents } from '../system'
+import type { GlRenderingContext } from '../types'
 import { Projection2D } from '../../../math'
 import { GlSystem } from '../system'
 import { GlRenderTarget } from './GlRenderTarget'
+
+export interface GlRenderTargetSystemEvents extends GlSystemEvents {
+  updateRenderTarget: [renderTarget: RenderTargetLike | null]
+}
+
+export interface GlRenderTargetSystem {
+  on: <K extends keyof GlRenderTargetSystemEvents & string>(event: K, listener: (...args: GlRenderTargetSystemEvents[K]) => void) => this
+  once: <K extends keyof GlRenderTargetSystemEvents & string>(event: K, listener: (...args: GlRenderTargetSystemEvents[K]) => void) => this
+  off: <K extends keyof GlRenderTargetSystemEvents & string>(event: K, listener: (...args: GlRenderTargetSystemEvents[K]) => void) => this
+  emit: <K extends keyof GlRenderTargetSystemEvents & string>(event: K, ...args: GlRenderTargetSystemEvents[K]) => this
+}
 
 export class GlRenderTargetSystem extends GlSystem {
   override install(renderer: GlRenderer): void {
@@ -20,12 +33,12 @@ export class GlRenderTargetSystem extends GlSystem {
   protected _writeDepthTexture = true
   projectionMatrix = new Projection2D()
 
-  override onUpdateContext(): void {
+  protected override _updateContext(gl: GlRenderingContext): void {
+    super._updateContext(gl)
     this._hasMRT = true
     this._writeDepthTexture = true
 
     if (this._renderer.version === 1) {
-      const gl = this._renderer.gl as WebGLRenderingContext
       const drawBuffers = this._renderer.extensions.drawBuffers
       const depthTexture = this._renderer.extensions.depthTexture
 
@@ -42,7 +55,6 @@ export class GlRenderTargetSystem extends GlSystem {
       }
     }
     else {
-      const gl = this._renderer.gl as WebGL2RenderingContext
       this._msaaSamples = gl.getInternalformatParameter(gl.RENDERBUFFER, gl.RGBA8, gl.SAMPLES)
     }
   }
@@ -118,10 +130,8 @@ export class GlRenderTargetSystem extends GlSystem {
       })
     }
 
-    // TODO
     if (didChange) {
-      this._renderer.scissor.onRenderTargetChange(this.current)
-      this._renderer.stencil.onRenderTargetChange(this.current)
+      this.emit('updateRenderTarget', this.current)
     }
   }
 

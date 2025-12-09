@@ -108,8 +108,8 @@ export class GlStencilSystem extends GlSystem {
     'greater-equal': number
   }
 
-  override onUpdateContext(gl: GlRenderingContext): void {
-    super.onUpdateContext(gl)
+  protected override _updateContext(gl: GlRenderingContext): void {
+    super._updateContext(gl)
 
     this._compareMap = {
       'always': gl.ALWAYS,
@@ -136,13 +136,18 @@ export class GlStencilSystem extends GlSystem {
     this.reset()
   }
 
+  protected override _setup(): void {
+    super._setup()
+    this._renderer.renderTarget.on('updateRenderTarget', this._updateRenderTarget)
+  }
+
   reset(): void {
     this._cache.enabled = false
     this._cache.stencilMode = StencilMode.none
     this._cache.refCount = 0
   }
 
-  onRenderTargetChange(renderTarget: RenderTargetLike | null): void {
+  protected _updateRenderTarget = (renderTarget: RenderTargetLike | null): void => {
     if (renderTarget) {
       let stencilState = this.current[renderTarget.instanceId]
       if (!stencilState) {
@@ -187,5 +192,10 @@ export class GlStencilSystem extends GlSystem {
         gl.stencilOp(gl.KEEP, gl.KEEP, (this._passOpMap as any)[mode.stencilBack.passOp])
       }
     }
+  }
+
+  override destroy(): void {
+    super.destroy()
+    this._renderer.renderTarget.off('updateRenderTarget', this._updateRenderTarget)
   }
 }

@@ -36,8 +36,8 @@ export class GlTextureSystem extends GlSystem {
     renderer.texture = this
   }
 
-  override onUpdateContext(gl: GlRenderingContext): void {
-    super.onUpdateContext(gl)
+  protected override _updateContext(gl: GlRenderingContext): void {
+    super._updateContext(gl)
 
     if (!Object.keys(this._mapFormatToInternalFormat).length) {
       this._mapFormatToInternalFormat = mapFormatToGlInternalFormat(gl, this._renderer.extensions)
@@ -59,7 +59,7 @@ export class GlTextureSystem extends GlSystem {
   }
 
   protected _createGlTexture(texture: TextureLike): GlTexture {
-    const gl = this.gl
+    const gl = this._gl
     const glTexture = new GlTexture(gl.createTexture())
     gl.bindTexture(glTexture.target, glTexture.native)
     glTexture.type = this._mapFormatToType[texture.format]

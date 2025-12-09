@@ -1,6 +1,5 @@
 import type { GlRenderer, RectangleLike } from '../../core'
 import type { Material } from '../resources'
-import type { Rectangulable } from './interfaces'
 import type { Node } from './Node'
 import type { SceneTree } from './SceneTree'
 import type { TimelineNodeProperties } from './TimelineNode'
@@ -138,6 +137,8 @@ export class Effect extends TimelineNode {
     }
   }
 
+  protected _rect: RectangleLike = { x: 0, y: 0, width: 0, height: 0 }
+
   protected _processParent(): void {
     const renderStack = this._tree?.renderStack
     if (!renderStack)
@@ -148,6 +149,12 @@ export class Effect extends TimelineNode {
     const calls = parentParentCall.calls
     let start: number | undefined
     let end: number | undefined
+    const minMax = {
+      minX: Number.MAX_SAFE_INTEGER,
+      minY: Number.MAX_SAFE_INTEGER,
+      maxX: 0,
+      maxY: 0,
+    }
     calls.forEach((call, index) => {
       const renderable = call.renderable
       if (
@@ -157,12 +164,49 @@ export class Effect extends TimelineNode {
         if (renderable.needsRender) {
           this.needsRender = true
         }
+        if ('getRect' in renderable) {
+          const _rect = (renderable.getRect as any)() as RectangleLike
+          const points = {
+            x: [_rect.x, _rect.x + _rect.width],
+            y: [_rect.y, _rect.y + _rect.height],
+          }
+          minMax.minX = Math.min(...points.x)
+          minMax.maxX = Math.max(...points.x)
+          minMax.minY = Math.min(...points.y)
+          minMax.maxY = Math.max(...points.y)
+        }
         start = start ?? index
         end = index
       }
     })
+
     if (start === undefined || end === undefined)
       return
+
+    const rect = {
+      x: minMax.minX,
+      y: minMax.minY,
+      width: minMax.maxX - minMax.minX,
+      height: minMax.maxY - minMax.minY,
+    }
+
+    if (
+      rect.width === Number.MAX_SAFE_INTEGER
+      || rect.height === Number.MAX_SAFE_INTEGER
+    ) {
+      return
+    }
+
+    if (
+      !this.needsRender
+      && (
+        this._rect.width !== rect.width
+        || this._rect.height !== rect.height
+      )
+    ) {
+      this.needsRender = true
+    }
+
     if (this.needsRender) {
       calls.splice(end + 1, 0, renderStack.createCall(this))
       calls.splice(start, 0, renderStack.createCall(this))
@@ -170,6 +214,7 @@ export class Effect extends TimelineNode {
     else {
       calls.splice(start, end + 1, renderStack.createCall(this))
     }
+    this._rect = rect
   }
 
   protected _processChildren(): void {
@@ -237,14 +282,7 @@ export class Effect extends TimelineNode {
 
   protected _renderParentOrChildren(renderer: GlRenderer): void {
     const currentViewport = this._tree?.getCurrentViewport()
-    let rect: RectangleLike = { x: 0, y: 0, width: 0, height: 0 }
-    if (this._parent && 'getRect' in this._parent) {
-      rect = (this._parent as Rectangulable).getRect()
-    }
-    else if (currentViewport) {
-      rect.width = currentViewport.width
-      rect.height = currentViewport.height
-    }
+    const rect = this._rect
     if (this.needsRender) {
       if (this._renderId % 2 === 0) {
         this._renderViewport = currentViewport
@@ -283,6 +321,7 @@ export class Effect extends TimelineNode {
           this.needsRender = false
         }
       }
+      this._renderId++
     }
     else {
       renderer.batch2D.render({
@@ -303,18 +342,17 @@ export class Effect extends TimelineNode {
     switch (this._effectMode) {
       case 'before':
         this._renderBefore(renderer)
+        this._renderId++
         break
       case 'transition':
         this._renderTransition(renderer)
+        this._renderId++
         break
       case 'parent':
       case 'children':
       default:
         this._renderParentOrChildren(renderer)
         break
-    }
-    if (this.needsRender) {
-      this._renderId++
     }
   }
 

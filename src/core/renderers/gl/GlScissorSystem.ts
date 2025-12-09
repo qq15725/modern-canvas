@@ -44,7 +44,12 @@ export class GlScissorSystem extends GlSystem {
     },
   }
 
-  onRenderTargetChange(renderTarget: RenderTargetLike | null): void {
+  protected override _setup(): void {
+    super._setup()
+    this._renderer.renderTarget.on('updateRenderTarget', this._updateRenderTarget)
+  }
+
+  protected _updateRenderTarget = (renderTarget: RenderTargetLike | null): void => {
     if (renderTarget) {
       let current = this.current[renderTarget.instanceId]
       if (!current) {
@@ -99,5 +104,10 @@ export class GlScissorSystem extends GlSystem {
     else {
       gl.disable(gl.SCISSOR_TEST)
     }
+  }
+
+  override destroy(): void {
+    super.destroy()
+    this._renderer.renderTarget.off('updateRenderTarget', this._updateRenderTarget)
   }
 }

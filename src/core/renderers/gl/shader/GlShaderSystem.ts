@@ -122,7 +122,7 @@ export class GlShaderSystem extends GlSystem {
   }
 
   protected _createGlShader(source: string, target: number): WebGLShader {
-    const gl = this.gl
+    const gl = this._gl
     const shader = gl.createShader(target)
     if (!shader) {
       throw new Error('Failed to create shader')

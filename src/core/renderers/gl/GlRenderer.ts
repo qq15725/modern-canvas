@@ -96,7 +96,8 @@ export class GlRenderer extends Renderer {
       ._setupSupports()
 
     this._systems.forEach(system => system.install(this))
-    this._systems.forEach(system => system.onUpdateContext(this.gl))
+    this._systems.forEach(system => system.emit('updateContext', this.gl))
+    this._systems.forEach(system => system.emit('setup'))
   }
 
   protected _setupContext(view: HTMLCanvasElement, options?: WebGLContextAttributes): this {
@@ -248,7 +249,7 @@ export class GlRenderer extends Renderer {
   protected _contextRestored(): void {
     this.contextLost = false
     this._setupExtensions()
-    this._systems.forEach(system => system.onUpdateContext(this.gl))
+    this._systems.forEach(system => system.emit('updateContext', this.gl))
   }
 
   override resize(width: number, height: number, updateStyle: boolean = true): void {

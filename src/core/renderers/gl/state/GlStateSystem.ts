@@ -90,8 +90,8 @@ export class GlStateSystem extends GlSystem {
   blendModes!: Record<GlBlendMode, any>
   defaultState = new GlState({ blend: true })
 
-  override onUpdateContext(gl: GlRenderingContext): void {
-    super.onUpdateContext(gl)
+  protected override _updateContext(gl: GlRenderingContext): void {
+    super._updateContext(gl)
     this.blendModes = mapGlBlendModes(gl)
   }
 
