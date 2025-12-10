@@ -1,6 +1,5 @@
 import type { Node as YogaNode } from 'yoga-layout/load'
-import type { Element2DStyle } from './element'
-import type { Element2D } from './Element2D'
+import type { Element2D, Element2DStyle } from './element'
 
 export const edgeMap = {
   left: 0, // Edge.Left
