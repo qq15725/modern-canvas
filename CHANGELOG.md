@@ -1,3 +1,14 @@
+## [0.14.6](https://github.com/qq15725/modern-canvas/compare/v0.14.5...v0.14.6) (2025-12-10)
+
+
+### Features
+
+* remove BaseElement2D ([a4b4bcf](https://github.com/qq15725/modern-canvas/commit/a4b4bcf118535375abc4fc365083e51a4366a7ca))
+* remove BaseElement2D ([688e2d7](https://github.com/qq15725/modern-canvas/commit/688e2d77e6e0b784cbb8ca797ce1cd03f83e43da))
+* rename Vector2Data to Vector2Like ([bc3c9ca](https://github.com/qq15725/modern-canvas/commit/bc3c9cae6e2d2dd5f89db43974adfc4b8e9defe1))
+
+
+
 ## [0.14.5](https://github.com/qq15725/modern-canvas/compare/v0.14.4...v0.14.5) (2025-12-09)
 
 
