@@ -4,7 +4,7 @@ import type { MeasureResult } from 'modern-text'
 import type { RectangleLike } from '../../../core'
 import type { CanvasContext, TransformVertex } from '../../main'
 import type { Texture2D } from '../../resources'
-import type { BaseElement2D } from './BaseElement2D'
+import type { Element2D } from './Element2D'
 import { isNone, normalizeText, normalizeTextContent, property } from 'modern-idoc'
 import { BoundingBox } from 'modern-path2d'
 import { Character, Text } from 'modern-text'
@@ -40,7 +40,7 @@ export class Element2DText extends CoreObject {
   }>()
 
   constructor(
-    public parent: BaseElement2D,
+    public parent: Element2D,
   ) {
     super()
 

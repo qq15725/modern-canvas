@@ -9,7 +9,7 @@ import { Effect } from '../main/Effect'
 import { Material, QuadUvGeometry } from '../resources'
 
 export interface MaskEffectProperties extends EffectProperties {
-  src?: string
+  image?: string
 }
 
 @customNode('MaskEffect')
@@ -51,7 +51,7 @@ void main(void) {
   })
 
   @property({ internal: true }) declare texture?: Texture2D<ImageBitmap>
-  @property({ fallback: '' }) declare src: string
+  @property({ fallback: '' }) declare image: string
 
   constructor(properties?: Partial<MaskEffectProperties>, children: Node[] = []) {
     super()
@@ -63,8 +63,9 @@ void main(void) {
 
   async load(): Promise<void> {
     this.texture = undefined
-    if (this.src) {
-      this.texture = await assets.texture.load(this.src)
+    if (this.image) {
+      this.texture = await assets.texture.load(this.image)
+      this.requestRender()
     }
   }
 
@@ -72,7 +73,7 @@ void main(void) {
     super._updateProperty(key, value, oldValue)
 
     switch (key) {
-      case 'src':
+      case 'image':
         this.load()
         break
       case 'texture':

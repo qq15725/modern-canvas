@@ -13,13 +13,13 @@ export class KawaseTransition extends Transition {
     gl: {
       vertex: `attribute vec2 position;
 attribute vec2 uv;
-varying vec2 vUv;
+out vec2 vUv;
 void main() {
   gl_Position = vec4(position, 0.0, 1.0);
   vUv = uv;
 }`,
       fragment: `precision highp float;
-varying vec2 vUv;
+in vec2 vUv;
 uniform sampler2D sampler;
 uniform vec2 offset;
 uniform float progress;
@@ -27,10 +27,10 @@ uniform float progress;
 void main(void) {
   vec2 offset1 = vec2(offset.x - progress * offset.x, offset.y - progress * offset.y);
   vec4 color = vec4(0.0);
-  color += texture2D(sampler, vec2(vUv.x - offset1.x, vUv.y + offset1.y));
-  color += texture2D(sampler, vec2(vUv.x + offset1.x, vUv.y + offset1.y));
-  color += texture2D(sampler, vec2(vUv.x + offset1.x, vUv.y - offset1.y));
-  color += texture2D(sampler, vec2(vUv.x - offset1.x, vUv.y - offset1.y));
+  color += texture(sampler, vec2(vUv.x - offset1.x, vUv.y + offset1.y));
+  color += texture(sampler, vec2(vUv.x + offset1.x, vUv.y + offset1.y));
+  color += texture(sampler, vec2(vUv.x + offset1.x, vUv.y - offset1.y));
+  color += texture(sampler, vec2(vUv.x - offset1.x, vUv.y - offset1.y));
   color *= 0.25;
   gl_FragColor = color;
 }`,

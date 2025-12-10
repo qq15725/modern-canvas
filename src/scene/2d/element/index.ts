@@ -1,4 +1,4 @@
-export * from './BaseElement2D'
+export * from './Element2D'
 export * from './Element2DBackground'
 export * from './Element2DFill'
 export * from './Element2DForeground'

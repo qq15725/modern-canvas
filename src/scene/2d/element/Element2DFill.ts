@@ -1,6 +1,6 @@
 import type { Fill, NormalizedFill } from 'modern-idoc'
 import type { AnimatedTexture, Texture2D } from '../../resources'
-import type { BaseElement2D } from './BaseElement2D'
+import type { Element2D } from './Element2D'
 import { isNone, normalizeFill, property } from 'modern-idoc'
 import { assets } from '../../../asset'
 import { CoreObject } from '../../../core'
@@ -28,7 +28,7 @@ export class Element2DFill extends CoreObject {
   animatedTexture?: AnimatedTexture
 
   constructor(
-    public parent: BaseElement2D,
+    public parent: Element2D,
   ) {
     super()
   }

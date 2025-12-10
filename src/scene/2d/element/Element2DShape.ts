@@ -1,5 +1,5 @@
 import type { NormalizedShape, Shape } from 'modern-idoc'
-import type { BaseElement2D } from './BaseElement2D'
+import type { Element2D } from './Element2D'
 import { isNone, normalizeShape, property } from 'modern-idoc'
 import {
   Matrix3,
@@ -20,7 +20,7 @@ export class Element2DShape extends CoreObject {
   protected _path2DSet: Path2DSet = new Path2DSet()
 
   constructor(
-    public parent: BaseElement2D,
+    public parent: Element2D,
   ) {
     super()
     this._updatePath2DSet()

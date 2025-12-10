@@ -1,5 +1,5 @@
 import type { NormalizedShadow, Shadow } from 'modern-idoc'
-import type { BaseElement2D } from './BaseElement2D'
+import type { Element2D } from './Element2D'
 import { isNone, normalizeShadow, property } from 'modern-idoc'
 import { CoreObject } from '../../../core'
 import { DropShadowEffect } from '../../effects'
@@ -12,7 +12,7 @@ export class Element2DShadow extends CoreObject {
   @property({ fallback: 0 }) declare offsetX: NormalizedShadow['offsetY']
 
   constructor(
-    public parent: BaseElement2D,
+    public parent: Element2D,
   ) {
     super()
   }

@@ -75,6 +75,10 @@ export class Effect extends TimelineNode implements Rectangulable {
       .append(children)
   }
 
+  requestRender(): void {
+    this.needsRender = true
+  }
+
   protected override _updateProperty(key: string, value: any, oldValue: any): void {
     super._updateProperty(key, value, oldValue)
 
@@ -178,7 +182,7 @@ export class Effect extends TimelineNode implements Rectangulable {
         || renderable.parent?.equal(this._parent)
       ) {
         if (renderable.needsRender) {
-          this.needsRender = true
+          this.requestRender()
         }
         if ('getRect' in renderable) {
           const _rect = (renderable.getRect as any)() as RectangleLike
@@ -220,7 +224,7 @@ export class Effect extends TimelineNode implements Rectangulable {
         || this._rect.height !== rect.height
       )
     ) {
-      this.needsRender = true
+      this.requestRender()
     }
 
     if (this.needsRender) {
@@ -277,32 +281,42 @@ export class Effect extends TimelineNode implements Rectangulable {
   }
 
   protected _renderTransition(renderer: GlRenderer): void {
+    const currentViewport = this._tree?.getCurrentViewport()
     if (this._renderId % 2 === 0) {
-      const currentViewport = this._tree?.getCurrentViewport()
+      this._renderViewport = currentViewport
       if (currentViewport) {
+        const isRoot = currentViewport.renderTarget.isRoot
         this.viewport1.activateWithCopy(renderer, currentViewport)
+        this.viewport1.renderTargets.forEach(t => t.isRoot = isRoot)
+        this.viewport1.canvasTransform.copy(currentViewport.canvasTransform)
         this.viewport2.resize(currentViewport.width, currentViewport.height)
+        this.viewport2.renderTargets.forEach(t => t.isRoot = isRoot)
+        this.viewport2.canvasTransform.copy(currentViewport.canvasTransform)
+        this.viewport2.renderStart(renderer)
       }
-      this.viewport2.activate(renderer)
-      renderer.clear()
     }
     else {
-      if (this._tree?.getCurrentViewport()?.equal(this.viewport2)) {
-        const previousViewport = this._tree?.getPreviousViewport()
-        if (previousViewport) {
-          previousViewport.activate(renderer)
-          renderer.clear()
-          this.viewport1.texture.activate(renderer, 0)
-          this.viewport2.texture.activate(renderer, 1)
-          this.apply(renderer, previousViewport, {
-            from: this.viewport1,
-            to: this.viewport2,
-          })
-          renderer.texture.unbind(0)
-          renderer.texture.unbind(1)
-        }
+      const oldViewport = this._renderViewport
+      if (
+        currentViewport
+        && currentViewport.equal(this.viewport2)
+        && oldViewport
+        && !oldViewport.equal(this.viewport2)
+      ) {
+        oldViewport.activate(renderer)
+        renderer.clear()
+        this.viewport1.texture.activate(renderer, 0)
+        this.viewport2.texture.activate(renderer, 1)
+        this.apply(renderer, oldViewport, {
+          from: this.viewport1,
+          to: this.viewport2,
+        })
+        renderer.texture.unbind(0)
+        renderer.texture.unbind(1)
+        this._renderViewport = undefined
       }
     }
+    this._renderId++
   }
 
   protected _renderParentOrChildren(renderer: GlRenderer): void {
@@ -371,7 +385,6 @@ export class Effect extends TimelineNode implements Rectangulable {
         break
       case 'transition':
         this._renderTransition(renderer)
-        this._renderId++
         break
       case 'parent':
       case 'children':

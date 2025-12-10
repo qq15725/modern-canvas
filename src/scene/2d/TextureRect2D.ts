@@ -1,7 +1,7 @@
 import type { Node } from '../main'
 import type { Texture2D } from '../resources'
-import type { Element2DProperties } from './Element2D'
-import { Element2D } from './Element2D'
+import type { Element2DProperties } from './element'
+import { Element2D } from './element'
 
 export interface TextureRect2DProperties extends Element2DProperties {
   //

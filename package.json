@@ -65,8 +65,8 @@
     "earcut": "^3.0.2",
     "modern-font": "^0.4.4",
     "modern-idoc": "^0.10.6",
-    "modern-path2d": "^1.4.14",
-    "modern-text": "^1.10.4"
+    "modern-path2d": "^1.4.15",
+    "modern-text": "^1.10.5"
   },
   "peerDependencies": {
     "lottie-web": "^5",
@@ -85,9 +85,9 @@
     }
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^6.5.1",
+    "@antfu/eslint-config": "^6.6.1",
     "@types/earcut": "^3.0.0",
-    "@types/node": "^24.10.1",
+    "@types/node": "^24.10.2",
     "bumpp": "^10.3.2",
     "conventional-changelog-cli": "^5.0.0",
     "eslint": "^9.39.1",

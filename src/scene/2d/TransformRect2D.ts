@@ -1,10 +1,10 @@
 import type { Node } from '../main'
-import type { BaseElement2DProperties } from './element'
+import type { Element2DProperties } from './element'
 import { property } from 'modern-idoc'
 import { Texture2D } from '../resources'
-import { Element2D } from './Element2D'
+import { Element2D } from './element'
 
-export interface TransformRect2DProperties extends BaseElement2DProperties {
+export interface TransformRect2DProperties extends Element2DProperties {
   //
 }
 

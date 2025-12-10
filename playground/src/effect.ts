@@ -1,5 +1,5 @@
 import {
-  Engine,
+  Engine, Timeline,
 } from '../../src'
 
 function testcase(left: number, top: number, children: Record<string, any>[] = []): any {
@@ -29,6 +29,7 @@ async function init(): Promise<void> {
   const engine = new Engine({
     autoStart: true,
     autoResize: true,
+    timeline: Timeline.from([0, 5000], true),
     data: [
       { is: 'Camera2D' },
       {
@@ -47,6 +48,12 @@ async function init(): Promise<void> {
           ...testcase(500, 340, [{ is: 'GlitchEffect' }]),
           ...testcase(500, 450, [{ is: 'GodrayEffect' }]),
         ],
+      },
+      { is: 'LeftEraseTransition' },
+      {
+        is: 'Element2D',
+        style: { left: 1000, top: 0, width: 100, height: 100 },
+        foreground: { image: '/example.jpg' },
       },
     ],
   })

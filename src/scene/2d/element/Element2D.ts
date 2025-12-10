@@ -5,7 +5,6 @@ import type {
   Outline,
   Shadow,
   Shape,
-  Style,
   Text,
 } from 'modern-idoc'
 import type {
@@ -16,7 +15,8 @@ import type {
 } from '../../../core'
 import type { Node, Rectangulable, RectangulableEvents, SceneTree } from '../../main'
 import type { Node2DEvents, Node2DProperties } from '../Node2D'
-import { clearUndef, getDefaultLayoutStyle, getDefaultTextStyle, isNone } from 'modern-idoc'
+import type { Element2DStyleProperties } from './Element2DStyle'
+import { clearUndef, getDefaultLayoutStyle, getDefaultTextStyle, isNone, property } from 'modern-idoc'
 import {
   customNode,
   DEG_TO_RAD,
@@ -25,6 +25,7 @@ import {
 } from '../../../core'
 import { parseCssTransform, parseCssTransformOrigin } from '../../../css'
 import { ColorFilterEffect, MaskEffect } from '../../effects'
+import { directionMap, FlexLayout } from '../FlexLayout'
 import { Node2D } from '../Node2D'
 import { Element2DBackground } from './Element2DBackground'
 import { Element2DFill } from './Element2DFill'
@@ -39,15 +40,16 @@ export interface BaseElement2DEvents extends Node2DEvents, RectangulableEvents {
   updateStyleProperty: [key: string, value: any, oldValue: any]
 }
 
-export interface BaseElement2D {
+export interface Element2D {
   on: <K extends keyof BaseElement2DEvents & string>(event: K, listener: (...args: BaseElement2DEvents[K]) => void) => this
   once: <K extends keyof BaseElement2DEvents & string>(event: K, listener: (...args: BaseElement2DEvents[K]) => void) => this
   off: <K extends keyof BaseElement2DEvents & string>(event: K, listener: (...args: BaseElement2DEvents[K]) => void) => this
   emit: <K extends keyof BaseElement2DEvents & string>(event: K, ...args: BaseElement2DEvents[K]) => this
 }
 
-export interface BaseElement2DProperties extends Node2DProperties {
-  style: Style
+export interface Element2DProperties extends Node2DProperties {
+  // style: Style
+  style: Partial<Element2DStyleProperties>
   background: Background
   shape: Shape
   fill: Fill
@@ -55,13 +57,20 @@ export interface BaseElement2DProperties extends Node2DProperties {
   foreground: Foreground
   text: Text
   shadow: Shadow
+  layoutMode: LayoutMode
 }
+
+export type LayoutMode = 'inherit' | 'absolute' | 'flex'
 
 const layoutStyle = new Set(Object.keys(getDefaultLayoutStyle()))
 const textStyles = new Set(Object.keys(getDefaultTextStyle()))
 
-@customNode('BaseElement2D')
-export class BaseElement2D extends Node2D implements Rectangulable {
+@customNode('Element2D')
+export class Element2D extends Node2D implements Rectangulable {
+  @property({ fallback: 'inherit' }) declare layoutMode: LayoutMode
+
+  _flex = new FlexLayout(this)
+
   readonly size = new Vector2().on('update', () => {
     this.onUpdateStyleProperty('transform', this.style.transform, undefined)
     this.onUpdateStyleProperty('transformOrigin', this.style.transformOrigin, undefined)
@@ -77,39 +86,39 @@ export class BaseElement2D extends Node2D implements Rectangulable {
   })
 
   get style(): Element2DStyle { return this._style }
-  set style(value: BaseElement2DProperties['style']) { this._style.resetProperties().setProperties(value) }
+  set style(value: Element2DProperties['style']) { this._style.resetProperties().setProperties(value) }
 
   protected _background = new Element2DBackground(this)
   get background(): Element2DBackground { return this._background }
-  set background(value: BaseElement2DProperties['background']) { this._background.resetProperties().setProperties(value) }
+  set background(value: Element2DProperties['background']) { this._background.resetProperties().setProperties(value) }
 
   protected _shape = new Element2DShape(this)
   get shape(): Element2DShape { return this._shape }
-  set shape(value: BaseElement2DProperties['shape']) { this._shape.resetProperties().setProperties(value) }
+  set shape(value: Element2DProperties['shape']) { this._shape.resetProperties().setProperties(value) }
 
   protected _fill = new Element2DFill(this)
   get fill(): Element2DFill { return this._fill }
-  set fill(value: BaseElement2DProperties['fill']) { this._fill.resetProperties().setProperties(value) }
+  set fill(value: Element2DProperties['fill']) { this._fill.resetProperties().setProperties(value) }
 
   protected _outline = new Element2DOutline(this)
   get outline(): Element2DOutline { return this._outline }
-  set outline(value: BaseElement2DProperties['outline']) { this._outline.resetProperties().setProperties(value) }
+  set outline(value: Element2DProperties['outline']) { this._outline.resetProperties().setProperties(value) }
 
   protected _foreground = new Element2DForeground(this)
   get foreground(): Element2DForeground { return this._foreground }
-  set foreground(value: BaseElement2DProperties['foreground']) { this._foreground.resetProperties().setProperties(value) }
+  set foreground(value: Element2DProperties['foreground']) { this._foreground.resetProperties().setProperties(value) }
 
   protected _text = new Element2DText(this)
   get text(): Element2DText { return this._text }
-  set text(value: BaseElement2DProperties['text']) { this._text.resetProperties().setProperties(value) }
+  set text(value: Element2DProperties['text']) { this._text.resetProperties().setProperties(value) }
 
   protected _shadow = new Element2DShadow(this)
   get shadow(): Element2DShadow { return this._shadow }
-  set shadow(value: BaseElement2DProperties['shadow']) { this._shadow.resetProperties().setProperties(value) }
+  set shadow(value: Element2DProperties['shadow']) { this._shadow.resetProperties().setProperties(value) }
 
   protected _styleFilter?: ColorFilterEffect
 
-  constructor(properties?: Partial<BaseElement2DProperties>, nodes: Node[] = []) {
+  constructor(properties?: Partial<Element2DProperties>, nodes: Node[] = []) {
     super()
     this.style = new Element2DStyle()
     this
@@ -122,6 +131,33 @@ export class BaseElement2D extends Node2D implements Rectangulable {
 
     if (this._text.isValid()) {
       this._text.update()
+    }
+  }
+
+  protected override _parented(parent: Node): void {
+    super._parented(parent)
+
+    if (
+      parent instanceof Element2D
+      && parent._flex._node
+      && this._flex._node
+    ) {
+      parent._flex._node.insertChild(
+        this._flex._node,
+        parent._flex._node.getChildCount(),
+      )
+    }
+  }
+
+  protected override _unparented(oldParent: Node): void {
+    super._unparented(oldParent)
+
+    if (
+      oldParent instanceof Element2D
+      && oldParent._flex?._node
+      && this._flex._node
+    ) {
+      oldParent._flex._node.removeChild(this._flex._node)
     }
   }
 
@@ -158,6 +194,18 @@ export class BaseElement2D extends Node2D implements Rectangulable {
 
   protected _updateStyleProperty(key: string, value: any, oldValue: any): void {
     switch (key) {
+      case 'left':
+        this.position.x = Number(value)
+        break
+      case 'top':
+        this.position.y = Number(value)
+        break
+      case 'width':
+        this.size.width = Number(value)
+        break
+      case 'height':
+        this.size.height = Number(value)
+        break
       case 'rotate':
         this.rotation = value * DEG_TO_RAD
         break
@@ -249,6 +297,12 @@ export class BaseElement2D extends Node2D implements Rectangulable {
         this.text.update()
       }
     }
+
+    this._flex.updateStyleProperty(key, value, oldValue)
+
+    if (this._flex._node?.isDirty()) {
+      this.requestLayout()
+    }
   }
 
   protected override _process(delta: number): void {
@@ -258,6 +312,39 @@ export class BaseElement2D extends Node2D implements Rectangulable {
     this.outline.process(delta)
     this.background.process(delta)
     super._process(delta)
+  }
+
+  getGlobalLayoutMode(): Omit<LayoutMode, 'inherit'> {
+    const layoutMode = this.layoutMode
+    switch (layoutMode) {
+      case 'inherit':
+        return this.parent instanceof Element2D
+          ? this.parent.getGlobalLayoutMode()
+          : 'absolute'
+      default:
+        return layoutMode
+    }
+  }
+
+  updateLayout(): void {
+    this.calculateLayout(undefined, undefined, directionMap.ltr)
+    if (this._flex._node) {
+      const { left, top, width, height } = this._flex._node.getComputedLayout()
+      this.position.x = left
+      this.position.y = top
+      this.size.x = width
+      this.size.y = height
+    }
+  }
+
+  calculateLayout(width?: number | 'auto', height?: number | 'auto', direction?: typeof directionMap[keyof typeof directionMap]): void {
+    const parent = this.getParent<Element2D>()
+    if (parent?._flex?.calculateLayout) {
+      parent?._flex.calculateLayout(width, height, direction)
+    }
+    else {
+      this._flex.calculateLayout(width, height, direction)
+    }
   }
 
   protected _getStyleFilter(): ColorFilterEffect {
@@ -273,10 +360,10 @@ export class BaseElement2D extends Node2D implements Rectangulable {
     if (maskImage && maskImage !== 'none') {
       const node = this.getNode<MaskEffect>(nodePath)
       if (node) {
-        node.src = maskImage
+        node.image = maskImage
       }
       else {
-        this.appendChild(new MaskEffect({ name: nodePath, src: maskImage }), 'back')
+        this.appendChild(new MaskEffect({ name: nodePath, image: maskImage }), 'back')
       }
     }
     else {
