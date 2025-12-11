@@ -1,3 +1,12 @@
+## [0.14.7](https://github.com/qq15725/modern-canvas/compare/v0.14.6...v0.14.7) (2025-12-11)
+
+
+### Features
+
+* rename Rectangle to Aabb2D ([4fb8bba](https://github.com/qq15725/modern-canvas/commit/4fb8bba690beb0459f65817d808e8226c3e0bd59))
+
+
+
 ## [0.14.6](https://github.com/qq15725/modern-canvas/compare/v0.14.5...v0.14.6) (2025-12-10)
 
 
