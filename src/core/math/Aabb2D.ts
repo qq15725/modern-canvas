@@ -40,6 +40,7 @@ export class Aabb2D implements RectangleLike {
   readonly min: Vector2
   readonly size: Vector2
 
+  constructor()
   constructor(rect: RectangleLike)
   constructor(pointArray: Vector2Like[])
   constructor(min: Vector2Like, size: Vector2Like)
@@ -91,7 +92,7 @@ export class Aabb2D implements RectangleLike {
     return this
   }
 
-  overlapsOnAxis(rect: Aabb2D, axis: 'horizontal' | 'vertical'): boolean {
+  overlapsOnAxis(rect: Aabb2D, axis?: 'horizontal' | 'vertical'): boolean {
     switch (axis) {
       case 'horizontal':
         return this.max.x >= rect.min.x
@@ -157,12 +158,16 @@ export class Aabb2D implements RectangleLike {
     return [this.x, this.y, this.width, this.height]
   }
 
-  toJSON(): { x: number, y: number, width: number, height: number } {
+  toJSON(): RectangleLike {
     return {
       x: this.x,
       y: this.y,
       width: this.width,
       height: this.height,
     }
+  }
+
+  clone(): Aabb2D {
+    return new Aabb2D(this.toJSON())
   }
 }

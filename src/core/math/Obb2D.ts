@@ -3,34 +3,48 @@ import type { Vector2Like } from './Vector2'
 import { Aabb2D } from './Aabb2D'
 import { DEG_TO_RAD } from './utils'
 
-export interface Obb2DLike extends RectangleLike {
+export interface RotatedRectangleLike extends RectangleLike {
   rotation?: number
 }
 
 /**
  * OrientedBoundingBox2D
  */
-export class Obb2D extends Aabb2D implements Obb2DLike {
+export class Obb2D extends Aabb2D implements RotatedRectangleLike {
+  /**
+   * Rotation radians
+   */
   rotation: number
 
-  constructor(source: Obb2DLike)
+  get rotationDegrees(): number { return this.rotation / DEG_TO_RAD }
+
+  constructor()
+  constructor(rect: RotatedRectangleLike)
   constructor(pointArray: Vector2Like[], rotation?: number)
   constructor(...args: any[]) {
     let rotation
-    let source
-    if (args.length === 1) {
-      source = args[0]
+    let rect
+    if (args.length === 0) {
+      //
+    }
+    else if (args.length === 1) {
+      rect = args[0]
       rotation = args[0].rotation
     }
-    else {
-      source = args[0]
+    else if (args.length === 2) {
+      rect = args[0]
       rotation = args[1]
     }
-    super(source)
+    if (rect) {
+      super(rect)
+    }
+    else {
+      super()
+    }
     this.rotation = rotation ?? 0
   }
 
-  override overlapsOnAxis(obb: Obb2D, axis: 'horizontal' | 'vertical'): boolean {
+  override overlapsOnAxis(obb: Obb2D, axis?: 'horizontal' | 'vertical'): boolean {
     if (!this.rotation && !obb.rotation) {
       return super.overlapsOnAxis(obb, axis)
     }
@@ -38,8 +52,8 @@ export class Obb2D extends Aabb2D implements Obb2DLike {
       // Separating Axis Theorem
       const dotProduct = (a: Vector2Like, b: Vector2Like): number => Math.abs(a.x * b.x + a.y * b.y)
       // eslint-disable-next-line ts/explicit-function-return-type
-      const createSAT = ({ width, height, rotation }: Obb2D) => {
-        let rotate = rotation / DEG_TO_RAD
+      const createSAT = ({ width, height, rotationDegrees }: Obb2D) => {
+        let rotate = rotationDegrees
         rotate = -rotate % 180
         const deg = (rotate / 180) * Math.PI
         const axisX = { x: Math.cos(deg), y: -Math.sin(deg) }
@@ -71,7 +85,25 @@ export class Obb2D extends Aabb2D implements Obb2DLike {
   override toCssStyle(): { left: string, top: string, width: string, height: string, transform: string } {
     return {
       ...super.toCssStyle(),
-      transform: `rotate(${this.rotation / DEG_TO_RAD}deg)`,
+      transform: `rotate(${this.rotationDegrees}deg)`,
     }
+  }
+
+  override toArray(): number[] {
+    return [...super.toArray(), this.rotation]
+  }
+
+  override toJSON(): Required<RotatedRectangleLike> {
+    return {
+      x: this.x,
+      y: this.y,
+      width: this.width,
+      height: this.height,
+      rotation: this.rotation,
+    }
+  }
+
+  override clone(): Obb2D {
+    return new Obb2D(this.toJSON())
   }
 }
