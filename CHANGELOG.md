@@ -1,3 +1,12 @@
+## [0.14.8](https://github.com/qq15725/modern-canvas/compare/v0.14.7...v0.14.8) (2025-12-11)
+
+
+### Features
+
+* Aabb2D / Obb2D ([78babba](https://github.com/qq15725/modern-canvas/commit/78babba7cae6b36087eeece4c295f2b0abc60d3a))
+
+
+
 ## [0.14.7](https://github.com/qq15725/modern-canvas/compare/v0.14.6...v0.14.7) (2025-12-11)
 
 
