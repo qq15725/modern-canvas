@@ -6,8 +6,6 @@ export interface Vector2Like {
   y: number
 }
 
-export type PointLike = VectorLike
-
 export class Vector2 extends Vector implements Vector2Like {
   get x(): number { return this._array[0] }
   set x(val) {

@@ -25,16 +25,16 @@ export class Aabb2D implements RectangleLike {
   set top(val) { this.min.y = val }
 
   get right(): number { return this.x + this.width }
-  set right(val) { this.size.x = val - this.min.x }
+  set right(val) { this.size.x = Math.max(0, val - this.min.x) }
 
   get bottom(): number { return this.y + this.height }
-  set bottom(val) { this.size.y = val - this.min.y }
+  set bottom(val) { this.size.y = Math.max(0, val - this.min.y) }
 
   get width(): number { return this.size.x }
-  set width(val) { this.size.x = val }
+  set width(val) { this.size.x = Math.max(0, val) }
 
   get height(): number { return this.size.y }
-  set height(val) { this.size.y = val }
+  set height(val) { this.size.y = Math.max(0, val) }
 
   readonly max = new Vector2()
   readonly min: Vector2
@@ -65,17 +65,17 @@ export class Aabb2D implements RectangleLike {
         }
         else {
           min.set(arg.x, arg.y)
-          size.set(arg.width, arg.height)
+          size.set(Math.max(0, arg.width), Math.max(0, arg.height))
         }
         break
       }
       case 2:
         min.set(args[0])
-        size.set(args[1])
+        size.set(Math.max(0, args[1]))
         break
       default:
         min.set(args[0], args[1])
-        size.set(args[2], args[3])
+        size.set(Math.max(0, args[2]), Math.max(0, args[3]))
         break
     }
     this.update = this.update.bind(this)
@@ -118,19 +118,18 @@ export class Aabb2D implements RectangleLike {
   getIntersectionRect(target: Aabb2D): Aabb2D {
     const a = this.toMinmax()
     const b = target.toMinmax()
-    const min = {
-      x: Math.max(a.min.x, b.min.x),
-      y: Math.max(a.min.y, b.min.y),
-    }
-    const max = {
-      x: Math.min(a.max.x, b.max.x),
-      y: Math.min(a.max.y, b.max.y),
+    const minX = Math.max(a.min.x, b.min.x)
+    const minY = Math.max(a.min.y, b.min.y)
+    const maxX = Math.min(a.max.x, b.max.x)
+    const maxY = Math.min(a.max.y, b.max.y)
+    if (maxX <= minX || maxY <= minY) {
+      return new Aabb2D()
     }
     return new Aabb2D(
-      min.x,
-      min.y,
-      max.x - min.x,
-      max.y - min.y,
+      minX,
+      minY,
+      Math.max(0, maxX - minX),
+      Math.max(0, maxY - minY),
     )
   }
 

@@ -44,16 +44,17 @@ export class Obb2D extends Aabb2D implements RotatedRectangleLike {
     this.rotation = rotation ?? 0
   }
 
-  override overlapsOnAxis(obb: Obb2D, axis?: 'horizontal' | 'vertical'): boolean {
-    if (!this.rotation && !obb.rotation) {
+  override overlapsOnAxis(obb: Obb2D | Aabb2D, axis?: 'horizontal' | 'vertical'): boolean {
+    if (!this.rotation && (!('rotation' in obb) || !obb.rotation)) {
       return super.overlapsOnAxis(obb, axis)
     }
     else {
       // Separating Axis Theorem
       const dotProduct = (a: Vector2Like, b: Vector2Like): number => Math.abs(a.x * b.x + a.y * b.y)
       // eslint-disable-next-line ts/explicit-function-return-type
-      const createSAT = ({ width, height, rotationDegrees }: Obb2D) => {
-        let rotate = rotationDegrees
+      const createSAT = (box: Obb2D | Aabb2D) => {
+        const { width, height, rotation = 0 } = box as any
+        let rotate = rotation / DEG_TO_RAD
         rotate = -rotate % 180
         const deg = (rotate / 180) * Math.PI
         const axisX = { x: Math.cos(deg), y: -Math.sin(deg) }
