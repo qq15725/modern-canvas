@@ -1,3 +1,12 @@
+## [0.14.9](https://github.com/qq15725/modern-canvas/compare/v0.14.8...v0.14.9) (2025-12-11)
+
+
+### Bug Fixes
+
+* Aabb2D ([7a4abbc](https://github.com/qq15725/modern-canvas/commit/7a4abbc2f5a518d2910f9f521ded7f34dbd92728))
+
+
+
 ## [0.14.8](https://github.com/qq15725/modern-canvas/compare/v0.14.7...v0.14.8) (2025-12-11)
 
 
