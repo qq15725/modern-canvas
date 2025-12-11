@@ -11,16 +11,15 @@ import type {
   InputEvent,
   InputEventKey,
   PointerInputEvent,
-  Vector2Like,
-} from '../../../core'
+  Vector2Like } from '../../../core'
 import type { Node, Rectangulable, RectangulableEvents, SceneTree } from '../../main'
 import type { Node2DEvents, Node2DProperties } from '../Node2D'
 import type { Element2DStyleProperties } from './Element2DStyle'
 import { clearUndef, getDefaultLayoutStyle, getDefaultTextStyle, isNone, property } from 'modern-idoc'
-import {
+import { Aabb2D,
   customNode,
   DEG_TO_RAD,
-  Rectangle,
+  Obb2D,
   Vector2,
 } from '../../../core'
 import { parseCssTransform, parseCssTransformOrigin } from '../../../css'
@@ -379,7 +378,7 @@ export class Element2D extends Node2D implements Rectangulable {
     this._updateMask()
   }
 
-  getRect(): Rectangle {
+  getRect(): Aabb2D {
     return this.getGlobalAabb()
   }
 
@@ -397,51 +396,47 @@ export class Element2D extends Node2D implements Rectangulable {
     ]
   }
 
-  getAabb(): Rectangle {
-    return new Rectangle(
+  getAabb(): Aabb2D {
+    return new Aabb2D(
       this._getPointArray().map((p) => {
         return this.transform.apply(p)
       }),
     )
   }
 
-  getGlobalAabb(): Rectangle {
-    return new Rectangle(
+  getGlobalAabb(): Aabb2D {
+    return new Aabb2D(
       this._getPointArray().map((p) => {
         return this.globalTransform.apply(p)
       }),
     )
   }
 
-  getObb(): { rect: Rectangle, rotation: number } {
+  getObb(): Obb2D {
     const pivot = this.pivot
     const _pivot = this.transform.apply(pivot).sub(pivot)
-    return {
-      rect: new Rectangle(
-        this._getPointArray().map((p) => {
-          p.x += _pivot.x
-          p.y += _pivot.y
-          return p
-        }),
-      ),
-      rotation: this.rotation,
-    }
+    return new Obb2D(
+      this._getPointArray().map((p) => {
+        p.x += _pivot.x
+        p.y += _pivot.y
+        return p
+      }),
+      this.rotation,
+    )
   }
 
-  getGlobalObb(): { rect: Rectangle, rotation: number } {
+  getGlobalObb(): Obb2D {
     const pivot = this.pivot
     const _pivot = this.globalTransform.apply(pivot).sub(pivot)
 
-    return {
-      rect: new Rectangle(
-        this._getPointArray().map((p) => {
-          p.x += _pivot.x
-          p.y += _pivot.y
-          return p
-        }),
-      ),
-      rotation: this.globalRotation,
-    }
+    return new Obb2D(
+      this._getPointArray().map((p) => {
+        p.x += _pivot.x
+        p.y += _pivot.y
+        return p
+      }),
+      this.globalRotation,
+    )
   }
 
   // protected _rectsOverlap(r1: any, r2: any): boolean {

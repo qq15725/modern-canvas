@@ -6,7 +6,7 @@ import type { SceneTree } from './SceneTree'
 import type { TimelineNodeEvents, TimelineNodeProperties } from './TimelineNode'
 import { property } from 'modern-idoc'
 import { assets } from '../../asset'
-import { customNode, Rectangle } from '../../core'
+import { Aabb2D, customNode } from '../../core'
 import { EffectMaterial, QuadUvGeometry } from '../resources'
 import { TimelineNode } from './TimelineNode'
 import { Viewport } from './Viewport'
@@ -155,8 +155,8 @@ export class Effect extends TimelineNode implements Rectangulable {
     }
   }
 
-  getRect(): Rectangle {
-    return new Rectangle(this._rect)
+  getRect(): Aabb2D {
+    return new Aabb2D(this._rect)
   }
 
   protected _processParent(): void {

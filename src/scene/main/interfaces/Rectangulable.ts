@@ -1,4 +1,4 @@
-import type { Rectangle } from '../../../core'
+import type { Aabb2D } from '../../../core'
 
 export interface RectangulableEvents {
   updateRect: []
@@ -12,5 +12,5 @@ export interface Rectangulable {
 }
 
 export interface Rectangulable {
-  getRect: () => Rectangle
+  getRect: () => Aabb2D
 }

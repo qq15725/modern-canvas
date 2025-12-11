@@ -7,7 +7,7 @@ import type { Texture2D } from '../resources'
 import type { Rectangulable, RectangulableEvents } from './interfaces'
 import type { NodeEvents } from './Node'
 import { property } from 'modern-idoc'
-import { customNode, Rectangle, Transform2D } from '../../core'
+import { Aabb2D, customNode, Transform2D } from '../../core'
 import { QuadUvGeometry, RenderTarget, UvMaterial } from '../resources'
 import { Node } from './Node'
 
@@ -134,8 +134,8 @@ export class Viewport extends Node implements Rectangulable {
     this.renderEnd(renderer, oldViewport)
   }
 
-  getRect(): Rectangle {
-    return new Rectangle(this.x, this.y, this.width, this.height)
+  getRect(): Aabb2D {
+    return new Aabb2D(this.x, this.y, this.width, this.height)
   }
 
   toCanvasGlobal<P extends Vector2Like = Vector2>(screenPos: Vector2Like, newPos?: P): P {
