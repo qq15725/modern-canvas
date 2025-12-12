@@ -1,3 +1,12 @@
+## [0.14.12](https://github.com/qq15725/modern-canvas/compare/v0.14.11...v0.14.12) (2025-12-12)
+
+
+### Features
+
+* rename node event appendChild to addChild ([9b1dff0](https://github.com/qq15725/modern-canvas/commit/9b1dff0076735e37b72af0f17b1bcb2cecaf9ff6))
+
+
+
 ## [0.14.11](https://github.com/qq15725/modern-canvas/compare/v0.14.10...v0.14.11) (2025-12-12)
 
 
