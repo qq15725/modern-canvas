@@ -41,10 +41,10 @@ export class CanvasItem extends TimelineNode {
   // Batch render
   context = new CanvasContext()
   protected _resetContext = true
-  needsRender = true
+  needsDraw = true
   needsLayout = false
   needsPaint = false
-  protected _rawBatchables: CanvasBatchable[] = []
+  protected _drawBatchables: CanvasBatchable[] = []
   protected _layoutBatchables: CanvasBatchable[] = []
   protected _batchables: CanvasBatchable[] = []
 
@@ -89,16 +89,19 @@ export class CanvasItem extends TimelineNode {
     return super.canRender() && this.isVisibleInTree()
   }
 
-  requestRender(): void {
-    this.needsRender = true
+  requestDraw(): void {
+    this.needsDraw = true
+    this.requestRender()
   }
 
   requestLayout(): void {
     this.needsLayout = true
+    this.requestRender()
   }
 
   requestPaint(): void {
     this.needsPaint = true
+    this.requestRender()
   }
 
   protected _updateGlobalVisible(): void {
@@ -178,18 +181,24 @@ export class CanvasItem extends TimelineNode {
   }
 
   protected _updateBatchables(): void {
-    const needsRender = this.needsRender
+    if (!this.needsRender) {
+      return
+    }
+
+    this.needsRender = false
+
+    const needsDraw = this.needsDraw
     let needsLayout = this.needsLayout
     let needsPaint = this.needsPaint
 
     let batchables: CanvasBatchable[] | undefined
-    if (needsRender) {
-      this._rawBatchables = this._redraw()
+    if (needsDraw) {
+      this._drawBatchables = this._redraw()
       needsLayout = true
     }
 
     if (needsLayout) {
-      this._layoutBatchables = this._relayout(this._rawBatchables)
+      this._layoutBatchables = this._relayout(this._drawBatchables)
       needsPaint = true
     }
 
@@ -197,7 +206,7 @@ export class CanvasItem extends TimelineNode {
       batchables = this._repaint(this._layoutBatchables)
     }
 
-    if (needsRender) {
+    if (needsDraw) {
       if (this._resetContext) {
         this.context.reset()
       }
@@ -205,7 +214,7 @@ export class CanvasItem extends TimelineNode {
 
     if (batchables) {
       this._batchables = batchables
-      this.needsRender = false
+      this.needsDraw = false
       this.needsLayout = false
       this.needsPaint = false
     }

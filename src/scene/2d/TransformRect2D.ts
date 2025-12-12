@@ -25,7 +25,7 @@ export class TransformRect2D extends Element2D {
     switch (key) {
       case 'width':
       case 'height':
-        this.requestRender()
+        this.requestDraw()
         break
     }
   }

@@ -99,6 +99,8 @@ export class Node extends CoreObject {
   get meta(): Meta { return this._meta }
   set meta(value: Record<string, any>) { this._meta.resetProperties().setProperties(value) }
 
+  @property({ internal: true, default: true }) declare needsRender: boolean
+
   protected _readyed = false
 
   constructor(properties?: Partial<NodeProperties>, nodes: Node[] = []) {
@@ -345,6 +347,22 @@ export class Node extends CoreObject {
     }
   }
 
+  requestRender(): void {
+    this.needsRender = true
+  }
+
+  protected override _updateProperty(key: string, newValue: any, oldValue: any): void {
+    super._updateProperty(key, newValue, oldValue)
+
+    switch (key) {
+      case 'needsRender':
+        if (newValue) {
+          this._parent?.requestRender()
+        }
+        break
+    }
+  }
+
   render(renderer: GlRenderer, next?: () => void): void {
     const mask = this.mask
 
@@ -395,7 +413,7 @@ export class Node extends CoreObject {
   }
 
   addSibling(sibling: Node): this {
-    if (this.equal(sibling) || !this.hasParent() || sibling.hasParent()) {
+    if (this.equal(sibling) || !this.hasParent()) {
       return this
     }
     sibling.internalMode = this.internalMode
@@ -477,9 +495,14 @@ export class Node extends CoreObject {
   }
 
   appendChild<T extends Node>(node: T, internalMode = node.internalMode): T {
-    if (this.equal(node) || node.hasParent()) {
+    if (this.equal(node)) {
       return node
     }
+
+    if (node.hasParent()) {
+      node.remove()
+    }
+
     switch (internalMode) {
       case 'front':
         this._children.front.push(node)
@@ -494,14 +517,20 @@ export class Node extends CoreObject {
     if (node.internalMode !== internalMode) {
       node.internalMode = internalMode
     }
+
     node.setParent(this)
     this.emit('appendChild', node)
+
     return node
   }
 
   moveChild(node: Node, toIndex: number, internalMode = node.internalMode): this {
-    if (this.equal(node) || (node.hasParent() && !this.equal(node.parent))) {
+    if (this.equal(node)) {
       return this
+    }
+
+    if (node.hasParent() && !this.equal(node.parent)) {
+      node.remove()
     }
 
     const fromArray = this._children.getInternal(node.internalMode)
@@ -608,7 +637,9 @@ export class Node extends CoreObject {
   // eslint-disable-next-line unused-imports/no-unused-vars
   protected _input(event: InputEvent, key: InputEventKey): void {}
   // eslint-disable-next-line unused-imports/no-unused-vars
-  protected _render(renderer: GlRenderer): void {}
+  protected _render(renderer: GlRenderer): void {
+    this.needsRender = false
+  }
 
   override destroy(): void {
     super.destroy()
@@ -633,12 +664,15 @@ export class Node extends CoreObject {
     })
   }
 
-  static parse(value: SerializedNode | SerializedNode[]): any {
+  static parse(
+    value: SerializedNode | SerializedNode[],
+    defaultInCanvasIs: string = 'Node',
+  ): any {
     if (Array.isArray(value)) {
       return value.map(val => this.parse(val))
     }
     const { is, meta = {}, children, ...props } = value
-    const Class = (customNodes.get(is ?? meta.inCanvasIs ?? 'Node') ?? Node) as any
+    const Class = (customNodes.get(is ?? meta.inCanvasIs ?? defaultInCanvasIs) ?? Node) as any
     const node = new Class({ ...props, meta }) as Node
     children?.forEach((child: Record<string, any>) => node.appendChild(this.parse(child)))
     return node

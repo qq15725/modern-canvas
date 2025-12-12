@@ -107,7 +107,7 @@ export class AudioWaveform extends Element2D {
     }
 
     this._src?.requestUpdate('source')
-    this.requestRender()
+    this.requestDraw()
   }
 
   protected override _process(delta: number): void {

@@ -61,7 +61,7 @@ export class Element2DText extends CoreObject {
 
     switch (key) {
       case 'enabled':
-        this.parent.requestRender()
+        this.parent.requestDraw()
         break
       case 'effects':
       case 'measureDom':
@@ -87,7 +87,7 @@ export class Element2DText extends CoreObject {
       pixelRatio: this._texture.pixelRatio,
     })
     this._texture.requestUpdate('source')
-    this.parent.requestRender()
+    this.parent.requestDraw()
   }
 
   protected _updateTextureMap(): void {
@@ -125,7 +125,7 @@ export class Element2DText extends CoreObject {
         texture: await this._loadTexture(fill, box),
         box,
       })
-      this.parent.requestRender()
+      this.parent.requestDraw()
     }
   }
 
@@ -345,7 +345,7 @@ export class Element2DText extends CoreObject {
           this._autoDrawMode = 'path'
         }
         if (oldDrawMode !== this._autoDrawMode) {
-          this.parent.requestRender()
+          this.parent.requestDraw()
         }
       }
     }

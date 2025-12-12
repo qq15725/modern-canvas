@@ -74,7 +74,7 @@ export class Element2D extends Node2D implements Rectangulable {
     this.onUpdateStyleProperty('transform', this.style.transform, undefined)
     this.onUpdateStyleProperty('transformOrigin', this.style.transformOrigin, undefined)
     this.updateGlobalTransform()
-    this.requestRender()
+    this.requestDraw()
   })
 
   protected _allowPointerEvents = true
@@ -211,13 +211,13 @@ export class Element2D extends Node2D implements Rectangulable {
       case 'scaleX':
         this.scale.x = value
         if (this.text.isValid() && (value ^ oldValue) < 0) {
-          this.requestRender()
+          this.requestDraw()
         }
         break
       case 'scaleY':
         this.scale.y = value
         if (this.text.isValid() && (value ^ oldValue) < 0) {
-          this.requestRender()
+          this.requestDraw()
         }
         break
       case 'skewX':
@@ -287,7 +287,7 @@ export class Element2D extends Node2D implements Rectangulable {
         this._allowPointerEvents = !isNone(value)
         break
       case 'borderRadius':
-        this.requestRender()
+        this.requestDraw()
         break
     }
 

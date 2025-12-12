@@ -18,7 +18,7 @@ export class Element2DForeground extends Element2DFill {
 
     switch (key) {
       case 'fillWithShape':
-        this.parent.requestRender()
+        this.parent.requestDraw()
         break
     }
   }

@@ -43,7 +43,7 @@ export class Element2DShape extends CoreObject {
       case 'viewBox':
       case 'enabled':
         this._updatePath2DSet()
-        this.parent.requestRender()
+        this.parent.requestDraw()
         break
     }
   }

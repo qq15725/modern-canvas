@@ -28,7 +28,7 @@ export class Element2DOutline extends Element2DFill {
       case 'lineCap':
       case 'lineJoin':
       case 'enabled':
-        this.parent.requestRender()
+        this.parent.requestDraw()
         break
     }
   }

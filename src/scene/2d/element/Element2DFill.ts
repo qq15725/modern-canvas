@@ -57,7 +57,7 @@ export class Element2DFill extends CoreObject {
       case 'tile':
       case 'opacity':
       case 'enabled':
-        this.parent.requestRender()
+        this.parent.requestDraw()
         break
       case 'image':
       case 'linearGradient':
@@ -112,7 +112,7 @@ export class Element2DFill extends CoreObject {
 
   protected async _updateTexture(): Promise<void> {
     await this.loadTexture()
-    this.parent.requestRender()
+    this.parent.requestDraw()
   }
 
   isValid(): boolean {
@@ -176,7 +176,7 @@ export class Element2DFill extends CoreObject {
     }
     if (this.animatedTexture.frameIndex !== index) {
       this.animatedTexture.frameIndex = index
-      this.parent.requestRender()
+      this.parent.requestDraw()
     }
     return this
   }

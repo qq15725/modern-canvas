@@ -47,8 +47,6 @@ export class Effect extends TimelineNode implements Rectangulable {
   @property() declare glsl?: string
   @property() declare glslSrc?: string
 
-  needsRender = true
-
   protected get _effectMode(): EffectMode { return this.effectMode ?? 'parent' }
 
   /** Viewports */
@@ -73,10 +71,6 @@ export class Effect extends TimelineNode implements Rectangulable {
     this
       .setProperties(properties)
       .append(children)
-  }
-
-  requestRender(): void {
-    this.needsRender = true
   }
 
   protected override _updateProperty(key: string, value: any, oldValue: any): void {
@@ -163,10 +157,10 @@ export class Effect extends TimelineNode implements Rectangulable {
     const renderStack = this._tree?.renderStack
     if (!renderStack)
       return
-    const parentParentCall = renderStack.currentCall?.parentCall
-    if (!parentParentCall)
+    const parentCall = renderStack.currentCall?.parentCall
+    if (!parentCall)
       return
-    const calls = parentParentCall.calls
+    const calls = parentCall.calls
     let start: number | undefined
     let end: number | undefined
     const minMax = {

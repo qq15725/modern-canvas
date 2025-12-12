@@ -50,13 +50,13 @@ export class Lottie2D extends TextureRect2D {
     this.animation = await assets.lottie.load(this.src, this.texture.source)
     this.duration = this.animation.getDuration(false) * 1000
     this.texture.requestUpdate('source')
-    this.requestRender()
+    this.requestDraw()
   }
 
   protected override _process(delta: number): void {
     this.animation?.goToAndStop(this.currentTime, false)
     this.texture.requestUpdate('source')
-    this.requestRender()
+    this.requestDraw()
     super._process(delta)
   }
 }
