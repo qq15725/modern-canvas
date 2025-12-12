@@ -1,3 +1,12 @@
+## [0.14.10](https://github.com/qq15725/modern-canvas/compare/v0.14.9...v0.14.10) (2025-12-12)
+
+
+### Bug Fixes
+
+* requestRender ([dd8bfe3](https://github.com/qq15725/modern-canvas/commit/dd8bfe3eb71ce63bb3cfa48daa3cfbbfc60cbee5))
+
+
+
 ## [0.14.9](https://github.com/qq15725/modern-canvas/compare/v0.14.8...v0.14.9) (2025-12-11)
 
 
