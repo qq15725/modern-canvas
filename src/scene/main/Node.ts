@@ -85,8 +85,8 @@ function getNodeIid(key: any): number {
 export class Node extends CoreObject {
   readonly declare is: string
 
-  @property({ fallback: idGenerator() }) declare id: string
-  @property({ fallback: idGenerator() }) declare name: string
+  @property({ default: () => idGenerator() }) declare id: string
+  @property({ default: () => idGenerator() }) declare name: string
 
   @property({ fallback: 'inherit' }) declare processMode: ProcessMode
   @property({ fallback: 'default' }) declare processSortMode: ProcessSortMode
