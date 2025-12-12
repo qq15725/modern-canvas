@@ -33,9 +33,9 @@ export interface NodeEvents extends CoreObjectEvents, InputEvents {
   processing: [delta?: number]
   process: [delta?: number]
   processed: [delta?: number]
-  appendChild: [child: Node]
-  removeChild: [child: Node, index: number]
+  addChild: [child: Node, newIndex: number]
   moveChild: [child: Node, newIndex: number, oldIndex: number]
+  removeChild: [child: Node, oldIndex: number]
 }
 
 export interface Node {
@@ -519,7 +519,7 @@ export class Node extends CoreObject {
     }
 
     node.setParent(this)
-    this.emit('appendChild', node)
+    this.emit('addChild', node, node.getIndex())
 
     return node
   }
@@ -555,7 +555,7 @@ export class Node extends CoreObject {
         this.emit('moveChild', node, toIndex, fromIndex)
       }
       else {
-        this.emit('appendChild', node)
+        this.emit('addChild', node, toIndex)
       }
     }
 
