@@ -1,3 +1,12 @@
+## [0.14.11](https://github.com/qq15725/modern-canvas/compare/v0.14.10...v0.14.11) (2025-12-12)
+
+
+### Bug Fixes
+
+* id / name default value ([b190931](https://github.com/qq15725/modern-canvas/commit/b190931ec9d3c31ee8a8455fbb7224897f0ad4c5))
+
+
+
 ## [0.14.10](https://github.com/qq15725/modern-canvas/compare/v0.14.9...v0.14.10) (2025-12-12)
 
 
