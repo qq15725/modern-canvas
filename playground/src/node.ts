@@ -35,7 +35,15 @@ async function init(): Promise<void> {
   root.on('removeChild', (...args) => console.warn('removeChild', ...args))
   root.on('addChild', (...args) => console.warn('addChild', ...args))
 
-  // ['Node:1', 'Node:3', 'Node:8', 'Node:2', 'Node:6', 'Node:5', 'Node:7', 'Node:4']
+  // ['Node:1', 'Node:3', 'Node:2', 'Node:8', 'Node:6', 'Node:5', 'Node:7', 'Node:4']
+  root.moveChild(node8, 3)
+  console.warn(engine.root.children.map(v => v.name))
+
+  // ['Node:1', 'Node:3', 'Node:2', 'Node:6', 'Node:8', 'Node:5', 'Node:7', 'Node:4']
+  root.moveChild(node8, 4)
+  console.warn(engine.root.children.map(v => v.name))
+
+  // ['Node:1', 'Node:3', 'Node:2', 'Node:8', 'Node:6', 'Node:5', 'Node:7', 'Node:4']
   root.moveChild(node8, 3)
   console.warn(engine.root.children.map(v => v.name))
 

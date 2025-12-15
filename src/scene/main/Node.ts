@@ -542,7 +542,6 @@ export class Node extends CoreObject {
     if (fromIndex !== toIndex) {
       if (fromIndex > -1) {
         children.splice(fromIndex, 1)
-        toIndex = Math.max(0, toIndex - 1)
         this.emit('removeChild', node, fromIndex)
       }
 
