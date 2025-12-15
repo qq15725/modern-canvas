@@ -1,3 +1,12 @@
+## [0.14.13](https://github.com/qq15725/modern-canvas/compare/v0.14.12...v0.14.13) (2025-12-15)
+
+
+### Features
+
+* remove moveChild event ([5114723](https://github.com/qq15725/modern-canvas/commit/51147239e8bd2ff9cdc3f016efa4865f98019a20))
+
+
+
 ## [0.14.12](https://github.com/qq15725/modern-canvas/compare/v0.14.11...v0.14.12) (2025-12-12)
 
 
