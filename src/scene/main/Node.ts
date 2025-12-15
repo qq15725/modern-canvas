@@ -537,17 +537,18 @@ export class Node extends CoreObject {
 
     const children = this._children.getInternal(internalMode)
     const fromIndex = children.indexOf(node)
+    toIndex = Math.max(0, toIndex)
 
     if (fromIndex !== toIndex) {
       if (fromIndex > -1) {
         children.splice(fromIndex, 1)
-        toIndex -= 1
+        toIndex = Math.max(0, toIndex - 1)
         this.emit('removeChild', node, fromIndex)
       }
 
       node.setParent(this)
 
-      if (toIndex > -1 && toIndex < children.length) {
+      if (toIndex < children.length) {
         children.splice(toIndex, 0, node)
       }
       else {
