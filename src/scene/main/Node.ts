@@ -162,12 +162,14 @@ export class Node extends CoreObject {
     const oldTree = this._tree
     if (!tree?.equal(oldTree)) {
       if (oldTree) {
+        oldTree.emit('nodeExit', this)
         this.emit('treeExit', oldTree)
       }
 
       this._tree = tree
 
       if (tree) {
+        tree.emit('nodeEnter', this)
         this.emit('treeEnter', tree)
       }
 

@@ -25,6 +25,8 @@ export interface SceneTreeEvents extends MainLoopEvents, InputEvents {
   processed: []
   rendering: []
   rendered: []
+  nodeEnter: [node: Node]
+  nodeExit: [node: Node]
   nodeProcessing: [node: Node]
   nodeProcessed: [node: Node]
 }
