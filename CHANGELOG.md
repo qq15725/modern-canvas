@@ -1,3 +1,12 @@
+## [0.14.15](https://github.com/qq15725/modern-canvas/compare/v0.14.14...v0.14.15) (2025-12-15)
+
+
+### Bug Fixes
+
+* moveChild ([3dd84d8](https://github.com/qq15725/modern-canvas/commit/3dd84d818758d4bb3726b2580e6ad86a0ec047b5))
+
+
+
 ## [0.14.14](https://github.com/qq15725/modern-canvas/compare/v0.14.13...v0.14.14) (2025-12-15)
 
 
