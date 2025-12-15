@@ -1,3 +1,12 @@
+## [0.14.16](https://github.com/qq15725/modern-canvas/compare/v0.14.15...v0.14.16) (2025-12-15)
+
+
+### Features
+
+* add nodeEnter / nodeExit event to SceneTree ([fa201b4](https://github.com/qq15725/modern-canvas/commit/fa201b4f465436b8466ddc247fe5744c0991928b))
+
+
+
 ## [0.14.15](https://github.com/qq15725/modern-canvas/compare/v0.14.14...v0.14.15) (2025-12-15)
 
 
