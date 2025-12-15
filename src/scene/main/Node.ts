@@ -34,7 +34,6 @@ export interface NodeEvents extends CoreObjectEvents, InputEvents {
   process: [delta?: number]
   processed: [delta?: number]
   addChild: [child: Node, newIndex: number]
-  moveChild: [child: Node, newIndex: number, oldIndex: number]
   removeChild: [child: Node, oldIndex: number]
 }
 
@@ -529,34 +528,33 @@ export class Node extends CoreObject {
       return this
     }
 
-    if (node.hasParent() && !this.equal(node.parent)) {
+    if (
+      (node.hasParent() && !this.equal(node.parent))
+      || node.internalMode !== internalMode
+    ) {
       node.remove()
     }
 
-    const fromArray = this._children.getInternal(node.internalMode)
-    const fromIndex = fromArray.indexOf(node)
-    const toArray = this._children.getInternal(internalMode)
+    const children = this._children.getInternal(internalMode)
+    const fromIndex = children.indexOf(node)
 
-    if (node.internalMode !== internalMode || toIndex !== fromIndex) {
+    if (fromIndex !== toIndex) {
       if (fromIndex > -1) {
-        fromArray.splice(fromIndex, 1)
+        children.splice(fromIndex, 1)
+        toIndex -= 1
+        this.emit('removeChild', node, fromIndex)
       }
 
       node.setParent(this)
 
-      if (toIndex > -1 && toIndex < toArray.length) {
-        toArray.splice(toIndex, 0, node)
+      if (toIndex > -1 && toIndex < children.length) {
+        children.splice(toIndex, 0, node)
       }
       else {
-        toArray.push(node)
+        children.push(node)
       }
 
-      if (fromIndex > -1) {
-        this.emit('moveChild', node, toIndex, fromIndex)
-      }
-      else {
-        this.emit('addChild', node, toIndex)
-      }
+      this.emit('addChild', node, toIndex)
     }
 
     if (node.internalMode !== internalMode) {
