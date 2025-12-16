@@ -3,7 +3,7 @@ import {
   Animation,
   Element2D,
   Engine,
-  FlexLayout,
+  Flexbox,
   Timeline,
 } from '../../src'
 
@@ -16,7 +16,7 @@ const engine = new Engine({
 document.body.append(engine.view!)
 
 async function init(): Promise<void> {
-  await FlexLayout.load()
+  await Flexbox.load()
 
   await fonts.loadFallbackFont({ family: 'fallbackFont', src: '/fonts/AaHouDiHei.woff' })
 

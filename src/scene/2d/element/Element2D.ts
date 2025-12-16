@@ -8,7 +8,6 @@ import type {
   Shape,
   Text,
 } from 'modern-idoc'
-import type { Node as YogaNode } from 'yoga-layout/load'
 import type {
   InputEvent,
   InputEventKey,
@@ -27,7 +26,6 @@ import {
 } from '../../../core'
 import { parseCssTransform, parseCssTransformOrigin } from '../../../css'
 import { ColorFilterEffect, MaskEffect } from '../../effects'
-import { directionMap, FlexLayout } from '../FlexLayout'
 import { Node2D } from '../Node2D'
 import { Element2DBackground } from './Element2DBackground'
 import { Element2DFill } from './Element2DFill'
@@ -37,6 +35,7 @@ import { Element2DShadow } from './Element2DShadow'
 import { Element2DShape } from './Element2DShape'
 import { Element2DStyle } from './Element2DStyle'
 import { Element2DText } from './Element2DText'
+import { Flexbox } from './Flexbox'
 
 export interface BaseElement2DEvents extends Node2DEvents, RectangulableEvents {
   updateStyleProperty: [key: string, value: any, oldValue: any]
@@ -70,11 +69,7 @@ export class Element2D extends Node2D implements Rectangulable {
   protected _globalDisplay?: Display
   get globalDisplay(): Display | undefined { return this._globalDisplay }
 
-  _flex = new FlexLayout(this)
-
-  get _flexNode(): YogaNode | undefined {
-    return this._flex._node
-  }
+  readonly flexbox = new Flexbox(this)
 
   readonly size = new Vector2().on('update', () => {
     this.onUpdateStyleProperty('transform', this.style.transform, undefined)
@@ -125,7 +120,6 @@ export class Element2D extends Node2D implements Rectangulable {
 
   constructor(properties?: Partial<Element2DProperties>, nodes: Node[] = []) {
     super()
-    this.style = new Element2DStyle()
     this
       .setProperties(properties)
       .append(nodes)
@@ -136,37 +130,6 @@ export class Element2D extends Node2D implements Rectangulable {
 
     if (this._text.isValid()) {
       this._text.update()
-    }
-  }
-
-  protected override _parented(parent: Node): void {
-    super._parented(parent)
-
-    if (
-      parent instanceof Element2D
-      && parent._flexNode
-      && this._flexNode
-    ) {
-      parent._flexNode!.insertChild(
-        this._flexNode,
-        parent._flexNode!.getChildCount(),
-      )
-      const properties = this.style.getProperties()
-      for (const key in properties) {
-        this._flex.updateStyleProperty(key, properties[key], undefined)
-      }
-    }
-  }
-
-  protected override _unparented(oldParent: Node): void {
-    super._unparented(oldParent)
-
-    if (
-      oldParent instanceof Element2D
-      && oldParent._flexNode
-      && this._flexNode
-    ) {
-      oldParent._flexNode.removeChild(this._flexNode)
     }
   }
 
@@ -204,7 +167,7 @@ export class Element2D extends Node2D implements Rectangulable {
   protected _updateStyleProperty(key: string, value: any, oldValue: any): void {
     switch (key) {
       case 'display':
-        this._updateGlobalDisplay()
+        this.updateGlobalDisplay()
         break
       case 'rotate':
         this.rotation = value * DEG_TO_RAD
@@ -299,7 +262,7 @@ export class Element2D extends Node2D implements Rectangulable {
     }
 
     if (this.globalDisplay === 'flex') {
-      this._flex.updateStyleProperty(key, value, oldValue)
+      this.flexbox.updateStyleProperty(key, value)
     }
     else {
       switch (key) {
@@ -319,9 +282,15 @@ export class Element2D extends Node2D implements Rectangulable {
     }
   }
 
-  protected _updateGlobalDisplay(): void {
+  updateGlobalDisplay(): void {
+    this._parentGlobalDisplay = this.getParent<Element2D>()?.globalDisplay
     this._globalDisplay = this.style.display
-      ?? this.getParent<Element2D>()?.globalDisplay
+      ?? this._parentGlobalDisplay
+  }
+
+  override requestLayout(): void {
+    super.requestLayout()
+    this.flexbox.update()
   }
 
   protected override _process(delta: number): void {
@@ -332,34 +301,14 @@ export class Element2D extends Node2D implements Rectangulable {
     this.background.process(delta)
 
     const parent = this.getParent<Element2D>()
+
     if (this._parentGlobalDisplay !== parent?.globalDisplay) {
-      this._updateGlobalDisplay()
+      this.updateGlobalDisplay()
     }
+
+    this.flexbox.update()
 
     super._process(delta)
-  }
-
-  override requestLayout(): void {
-    if (this.globalDisplay === 'flex') {
-      const parent = this.getParent<Element2D>()
-
-      if (parent?.globalDisplay === 'flex') {
-        parent.requestLayout()
-      }
-      else {
-        this._flex.calculateLayout(undefined, undefined, directionMap.ltr)
-      }
-
-      if (this._flexNode) {
-        const { left, top, width, height } = this._flexNode.getComputedLayout()
-        this.position.x = left
-        this.position.y = top
-        this.size.x = width
-        this.size.y = height
-      }
-    }
-
-    super.requestLayout()
   }
 
   protected _getStyleFilter(): ColorFilterEffect {

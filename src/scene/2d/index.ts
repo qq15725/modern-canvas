@@ -1,6 +1,5 @@
 export * from './Camera2D'
 export * from './element'
-export * from './FlexLayout'
 export * from './Lottie2D'
 export * from './Node2D'
 export * from './TextureRect2D'

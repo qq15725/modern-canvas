@@ -119,7 +119,8 @@ export class Node extends CoreObject {
       })
       .append(nodes)
 
-    this.on('treeEnter', this._onTreeEnter)
+    this
+      .on('treeEnter', this._onTreeEnter)
       .on('treeExit', this._onTreeExit)
       .on('parented', this._onParented)
       .on('unparented', this._onUnparented)
@@ -276,26 +277,26 @@ export class Node extends CoreObject {
     }
   }
 
-  protected _onTreeEnter(tree: SceneTree): void {
+  private _onTreeEnter(tree: SceneTree): void {
     this._treeEnter(tree)
     this.emit('treeEntered', tree)
   }
 
-  protected _onTreeExit(oldTree: SceneTree): void {
+  private _onTreeExit(oldTree: SceneTree): void {
     this.emit('treeExiting', oldTree)
     this._treeExit(oldTree)
     this.emit('treeExited', oldTree)
   }
 
-  protected _onParented(parent: Node): void {
+  private _onParented(parent: Node): void {
     this._parented(parent)
   }
 
-  protected _onUnparented(oldParent: Node): void {
+  private _onUnparented(oldParent: Node): void {
     this._unparented(oldParent)
   }
 
-  protected _onReady(): void {
+  private _onReady(): void {
     this._ready()
   }
 
@@ -515,11 +516,13 @@ export class Node extends CoreObject {
         this._children.back.push(node)
         break
     }
+
     if (node.internalMode !== internalMode) {
       node.internalMode = internalMode
     }
 
     node.setParent(this)
+
     this.emit('addChild', node, node.getIndex())
 
     return node
@@ -547,14 +550,14 @@ export class Node extends CoreObject {
         this.emit('removeChild', node, fromIndex)
       }
 
-      node.setParent(this)
-
       if (toIndex < children.length) {
         children.splice(toIndex, 0, node)
       }
       else {
         children.push(node)
       }
+
+      node.setParent(this)
 
       this.emit('addChild', node, toIndex)
     }

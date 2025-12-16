@@ -171,10 +171,13 @@ export class CanvasItem extends TimelineNode {
 
   protected override _process(delta: number): void {
     super._process(delta)
+
     const parent = this.getParent<CanvasItem>()
+
     if (this._parentGlobalVisible !== parent?.globalVisible) {
       this._updateGlobalVisible()
     }
+
     if (this._parentGlobalOpacity !== parent?.globalOpacity) {
       this._updateGlobalOpacity()
     }
@@ -184,8 +187,6 @@ export class CanvasItem extends TimelineNode {
     if (!this.needsRender) {
       return
     }
-
-    this.needsRender = false
 
     const needsDraw = this.needsDraw
     let needsLayout = this.needsLayout
@@ -218,6 +219,8 @@ export class CanvasItem extends TimelineNode {
       this.needsLayout = false
       this.needsPaint = false
     }
+
+    this.needsRender = false
   }
 
   protected _handleViewportTexture(batchable: Batchable2D): Texture2D | undefined {

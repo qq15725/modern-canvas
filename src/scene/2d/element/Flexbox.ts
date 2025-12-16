@@ -1,5 +1,6 @@
 import type { Node as YogaNode } from 'yoga-layout/load'
-import type { Element2D, Element2DStyle } from './element'
+import type { Node } from '../../main'
+import { Element2D } from './Element2D'
 
 export const edgeMap = {
   left: 0, // Edge.Left
@@ -82,32 +83,52 @@ export const boxSizingMap = {
   'content-box': 1, // BoxSizing.ContentBox
 }
 
-export class FlexLayout {
+export class Flexbox {
   static _yoga?: any
   static async load(): Promise<void> {
     const { loadYoga } = await import('yoga-layout/load')
     this._yoga = await loadYoga()
   }
 
-  _node: YogaNode | undefined = FlexLayout._yoga?.Node.create()
-
-  protected get _style(): Element2DStyle {
-    return this._parent.style
-  }
+  readonly node: YogaNode | undefined = Flexbox._yoga?.Node.create()
 
   constructor(
-    protected _parent: Element2D,
+    protected _el: Element2D,
   ) {
-    //
+    this._addChild = this._addChild.bind(this)
+    this._removeChild = this._removeChild.bind(this)
+
+    this._el.on('addChild', this._addChild)
+    this._el.on('removeChild', this._removeChild)
   }
 
-  calculateLayout(width?: number | 'auto', height?: number | 'auto', direction?: typeof displayMap[keyof typeof displayMap]): void {
-    this._node?.calculateLayout(width, height, direction)
+  protected _addChild(child: Node, newIndex: number): void {
+    if (
+      child instanceof Element2D
+      && child.flexbox.node
+      && this.node
+    ) {
+      this.node.insertChild(child.flexbox.node, newIndex)
+
+      const properties = child.style.getProperties()
+      for (const key in properties) {
+        child.flexbox.updateStyleProperty(key, properties[key])
+      }
+    }
   }
 
-  // eslint-disable-next-line unused-imports/no-unused-vars
-  updateStyleProperty(key: string, value: any, oldValue: any): void {
-    const node = this._node
+  protected _removeChild(child: Node, _oldIndex: number): void {
+    if (
+      child instanceof Element2D
+      && child.flexbox.node
+      && this.node
+    ) {
+      this.node.removeChild(child.flexbox.node)
+    }
+  }
+
+  updateStyleProperty(key: string, value: any): void {
+    const node = this.node
 
     if (!node) {
       return
@@ -117,90 +138,90 @@ export class FlexLayout {
       case 'alignContent':
         node.setAlignContent(
           value
-            ? alignMap[value as keyof typeof alignMap]
+            ? (alignMap[value as keyof typeof alignMap] ?? alignMap['flex-start'])
             : alignMap['flex-start'],
         )
         break
       case 'alignItems':
         node.setAlignItems(
           value
-            ? alignMap[value as keyof typeof alignMap]
+            ? (alignMap[value as keyof typeof alignMap] ?? alignMap['flex-start'])
             : alignMap['flex-start'],
         )
         break
       case 'alignSelf':
         node.setAlignSelf(
           value
-            ? alignMap[value as keyof typeof alignMap]
+            ? (alignMap[value as keyof typeof alignMap] ?? alignMap['flex-start'])
             : alignMap['flex-start'],
         )
         break
       case 'aspectRatio':
-        // node.setIsReferenceBaseline(this._style.isReferenceBaseline)
+        // node.setIsReferenceBaseline(this._el.style.isReferenceBaseline)
         node.setAspectRatio(value)
         break
       case 'borderTop':
-        node.setBorder(edgeMap.top, this._style.borderWidth)
+        node.setBorder(edgeMap.top, this._el.style.borderWidth)
         break
       case 'borderBottom':
-        node.setBorder(edgeMap.bottom, this._style.borderWidth)
+        node.setBorder(edgeMap.bottom, this._el.style.borderWidth)
         break
       case 'borderLeft':
-        node.setBorder(edgeMap.left, this._style.borderWidth)
+        node.setBorder(edgeMap.left, this._el.style.borderWidth)
         break
       case 'borderRight':
-        node.setBorder(edgeMap.right, this._style.borderWidth)
+        node.setBorder(edgeMap.right, this._el.style.borderWidth)
         break
       case 'border':
-        node.setBorder(edgeMap.all, this._style.borderWidth)
+        node.setBorder(edgeMap.all, this._el.style.borderWidth)
         break
       case 'direction':
         node.setDirection(
           value
-            ? directionMap[value as keyof typeof directionMap]
+            ? (directionMap[value as keyof typeof directionMap] ?? directionMap.inherit)
             : directionMap.inherit,
         )
         break
       case 'display':
         node.setDisplay(
           value
-            ? displayMap[value as keyof typeof displayMap]
+            ? (displayMap[value as keyof typeof displayMap] ?? displayMap.flex)
             : displayMap.flex,
         )
         break
       case 'flex':
-        node.setFlex(this._style.flex)
+        node.setFlex(value)
         break
       case 'flexBasis':
-        node.setFlexBasis(this._style.flexBasis)
+        node.setFlexBasis(value)
         break
       case 'flexDirection':
         node.setFlexDirection(
           value
-            ? flexDirectionMap[value as keyof typeof flexDirectionMap]
+            ? (flexDirectionMap[value as keyof typeof flexDirectionMap] ?? flexDirectionMap.row)
             : flexDirectionMap.row,
         )
         break
       case 'flexGrow':
-        node.setFlexGrow(this._style.flexGrow)
+        node.setFlexGrow(value)
         break
       case 'flexShrink':
-        node.setFlexShrink(this._style.flexShrink)
+        node.setFlexShrink(value)
         break
       case 'flexWrap':
         node.setFlexWrap(
           value
-            ? flexWrapMap[value as keyof typeof flexWrapMap]
+            ? (flexWrapMap[value as keyof typeof flexWrapMap] ?? flexWrapMap.wrap)
             : flexWrapMap.wrap,
         )
         break
       case 'height':
-        node.setHeight(this._style.height)
+        node.setHeight(value)
         break
       case 'justifyContent':
         node.setJustifyContent(
           value
-            ? justifyMap[value as keyof typeof justifyMap]
+            ? (justifyMap[value as keyof typeof justifyMap] ?? justifyMap['flex-start'])
             : justifyMap['flex-start'],
         )
         break
@@ -233,66 +254,97 @@ export class FlexLayout {
       //   setDirtiedFunc(dirtiedFunc: DirtiedFunction | null): void;
       //   setMeasureFunc(measureFunc: MeasureFunction | null): void;
       case 'minHeight':
-        node.setMinHeight(this._style.minHeight)
+        node.setMinHeight(value)
         break
       case 'minWidth':
-        node.setMinWidth(this._style.minWidth)
+        node.setMinWidth(value)
         break
       case 'overflow':
         node.setOverflow(
           value
-            ? overflowMap[value as keyof typeof overflowMap]
+            ? (overflowMap[value as keyof typeof overflowMap] ?? overflowMap.visible)
             : overflowMap.visible,
         )
         break
       case 'paddingTop':
-        node.setPadding(edgeMap.top, this._style.paddingTop)
+        node.setPadding(edgeMap.top, value)
         break
       case 'paddingBottom':
-        node.setPadding(edgeMap.bottom, this._style.paddingBottom)
+        node.setPadding(edgeMap.bottom, value)
         break
       case 'paddingLeft':
-        node.setPadding(edgeMap.left, this._style.paddingLeft)
+        node.setPadding(edgeMap.left, value)
         break
       case 'paddingRight':
-        node.setPadding(edgeMap.right, this._style.paddingRight)
+        node.setPadding(edgeMap.right, value)
         break
       case 'padding':
-        node.setPadding(edgeMap.all, this._style.padding)
+        node.setPadding(edgeMap.all, value)
         break
       case 'top':
-        node.setPosition(edgeMap.top, this._style.top)
+        node.setPosition(edgeMap.top, value)
         break
       case 'bottom':
-        node.setPosition(edgeMap.bottom, this._style.bottom)
+        node.setPosition(edgeMap.bottom, value)
         break
       case 'left':
-        node.setPosition(edgeMap.left, this._style.left)
+        node.setPosition(edgeMap.left, value)
         break
       case 'right':
-        node.setPosition(edgeMap.right, this._style.right)
+        node.setPosition(edgeMap.right, value)
         break
       case 'position':
         node.setPositionType(
           value
-            ? positionTypeMap[value as keyof typeof positionTypeMap]
+            ? (positionTypeMap[value as keyof typeof positionTypeMap] ?? positionTypeMap.relative)
             : positionTypeMap.relative,
         )
         break
       case 'boxSizing':
         node.setBoxSizing(
           value
-            ? boxSizingMap[value as keyof typeof boxSizingMap]
+            ? (boxSizingMap[value as keyof typeof boxSizingMap] ?? boxSizingMap['content-box'])
             : boxSizingMap['content-box'],
         )
         break
       case 'width':
-        node.setWidth(this._style.width)
+        node.setWidth(value)
         break
     }
 
-    if (node.isDirty()) {
-      this._parent.requestLayout()
+    this.update()
+  }
+
+  update(): void {
+    const el = this._el
+    const node = this.node
+
+    el.getParent<Element2D>()?.flexbox?.update()
+
+    if (el.globalDisplay === 'flex' && node) {
+      if (node.isDirty()) {
+        node.calculateLayout(undefined, undefined, directionMap.ltr)
+      }
+
+      if (node.hasNewLayout()) {
+        const { left, top, width, height } = node.getComputedLayout()
+
+        if (
+          (!Number.isNaN(left) && left !== el.position.x)
+          || (!Number.isNaN(top) && top !== el.position.y)
+        ) {
+          el.position.set(left, top)
+        }
+
+        if (
+          (!Number.isNaN(width) && width !== el.size.x)
+          || (!Number.isNaN(height) && height !== el.size.y)
+        ) {
+          el.size.set(width, height)
+        }
+
+        node.markLayoutSeen()
+      }
     }
   }
 }

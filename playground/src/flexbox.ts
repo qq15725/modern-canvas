@@ -1,16 +1,17 @@
-import { Engine, FlexLayout } from '../../src'
+import { Engine, Flexbox, Timeline } from '../../src'
 
 async function init(): Promise<void> {
-  await FlexLayout.load()
+  await Flexbox.load()
 
   const engine = new Engine({
     autoStart: true,
     autoResize: true,
+    timeline: Timeline.from([0, 2000], true),
     data: [
       { is: 'Camera2D' },
       {
         is: 'Element2D',
-        style: { display: 'flex', left: 100, top: 100, width: 1000, height: 400 },
+        style: { display: 'flex', left: 100, top: 100, borderColor: '#000000' },
         children: [
           { is: 'Element2D', style: { width: 100, height: 100, backgroundColor: '#000000FF' } },
           { is: 'Element2D', style: { width: 100, height: 100, backgroundColor: '#000000DD' } },

@@ -1,10 +1,10 @@
 import {
   Engine,
-  FlexLayout,
+  Flexbox,
 } from '../../src'
 
 async function init(): Promise<void> {
-  await FlexLayout.load()
+  await Flexbox.load()
 
   const engine = new Engine({
     autoStart: true,
