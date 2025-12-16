@@ -1,3 +1,12 @@
+## [0.14.18](https://github.com/qq15725/modern-canvas/compare/v0.14.17...v0.14.18) (2025-12-16)
+
+
+### Bug Fixes
+
+* up deps ([5b38019](https://github.com/qq15725/modern-canvas/commit/5b3801983abe02646b3262f2f0d09e36f507537e))
+
+
+
 ## [0.14.17](https://github.com/qq15725/modern-canvas/compare/v0.14.16...v0.14.17) (2025-12-16)
 
 
