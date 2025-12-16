@@ -1,3 +1,13 @@
+## [0.14.17](https://github.com/qq15725/modern-canvas/compare/v0.14.16...v0.14.17) (2025-12-16)
+
+
+### Features
+
+* supports display flex ([e6b0248](https://github.com/qq15725/modern-canvas/commit/e6b02488f1ea7eacb4600821fd40b53d1888dc92))
+* supports display flex ([70419ae](https://github.com/qq15725/modern-canvas/commit/70419aeaa8302932e82c924fdaa8266d61bd0bdb))
+
+
+
 ## [0.14.16](https://github.com/qq15725/modern-canvas/compare/v0.14.15...v0.14.16) (2025-12-15)
 
 
