@@ -1,7 +1,8 @@
 import { fonts } from 'modern-font'
 import {
   Camera2D,
-  Element2D, Engine,
+  Element2D,
+  Engine,
 } from '../../src'
 
 const engine = new Engine({

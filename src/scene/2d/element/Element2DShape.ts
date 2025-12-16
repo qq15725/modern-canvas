@@ -48,6 +48,14 @@ export class Element2DShape extends CoreObject {
     }
   }
 
+  isValid(): boolean {
+    return Boolean(
+      this.enabled && (
+        this._path2DSet.paths.some(p => p.getLength())
+      ),
+    )
+  }
+
   protected _updatePath2DSet(): void {
     let viewBox: number[] | undefined
     if (this.svg) {
@@ -77,7 +85,7 @@ export class Element2DShape extends CoreObject {
   }
 
   draw(rect = false): void {
-    if (!rect && this.enabled && this._path2DSet.paths.length) {
+    if (!rect && this.isValid()) {
       const ctx = this.parent.context
       const { width, height } = this.parent.size
       this._path2DSet.paths.forEach((path) => {

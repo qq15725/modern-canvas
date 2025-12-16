@@ -82,15 +82,6 @@ export const boxSizingMap = {
   'content-box': 1, // BoxSizing.ContentBox
 }
 
-export interface ComputedLayout {
-  left: number
-  right: number
-  top: number
-  bottom: number
-  width: number
-  height: number
-}
-
 export class FlexLayout {
   static _yoga?: any
   static async load(): Promise<void> {
@@ -101,11 +92,11 @@ export class FlexLayout {
   _node: YogaNode | undefined = FlexLayout._yoga?.Node.create()
 
   protected get _style(): Element2DStyle {
-    return this._element.style
+    return this._parent.style
   }
 
   constructor(
-    protected _element: Element2D,
+    protected _parent: Element2D,
   ) {
     //
   }
@@ -214,7 +205,9 @@ export class FlexLayout {
         )
         break
       case 'gap':
-        value !== undefined && node.setGap(gutterMap.all, value)
+        if (value !== undefined) {
+          node.setGap(gutterMap.all, value)
+        }
         break
       case 'marginTop':
         node.setMargin(edgeMap.top, value)
@@ -283,7 +276,7 @@ export class FlexLayout {
         node.setPositionType(
           value
             ? positionTypeMap[value as keyof typeof positionTypeMap]
-            : positionTypeMap.static,
+            : positionTypeMap.relative,
         )
         break
       case 'boxSizing':
@@ -296,6 +289,10 @@ export class FlexLayout {
       case 'width':
         node.setWidth(this._style.width)
         break
+    }
+
+    if (node.isDirty()) {
+      this._parent.requestLayout()
     }
   }
 }
