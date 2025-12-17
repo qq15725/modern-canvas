@@ -1,3 +1,12 @@
+## [0.14.19](https://github.com/qq15725/modern-canvas/compare/v0.14.18...v0.14.19) (2025-12-17)
+
+
+### Bug Fixes
+
+* transform ([9b6f6da](https://github.com/qq15725/modern-canvas/commit/9b6f6da012044817da422a99df6cd2fa2f387cfe))
+
+
+
 ## [0.14.18](https://github.com/qq15725/modern-canvas/compare/v0.14.17...v0.14.18) (2025-12-16)
 
 
