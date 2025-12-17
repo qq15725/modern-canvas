@@ -11,7 +11,7 @@ async function init(): Promise<void> {
       { is: 'Camera2D' },
       {
         is: 'Element2D',
-        style: { display: 'flex', left: 100, top: 100, borderColor: '#000000' },
+        style: { display: 'flex', flexDirection: 'row', left: 100, top: 100, borderColor: '#000000' },
         children: [
           { is: 'Element2D', style: { width: 100, height: 100, backgroundColor: '#000000FF' } },
           { is: 'Element2D', style: { width: 100, height: 100, backgroundColor: '#000000DD' } },

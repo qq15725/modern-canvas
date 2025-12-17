@@ -72,8 +72,8 @@ export class Element2D extends Node2D implements Rectangulable {
   readonly flexbox = new Flexbox(this)
 
   readonly size = new Vector2().on('update', () => {
-    this.onUpdateStyleProperty('transform', this.style.transform, undefined)
     this.onUpdateStyleProperty('transformOrigin', this.style.transformOrigin, undefined)
+    this.onUpdateStyleProperty('transform', this.style.transform, undefined)
     this.updateGlobalTransform()
     this.requestDraw()
   })
@@ -191,12 +191,15 @@ export class Element2D extends Node2D implements Rectangulable {
         this.skew.y = value
         break
       case 'transform':
+        this.extraTransform.identity()
+        this.extraTransform.translate(-this.pivot.x, -this.pivot.y)
         parseCssTransform(
           value ?? '',
           this.size.width,
           this.size.height,
-          this.extraTransform.identity(),
+          this.extraTransform,
         )
+        this.extraTransform.translate(this.pivot.x, this.pivot.y)
         this.updateGlobalTransform()
         break
       case 'transformOrigin': {
