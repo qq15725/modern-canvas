@@ -25,7 +25,7 @@ export interface TimelineProperties extends NodeProperties {
 @customNode('Timeline')
 export class Timeline extends Node {
   @property({ fallback: 0 }) declare startTime: number
-  @property({ fallback: 0 }) declare currentTime: number
+  currentTime = 0
   @property({ fallback: Number.MAX_SAFE_INTEGER }) declare endTime: number
   @property({ fallback: false }) declare loop: boolean
   @property({ fallback: false }) declare paused: boolean
@@ -46,6 +46,22 @@ export class Timeline extends Node {
   constructor(properties?: Partial<TimelineProperties>) {
     super()
     this.setProperties(properties)
+  }
+
+  override setProperties(properties?: Record<string, any>): this {
+    if (properties) {
+      const {
+        currentTime,
+        ...restProperties
+      } = properties
+
+      if (currentTime !== undefined) {
+        this.currentTime = currentTime
+      }
+
+      super.setProperties(restProperties)
+    }
+    return this
   }
 
   protected _updateProperty(key: string, value: any, oldValue: any): void {

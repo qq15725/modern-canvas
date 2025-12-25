@@ -165,7 +165,9 @@ export class Node extends CoreObject {
   get tree(): SceneTree | undefined { return this.getTree() }
   set tree(tree: SceneTree | undefined) { this.setTree(tree) }
   getTree(): SceneTree | undefined { return this._tree }
-  getViewport(): Viewport | undefined { return this.parent?.getViewport() ?? this.getWindow() }
+  // TODO 性能
+  // getViewport(): Viewport | undefined { return this.parent?.getViewport() ?? this.getWindow() }
+  getViewport(): Viewport | undefined { return this._tree?.root }
   getWindow(): Window | undefined { return this._tree?.root }
   isInsideTree(): boolean { return Boolean(this._tree) }
   setTree(tree: SceneTree | undefined): this {
