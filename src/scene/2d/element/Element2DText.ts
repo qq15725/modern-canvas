@@ -80,13 +80,14 @@ export class Element2DText extends CoreObject {
   update(): void {
     this.base.fonts = this.base.fonts ?? this.parent.tree?.fonts
     this.base.update()
-    this._texture.width = Math.ceil(this.base.boundingBox.width)
-    this._texture.height = Math.ceil(this.base.boundingBox.height)
+    const texture = this._texture
+    texture.width = Math.ceil(this.base.boundingBox.width)
+    texture.height = Math.ceil(this.base.boundingBox.height)
     this.base.render({
-      view: this._texture.source,
-      pixelRatio: this._texture.pixelRatio,
+      view: texture.source,
+      pixelRatio: texture.pixelRatio,
     })
-    this._texture.requestUpdate('source')
+    texture.requestUpdate('source')
     this.parent.requestDraw()
   }
 
@@ -150,6 +151,10 @@ export class Element2DText extends CoreObject {
     this.content = normalizeTextContent(content)
   }
 
+  getStringContent(): string {
+    return this.base.toString()
+  }
+
   measure(): MeasureResult {
     this.update()
     return this.base.measure()
@@ -158,7 +163,7 @@ export class Element2DText extends CoreObject {
   isValid(): boolean {
     return Boolean(
       this.enabled
-      && !/^\s*$/.test(this.base.toString()),
+      && !/^\s*$/.test(this.getStringContent()),
     )
   }
 
