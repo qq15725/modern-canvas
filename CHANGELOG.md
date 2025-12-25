@@ -1,3 +1,12 @@
+## [0.14.21](https://github.com/qq15725/modern-canvas/compare/v0.14.20...v0.14.21) (2025-12-25)
+
+
+### Features
+
+* performance ([9181c2a](https://github.com/qq15725/modern-canvas/commit/9181c2ab2c203b45ae991faaae1fbf1bf9997083))
+
+
+
 ## [0.14.20](https://github.com/qq15725/modern-canvas/compare/v0.14.19...v0.14.20) (2025-12-25)
 
 
