@@ -1,3 +1,14 @@
+## [0.14.20](https://github.com/qq15725/modern-canvas/compare/v0.14.19...v0.14.20) (2025-12-25)
+
+
+### Features
+
+* add el.text.getStringContent() method ([2fb9e93](https://github.com/qq15725/modern-canvas/commit/2fb9e93002c6cf023c948422110aaacc3a8ee2a6))
+* add processable / renderable to replace canProcess / canRender ([5bdf2c6](https://github.com/qq15725/modern-canvas/commit/5bdf2c6649c71975cb1cb61c53d517d153901c57))
+* up deps ([67cebca](https://github.com/qq15725/modern-canvas/commit/67cebca6e800ec8a6d3a82020c7a5628cf0c3299))
+
+
+
 ## [0.14.19](https://github.com/qq15725/modern-canvas/compare/v0.14.18...v0.14.19) (2025-12-17)
 
 
