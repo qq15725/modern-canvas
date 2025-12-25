@@ -85,8 +85,9 @@ export class CanvasItem extends TimelineNode {
     return this.globalOpacity > 0 && this.globalVisible
   }
 
-  override canRender(): boolean {
-    return super.canRender() && this.isVisibleInTree()
+  override updateRenderable(): void {
+    super.updateRenderable()
+    this._renderable = this._renderable && this.isVisibleInTree()
   }
 
   requestDraw(): void {

@@ -100,6 +100,12 @@ export class Node extends CoreObject {
 
   @property({ internal: true, default: true }) declare needsRender: boolean
 
+  protected _processable = false
+  get processable(): boolean { return this._processable }
+
+  protected _renderable = false
+  get renderable(): boolean { return this._renderable }
+
   protected _readyed = false
 
   constructor(properties?: Partial<NodeProperties>, nodes: Node[] = []) {
@@ -126,6 +132,9 @@ export class Node extends CoreObject {
       .on('unparented', this._onUnparented)
       .on('ready', this._onReady)
       .on('process', this._onProcess)
+
+    this.updateProcessable()
+    this.updateRenderable()
   }
 
   override setProperties(properties?: Record<string, any>): this {
@@ -231,44 +240,12 @@ export class Node extends CoreObject {
     return children ? children[children.length - 1] : undefined
   }
 
-  canProcess(): boolean {
-    if (!this._tree)
-      return false
-    switch (this.processMode) {
-      case 'inherit':
-        return this._parent?.canProcess() ?? true
-      case 'pausable':
-        return !this._tree.processPaused
-      case 'when-paused':
-        return this._tree.processPaused
-      case 'always':
-        return true
-      case 'disabled':
-      default:
-        return false
-    }
-  }
-
   canInput(): boolean {
     if (!this._tree)
       return false
     switch (this.inputMode) {
       case 'inherit':
         return this._parent?.canInput() ?? true
-      case 'always':
-        return true
-      case 'disabled':
-      default:
-        return false
-    }
-  }
-
-  canRender(): boolean {
-    if (!this._tree)
-      return false
-    switch (this.renderMode) {
-      case 'inherit':
-        return this._parent?.canRender() ?? true
       case 'always':
         return true
       case 'disabled':
@@ -302,8 +279,8 @@ export class Node extends CoreObject {
 
   protected _onProcess(delta = 0): void {
     const tree = this._tree
-    const canRender = this.canRender()
-    const canProcess = this.canProcess()
+    const renderable = this.renderable
+    const processable = this.processable
 
     const childrenInBefore: Node[] = []
     const childrenInAfter: Node[] = []
@@ -322,14 +299,14 @@ export class Node extends CoreObject {
       child.emit('process', delta)
     })
 
-    if (canProcess) {
+    if (processable) {
       tree?.emit('nodeProcessing', this)
       this.emit('processing', delta)
       this._process(delta)
     }
 
     let oldRenderCall
-    if (canRender) {
+    if (renderable) {
       const renderCall = tree!.renderStack.push(this)
       oldRenderCall = tree!.renderStack.currentCall
       tree!.renderStack.currentCall = renderCall
@@ -339,11 +316,11 @@ export class Node extends CoreObject {
       child.emit('process', delta)
     })
 
-    if (canRender) {
+    if (renderable) {
       tree!.renderStack.currentCall = oldRenderCall
     }
 
-    if (canProcess) {
+    if (processable) {
       this.emit('processed', delta)
       tree?.emit('nodeProcessed', this)
     }
@@ -353,10 +330,64 @@ export class Node extends CoreObject {
     this.needsRender = true
   }
 
+  updateProcessable(): void {
+    switch (this.processMode) {
+      case 'inherit':
+        this._processable = this._parent?.processable ?? true
+        break
+      case 'pausable':
+        this._processable = this._tree ? !this._tree.processPaused : false
+        break
+      case 'when-paused':
+        this._processable = this._tree ? this._tree.processPaused : false
+        break
+      case 'always':
+        this._processable = true
+        break
+      case 'disabled':
+      default:
+        this._processable = false
+        break
+    }
+
+    this.children.forEach((child) => {
+      if (child.processMode === 'inherit') {
+        child.updateProcessable()
+      }
+    })
+  }
+
+  updateRenderable(): void {
+    switch (this.renderMode) {
+      case 'inherit':
+        this._renderable = this._parent?.renderable ?? true
+        break
+      case 'always':
+        this._renderable = true
+        break
+      case 'disabled':
+      default:
+        this._renderable = false
+        break
+    }
+
+    this.children.forEach((child) => {
+      if (child.renderMode === 'inherit') {
+        child.updateRenderable()
+      }
+    })
+  }
+
   protected override _updateProperty(key: string, newValue: any, oldValue: any): void {
     super._updateProperty(key, newValue, oldValue)
 
     switch (key) {
+      case 'processMode':
+        this.updateProcessable()
+        break
+      case 'renderMode':
+        this.updateRenderable()
+        break
       case 'needsRender':
         if (newValue) {
           this._parent?.requestRender()
@@ -631,10 +662,19 @@ export class Node extends CoreObject {
   protected _treeEnter(tree: SceneTree): void {}
   // eslint-disable-next-line unused-imports/no-unused-vars
   protected _treeExit(oldTree: SceneTree): void {}
+
   // eslint-disable-next-line unused-imports/no-unused-vars
-  protected _parented(parent: Node): void {}
+  protected _parented(parent: Node): void {
+    this.updateProcessable()
+    this.updateRenderable()
+  }
+
   // eslint-disable-next-line unused-imports/no-unused-vars
-  protected _unparented(oldParent: Node): void {}
+  protected _unparented(oldParent: Node): void {
+    this.updateProcessable()
+    this.updateRenderable()
+  }
+
   // eslint-disable-next-line unused-imports/no-unused-vars
   protected _process(delta: number): void {}
   // eslint-disable-next-line unused-imports/no-unused-vars

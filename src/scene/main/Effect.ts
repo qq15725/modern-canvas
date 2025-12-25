@@ -112,7 +112,7 @@ export class Effect extends TimelineNode implements Rectangulable {
   }
 
   protected _onProcessing(): void {
-    if (!this.canProcess())
+    if (!this.processable)
       return
     this._updateCurrentTime()
     switch (this._effectMode) {
@@ -128,7 +128,7 @@ export class Effect extends TimelineNode implements Rectangulable {
   }
 
   protected _onNodeProcessed(node: Node): void {
-    if (!this.canProcess())
+    if (!this.processable)
       return
     if (!this.isInsideTimeRange())
       return
@@ -248,7 +248,7 @@ export class Effect extends TimelineNode implements Rectangulable {
   }
 
   override _onProcess(delta = 0): void {
-    if (!this.canProcess())
+    if (!this.processable)
       return
     this._renderId = 0
     switch (this._effectMode) {

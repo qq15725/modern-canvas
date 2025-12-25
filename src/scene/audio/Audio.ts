@@ -195,7 +195,7 @@ export class Audio extends TimelineNode {
   protected _process(delta: number): void {
     super._process(delta)
 
-    if (this.canProcess()) {
+    if (this.processable) {
       const currentTime = this._tree?.timeline.currentTime ?? 0
       if (currentTime - this._prevTime > 0) {
         if (!this._timer) {

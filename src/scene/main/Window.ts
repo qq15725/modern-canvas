@@ -2,7 +2,10 @@ import type { GlRenderer } from '../../core'
 import { customNode } from '../../core'
 import { Viewport } from './Viewport'
 
-@customNode('Window')
+@customNode('Window', {
+  processMode: 'always',
+  renderMode: 'always',
+})
 export class Window extends Viewport {
   constructor() {
     super()

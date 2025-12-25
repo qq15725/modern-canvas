@@ -146,7 +146,7 @@ export class Animation extends TimelineNode {
   }
 
   protected _process(): void {
-    if (this.canProcess()) {
+    if (this.processable) {
       this.commitStyles()
     }
   }
