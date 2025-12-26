@@ -110,6 +110,7 @@ export class CanvasItem extends TimelineNode {
     this._globalVisible = (this._parentGlobalVisible ?? true)
       && this.visible
       && this.insideTimeRange
+    this.updateRenderable()
   }
 
   protected _updateGlobalOpacity(): void {
@@ -119,6 +120,7 @@ export class CanvasItem extends TimelineNode {
     if (this._globalOpacity !== globalOpacity) {
       this._globalOpacity = globalOpacity
       this.requestPaint()
+      this.updateRenderable()
     }
   }
 
