@@ -1,3 +1,12 @@
+## [0.14.23](https://github.com/qq15725/modern-canvas/compare/v0.14.22...v0.14.23) (2025-12-28)
+
+
+### Bug Fixes
+
+* texture width height ([0527162](https://github.com/qq15725/modern-canvas/commit/0527162b0b8641034aea411750d22815ae76c882))
+
+
+
 ## [0.14.22](https://github.com/qq15725/modern-canvas/compare/v0.14.21...v0.14.22) (2025-12-26)
 
 
