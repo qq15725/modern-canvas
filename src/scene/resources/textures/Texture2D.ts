@@ -105,11 +105,11 @@ export class Texture2D<T extends TextureSource = TextureSource> extends Resource
 
   updateSize(): void {
     if (!this.width) {
-      this.width = this.sourceWidth / this.pixelRatio
+      this.width = Math.floor(this.sourceWidth / this.pixelRatio)
     }
 
     if (!this.height) {
-      this.height = this.sourceHeight / this.pixelRatio
+      this.height = Math.floor(this.sourceHeight / this.pixelRatio)
     }
   }
 

@@ -38,10 +38,10 @@ export class Lottie2D extends TextureRect2D {
     super._updateStyleProperty(key, value, oldValue)
     switch (key) {
       case 'width':
-        this.texture.width = this.style.width
+        this.texture.width = Math.floor(this.style.width)
         break
       case 'height':
-        this.texture.height = this.style.height
+        this.texture.height = Math.floor(this.style.height)
         break
     }
   }

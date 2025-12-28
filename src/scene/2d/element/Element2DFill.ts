@@ -71,8 +71,8 @@ export class Element2DFill extends CoreObject {
     if (this.linearGradient || this.radialGradient) {
       this.texture = new GradientTexture(
         (this.linearGradient ?? this.radialGradient)!,
-        this.parent.size.width,
-        this.parent.size.height,
+        Math.floor(this.parent.size.width),
+        Math.floor(this.parent.size.height),
       )
     }
     else if (!isNone(this.image)) {
