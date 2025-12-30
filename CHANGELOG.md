@@ -1,3 +1,12 @@
+## [0.14.26](https://github.com/qq15725/modern-canvas/compare/v0.14.25...v0.14.26) (2025-12-30)
+
+
+### Features
+
+* rename innerText to textContent ([9d56098](https://github.com/qq15725/modern-canvas/commit/9d56098aee2f88f9ba4a5d48ee12ef9d04188dab))
+
+
+
 ## [0.14.25](https://github.com/qq15725/modern-canvas/compare/v0.14.24...v0.14.25) (2025-12-30)
 
 
