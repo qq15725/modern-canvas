@@ -50,7 +50,7 @@ void main(void) {
     },
   })
 
-  @property({ internal: true }) declare texture?: Texture2D<ImageBitmap>
+  texture?: Texture2D<ImageBitmap>
   @property({ fallback: '' }) declare image: string
 
   constructor(properties?: Partial<MaskEffectProperties>, children: Node[] = []) {
@@ -62,10 +62,12 @@ void main(void) {
   }
 
   async load(): Promise<void> {
-    this.texture = undefined
     if (this.image) {
       this.texture = await assets.texture.load(this.image)
       this.requestRender()
+    }
+    else {
+      this.texture = undefined
     }
   }
 
@@ -75,9 +77,6 @@ void main(void) {
     switch (key) {
       case 'image':
         this.load()
-        break
-      case 'texture':
-        oldValue?.free?.()
         break
     }
   }

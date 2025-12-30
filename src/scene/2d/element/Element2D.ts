@@ -322,6 +322,7 @@ export class Element2D extends Node2D implements Rectangulable {
     else {
       this._colorFilterEffect?.remove()
       this._colorFilterEffect = undefined
+      this.requestRender()
     }
   }
 
@@ -339,6 +340,7 @@ export class Element2D extends Node2D implements Rectangulable {
     else {
       this._maskEffect?.remove()
       this._maskEffect = undefined
+      this.requestRender()
     }
   }
 

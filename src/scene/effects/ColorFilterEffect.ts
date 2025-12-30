@@ -57,6 +57,7 @@ void main(void) {
     switch (key) {
       case 'filter':
         this.renderMode = this.filter ? 'inherit' : 'disabled'
+        this.requestRender()
         break
     }
   }

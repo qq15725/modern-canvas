@@ -166,8 +166,8 @@ export class Effect extends TimelineNode implements Rectangulable {
     const minMax = {
       minX: Number.MAX_SAFE_INTEGER,
       minY: Number.MAX_SAFE_INTEGER,
-      maxX: 0,
-      maxY: 0,
+      maxX: Number.MIN_SAFE_INTEGER,
+      maxY: Number.MIN_SAFE_INTEGER,
     }
     calls.forEach((call, index) => {
       const renderable = call.renderable
@@ -197,18 +197,20 @@ export class Effect extends TimelineNode implements Rectangulable {
     if (start === undefined || end === undefined)
       return
 
+    if (
+      minMax.minX === Number.MAX_SAFE_INTEGER
+      || minMax.minY === Number.MAX_SAFE_INTEGER
+      || minMax.maxX === Number.MIN_SAFE_INTEGER
+      || minMax.maxY === Number.MIN_SAFE_INTEGER
+    ) {
+      return
+    }
+
     const rect = {
       x: minMax.minX,
       y: minMax.minY,
       width: minMax.maxX - minMax.minX,
       height: minMax.maxY - minMax.minY,
-    }
-
-    if (
-      rect.width === Number.MAX_SAFE_INTEGER
-      || rect.height === Number.MAX_SAFE_INTEGER
-    ) {
-      return
     }
 
     if (
