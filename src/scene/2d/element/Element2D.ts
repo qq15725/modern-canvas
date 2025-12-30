@@ -86,35 +86,35 @@ export class Element2D extends Node2D implements Rectangulable {
   })
 
   get style(): Element2DStyle { return this._style }
-  set style(value: Element2DProperties['style']) { this._style.resetProperties().setProperties(value) }
+  set style(value: Element2DProperties['style'] | undefined) { this._style.resetProperties().setProperties(value) }
 
   protected _background = new Element2DBackground(this)
   get background(): Element2DBackground { return this._background }
-  set background(value: Element2DProperties['background']) { this._background.resetProperties().setProperties(value) }
+  set background(value: Element2DProperties['background'] | undefined) { this._background.resetProperties().setProperties(value) }
 
   protected _shape = new Element2DShape(this)
   get shape(): Element2DShape { return this._shape }
-  set shape(value: Element2DProperties['shape']) { this._shape.resetProperties().setProperties(value) }
+  set shape(value: Element2DProperties['shape'] | undefined) { this._shape.resetProperties().setProperties(value) }
 
   protected _fill = new Element2DFill(this)
   get fill(): Element2DFill { return this._fill }
-  set fill(value: Element2DProperties['fill']) { this._fill.resetProperties().setProperties(value) }
+  set fill(value: Element2DProperties['fill'] | undefined) { this._fill.resetProperties().setProperties(value) }
 
   protected _outline = new Element2DOutline(this)
   get outline(): Element2DOutline { return this._outline }
-  set outline(value: Element2DProperties['outline']) { this._outline.resetProperties().setProperties(value) }
+  set outline(value: Element2DProperties['outline'] | undefined) { this._outline.resetProperties().setProperties(value) }
 
   protected _foreground = new Element2DForeground(this)
   get foreground(): Element2DForeground { return this._foreground }
-  set foreground(value: Element2DProperties['foreground']) { this._foreground.resetProperties().setProperties(value) }
+  set foreground(value: Element2DProperties['foreground'] | undefined) { this._foreground.resetProperties().setProperties(value) }
 
   protected _text = new Element2DText(this)
   get text(): Element2DText { return this._text }
-  set text(value: Element2DProperties['text']) { this._text.resetProperties().setProperties(value) }
+  set text(value: Element2DProperties['text'] | undefined) { this._text.resetProperties().setProperties(value) }
 
   protected _shadow = new Element2DShadow(this)
   get shadow(): Element2DShadow { return this._shadow }
-  set shadow(value: Element2DProperties['shadow']) { this._shadow.resetProperties().setProperties(value) }
+  set shadow(value: Element2DProperties['shadow'] | undefined) { this._shadow.resetProperties().setProperties(value) }
 
   protected _colorFilterEffect?: ColorFilterEffect
   protected _maskEffect?: MaskEffect
