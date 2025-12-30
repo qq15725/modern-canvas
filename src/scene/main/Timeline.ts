@@ -64,22 +64,9 @@ export class Timeline extends Node {
     return this
   }
 
-  protected _updateProperty(key: string, value: any, oldValue: any): void {
-    super._updateProperty(key, value, oldValue)
-
-    switch (key) {
-      case 'startTime':
-        this.startTime = Math.min(value, this.endTime)
-        break
-      case 'endTime':
-        this.endTime = value || Number.MAX_SAFE_INTEGER
-        break
-    }
-  }
-
   addTime(delta: number): this {
-    const start = this.startTime
     const end = this.endTime
+    const start = Math.min(this.startTime, this.endTime)
     let current = this.currentTime
     current = current + delta
     if (this.loop && current > end) {
