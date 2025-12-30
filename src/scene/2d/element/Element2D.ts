@@ -329,7 +329,7 @@ export class Element2D extends Node2D implements Rectangulable {
     if (!isNone(value)) {
       if (!this._maskEffect) {
         this._maskEffect = new MaskEffect({
-          name: 'styleFilter',
+          name: 'styleMaskImage',
           internalMode: 'back',
         })
         this.append(this._maskEffect)
