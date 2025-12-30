@@ -28,6 +28,10 @@ export class Element2DText extends CoreObject {
 
   readonly base: Text
 
+  get innerText(): string { return this._innerText }
+  set innerText(val) { this.setContent(val) }
+
+  protected _innerText = ''
   protected _autoDrawMode?: TextDrawMode
   protected _autoDrawThreshold = 100
   protected _texture = new CanvasTexture({
@@ -73,6 +77,12 @@ export class Element2DText extends CoreObject {
       case 'content':
         this.update()
         this._updateTextureMap()
+        break
+    }
+
+    switch (key) {
+      case 'content':
+        this._innerText = this.getStringContent()
         break
     }
   }
