@@ -116,7 +116,8 @@ export class Element2D extends Node2D implements Rectangulable {
   get shadow(): Element2DShadow { return this._shadow }
   set shadow(value: Element2DProperties['shadow']) { this._shadow.resetProperties().setProperties(value) }
 
-  protected _styleFilter?: ColorFilterEffect
+  protected _colorFilterEffect?: ColorFilterEffect
+  protected _maskEffect?: MaskEffect
 
   constructor(properties?: Partial<Element2DProperties>, nodes: Node[] = []) {
     super()
@@ -217,17 +218,10 @@ export class Element2D extends Node2D implements Rectangulable {
         this.visible = value === 'visible'
         break
       case 'filter':
-        if (value) {
-          this._getStyleFilter().filter = value
-        }
-        else {
-          this._styleFilter?.remove()
-          this._styleFilter = undefined
-        }
-        this.requestPaint()
+        this._updateStyleFilter(value)
         break
       case 'maskImage':
-        this._updateMaskImage(value)
+        this._updateStyleMaskImage(value)
         break
       case 'backgroundColor':
         this.background.color = value
@@ -314,30 +308,37 @@ export class Element2D extends Node2D implements Rectangulable {
     super._process(delta)
   }
 
-  protected _getStyleFilter(): ColorFilterEffect {
-    if (!this._styleFilter) {
-      this._styleFilter = new ColorFilterEffect({ internalMode: 'front' })
-      this.append(this._styleFilter)
-    }
-    return this._styleFilter
-  }
-
-  protected _updateMaskImage(maskImage?: string): void {
-    const nodePath = '__$style.maskImage'
-    if (maskImage && maskImage !== 'none') {
-      const node = this.getNode<MaskEffect>(nodePath)
-      if (node) {
-        node.image = maskImage
+  protected _updateStyleFilter(value?: string): void {
+    if (!isNone(value)) {
+      if (!this._colorFilterEffect) {
+        this._colorFilterEffect = new ColorFilterEffect({
+          name: 'styleFilter',
+          internalMode: 'front',
+        })
+        this.append(this._colorFilterEffect)
       }
-      else {
-        this.appendChild(new MaskEffect({ name: nodePath, image: maskImage }), 'back')
-      }
+      this._colorFilterEffect.filter = value
     }
     else {
-      const node = this.getNode(nodePath)
-      if (node) {
-        this.removeChild(node)
+      this._colorFilterEffect?.remove()
+      this._colorFilterEffect = undefined
+    }
+  }
+
+  protected _updateStyleMaskImage(value?: string): void {
+    if (!isNone(value)) {
+      if (!this._maskEffect) {
+        this._maskEffect = new MaskEffect({
+          name: 'styleFilter',
+          internalMode: 'back',
+        })
+        this.append(this._maskEffect)
       }
+      this._maskEffect.image = value
+    }
+    else {
+      this._maskEffect?.remove()
+      this._maskEffect = undefined
     }
   }
 
