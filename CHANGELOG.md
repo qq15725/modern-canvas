@@ -1,3 +1,21 @@
+## [0.14.24](https://github.com/qq15725/modern-canvas/compare/v0.14.23...v0.14.24) (2025-12-30)
+
+
+### Bug Fixes
+
+* style.filter / style.maskImage ([edd02e5](https://github.com/qq15725/modern-canvas/commit/edd02e553cf529420c12a019f88b072026dcd261))
+* style.maskImage ([626a655](https://github.com/qq15725/modern-canvas/commit/626a6551306326c122c5c1218c88cc54ee6cefff))
+* timeline endTime ([0940fcf](https://github.com/qq15725/modern-canvas/commit/0940fcf29713e57e933e435b8c2398a7fe888a4b))
+
+
+### Features
+
+* Element2D prop setter ([eb9f5b2](https://github.com/qq15725/modern-canvas/commit/eb9f5b29da8c6e90656de6a8f8a962603b96b828))
+* Element2DText add innerText computed prop ([a83eb62](https://github.com/qq15725/modern-canvas/commit/a83eb62eb786b54aba3e7efec40faa2d78404d71))
+* up deps ([489a3d1](https://github.com/qq15725/modern-canvas/commit/489a3d13cef987005e8dc26d670c621ebd8b8422))
+
+
+
 ## [0.14.23](https://github.com/qq15725/modern-canvas/compare/v0.14.22...v0.14.23) (2025-12-28)
 
 
