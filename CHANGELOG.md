@@ -1,3 +1,12 @@
+## [0.14.25](https://github.com/qq15725/modern-canvas/compare/v0.14.24...v0.14.25) (2025-12-30)
+
+
+### Bug Fixes
+
+* style.filter / style.maskImage ([141ec36](https://github.com/qq15725/modern-canvas/commit/141ec362ad6260e3f6c2fb6a2139ad27ed9a1d89))
+
+
+
 ## [0.14.24](https://github.com/qq15725/modern-canvas/compare/v0.14.23...v0.14.24) (2025-12-30)
 
 
