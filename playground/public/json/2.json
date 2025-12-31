@@ -1,0 +1,1079 @@
+{
+  "name": "blipFill.srcRect.pptx",
+  "id": "4RXRxEnduu",
+  "is": "Node",
+  "children": [
+    {
+      "name": "Slide 1",
+      "id": "zBPau1z4_v",
+      "children": [
+        {
+          "name": "图片 5",
+          "id": "TCSc5CUEo3",
+          "meta": {
+            "id": "6",
+            "desc": "example",
+            "inCanvasIs": "Element2D",
+            "inPptIs": "Picture"
+          },
+          "style": {
+            "left": 0,
+            "top": 0,
+            "width": 210.6,
+            "height": 210.6,
+            "rotate": 0,
+            "scaleX": 1,
+            "scaleY": 1
+          },
+          "text": {
+            "content": []
+          },
+          "foreground": {
+            "image": "https://poster.cdn.bcebos.com/users/10000/20251231/9df9e33fee4671ed6abbf12b55bc0c3e.jpeg",
+            "cropRect": {
+              "right": -0.49974,
+              "left": 0.49974
+            },
+            "fillWithShape": true
+          }
+        },
+        {
+          "name": "图片 2",
+          "id": "w4TUaF4g7e",
+          "meta": {
+            "id": "3",
+            "desc": "example",
+            "inCanvasIs": "Element2D",
+            "inPptIs": "Picture"
+          },
+          "style": {
+            "left": 220.60000000000002,
+            "top": 0,
+            "width": 210.6,
+            "height": 210.6,
+            "rotate": 0,
+            "scaleX": 1,
+            "scaleY": 1
+          },
+          "text": {
+            "content": []
+          },
+          "foreground": {
+            "image": "https://poster.cdn.bcebos.com/users/10000/20251231/6e3f66cc4552f52a2700961abb5c1acd.jpeg",
+            "cropRect": {
+              "right": -0.00618,
+              "left": 0.51476
+            },
+            "fillWithShape": true
+          }
+        },
+        {
+          "name": "图片 3",
+          "id": "LxgT6LdVA5",
+          "meta": {
+            "id": "4",
+            "desc": "example",
+            "inCanvasIs": "Element2D",
+            "inPptIs": "Picture"
+          },
+          "style": {
+            "left": 431.2,
+            "top": 0,
+            "width": 210.6,
+            "height": 210.6,
+            "rotate": 0,
+            "scaleX": 1,
+            "scaleY": 1
+          },
+          "text": {
+            "content": []
+          },
+          "foreground": {
+            "image": "https://poster.cdn.bcebos.com/users/10000/20251231/41b157874bfe8fa2b08677824b096ba7.jpeg",
+            "cropRect": {
+              "top": -0.80231,
+              "right": -0.0214,
+              "left": -0.67972
+            },
+            "fillWithShape": true
+          }
+        },
+        {
+          "name": "图片 6",
+          "id": "b-0HEi3dH9",
+          "meta": {
+            "id": "7",
+            "desc": "example",
+            "inCanvasIs": "Element2D",
+            "inPptIs": "Picture"
+          },
+          "style": {
+            "left": 655.55,
+            "top": 0,
+            "width": 210.6,
+            "height": 210.6,
+            "rotate": 0,
+            "scaleX": 1,
+            "scaleY": 1
+          },
+          "text": {
+            "content": []
+          },
+          "foreground": {
+            "image": "https://poster.cdn.bcebos.com/users/10000/20251231/db3b4b7c4b17337419b675b18d477cbc.jpeg",
+            "cropRect": {
+              "top": 0.11296,
+              "right": 0.19925,
+              "bottom": 0.38934,
+              "left": 0.08161
+            },
+            "fillWithShape": true
+          }
+        },
+        {
+          "name": "图片 7",
+          "id": "59oN87Zls3",
+          "meta": {
+            "id": "8",
+            "desc": "example",
+            "inCanvasIs": "Element2D",
+            "inPptIs": "Picture"
+          },
+          "style": {
+            "left": -4,
+            "top": 210.6,
+            "width": 210.6,
+            "height": 210.6,
+            "rotate": 0,
+            "scaleX": 1,
+            "scaleY": 1
+          },
+          "text": {
+            "content": []
+          },
+          "foreground": {
+            "image": "https://poster.cdn.bcebos.com/users/10000/20251231/31ae6dbf8be3cebc4b1cdd3c674eb927.jpeg",
+            "cropRect": {
+              "top": 0.34924,
+              "right": 0.01045,
+              "bottom": -0.34924,
+              "left": -0.01045
+            },
+            "fillWithShape": true
+          }
+        },
+        {
+          "name": "图片 8",
+          "id": "6H16pLfGSL",
+          "meta": {
+            "id": "9",
+            "desc": "example",
+            "inCanvasIs": "Element2D",
+            "inPptIs": "Picture"
+          },
+          "style": {
+            "left": 655.55,
+            "top": 210.6,
+            "width": 210.6,
+            "height": 210.6,
+            "rotate": 0,
+            "scaleX": 1,
+            "scaleY": 1
+          },
+          "text": {
+            "content": []
+          },
+          "foreground": {
+            "image": "https://poster.cdn.bcebos.com/users/10000/20251231/65429e6805e1eb2d2effd58b4c0bec50.jpeg",
+            "cropRect": {
+              "top": 0.15586,
+              "right": 0.12054,
+              "bottom": 0.20489,
+              "left": 0.16032
+            },
+            "fillWithShape": true
+          }
+        }
+      ],
+      "meta": {
+        "inCanvasIs": "Element2D",
+        "inPptIs": "Slide",
+        "pptPath": "ppt/slides/slide1.xml",
+        "pptLayoutPath": "ppt/slideLayouts/slideLayout1.xml",
+        "pptMasterPath": "ppt/slideMasters/slideMaster1.xml",
+        "pptThemePath": "ppt/theme/theme1.xml",
+        "inEditorIs": "Frame"
+      },
+      "style": {
+        "width": 960,
+        "height": 540,
+        "top": 0,
+        "left": 0,
+        "overflow": "hidden"
+      },
+      "background": {
+        "color": "#ffffffff",
+        "fillWithShape": true
+      },
+      "text": {
+        "content": []
+      }
+    }
+  ],
+  "meta": {
+    "title": "PowerPoint 演示文稿",
+    "modified": "2025-05-23T10:03:18Z",
+    "themes": [
+      {
+        "colorScheme": {
+          "dk1": "#000000ff",
+          "lt1": "#ffffffff",
+          "dk2": "#0f1423ff",
+          "lt2": "#ffffffff",
+          "accent1": "#4874cbff",
+          "accent2": "#ee822fff",
+          "accent3": "#f2ba02ff",
+          "accent4": "#75bd42ff",
+          "accent5": "#30c0b4ff",
+          "accent6": "#e54c5eff",
+          "hlink": "#0026e5ff",
+          "folHlink": "#7e1fadff"
+        },
+        "fontScheme": {
+          "major": {
+            "eastasian": "宋体",
+            "latin": "Calibri"
+          },
+          "minor": {
+            "eastasian": "宋体",
+            "latin": "Calibri"
+          }
+        },
+        "fillStyleList": [
+          {
+            "color": "phClr"
+          },
+          {
+            "linearGradient": {
+              "angle": 45,
+              "stops": [
+                {
+                  "color": "phClr",
+                  "offset": 0
+                },
+                {
+                  "color": "phClr",
+                  "offset": 1
+                }
+              ]
+            }
+          },
+          {
+            "linearGradient": {
+              "angle": 45,
+              "stops": [
+                {
+                  "color": "phClr",
+                  "offset": 0
+                },
+                {
+                  "color": "phClr",
+                  "offset": 1
+                }
+              ]
+            }
+          }
+        ],
+        "outlineStyleList": [
+          {
+            "style": "solid",
+            "width": 1,
+            "lineCap": "butt",
+            "lineJoin": "miter",
+            "color": "phClr"
+          },
+          {
+            "style": "solid",
+            "width": 1,
+            "lineCap": "butt",
+            "lineJoin": "miter",
+            "color": "phClr"
+          },
+          {
+            "style": "solid",
+            "width": 1,
+            "lineCap": "butt",
+            "lineJoin": "miter"
+          }
+        ],
+        "effectStyleList": [
+          {},
+          {},
+          {}
+        ],
+        "backgroundFillStyleList": [
+          {
+            "color": "phClr"
+          },
+          {
+            "color": "phClr"
+          },
+          {
+            "linearGradient": {
+              "angle": 90,
+              "stops": [
+                {
+                  "color": "phClr",
+                  "offset": 0
+                },
+                {
+                  "color": "phClr",
+                  "offset": 0.5
+                },
+                {
+                  "color": "phClr",
+                  "offset": 1
+                }
+              ]
+            }
+          }
+        ],
+        "meta": {
+          "pptPath": "ppt/theme/theme1.xml"
+        }
+      }
+    ],
+    "slides": [
+      {
+        "id": "zBPau1z4_v",
+        "style": {
+          "width": 960,
+          "height": 540,
+          "top": 0
+        },
+        "children": [
+          {
+            "id": "TCSc5CUEo3",
+            "name": "图片 5",
+            "meta": {
+              "id": "6",
+              "desc": "example",
+              "inCanvasIs": "Element2D",
+              "inPptIs": "Picture"
+            },
+            "style": {
+              "left": 0,
+              "top": 0,
+              "width": 210.6,
+              "height": 210.6,
+              "rotate": 0,
+              "scaleX": 1,
+              "scaleY": 1
+            },
+            "foreground": {
+              "image": "ppt/media/image1.jpeg",
+              "cropRect": {
+                "right": -0.49974,
+                "left": 0.49974
+              },
+              "fillWithShape": true
+            }
+          },
+          {
+            "id": "w4TUaF4g7e",
+            "name": "图片 2",
+            "meta": {
+              "id": "3",
+              "desc": "example",
+              "inCanvasIs": "Element2D",
+              "inPptIs": "Picture"
+            },
+            "style": {
+              "left": 220.60000000000002,
+              "top": 0,
+              "width": 210.6,
+              "height": 210.6,
+              "rotate": 0,
+              "scaleX": 1,
+              "scaleY": 1
+            },
+            "foreground": {
+              "image": "ppt/media/image1.jpeg",
+              "cropRect": {
+                "right": -0.00618,
+                "left": 0.51476
+              },
+              "fillWithShape": true
+            }
+          },
+          {
+            "id": "LxgT6LdVA5",
+            "name": "图片 3",
+            "meta": {
+              "id": "4",
+              "desc": "example",
+              "inCanvasIs": "Element2D",
+              "inPptIs": "Picture"
+            },
+            "style": {
+              "left": 431.2,
+              "top": 0,
+              "width": 210.6,
+              "height": 210.6,
+              "rotate": 0,
+              "scaleX": 1,
+              "scaleY": 1
+            },
+            "foreground": {
+              "image": "ppt/media/image1.jpeg",
+              "cropRect": {
+                "top": -0.80231,
+                "right": -0.0214,
+                "left": -0.67972
+              },
+              "fillWithShape": true
+            }
+          },
+          {
+            "id": "b-0HEi3dH9",
+            "name": "图片 6",
+            "meta": {
+              "id": "7",
+              "desc": "example",
+              "inCanvasIs": "Element2D",
+              "inPptIs": "Picture"
+            },
+            "style": {
+              "left": 655.55,
+              "top": 0,
+              "width": 210.6,
+              "height": 210.6,
+              "rotate": 0,
+              "scaleX": 1,
+              "scaleY": 1
+            },
+            "foreground": {
+              "image": "ppt/media/image1.jpeg",
+              "cropRect": {
+                "top": 0.11296,
+                "right": 0.19925,
+                "bottom": 0.38934,
+                "left": 0.08161
+              },
+              "fillWithShape": true
+            }
+          },
+          {
+            "id": "59oN87Zls3",
+            "name": "图片 7",
+            "meta": {
+              "id": "8",
+              "desc": "example",
+              "inCanvasIs": "Element2D",
+              "inPptIs": "Picture"
+            },
+            "style": {
+              "left": -4,
+              "top": 210.6,
+              "width": 210.6,
+              "height": 210.6,
+              "rotate": 0,
+              "scaleX": 1,
+              "scaleY": 1
+            },
+            "foreground": {
+              "image": "ppt/media/image1.jpeg",
+              "cropRect": {
+                "top": 0.34924,
+                "right": 0.01045,
+                "bottom": -0.34924,
+                "left": -0.01045
+              },
+              "fillWithShape": true
+            }
+          },
+          {
+            "id": "6H16pLfGSL",
+            "name": "图片 8",
+            "meta": {
+              "id": "9",
+              "desc": "example",
+              "inCanvasIs": "Element2D",
+              "inPptIs": "Picture"
+            },
+            "style": {
+              "left": 655.55,
+              "top": 210.6,
+              "width": 210.6,
+              "height": 210.6,
+              "rotate": 0,
+              "scaleX": 1,
+              "scaleY": 1
+            },
+            "foreground": {
+              "image": "ppt/media/image1.jpeg",
+              "cropRect": {
+                "top": 0.15586,
+                "right": 0.12054,
+                "bottom": 0.20489,
+                "left": 0.16032
+              },
+              "fillWithShape": true
+            }
+          }
+        ],
+        "meta": {
+          "inCanvasIs": "Element2D",
+          "inPptIs": "Slide",
+          "pptPath": "ppt/slides/slide1.xml",
+          "pptLayoutPath": "ppt/slideLayouts/slideLayout1.xml",
+          "pptMasterPath": "ppt/slideMasters/slideMaster1.xml",
+          "pptThemePath": "ppt/theme/theme1.xml"
+        }
+      }
+    ],
+    "slideLayouts": [
+      {
+        "id": "ZeExK79-RL",
+        "style": {
+          "width": 960,
+          "height": 540
+        },
+        "children": [
+          {
+            "id": "xcC430HnGl",
+            "name": "标题 1",
+            "meta": {
+              "id": "2",
+              "inCanvasIs": "Element2D",
+              "inPptIs": "Shape",
+              "placeholderType": "ctrTitle"
+            },
+            "style": {
+              "left": 120,
+              "top": 104.17023622047245,
+              "width": 720,
+              "height": 172.2048031496063,
+              "rotate": 0,
+              "scaleX": 1,
+              "scaleY": 1,
+              "textAlign": "left",
+              "verticalAlign": "bottom"
+            },
+            "text": {
+              "content": [
+                {
+                  "marginLeft": 0,
+                  "lineHeight": 1.3,
+                  "textAlign": "center",
+                  "fragments": [
+                    {
+                      "fontFamily": "Calibri",
+                      "fontSize": 60,
+                      "color": "#000000ff",
+                      "fill": {
+                        "color": "#000000ff"
+                      },
+                      "content": "单击此处添加标题"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "LmCdLTW8eL",
+            "name": "日期占位符 3",
+            "meta": {
+              "id": "4",
+              "inCanvasIs": "Element2D",
+              "inPptIs": "Shape",
+              "placeholderType": "dt",
+              "placeholderIndex": "10"
+            },
+            "style": {
+              "rotate": 0,
+              "scaleX": 1,
+              "scaleY": 1,
+              "textAlign": "left"
+            },
+            "text": {
+              "content": [
+                {
+                  "marginLeft": 0,
+                  "textAlign": "left",
+                  "fragments": [
+                    {
+                      "fontFamily": "Calibri",
+                      "fontSize": 18,
+                      "color": "#000000ff",
+                      "fill": {
+                        "color": "#000000ff"
+                      },
+                      "content": "\n"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "uVnWoheA_s",
+            "name": "页脚占位符 4",
+            "meta": {
+              "id": "5",
+              "inCanvasIs": "Element2D",
+              "inPptIs": "Shape",
+              "placeholderType": "ftr",
+              "placeholderIndex": "11"
+            },
+            "style": {
+              "rotate": 0,
+              "scaleX": 1,
+              "scaleY": 1,
+              "textAlign": "left"
+            },
+            "text": {
+              "content": [
+                {
+                  "marginLeft": 0,
+                  "textAlign": "left",
+                  "fragments": [
+                    {
+                      "fontFamily": "Calibri",
+                      "fontSize": 18,
+                      "color": "#000000ff",
+                      "fill": {
+                        "color": "#000000ff"
+                      },
+                      "content": "\n"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "zNDvpPzMxa",
+            "name": "灯片编号占位符 5",
+            "meta": {
+              "id": "6",
+              "inCanvasIs": "Element2D",
+              "inPptIs": "Shape",
+              "placeholderType": "sldNum",
+              "placeholderIndex": "12"
+            },
+            "style": {
+              "rotate": 0,
+              "scaleX": 1,
+              "scaleY": 1,
+              "textAlign": "left"
+            },
+            "text": {
+              "content": [
+                {
+                  "marginLeft": 0,
+                  "textAlign": "left",
+                  "fragments": [
+                    {
+                      "fontFamily": "Calibri",
+                      "fontSize": 18,
+                      "color": "#000000ff",
+                      "fill": {
+                        "color": "#000000ff"
+                      },
+                      "content": "\n"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "kL8TedsnD_",
+            "name": "副标题 2",
+            "meta": {
+              "id": "3",
+              "inCanvasIs": "Element2D",
+              "inPptIs": "Shape",
+              "placeholderType": "subTitle",
+              "placeholderIndex": "1"
+            },
+            "style": {
+              "left": 120,
+              "top": 283.62503937007875,
+              "width": 720,
+              "height": 130.37496062992128,
+              "rotate": 0,
+              "scaleX": 1,
+              "scaleY": 1,
+              "textAlign": "left"
+            },
+            "text": {
+              "content": [
+                {
+                  "marginLeft": 0,
+                  "textIndent": 0,
+                  "textAlign": "center",
+                  "fragments": [
+                    {
+                      "fontFamily": "宋体",
+                      "fontSize": 24,
+                      "color": "#404040ff",
+                      "fill": {
+                        "color": "#404040ff"
+                      },
+                      "content": "单击此处添加副标题"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "meta": {
+          "inCanvasIs": "Element2D",
+          "inPptIs": "SlideLayout",
+          "pptPath": "ppt/slideLayouts/slideLayout1.xml",
+          "pptMasterPath": "ppt/slideMasters/slideMaster1.xml",
+          "pptThemePath": "ppt/theme/theme1.xml"
+        }
+      }
+    ],
+    "slideMasters": [
+      {
+        "id": "KN6RSLxLJr",
+        "style": {
+          "width": 960,
+          "height": 540
+        },
+        "background": {
+          "color": "#ffffffff",
+          "fillWithShape": true
+        },
+        "children": [
+          {
+            "id": "2tPQ574UEV",
+            "name": "标题占位符 1",
+            "meta": {
+              "id": "2",
+              "inCanvasIs": "Element2D",
+              "inPptIs": "Shape",
+              "placeholderType": "title"
+            },
+            "style": {
+              "left": 66,
+              "top": 28.75,
+              "width": 828,
+              "height": 104.37503937007874,
+              "rotate": 0,
+              "scaleX": 1,
+              "scaleY": 1,
+              "paddingLeft": 7.2,
+              "paddingTop": 3.6,
+              "paddingRight": 7.2,
+              "paddingBottom": 3.6,
+              "writingMode": "horizontal-tb",
+              "textAlign": "left",
+              "verticalAlign": "middle"
+            },
+            "text": {
+              "content": [
+                {
+                  "marginLeft": 0,
+                  "lineHeight": 0.9,
+                  "textAlign": "left",
+                  "fragments": [
+                    {
+                      "fontFamily": "Calibri",
+                      "fontSize": 44,
+                      "color": "#000000ff",
+                      "fill": {
+                        "color": "#000000ff"
+                      },
+                      "content": "单击此处编辑母版标题样式"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "16dxzR0FEB",
+            "name": "文本占位符 2",
+            "meta": {
+              "id": "3",
+              "inCanvasIs": "Element2D",
+              "inPptIs": "Shape",
+              "placeholderType": "body",
+              "placeholderIndex": "1"
+            },
+            "style": {
+              "left": 66,
+              "top": 143.75,
+              "width": 828,
+              "height": 342.62503937007875,
+              "rotate": 0,
+              "scaleX": 1,
+              "scaleY": 1,
+              "paddingLeft": 7.2,
+              "paddingTop": 3.6,
+              "paddingRight": 7.2,
+              "paddingBottom": 3.6,
+              "writingMode": "horizontal-tb",
+              "textAlign": "left"
+            },
+            "text": {
+              "content": [
+                {
+                  "marginLeft": 18,
+                  "textIndent": -18,
+                  "lineHeight": 0.9,
+                  "textAlign": "left",
+                  "fragments": [
+                    {
+                      "fontFamily": "Calibri",
+                      "fontSize": 28,
+                      "color": "#000000ff",
+                      "fill": {
+                        "color": "#000000ff"
+                      },
+                      "content": "单击此处编辑母版文本样式"
+                    }
+                  ]
+                },
+                {
+                  "marginLeft": 54,
+                  "textIndent": -18,
+                  "lineHeight": 0.9,
+                  "textAlign": "left",
+                  "fragments": [
+                    {
+                      "fontFamily": "Calibri",
+                      "fontSize": 24,
+                      "color": "#000000ff",
+                      "fill": {
+                        "color": "#000000ff"
+                      },
+                      "content": "第二级"
+                    }
+                  ]
+                },
+                {
+                  "marginLeft": 90,
+                  "textIndent": -18,
+                  "lineHeight": 0.9,
+                  "textAlign": "left",
+                  "fragments": [
+                    {
+                      "fontFamily": "Calibri",
+                      "fontSize": 20,
+                      "color": "#000000ff",
+                      "fill": {
+                        "color": "#000000ff"
+                      },
+                      "content": "第三级"
+                    }
+                  ]
+                },
+                {
+                  "marginLeft": 126,
+                  "textIndent": -18,
+                  "lineHeight": 0.9,
+                  "textAlign": "left",
+                  "fragments": [
+                    {
+                      "fontFamily": "Calibri",
+                      "fontSize": 18,
+                      "color": "#000000ff",
+                      "fill": {
+                        "color": "#000000ff"
+                      },
+                      "content": "第四级"
+                    }
+                  ]
+                },
+                {
+                  "marginLeft": 162,
+                  "textIndent": -18,
+                  "lineHeight": 0.9,
+                  "textAlign": "left",
+                  "fragments": [
+                    {
+                      "fontFamily": "Calibri",
+                      "fontSize": 18,
+                      "color": "#000000ff",
+                      "fill": {
+                        "color": "#000000ff"
+                      },
+                      "content": "第五级"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "ZCoch9joyD",
+            "name": "日期占位符 3",
+            "meta": {
+              "id": "4",
+              "inCanvasIs": "Element2D",
+              "inPptIs": "Shape",
+              "placeholderType": "dt",
+              "placeholderIndex": "2"
+            },
+            "style": {
+              "left": 66,
+              "top": 500.5,
+              "width": 216,
+              "height": 28.75,
+              "rotate": 0,
+              "scaleX": 1,
+              "scaleY": 1,
+              "paddingLeft": 7.2,
+              "paddingTop": 3.6,
+              "paddingRight": 7.2,
+              "paddingBottom": 3.6,
+              "writingMode": "horizontal-tb",
+              "textAlign": "left",
+              "verticalAlign": "middle"
+            },
+            "text": {
+              "content": [
+                {
+                  "marginLeft": 0,
+                  "textAlign": "left",
+                  "fragments": [
+                    {
+                      "fontFamily": "Calibri",
+                      "fontSize": 12,
+                      "color": "#000000ff",
+                      "fill": {
+                        "color": "#000000ff"
+                      },
+                      "content": "\n"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "XyeWf2Id1m",
+            "name": "页脚占位符 4",
+            "meta": {
+              "id": "5",
+              "inCanvasIs": "Element2D",
+              "inPptIs": "Shape",
+              "placeholderType": "ftr",
+              "placeholderIndex": "3"
+            },
+            "style": {
+              "left": 318,
+              "top": 500.5,
+              "width": 324,
+              "height": 28.75,
+              "rotate": 0,
+              "scaleX": 1,
+              "scaleY": 1,
+              "paddingLeft": 7.2,
+              "paddingTop": 3.6,
+              "paddingRight": 7.2,
+              "paddingBottom": 3.6,
+              "writingMode": "horizontal-tb",
+              "textAlign": "left",
+              "verticalAlign": "middle"
+            },
+            "text": {
+              "content": [
+                {
+                  "marginLeft": 0,
+                  "textAlign": "center",
+                  "fragments": [
+                    {
+                      "fontFamily": "Calibri",
+                      "fontSize": 12,
+                      "color": "#000000ff",
+                      "fill": {
+                        "color": "#000000ff"
+                      },
+                      "content": "\n"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "NgxxHtJFX2",
+            "name": "灯片编号占位符 5",
+            "meta": {
+              "id": "6",
+              "inCanvasIs": "Element2D",
+              "inPptIs": "Shape",
+              "placeholderType": "sldNum",
+              "placeholderIndex": "4"
+            },
+            "style": {
+              "left": 678,
+              "top": 500.5,
+              "width": 216,
+              "height": 28.75,
+              "rotate": 0,
+              "scaleX": 1,
+              "scaleY": 1,
+              "paddingLeft": 7.2,
+              "paddingTop": 3.6,
+              "paddingRight": 7.2,
+              "paddingBottom": 3.6,
+              "writingMode": "horizontal-tb",
+              "textAlign": "left",
+              "verticalAlign": "middle"
+            },
+            "text": {
+              "content": [
+                {
+                  "marginLeft": 0,
+                  "textAlign": "right",
+                  "fragments": [
+                    {
+                      "fontFamily": "Calibri",
+                      "fontSize": 12,
+                      "color": "#000000ff",
+                      "fill": {
+                        "color": "#000000ff"
+                      },
+                      "content": "\n"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "meta": {
+          "inCanvasIs": "Element2D",
+          "inPptIs": "SlideMaster",
+          "pptPath": "ppt/slideMasters/slideMaster1.xml",
+          "pptThemePath": "ppt/theme/theme1.xml",
+          "colorMap": {
+            "bg1": "lt1",
+            "tx1": "dk1",
+            "bg2": "lt2",
+            "tx2": "dk2",
+            "accent1": "accent1",
+            "accent2": "accent2",
+            "accent3": "accent3",
+            "accent4": "accent4",
+            "accent5": "accent5",
+            "accent6": "accent6",
+            "hlink": "hlink",
+            "folHlink": "folHlink"
+          }
+        }
+      }
+    ],
+    "inEditorIs": "Doc"
+  }
+}
