@@ -23,7 +23,7 @@ export function getFillDrawOptions(
     } = fill.cropRect
 
     uvTransform
-      .translate(left, top)
+      .translate(-left, -top)
       .scale(
         1 / Math.abs(1 + (left + right)),
         1 / Math.abs(1 + (top + bottom)),
