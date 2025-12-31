@@ -1,3 +1,12 @@
+## [0.14.27](https://github.com/qq15725/modern-canvas/compare/v0.14.26...v0.14.27) (2025-12-31)
+
+
+### Bug Fixes
+
+* cropRect ([3dfe001](https://github.com/qq15725/modern-canvas/commit/3dfe001623125a1aecc8dee56d523a482f6b2491))
+
+
+
 ## [0.14.26](https://github.com/qq15725/modern-canvas/compare/v0.14.25...v0.14.26) (2025-12-30)
 
 
