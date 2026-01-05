@@ -1,7 +1,7 @@
 import type { ObservableEvents } from 'modern-idoc'
 import type { Resource } from '../core'
 import type { Loader } from './loaders'
-import { Observable } from 'modern-idoc'
+import { idGenerator, Observable } from 'modern-idoc'
 import { Ticker } from '../core'
 import {
   FontLoader,
@@ -162,6 +162,15 @@ export class Assets extends Observable<AssetsEvents> {
       handled = new WeakRef(value)
     }
     this._handled.set(id, handled)
+  }
+
+  async awaitBy(handler: () => Promise<void>): Promise<string> {
+    const promise = handler()
+    const id = idGenerator()
+    promise.finally(() => this._handleing.delete(id))
+    this._handleing.set(id, promise)
+    await promise
+    return id
   }
 
   async loadBy<T = Blob>(

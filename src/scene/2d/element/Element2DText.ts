@@ -1,11 +1,17 @@
 import type { Fonts } from 'modern-font'
-import type { NormalizedFill, NormalizedOutline, NormalizedText, TextContent, Text as TextProperties } from 'modern-idoc'
+import type {
+  NormalizedFill,
+  NormalizedOutline,
+  NormalizedText,
+  TextContent,
+  Text as TextProperties,
+} from 'modern-idoc'
 import type { MeasureResult } from 'modern-text'
 import type { RectangleLike } from '../../../core'
 import type { CanvasContext, TransformVertex } from '../../main'
 import type { Texture2D } from '../../resources'
 import type { Element2D } from './Element2D'
-import { isNone, normalizeText, normalizeTextContent, property } from 'modern-idoc'
+import { isNone, normalizeFill, normalizeText, normalizeTextContent, property } from 'modern-idoc'
 import { BoundingBox } from 'modern-path2d'
 import { Character, Text } from 'modern-text'
 import { assets } from '../../../asset'
@@ -70,13 +76,14 @@ export class Element2DText extends CoreObject {
       case 'effects':
       case 'measureDom':
       case 'fonts':
-        this.update()
+        this.load()
         break
       case 'fill':
       case 'outline':
       case 'content':
-        this.update()
-        this._updateTextureMap()
+        this.load().then(() => {
+          this._updateTextureMap()
+        })
         break
     }
 
@@ -85,6 +92,13 @@ export class Element2DText extends CoreObject {
         this._textContent = this.getStringContent()
         break
     }
+  }
+
+  async load(): Promise<void> {
+    await assets.awaitBy(async () => {
+      await this.base.load()
+      this.update()
+    })
   }
 
   update(): void {
@@ -133,7 +147,7 @@ export class Element2DText extends CoreObject {
   protected async _updateTexture(key: string, fill: NormalizedFill | undefined, box: BoundingBox): Promise<void> {
     if (fill && Object.keys(fill).length > 0) {
       this._textureMap.set(key, {
-        texture: await this._loadTexture(fill, box),
+        texture: await this._loadTexture(normalizeFill(fill), box),
         box,
       })
       this.parent.requestDraw()
