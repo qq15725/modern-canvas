@@ -231,6 +231,7 @@ export class Element2DText extends CoreObject {
   }
 
   protected _pathDraw(ctx: CanvasContext): void {
+    const transformVertex = this._createTransformVertex()
     this.base.pathSets.forEach((pathSet) => {
       pathSet.paths.forEach((path) => {
         const meta = path.getMeta()
@@ -264,7 +265,7 @@ export class Element2DText extends CoreObject {
                       height: this.parent.size.height,
                     },
                   ),
-                  transformVertex: this._createTransformVertex(),
+                  transformVertex,
                 })
               }
             }
@@ -272,7 +273,7 @@ export class Element2DText extends CoreObject {
               ctx.addPath(path)
               ctx.style = { ...path.style }
               ctx.fill({
-                transformVertex: this._createTransformVertex(),
+                transformVertex,
               })
             }
           }
@@ -305,7 +306,7 @@ export class Element2DText extends CoreObject {
                       height: this.parent.size.height,
                     },
                   ),
-                  transformVertex: this._createTransformVertex(),
+                  transformVertex,
                 })
               }
             }
@@ -313,7 +314,7 @@ export class Element2DText extends CoreObject {
               ctx.addPath(path)
               ctx.style = { ...path.style }
               ctx.stroke({
-                transformVertex: this._createTransformVertex(),
+                transformVertex,
               })
             }
           }
@@ -321,9 +322,18 @@ export class Element2DText extends CoreObject {
         else {
           ctx.addPath(path)
           ctx.style = { ...path.style }
-          ctx.fill({
-            transformVertex: this._createTransformVertex(),
-          })
+
+          if (path.style.fill && !isNone(path.style.fill)) {
+            ctx.fill({
+              transformVertex: this._createTransformVertex(),
+            })
+          }
+
+          if (path.style.stroke && !isNone(path.style.stroke)) {
+            ctx.stroke({
+              transformVertex: this._createTransformVertex(),
+            })
+          }
         }
       })
     })

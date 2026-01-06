@@ -62,15 +62,16 @@ export class CanvasContext extends Path2D {
       return
     }
 
-    let strokeStyle = this.strokeStyle
-    if (!strokeStyle && this.style.stroke) {
-      switch (typeof this.style.stroke) {
+    const styleStroke = this.style.stroke
+    let stroke = this.strokeStyle
+    if (!stroke && styleStroke) {
+      switch (typeof styleStroke) {
         case 'string':
-          strokeStyle = this.style.stroke
+          stroke = styleStroke
           break
         case 'object':
-          if (isColorFillObject(this.style.stroke)) {
-            strokeStyle = this.style.stroke.color
+          if (isColorFillObject(styleStroke)) {
+            stroke = styleStroke.color
           }
           break
       }
@@ -78,7 +79,7 @@ export class CanvasContext extends Path2D {
 
     this._draws.push({
       ...options,
-      ...this._parseDrawStyle(strokeStyle),
+      ...this._parseDrawStyle(stroke),
       type: 'stroke',
       path: new Path2D(this),
       transformUv: this.transformUv,
@@ -87,8 +88,8 @@ export class CanvasContext extends Path2D {
         alignment: this.strokeAlignment ?? 0.5,
         cap: this.lineCap ?? 'butt',
         join: this.lineJoin ?? 'miter',
-        width: this.lineWidth ?? 1,
-        miterLimit: this.miterLimit ?? 10,
+        width: this.lineWidth ?? this.style.strokeWidth ?? 1,
+        miterLimit: this.miterLimit ?? this.style.strokeMiterlimit ?? 10,
       },
     })
 
