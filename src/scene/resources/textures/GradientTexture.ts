@@ -23,14 +23,14 @@ export class GradientTexture extends Texture2D {
     const h = height
     const cx = w / 2
     const cy = h / 2
-    const A = (angle + 90) * Math.PI / 180
-    const dx = Math.sin(A)
-    const dy = -Math.cos(A)
-    const L = Math.abs(w * Math.sin(A)) + Math.abs(h * Math.cos(A))
-    const x0 = cx - dx * (L / 2)
-    const y0 = cy - dy * (L / 2)
-    const x1 = cx + dx * (L / 2)
-    const y1 = cy + dy * (L / 2)
+    const rad = (angle + 90) * Math.PI / 180
+    const dx = Math.sin(rad)
+    const dy = -Math.cos(rad)
+    const l = Math.abs(w * Math.sin(rad)) + Math.abs(h * Math.cos(rad))
+    const x0 = cx - dx * (l / 2)
+    const y0 = cy - dy * (l / 2)
+    const x1 = cx + dx * (l / 2)
+    const y1 = cy + dy * (l / 2)
     const g = ctx.createLinearGradient(x0, y0, x1, y1)
     for (const s of stops) g.addColorStop(s.offset, s.color)
     ctx.fillStyle = g

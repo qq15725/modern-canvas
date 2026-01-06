@@ -4,7 +4,7 @@ import type { CanvasBatchable } from './CanvasContext'
 import type { Node } from './Node'
 import type { TimelineNodeEvents, TimelineNodeProperties } from './TimelineNode'
 import { property } from 'modern-idoc'
-import { clamp, customNode, Transform2D } from '../../core'
+import { clamp, Color, customNode, Transform2D } from '../../core'
 import { ViewportTexture } from '../resources'
 import { CanvasContext } from './CanvasContext'
 import { TimelineNode } from './TimelineNode'
@@ -37,6 +37,8 @@ export class CanvasItem extends TimelineNode {
   protected _parentGlobalOpacity?: number
   protected _globalOpacity?: number
   get globalOpacity(): number { return this._globalOpacity ?? 1 }
+
+  protected _modulate = new Color(0xFFFFFFFF)
 
   // Batch render
   context = new CanvasContext()
@@ -164,9 +166,11 @@ export class CanvasItem extends TimelineNode {
 
   protected _repaint(batchables: CanvasBatchable[]): CanvasBatchable[] {
     this._tree?.log(this.name, 'painting')
+    const modulate = this._modulate.toInt8Array().map(v => v * this.globalOpacity)
     return batchables.map((batchable) => {
       return {
         ...batchable,
+        modulate,
         blendMode: this.blendMode,
       }
     })

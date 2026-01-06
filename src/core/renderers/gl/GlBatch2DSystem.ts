@@ -19,6 +19,7 @@ export interface Batchable2D {
   uvs?: Float32Array
   size?: { width: number, height: number }
   texture?: TextureLike
+  modulate?: number[]
   blendMode?: GlBlendMode
   roundPixels?: boolean
   clipOutsideUv?: boolean
@@ -56,9 +57,10 @@ export class GlBatch2DSystem extends GlSystem {
     aPosition: { format: 'float32x2' }, // 2
     aUv: { format: 'float32x2' }, // 2
     aTextureParams: { format: 'uint8x4' }, // 1
+    aModulate: { format: 'unorm8x4' }, // 1
   }
 
-  protected _vertexSize = 2 + 2 + 1
+  protected _vertexSize = 2 + 2 + 1 + 1
 
   protected _getShader(maxTextureUnits: number): Shader {
     let shader = this._shaders.get(maxTextureUnits)
@@ -78,6 +80,7 @@ export class GlBatch2DSystem extends GlSystem {
 in vec2 aPosition;
 in vec2 aUv;
 in vec4 aTextureParams;
+in vec4 aModulate;
 
 uniform vec2 size;
 uniform mat3 projectionMatrix;
@@ -86,6 +89,7 @@ uniform mat3 viewMatrix;
 out float vTextureId;
 out float vClipOutsideUv;
 out vec2 vUv;
+out vec4 vModulate;
 
 vec2 roundPixels(vec2 position, vec2 targetSize) {
   return (floor(((position * 0.5 + 0.5) * targetSize) + 0.5) / targetSize) * 2.0 - 1.0;
@@ -105,11 +109,13 @@ void main(void) {
     gl_Position.xy = roundPixels(gl_Position.xy, size);
   }
   vUv = aUv;
+  vModulate = aModulate;
 }`,
         fragment: `precision highp float;
 in float vTextureId;
 in float vClipOutsideUv;
 in vec2 vUv;
+in vec4 vModulate;
 
 uniform sampler2D samplers[${maxTextureUnits}];
 
@@ -128,6 +134,8 @@ ${Array.from({ length: maxTextureUnits }, (_, i) => {
   if (vClipOutsideUv == 1. && (uv.x < 0.0 || uv.y < 0.0 || uv.x > 1.0 || uv.y > 1.0)) {
     color.a = 0.0;
   }
+
+    color *= vModulate;
 
   finalColor = color;
 }`,
@@ -259,6 +267,7 @@ ${Array.from({ length: maxTextureUnits }, (_, i) => {
             blendMode = GlBlendMode.normal,
             clipOutsideUv,
             roundPixels,
+            modulate = [255, 255, 255, 255],
           } = batchables[i]
 
           if (start < i && drawCall.blendMode !== blendMode) {
@@ -276,7 +285,7 @@ ${Array.from({ length: maxTextureUnits }, (_, i) => {
           const roundPixelsInt = roundPixels ? 1 : 0
           const clipOutsideUvInt = clipOutsideUv ? 1 : 0
 
-          let uvX, uvY
+          let uvX, uvY, aU8Index
           for (let len = vertices.length, i = 0; i < len; i += 2) {
             uvX = uvs[i]
             uvY = uvs[i + 1]
@@ -288,11 +297,17 @@ ${Array.from({ length: maxTextureUnits }, (_, i) => {
             float32View[aIndex++] = vertices[i + 1]
             float32View[aIndex++] = uvX
             float32View[aIndex++] = uvY
-            const aU8Index = aIndex * 4
+            aU8Index = aIndex * 4
             uint8View[aU8Index] = textureLocation
             uint8View[aU8Index + 1] = clipOutsideUvInt
             uint8View[aU8Index + 2] = roundPixelsInt
             uint8View[aU8Index + 3] = 0
+            aIndex++
+            aU8Index = aIndex * 4
+            uint8View[aU8Index] = modulate[0]
+            uint8View[aU8Index + 1] = modulate[1]
+            uint8View[aU8Index + 2] = modulate[2]
+            uint8View[aU8Index + 3] = modulate[3]
             aIndex++
           }
 
