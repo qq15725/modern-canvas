@@ -7,6 +7,15 @@
 
 
 
+## [0.14.30](https://github.com/qq15725/modern-canvas/compare/v0.14.29...v0.14.30) (2026-01-06)
+
+
+### Bug Fixes
+
+* style.opacity ([e454f35](https://github.com/qq15725/modern-canvas/commit/e454f35edf14ba71f5e1981d773e853942fc43e5))
+
+
+
 ## [0.14.29](https://github.com/qq15725/modern-canvas/compare/v0.14.28...v0.14.29) (2026-01-05)
 
 
