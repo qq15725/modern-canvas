@@ -1,3 +1,7 @@
+## [0.14.31](https://github.com/qq15725/modern-canvas/compare/v0.14.30...v0.14.31) (2026-01-06)
+
+
+
 ## [0.14.30](https://github.com/qq15725/modern-canvas/compare/v0.14.29...v0.14.30) (2026-01-06)
 
 
