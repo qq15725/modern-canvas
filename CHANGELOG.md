@@ -1,3 +1,13 @@
+## [0.14.32](https://github.com/qq15725/modern-canvas/compare/v0.14.31...v0.14.32) (2026-01-07)
+
+
+### Bug Fixes
+
+* TimelineNode ([303f868](https://github.com/qq15725/modern-canvas/commit/303f8689adb3b02373f649daae9ae52d0b62e2eb))
+* Video2D ([e894fe2](https://github.com/qq15725/modern-canvas/commit/e894fe29fdc11bb543df33460890a428d589b9aa))
+
+
+
 ## [0.14.31](https://github.com/qq15725/modern-canvas/compare/v0.14.30...v0.14.31) (2026-01-06)
 
 
