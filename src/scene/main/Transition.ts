@@ -9,7 +9,6 @@ export interface TransitionProperties extends Omit<EffectProperties, 'effectMode
 
 @customNode<EffectProperties>('Transition', {
   effectMode: 'transition',
-  processMode: 'pausable',
   duration: 2000,
 })
 export class Transition extends Effect {
