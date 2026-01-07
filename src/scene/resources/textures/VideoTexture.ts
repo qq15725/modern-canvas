@@ -103,7 +103,10 @@ export class VideoTexture extends Texture2D<HTMLVideoElement> {
       source = videoElement
     }
 
-    super(source)
+    super({
+      source,
+      uploadMethodId: 'image',
+    })
 
     this.fps = resolved.fps
     this._autoPlay = resolved.autoPlay

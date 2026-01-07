@@ -38,38 +38,24 @@ export class Video2D extends TextureRect2D<VideoTexture> {
 
   protected async _load(src: string): Promise<void> {
     this.texture = await assets.video.load(src)
-    if (!this.style.width || !this.style.height) {
-      this.style.width = this.texture!.width
-      this.style.height = this.texture!.height
-    }
     this.requestDraw()
   }
 
   protected _updateVideoCurrentTime(): void {
-    let currentTime = this.currentTime
-    if (currentTime < 0)
-      return
-
     const texture = this.texture
     if (!texture)
       return
 
-    const duration = texture.duration
-
-    currentTime = duration
-      ? currentTime % (duration * 1000)
-      : 0
-
     if (!texture.isPlaying && !texture.seeking) {
-      currentTime = ~~currentTime / 1000
-      if (texture.currentTime !== currentTime) {
-        texture.currentTime = currentTime
+      const videoCurrentTime = ~~Math.max(0, this.currentTime % (texture.duration * 1000)) / 1000
+      if (texture.currentTime !== videoCurrentTime) {
+        texture.currentTime = videoCurrentTime
       }
     }
   }
 
   protected override _process(delta: number): void {
-    this._updateVideoCurrentTime()
     super._process(delta)
+    this._updateVideoCurrentTime()
   }
 }

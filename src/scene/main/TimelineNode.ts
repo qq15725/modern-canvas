@@ -48,7 +48,7 @@ export class TimelineNode extends Node {
   protected _duration = 0
   protected _globalStartTime = 0
   get parentGlobalStartTime(): number { return (this._parent as TimelineNode)?.globalStartTime ?? 0 }
-  get currentTime(): number { return clamp(this._currentTime, 0, this._duration) }
+  get currentTime(): number { return this._currentTime }
   get globalStartTime(): number { return this._globalStartTime }
   get globalEndTime(): number { return this._globalStartTime + this._duration }
   get currentTimeProgress(): number { return this._duration ? clamp(this._currentTime / this._duration, 0, 1) : 0 }
