@@ -50,7 +50,7 @@ export class Element2DText extends CoreObject {
   }>()
 
   constructor(
-    public parent: Element2D,
+    protected _parent: Element2D,
   ) {
     super()
 
@@ -71,7 +71,7 @@ export class Element2DText extends CoreObject {
 
     switch (key) {
       case 'enabled':
-        this.parent.requestDraw()
+        this._parent.requestDraw()
         break
       case 'effects':
       case 'measureDom':
@@ -102,7 +102,7 @@ export class Element2DText extends CoreObject {
   }
 
   update(): void {
-    this.base.fonts = this.base.fonts ?? this.parent.tree?.fonts
+    this.base.fonts = this.base.fonts ?? this._parent.tree?.fonts
     this.base.update()
     const texture = this._texture
     texture.width = Math.ceil(this.base.boundingBox.width)
@@ -112,7 +112,7 @@ export class Element2DText extends CoreObject {
       pixelRatio: texture.pixelRatio,
     })
     texture.requestUpdate('source')
-    this.parent.requestDraw()
+    this._parent.requestDraw()
   }
 
   protected _updateTextureMap(): void {
@@ -150,7 +150,7 @@ export class Element2DText extends CoreObject {
         texture: await this._loadTexture(normalizeFill(fill), box),
         box,
       })
-      this.parent.requestDraw()
+      this._parent.requestDraw()
     }
   }
 
@@ -163,7 +163,7 @@ export class Element2DText extends CoreObject {
       )
     }
     else if (!isNone(fill.image)) {
-      this.parent.tree?.log(`load image ${fill.image}`)
+      this._parent.tree?.log(`load image ${fill.image}`)
       return await assets.texture.load(fill.image)
     }
     else {
@@ -192,7 +192,7 @@ export class Element2DText extends CoreObject {
   }
 
   protected _createTransformVertex(): TransformVertex | undefined {
-    const parent = this.parent
+    const parent = this._parent
     if (parent.scale.x > 0 && parent.scale.y > 0) {
       return undefined
     }
@@ -261,8 +261,8 @@ export class Element2DText extends CoreObject {
                     texture?.box ?? {
                       x: 0,
                       y: 0,
-                      width: this.parent.size.width,
-                      height: this.parent.size.height,
+                      width: this._parent.size.width,
+                      height: this._parent.size.height,
                     },
                   ),
                   transformVertex,
@@ -302,8 +302,8 @@ export class Element2DText extends CoreObject {
                     texture?.box ?? {
                       x: 0,
                       y: 0,
-                      width: this.parent.size.width,
-                      height: this.parent.size.height,
+                      width: this._parent.size.width,
+                      height: this._parent.size.height,
                     },
                   ),
                   transformVertex,
@@ -360,7 +360,7 @@ export class Element2DText extends CoreObject {
   }
 
   draw(): void {
-    const ctx = this.parent.context
+    const ctx = this._parent.context
 
     if (this.useTextureDraw()) {
       this._textureDraw(ctx)
@@ -373,7 +373,7 @@ export class Element2DText extends CoreObject {
   process(_delta: number): void {
     if (this.drawMode === 'auto') {
       const { width, height } = this.base.boundingBox
-      const viewport = this.parent.getViewport()
+      const viewport = this._parent.getViewport()
       if (viewport) {
         const { a, d } = viewport.canvasTransform.toObject()
         const oldDrawMode = this._autoDrawMode
@@ -384,7 +384,7 @@ export class Element2DText extends CoreObject {
           this._autoDrawMode = 'path'
         }
         if (oldDrawMode !== this._autoDrawMode) {
-          this.parent.requestDraw()
+          this._parent.requestDraw()
         }
       }
     }

@@ -93,13 +93,13 @@ export class Flexbox {
   readonly node: YogaNode | undefined = Flexbox._yoga?.Node.create()
 
   constructor(
-    protected _el: Element2D,
+    protected _parent: Element2D,
   ) {
     this._addChild = this._addChild.bind(this)
     this._removeChild = this._removeChild.bind(this)
 
-    this._el.on('addChild', this._addChild)
-    this._el.on('removeChild', this._removeChild)
+    this._parent.on('addChild', this._addChild)
+    this._parent.on('removeChild', this._removeChild)
   }
 
   protected _addChild(child: Node, newIndex: number): void {
@@ -157,23 +157,23 @@ export class Flexbox {
         )
         break
       case 'aspectRatio':
-        // node.setIsReferenceBaseline(this._el.style.isReferenceBaseline)
+        // node.setIsReferenceBaseline(this._parent.style.isReferenceBaseline)
         node.setAspectRatio(value)
         break
       case 'borderTop':
-        node.setBorder(edgeMap.top, this._el.style.borderWidth)
+        node.setBorder(edgeMap.top, this._parent.style.borderWidth)
         break
       case 'borderBottom':
-        node.setBorder(edgeMap.bottom, this._el.style.borderWidth)
+        node.setBorder(edgeMap.bottom, this._parent.style.borderWidth)
         break
       case 'borderLeft':
-        node.setBorder(edgeMap.left, this._el.style.borderWidth)
+        node.setBorder(edgeMap.left, this._parent.style.borderWidth)
         break
       case 'borderRight':
-        node.setBorder(edgeMap.right, this._el.style.borderWidth)
+        node.setBorder(edgeMap.right, this._parent.style.borderWidth)
         break
       case 'border':
-        node.setBorder(edgeMap.all, this._el.style.borderWidth)
+        node.setBorder(edgeMap.all, this._parent.style.borderWidth)
         break
       case 'direction':
         node.setDirection(
@@ -316,7 +316,7 @@ export class Flexbox {
   }
 
   update(): void {
-    const el = this._el
+    const el = this._parent
     const node = this.node
 
     el.getParent<Element2D>()?.flexbox?.update()

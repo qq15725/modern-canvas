@@ -12,7 +12,7 @@ export class Element2DShadow extends CoreObject {
   @property({ fallback: 0 }) declare offsetX: NormalizedShadow['offsetY']
 
   constructor(
-    public parent: Element2D,
+    protected _parent: Element2D,
   ) {
     super()
   }
@@ -40,7 +40,7 @@ export class Element2DShadow extends CoreObject {
 
   updateEffect(): void {
     const name = '__$shadow'
-    let effect = this.parent.getNode<DropShadowEffect>(name)
+    let effect = this._parent.getNode<DropShadowEffect>(name)
     if (
       this.blur
       || this.offsetX
@@ -48,13 +48,13 @@ export class Element2DShadow extends CoreObject {
     ) {
       if (!effect) {
         effect = new DropShadowEffect({ name })
-        this.parent.appendChild(effect, 'back')
+        this._parent.appendChild(effect, 'back')
       }
       effect.setProperties(this.getProperties())
     }
     else {
       if (effect) {
-        this.parent.removeChild(effect)
+        this._parent.removeChild(effect)
       }
     }
   }

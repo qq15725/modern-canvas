@@ -20,7 +20,7 @@ export class Element2DShape extends CoreObject {
   protected _path2DSet: Path2DSet = new Path2DSet()
 
   constructor(
-    public parent: Element2D,
+    protected _parent: Element2D,
   ) {
     super()
     this._updatePath2DSet()
@@ -43,7 +43,7 @@ export class Element2DShape extends CoreObject {
       case 'viewBox':
       case 'enabled':
         this._updatePath2DSet()
-        this.parent.requestDraw()
+        this._parent.requestDraw()
         break
     }
   }
@@ -86,8 +86,8 @@ export class Element2DShape extends CoreObject {
 
   draw(rect = false): void {
     if (!rect && this.isValid()) {
-      const ctx = this.parent.context
-      const { width, height } = this.parent.size
+      const ctx = this._parent.context
+      const { width, height } = this._parent.size
       this._path2DSet.paths.forEach((path) => {
         ctx.addPath(path.clone().applyTransform(new Matrix3().scale(width, height)))
       })
@@ -98,9 +98,9 @@ export class Element2DShape extends CoreObject {
   }
 
   protected _drawRect(): void {
-    const ctx = this.parent.context
-    const { width, height } = this.parent.size
-    const { borderRadius } = this.parent.style
+    const ctx = this._parent.context
+    const { width, height } = this._parent.size
+    const { borderRadius } = this._parent.style
     if (width && height) {
       if (borderRadius) {
         ctx.roundRect(0, 0, width, height, borderRadius)

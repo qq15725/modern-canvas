@@ -47,7 +47,7 @@ export class Video2D extends TextureRect2D<VideoTexture> {
       return
 
     if (!texture.isPlaying && !texture.seeking) {
-      const videoCurrentTime = ~~Math.max(0, this.currentTime % (texture.duration * 1000)) / 1000
+      const videoCurrentTime = ~~Math.max(0, this.currentTime % this.videoDuration) / 1000
       if (texture.currentTime !== videoCurrentTime) {
         texture.currentTime = videoCurrentTime
       }

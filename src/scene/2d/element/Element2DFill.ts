@@ -28,7 +28,7 @@ export class Element2DFill extends CoreObject {
   animatedTexture?: AnimatedTexture
 
   constructor(
-    public parent: Element2D,
+    protected _parent: Element2D,
   ) {
     super()
   }
@@ -57,7 +57,7 @@ export class Element2DFill extends CoreObject {
       case 'tile':
       case 'opacity':
       case 'enabled':
-        this.parent.requestDraw()
+        this._parent.requestDraw()
         break
       case 'image':
       case 'linearGradient':
@@ -71,12 +71,12 @@ export class Element2DFill extends CoreObject {
     if (this.linearGradient || this.radialGradient) {
       this.texture = new GradientTexture(
         (this.linearGradient ?? this.radialGradient)!,
-        Math.floor(this.parent.size.width),
-        Math.floor(this.parent.size.height),
+        Math.floor(this._parent.size.width),
+        Math.floor(this._parent.size.height),
       )
     }
     else if (!isNone(this.image)) {
-      this.parent.tree?.log(`load image ${this.image}`)
+      this._parent.tree?.log(`load image ${this.image}`)
 
       if (this.image === 'viewport') {
         // skip
@@ -112,7 +112,7 @@ export class Element2DFill extends CoreObject {
 
   protected async _updateTexture(): Promise<void> {
     await this.loadTexture()
-    this.parent.requestDraw()
+    this._parent.requestDraw()
   }
 
   isValid(): boolean {
@@ -127,8 +127,8 @@ export class Element2DFill extends CoreObject {
   }
 
   draw(): void {
-    const { width, height } = this.parent.size
-    const ctx = this.parent.context
+    const { width, height } = this._parent.size
+    const ctx = this._parent.context
     let options = {
       size: { width, height },
     }
@@ -152,7 +152,7 @@ export class Element2DFill extends CoreObject {
     const duration = this.animatedTexture?.duration ?? 0
     if (!duration)
       return 0
-    const currentTime = this.parent.currentTime
+    const currentTime = this._parent.currentTime
     if (currentTime < 0)
       return 0
     return currentTime % duration
@@ -176,7 +176,7 @@ export class Element2DFill extends CoreObject {
     }
     if (this.animatedTexture.frameIndex !== index) {
       this.animatedTexture.frameIndex = index
-      this.parent.requestDraw()
+      this._parent.requestDraw()
     }
     return this
   }

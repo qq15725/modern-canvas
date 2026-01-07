@@ -28,7 +28,7 @@ export class Element2DOutline extends Element2DFill {
       case 'lineCap':
       case 'lineJoin':
       case 'enabled':
-        this.parent.requestDraw()
+        this._parent.requestDraw()
         break
     }
   }
@@ -44,8 +44,8 @@ export class Element2DOutline extends Element2DFill {
   }
 
   draw(): void {
-    const { width, height } = this.parent.size
-    const ctx = this.parent.context
+    const { width, height } = this._parent.size
+    const ctx = this._parent.context
     if (this.image === 'viewport') {
       ctx.strokeStyle = new ViewportTexture()
     }
