@@ -44,7 +44,7 @@ export interface Node {
   emit: <K extends keyof NodeEvents & string>(event: K, ...args: NodeEvents[K]) => this
 }
 
-export type ProcessMode = 'inherit' | 'pausable' | 'when-paused' | 'always' | 'disabled'
+export type ProcessMode = 'inherit' | 'always' | 'disabled'
 export type ProcessSortMode = 'default' | 'parent-before'
 export type RenderMode = 'inherit' | 'always' | 'disabled'
 export type InputMode = 'inherit' | 'always' | 'disabled'
@@ -336,12 +336,6 @@ export class Node extends CoreObject {
     switch (this.processMode) {
       case 'inherit':
         this._processable = this._parent?.processable ?? true
-        break
-      case 'pausable':
-        this._processable = this._tree ? !this._tree.processPaused : false
-        break
-      case 'when-paused':
-        this._processable = this._tree ? this._tree.processPaused : false
         break
       case 'always':
         this._processable = true

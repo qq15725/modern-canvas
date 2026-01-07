@@ -113,7 +113,6 @@ export interface AnimationProperties extends Omit<TimelineNodeProperties, 'rende
 
 @customNode<TimelineNodeProperties>('Animation', {
   renderMode: 'disabled',
-  processMode: 'pausable',
   processSortMode: 'parent-before',
   duration: 2000,
 })
@@ -145,10 +144,9 @@ export class Animation extends TimelineNode {
     this.cancel()
   }
 
-  protected _process(): void {
-    if (this.processable) {
-      this.commitStyles()
-    }
+  protected _process(delta: number): void {
+    super._process(delta)
+    this.commitStyles()
   }
 
   protected override _updateProperty(key: string, value: any, oldValue: any): void {
@@ -413,12 +411,16 @@ export class Animation extends TimelineNode {
   }
 
   play(): boolean {
+    const timeline = this._timeline
+    if (!timeline) {
+      return false
+    }
     if (this._stoped) {
       this._stoped = false
-      this.globalStartTime = this.globalCurrentTime
+      timeline.currentTime = this.globalStartTime
     }
     else {
-      this.globalStartTime = this.globalCurrentTime - this.currentTime
+      timeline.currentTime = this.globalStartTime + this.currentTime
     }
     this.paused = false
     return true

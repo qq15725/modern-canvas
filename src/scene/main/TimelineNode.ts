@@ -42,19 +42,14 @@ export class TimelineNode extends Node {
   }
 
   /** Timeline */
-  _currentTime = 0
-  _duration = 0
-  _globalStartTime = 0
-  get timeline(): Timeline | undefined { return this._tree?.timeline }
-  get globalCurrentTime(): number { return this.timeline?.currentTime ?? 0 }
+  protected get _timeline(): Timeline | undefined { return this._tree?.timeline }
+  protected get _globalCurrentTime(): number { return this._timeline?.currentTime ?? 0 }
+  protected _currentTime = 0
+  protected _duration = 0
+  protected _globalStartTime = 0
   get parentGlobalStartTime(): number { return (this._parent as TimelineNode)?.globalStartTime ?? 0 }
   get currentTime(): number { return clamp(this._currentTime, 0, this._duration) }
   get globalStartTime(): number { return this._globalStartTime }
-  set globalStartTime(val: number) {
-    this.delay = val - this.parentGlobalStartTime
-    this._updateCurrentTime(true)
-  }
-
   get globalEndTime(): number { return this._globalStartTime + this._duration }
   get currentTimeProgress(): number { return this._duration ? clamp(this._currentTime / this._duration, 0, 1) : 0 }
   isInsideTimeRange(): boolean {
@@ -67,6 +62,18 @@ export class TimelineNode extends Node {
     }
   }
 
+  protected override _updateProperty(key: string, newValue: any, oldValue: any): void {
+    super._updateProperty(key, newValue, oldValue)
+
+    switch (key) {
+      case 'loop':
+      case 'delay':
+      case 'duration':
+        this._updateCurrentTime(true)
+        break
+    }
+  }
+
   protected _updateCurrentTime(force = false): void {
     if (force || !this.paused) {
       const parent = this._parent as TimelineNode
@@ -74,7 +81,7 @@ export class TimelineNode extends Node {
       const duration = parent?._duration
         ? Math.min(globalStartTime + this.duration, parent.globalEndTime) - globalStartTime
         : this.duration
-      let currentTime = this.globalCurrentTime - globalStartTime
+      let currentTime = this._globalCurrentTime - globalStartTime
       if (this.loop) {
         currentTime = currentTime % duration
       }

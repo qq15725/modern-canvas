@@ -46,7 +46,7 @@ export class Video2D extends TextureRect2D<VideoTexture> {
   }
 
   protected _updateVideoCurrentTime(): void {
-    let currentTime = this._currentTime
+    let currentTime = this.currentTime
     if (currentTime < 0)
       return
 

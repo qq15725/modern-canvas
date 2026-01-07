@@ -152,7 +152,7 @@ export class Element2DFill extends CoreObject {
     const duration = this.animatedTexture?.duration ?? 0
     if (!duration)
       return 0
-    const currentTime = this.parent._currentTime
+    const currentTime = this.parent.currentTime
     if (currentTime < 0)
       return 0
     return currentTime % duration
