@@ -1,3 +1,19 @@
+## [0.14.33](https://github.com/qq15725/modern-canvas/compare/v0.14.32...v0.14.33) (2026-01-08)
+
+
+### Bug Fixes
+
+* shape ([a0bf07a](https://github.com/qq15725/modern-canvas/commit/a0bf07a62d37e0736b606a5247ab9021df32e889))
+* text transformVertex ([cc9e8aa](https://github.com/qq15725/modern-canvas/commit/cc9e8aa8f053fb073cf932b693aa0c60f2b0ebe2))
+* useTextureDraw ([431c18a](https://github.com/qq15725/modern-canvas/commit/431c18acbe5313e20f0282aa86c213ac812960f8))
+
+
+### Features
+
+* opz code ([463813d](https://github.com/qq15725/modern-canvas/commit/463813d307f5d52c081df4d0f8db49b5ceca7b86))
+
+
+
 ## [0.14.32](https://github.com/qq15725/modern-canvas/compare/v0.14.31...v0.14.32) (2026-01-07)
 
 
