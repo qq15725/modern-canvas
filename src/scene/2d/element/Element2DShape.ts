@@ -64,6 +64,7 @@ export class Element2DShape extends CoreObject {
       viewBox = this._path2DSet.viewBox
     }
     else {
+      this._path2DSet.paths.length = 0
       this.paths?.forEach((path, i) => {
         const { data, ...style } = path
         const path2D = new Path2D()
