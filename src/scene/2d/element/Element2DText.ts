@@ -221,6 +221,7 @@ export class Element2DText extends CoreObject {
     if (drawMode === 'auto') {
       if (
         Boolean(this.effects?.length)
+        || Boolean(this.outline?.width)
         || this.content.some((p) => {
           return p.fragments.some(f => Boolean(
             f.highlightImage
