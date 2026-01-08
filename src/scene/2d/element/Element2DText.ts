@@ -117,6 +117,9 @@ export class Element2DText extends CoreObject {
 
   protected _updateTextureMap(): void {
     this._textureMap.clear()
+    if (this.useTextureDraw()) {
+      return
+    }
     const pGlyphBoxs: BoundingBox[] = []
     this.base.paragraphs.forEach((p, pIndex) => {
       const fGlyphBoxs: BoundingBox[] = []
@@ -192,24 +195,25 @@ export class Element2DText extends CoreObject {
   }
 
   protected _createTransformVertex(): TransformVertex | undefined {
-    const parent = this._parent
-    if (parent.scale.x > 0 && parent.scale.y > 0) {
-      return undefined
-    }
-    const scale = parent.scale.x * parent.scale.y
-    const pivot = parent.pivot
-    const t2d = new Transform2D()
-      .translate(-pivot.x, -pivot.y)
-      .scale(scale > 0 ? 1 : -1, 1)
-      .translate(pivot.x, pivot.y)
-    const { a, c, tx, b, d, ty } = t2d.toObject()
-    let x, y
-    return (vertices, i) => {
-      x = vertices[i]
-      y = vertices[i + 1]
-      vertices[i] = (a * x) + (c * y) + tx
-      vertices[i + 1] = (b * x) + (d * y) + ty
-    }
+    return undefined
+    // const parent = this._parent
+    // if (parent.scale.x > 0 && parent.scale.y > 0) {
+    //   return undefined
+    // }
+    // const scale = parent.scale.x * parent.scale.y
+    // const pivot = parent.pivot
+    // const t2d = new Transform2D()
+    //   .translate(-pivot.x, -pivot.y)
+    //   .scale(scale > 0 ? 1 : -1, 1)
+    //   .translate(pivot.x, pivot.y)
+    // const { a, c, tx, b, d, ty } = t2d.toObject()
+    // let x, y
+    // return (vertices, i) => {
+    //   x = vertices[i]
+    //   y = vertices[i + 1]
+    //   vertices[i] = (a * x) + (c * y) + tx
+    //   vertices[i + 1] = (b * x) + (d * y) + ty
+    // }
   }
 
   useTextureDraw(): boolean {
@@ -387,6 +391,9 @@ export class Element2DText extends CoreObject {
           this._autoDrawMode = 'path'
         }
         if (oldDrawMode !== this._autoDrawMode) {
+          if (this._autoDrawMode === 'path') {
+            this._updateTextureMap()
+          }
           this._parent.requestDraw()
         }
       }
