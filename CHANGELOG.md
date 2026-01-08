@@ -1,3 +1,12 @@
+## [0.14.35](https://github.com/qq15725/modern-canvas/compare/v0.14.34...v0.14.35) (2026-01-08)
+
+
+### Bug Fixes
+
+* text.outline ([c539c0d](https://github.com/qq15725/modern-canvas/commit/c539c0dda5d6177b7956818470f759c6cc0e588c))
+
+
+
 ## [0.14.34](https://github.com/qq15725/modern-canvas/compare/v0.14.33...v0.14.34) (2026-01-08)
 
 
