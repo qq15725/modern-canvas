@@ -216,9 +216,12 @@ export class Element2DText extends CoreObject {
     let drawMode = this.drawMode
     if (drawMode === 'auto') {
       if (
-        !!this.effects?.length
+        Boolean(this.effects?.length)
         || this.content.some((p) => {
-          return p.fragments.some(f => !!f.highlightImage)
+          return p.fragments.some(f => Boolean(
+            f.highlightImage
+            || f.highlight?.image,
+          ))
         })
       ) {
         drawMode = 'texture'
