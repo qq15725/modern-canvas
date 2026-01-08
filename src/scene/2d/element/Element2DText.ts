@@ -24,7 +24,7 @@ export type TextDrawMode = 'auto' | 'texture' | 'path'
 export class Element2DText extends CoreObject {
   @property({ fallback: true }) declare enabled: boolean
   @property({ fallback: () => [] }) declare content: NormalizedText['content']
-  @property({ alias: 'parent.style.json' }) declare style: NormalizedText['style']
+  @property({ alias: '_parent.style.json' }) declare style: NormalizedText['style']
   @property() declare effects: NormalizedText['effects']
   @property() declare fill: NormalizedText['fill']
   @property() declare outline: NormalizedText['outline']
