@@ -1,3 +1,12 @@
+## [0.14.36](https://github.com/qq15725/modern-canvas/compare/v0.14.35...v0.14.36) (2026-01-13)
+
+
+### Features
+
+* rename Aabb2D overlapsOnAxis to overlap, containsPoint to contains ([8e4f4cd](https://github.com/qq15725/modern-canvas/commit/8e4f4cd179071ddf8a6e6e4b679a15e11f407d85))
+
+
+
 ## [0.14.35](https://github.com/qq15725/modern-canvas/compare/v0.14.34...v0.14.35) (2026-01-08)
 
 
