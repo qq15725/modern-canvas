@@ -44,9 +44,9 @@ export class Obb2D extends Aabb2D implements RotatedRectangleLike {
     this.rotation = rotation ?? 0
   }
 
-  override overlapsOnAxis(obb: Obb2D | Aabb2D, axis?: 'horizontal' | 'vertical'): boolean {
+  override overlap(obb: Obb2D | Aabb2D, axis?: 'x' | 'y'): boolean {
     if (!this.rotation && (!('rotation' in obb) || !obb.rotation)) {
-      return super.overlapsOnAxis(obb, axis)
+      return super.overlap(obb, axis)
     }
     else {
       // Separating Axis Theorem

@@ -92,27 +92,34 @@ export class Aabb2D implements RectangleLike {
     return this
   }
 
-  overlapsOnAxis(rect: Aabb2D, axis?: 'horizontal' | 'vertical'): boolean {
+  overlap(rect: Aabb2D, axis?: 'x' | 'y'): boolean {
     switch (axis) {
-      case 'horizontal':
+      case 'x':
         return this.max.x >= rect.min.x
           && rect.max.x >= this.min.x
-      case 'vertical':
+      case 'y':
         return this.max.y >= rect.min.y
           && rect.max.y >= this.min.y
       default:
-        return this.overlapsOnAxis(rect, 'horizontal')
-          && this.overlapsOnAxis(rect, 'vertical')
+        return this.overlap(rect, 'x')
+          && this.overlap(rect, 'y')
     }
   }
 
-  containsPoint(point: Vector2Like): boolean {
-    return (
-      point.x >= this.min.x
-      && point.x <= this.max.x
-      && point.y >= this.min.y
-      && point.y <= this.max.y
-    )
+  contains(value: Aabb2D | Vector2Like): boolean {
+    let min, max
+    if (value instanceof Aabb2D) {
+      min = value.min
+      max = value.max
+    }
+    else {
+      min = value
+      max = value
+    }
+    return this.max.x >= max.x
+      && this.max.y >= max.y
+      && this.min.x <= min.x
+      && this.min.y <= min.y
   }
 
   getIntersectionRect(target: Aabb2D): Aabb2D {
