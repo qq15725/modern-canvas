@@ -12,6 +12,7 @@ import { clamp, customNode, IN_MAC_OS, Transform2D, Vector2 } from '../../core'
 import { Node2D } from './Node2D'
 
 export interface Camera2DProperties extends Node2DProperties {
+  position?: Vector2Like
   zoom?: Vector2Like
   minZoom?: Vector2Like
   maxZoom?: Vector2Like
@@ -61,16 +62,22 @@ export class Camera2D extends Node2D {
   override setProperties(properties?: Record<string, any>): this {
     if (properties) {
       const {
+        position,
         zoom,
         minZoom,
         maxZoom,
         ...restProperties
       } = properties
 
+      if (position)
+        this.position.set(position.x, position.y)
+
       if (zoom)
         this.zoom = zoom
+
       if (minZoom)
         this.minZoom = minZoom
+
       if (maxZoom)
         this.maxZoom = maxZoom
 
