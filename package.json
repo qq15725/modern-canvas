@@ -85,10 +85,10 @@
     }
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^6.7.3",
+    "@antfu/eslint-config": "^7.0.1",
     "@types/earcut": "^3.0.0",
-    "@types/node": "^25.0.7",
-    "bumpp": "^10.3.2",
+    "@types/node": "^25.0.9",
+    "bumpp": "^10.4.0",
     "conventional-changelog-cli": "^5.0.0",
     "eslint": "^9.39.2",
     "lint-staged": "^16.2.7",
