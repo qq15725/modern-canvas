@@ -38,8 +38,7 @@ export class Element2DText extends CoreObject {
   set textContent(val) { this.setContent(val) }
 
   protected _textContent = ''
-  protected _autoDrawMode?: TextDrawMode
-  protected _autoDrawThreshold = 100
+  protected _autoDrawMode?: TextDrawMode // TODO
   protected _texture = new CanvasTexture({
     mipmap: true,
   })
@@ -375,29 +374,6 @@ export class Element2DText extends CoreObject {
     }
     else {
       this._pathDraw(ctx)
-    }
-  }
-
-  process(_delta: number): void {
-    if (this.drawMode === 'auto') {
-      const { width, height } = this.base.boundingBox
-      const viewport = this._parent.getViewport()
-      if (viewport) {
-        const { a, d } = viewport.canvasTransform.toObject()
-        const oldDrawMode = this._autoDrawMode
-        if (width * a < this._autoDrawThreshold || height * d < this._autoDrawThreshold) {
-          this._autoDrawMode = 'texture'
-        }
-        else {
-          this._autoDrawMode = 'path'
-        }
-        if (oldDrawMode !== this._autoDrawMode) {
-          if (this._autoDrawMode === 'path') {
-            this._updateTextureMap()
-          }
-          this._parent.requestDraw()
-        }
-      }
     }
   }
 }
