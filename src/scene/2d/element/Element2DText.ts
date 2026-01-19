@@ -376,4 +376,8 @@ export class Element2DText extends CoreObject {
       this._pathDraw(ctx)
     }
   }
+
+  process(_delta: number): void {
+    //
+  }
 }
