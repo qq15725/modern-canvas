@@ -1,3 +1,12 @@
+## [0.14.39](https://github.com/qq15725/modern-canvas/compare/v0.14.38...v0.14.39) (2026-01-19)
+
+
+### Bug Fixes
+
+* Camera2D position ([743f05d](https://github.com/qq15725/modern-canvas/commit/743f05d136071e8662f679239745cb6f6c6d53e3))
+
+
+
 ## [0.14.38](https://github.com/qq15725/modern-canvas/compare/v0.14.37...v0.14.38) (2026-01-19)
 
 
