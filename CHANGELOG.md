@@ -1,3 +1,12 @@
+## [0.14.37](https://github.com/qq15725/modern-canvas/compare/v0.14.36...v0.14.37) (2026-01-19)
+
+
+### Bug Fixes
+
+* autoDrawMode todo ([1946d19](https://github.com/qq15725/modern-canvas/commit/1946d191a8f04f6f49f86cc42ec0bc784126eecc))
+
+
+
 ## [0.14.36](https://github.com/qq15725/modern-canvas/compare/v0.14.35...v0.14.36) (2026-01-13)
 
 
