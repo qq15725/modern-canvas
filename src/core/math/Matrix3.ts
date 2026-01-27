@@ -17,7 +17,7 @@ export class Matrix3 extends Matrix {
       n11, n21, n31,
       n12, n22, n32,
       n13, n23, n33,
-    ] = this._typedArray
+    ] = this._array
     const t11 = n33 * n22 - n32 * n23
     const t12 = n32 * n13 - n33 * n12
     const t13 = n23 * n12 - n22 * n13

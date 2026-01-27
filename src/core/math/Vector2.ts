@@ -7,17 +7,17 @@ export interface Vector2Like {
 }
 
 export class Vector2 extends Vector implements Vector2Like {
-  get x(): number { return this._typedArray[0] }
+  get x(): number { return this._array[0] }
   set x(val) {
-    const [x, y] = this._typedArray
+    const [x, y] = this._array
     if (x !== val) {
       this.set(val, y)
     }
   }
 
-  get y(): number { return this._typedArray[1] }
+  get y(): number { return this._array[1] }
   set y(val) {
-    const [x, y] = this._typedArray
+    const [x, y] = this._array
     if (y !== val) {
       this.set(x, val)
     }
@@ -41,7 +41,7 @@ export class Vector2 extends Vector implements Vector2Like {
   }
 
   update(x: number, y: number): this {
-    const [oldX, oldY] = this._typedArray
+    const [oldX, oldY] = this._array
     if (oldX !== x || oldY !== y) {
       this.set(x, y)
     }
@@ -49,12 +49,12 @@ export class Vector2 extends Vector implements Vector2Like {
   }
 
   getLength(): number {
-    const [x, y] = this._typedArray
+    const [x, y] = this._array
     return Math.sqrt(x * x + y * y)
   }
 
   getAngle(): number {
-    const [x, y] = this._typedArray
+    const [x, y] = this._array
     return Math.atan2(-x, -y) + Math.PI
   }
 
@@ -63,7 +63,7 @@ export class Vector2 extends Vector implements Vector2Like {
   }
 
   normalize(): this {
-    const [x, y] = this._typedArray
+    const [x, y] = this._array
     const scalar = 1 / (this.getLength() || 1)
     this.set(x * scalar, y * scalar)
     return this

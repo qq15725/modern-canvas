@@ -1,6 +1,6 @@
 import type { TypedArray } from '../renderers'
+import type { Matrix } from './Matrix'
 import { Observable } from 'modern-idoc'
-import { Matrix } from './Matrix'
 
 export type VectorLike = number | number[] | Matrix | Vector
 export type VectorOperateOutput = number[] | Vector
@@ -8,16 +8,14 @@ export type VectorOperateOutput = number[] | Vector
 export abstract class Vector extends Observable {
   readonly __vector = true
 
-  protected _typedArray: Float64Array<ArrayBuffer>
-
-  get length(): number { return this.dim }
+  _array: number[]
 
   constructor(
-    readonly dim: number,
+    readonly length: number,
   ) {
     super()
 
-    this._typedArray = new Float64Array(dim)
+    this._array = Array.from({ length }).fill(0) as number[]
   }
 
   operate(
@@ -25,17 +23,21 @@ export abstract class Vector extends Observable {
     target: VectorLike,
     output?: VectorOperateOutput,
   ): any {
-    const { dim: length, _typedArray } = this
+    const { length, _array } = this
+
+    const isNumber = typeof target === 'number'
+    const isMatrix = !isNumber && Boolean((target as any).__matrix)
+    const isVector = !isNumber && Boolean((target as any).__vector)
 
     let targetArray: number[] | TypedArray
-    if (typeof target === 'number') {
-      targetArray = new Float64Array(length).fill(target)
+    if (isNumber) {
+      targetArray = new Float64Array(length).fill(target as number)
     }
-    else if (target instanceof Matrix || target instanceof Vector) {
-      targetArray = target.toTypedArray()
+    else if (isMatrix || isVector) {
+      targetArray = (target as Matrix | Vector)._array
     }
     else {
-      targetArray = target
+      targetArray = target as any
     }
 
     let outputObject: Vector | undefined
@@ -50,62 +52,66 @@ export abstract class Vector extends Observable {
       outputArray = output
     }
 
-    if (target instanceof Matrix) {
-      const { cols } = target
+    if (isMatrix) {
+      const { cols } = target as Matrix
       switch (operator) {
         case '*':
           for (let x = 0; x < length; x++) {
             let val = 0
             for (let y = 0; y < length; y++) {
-              val += _typedArray[x] * targetArray[y * cols + x]
+              val += _array[x] * targetArray[y * cols + x]
             }
             outputArray[x] = val
           }
           break
         default:
-          throw new Error(`Not support operator in '${this.toName()} ${operator} ${target.toName()}'`)
+          throw new Error(`Not support operator in '${this.toName()} ${operator} ${target}'`)
       }
     }
     else {
       switch (operator) {
         case '+':
           for (let i = 0; i < length; i++) {
-            outputArray[i] = _typedArray[i] + targetArray[i]
+            outputArray[i] = _array[i] + targetArray[i]
           }
           break
         case '-':
           for (let i = 0; i < length; i++) {
-            outputArray[i] = _typedArray[i] - targetArray[i]
+            outputArray[i] = _array[i] - targetArray[i]
           }
           break
         case '*':
           for (let i = 0; i < length; i++) {
-            outputArray[i] = _typedArray[i] * targetArray[i]
+            outputArray[i] = _array[i] * targetArray[i]
           }
           break
         case '/':
           for (let i = 0; i < length; i++) {
-            outputArray[i] = _typedArray[i] / targetArray[i]
+            outputArray[i] = _array[i] / targetArray[i]
           }
           break
         case 'rot': {
           const c = Math.cos(targetArray[0])
           const s = Math.sin(targetArray[0])
-          outputArray[0] = _typedArray[0] * c - _typedArray[1] * s
-          outputArray[1] = _typedArray[1] * c + _typedArray[0] * s
+          outputArray[0] = _array[0] * c - _array[1] * s
+          outputArray[1] = _array[1] * c + _array[0] * s
           break
         }
         case '==': {
           let flag = true
           for (let i = 0; i < length; i++) {
-            flag = flag && _typedArray[i] === targetArray[i]
+            flag = flag && _array[i] === targetArray[i]
           }
           return flag
         }
         case '=':
-          _typedArray.set(targetArray)
-          this._onUpdate(_typedArray)
-          this.emit('update', _typedArray)
+          for (let i = 0; i < length; i++) {
+            if (targetArray[i] !== undefined) {
+              _array[i] = targetArray[i]
+            }
+          }
+          this._onUpdate(_array)
+          this.emit('update', _array)
           return this
         default:
           throw new Error(`Not support operator in '${this.toName()} ${operator} Vector'`)
@@ -168,18 +174,18 @@ export abstract class Vector extends Observable {
     return cloned
   }
 
-  protected _onUpdate(_array: Float64Array): void { /** override */ }
+  protected _onUpdate(_array: number[]): void { /** override */ }
 
   toName(): string {
-    return `Vector${this.dim}`
+    return `Vector${this.length}`
   }
 
   toArray(): number[] {
-    return Array.from(this._typedArray)
+    return [...this._array]
   }
 
-  toTypedArray(): Float64Array {
-    return this._typedArray
+  toTypedArray(): Float64Array<ArrayBuffer> {
+    return new Float64Array(this._array)
   }
 
   toJSON(): number[] {

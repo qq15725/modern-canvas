@@ -196,7 +196,7 @@ export class Transform2D extends Matrix3 {
       a, c, tx,
       b, d, ty,,,
       tz,
-    ] = this._typedArray
+    ] = this._array
     return { a, c, tx, b, d, ty, tz }
   }
 }

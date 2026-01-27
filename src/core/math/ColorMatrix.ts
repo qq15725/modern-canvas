@@ -145,7 +145,7 @@ export class ColorMatrix extends Matrix {
 
   override multiply(target: number[]): this {
     const b = target
-    const a = this._typedArray
+    const a = this._array
     return this.set([
       // Red Channel
       (a[0] * b[0]) + (a[1] * b[5]) + (a[2] * b[10]) + (a[3] * b[15]),
@@ -175,7 +175,7 @@ export class ColorMatrix extends Matrix {
   }
 
   toMatrix4(): Matrix4 {
-    const array = this._typedArray
+    const array = this._array
     return new Matrix4([
       array[0], array[1], array[2], array[3],
       array[5], array[6], array[7], array[8],
@@ -185,7 +185,7 @@ export class ColorMatrix extends Matrix {
   }
 
   toVector4(): Vector4 {
-    const array = this._typedArray
+    const array = this._array
     return new Vector4(array[4] / 255, array[9] / 255, array[14] / 255, array[19] / 255)
   }
 }
