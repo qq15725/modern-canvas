@@ -461,31 +461,26 @@ export class Element2D extends Node2D implements Rectangulable {
     super._draw()
 
     if (this._background.isValid()) {
-      this._tree?.log(this.name, 'background drawing')
       this._shape.draw(!this._background.fillWithShape)
       this._background.draw()
     }
 
     if (this._fill.isValid()) {
-      this._tree?.log(this.name, 'fill drawing')
       this._shape.draw()
       this._fill.draw()
     }
 
     if (this._outline.isValid()) {
-      this._tree?.log(this.name, 'outline drawing')
       this._shape.draw()
       this._outline.draw()
     }
 
     if (this._foreground.isValid()) {
-      this._tree?.log(this.name, 'foreground drawing')
       this._shape.draw(!this._foreground.fillWithShape)
       this._foreground.draw()
     }
 
     if (this._text.isValid()) {
-      this._tree?.log(this.name, 'text drawing')
       this._text.draw()
     }
 

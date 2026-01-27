@@ -1,43 +1,76 @@
-import { fonts } from 'modern-font'
 import {
-  Element2D,
-  Engine,
+  Camera2D,
+  Element2D, Engine,
 } from '../../src'
 
-const engine = new Engine({
-  autoStart: true,
-  autoResize: true,
-  backgroundColor: '#F6F7F9',
-})
+class PerformanceTest {
+  count = 2000
+  width = 1000
+  height = 500
 
-;(window as any).engine = engine
+  protected engine: Engine
+  protected rects: { x: number, y: number, size: number, speed: number, el: Element2D }[] = []
 
-document.body.append(engine.view!)
+  constructor() {
+    this.rects = []
+    this.engine = new Engine({
+      width: this.width,
+      height: this.height,
+      backgroundColor: '#FFFFFF',
+      antialias: true,
+    })
 
-async function init(): Promise<void> {
-  await fonts.loadFallbackFont({ family: 'fallbackFont', src: '/fonts/AaHouDiHei.woff' })
+    this.engine.root.append(
+      new Camera2D({
+        internalMode: 'front',
+      }),
+    )
 
-  const length = 1500
-  const size = 10
-  const cols = Math.ceil(Math.sqrt(length))
-  const gap = 2
-  engine.root.append(
-    Array.from({ length }, (_, i) => {
-      const x = i % cols
-      const y = Math.floor(i / cols)
-      return new Element2D({
+    document.body.append(this.engine.view!)
+    ;(window as any).engine = this.engine
+  }
+
+  protected onProcess(): void {
+    const rectsToRemove = []
+
+    for (let i = 0; i < this.count; i++) {
+      const rect = this.rects[i]
+      rect.x -= rect.speed
+      rect.el.position.x = rect.x
+      if (rect.x + rect.size / 2 < 0)
+        rectsToRemove.push(i)
+    }
+
+    rectsToRemove.forEach((i) => {
+      this.rects[i].x = this.width + this.rects[i].size / 2
+    })
+  }
+
+  render(): void {
+    this.engine.stop()
+    this.engine.root.removeChildren()
+    this.rects = []
+    for (let i = 0; i < this.count; i++) {
+      const x = Math.random() * this.width
+      const y = Math.random() * this.height
+      const size = 10 + Math.random() * 40
+      const speed = 1 + Math.random()
+      const rect = new Element2D({
         style: {
-          left: x * (size + gap),
-          top: y * (size + gap),
+          left: x,
+          top: y,
           width: size,
           height: size,
-          backgroundColor: '#000',
+          backgroundColor: '#FFFFFF',
+          borderColor: '#000000',
         },
       })
-    }),
-  )
-
-  console.warn(engine.root.toJSON())
+      this.engine.root.append(rect)
+      this.rects[i] = { x, y, size, speed, el: rect }
+    }
+    this.engine.on('process', this.onProcess.bind(this))
+    this.engine.start()
+  }
 }
 
-init()
+new PerformanceTest().render()

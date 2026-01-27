@@ -31,7 +31,7 @@ export class TimelineNode extends Node {
   @property({ fallback: 0 }) declare delay: number
   @property({ fallback: 0 }) declare duration: number
   @property({ fallback: false }) declare paused: boolean
-  @property({ internal: true, fallback: false }) declare insideTimeRange: boolean
+  insideTimeRange = false
 
   constructor(properties?: Partial<TimelineNodeProperties>, nodes: Node[] = []) {
     super()
@@ -44,18 +44,23 @@ export class TimelineNode extends Node {
   /** Timeline */
   protected get _timeline(): Timeline | undefined { return this._tree?.timeline }
   protected get _globalCurrentTime(): number { return this._timeline?.currentTime ?? 0 }
+  private _loop = false
+  private _delay = 0
+  private _duration = 0
+  private _paused = false
   protected _currentTime = 0
-  protected _duration = 0
   protected _globalStartTime = 0
+  protected _globalDuration = 0
   get parentGlobalStartTime(): number { return (this._parent as TimelineNode)?.globalStartTime ?? 0 }
   get currentTime(): number { return this._currentTime }
   get globalStartTime(): number { return this._globalStartTime }
-  get globalEndTime(): number { return this._globalStartTime + this._duration }
+  get globalDuration(): number { return this._globalDuration }
+  get globalEndTime(): number { return this._globalStartTime + this._globalDuration }
   get currentTimeProgress(): number { return this._duration ? clamp(this._currentTime / this._duration, 0, 1) : 0 }
   isInsideTimeRange(): boolean {
     const current = this._currentTime
-    if (this._duration) {
-      return current >= 0 && current <= this._duration
+    if (this._globalDuration) {
+      return current >= 0 && current <= this._globalDuration
     }
     else {
       return current >= 0
@@ -67,29 +72,46 @@ export class TimelineNode extends Node {
 
     switch (key) {
       case 'loop':
+        this._loop = this.loop
+        this._updateCurrentTime(true)
+        break
       case 'delay':
+        this._delay = this.delay
+        this._updateCurrentTime(true)
+        break
       case 'duration':
+        this._duration = this.duration
+        this._updateCurrentTime(true)
+        break
+      case 'paused':
+        this._paused = this.paused
         this._updateCurrentTime(true)
         break
     }
   }
 
+  protected _updateInsideTimeRange(): void {
+    this.insideTimeRange = this.isInsideTimeRange()
+  }
+
   protected _updateCurrentTime(force = false): void {
-    if (force || !this.paused) {
+    if (force || !this._paused) {
       const parent = this._parent as TimelineNode
-      const globalStartTime = this.parentGlobalStartTime + this.delay
-      const duration = parent?._duration
-        ? Math.min(globalStartTime + this.duration, parent.globalEndTime) - globalStartTime
-        : this.duration
-      let currentTime = this._globalCurrentTime - globalStartTime
-      if (this.loop) {
-        currentTime = currentTime % duration
-      }
+      const globalStartTime = this.parentGlobalStartTime + this._delay
+      const globalDuration = parent?.globalDuration
+        ? Math.min(globalStartTime + this._duration, parent.globalEndTime) - globalStartTime
+        : this._duration
+
       this._globalStartTime = globalStartTime
+      this._globalDuration = globalDuration
+
+      let currentTime = this._globalCurrentTime - this.globalStartTime
+      if (this._loop) {
+        currentTime = currentTime % this.globalDuration
+      }
       this._currentTime = currentTime
-      this._duration = duration
       this.emit('updateCurrentTime', this._currentTime)
-      this.insideTimeRange = this.isInsideTimeRange()
+      this._updateInsideTimeRange()
     }
   }
 

@@ -1,15 +1,19 @@
+import type { TypedArray } from '../renderers'
+import type { Vector } from './Vector'
 import { Observable } from 'modern-idoc'
-import { Vector } from './Vector'
 
-export type MatrixLike = number | number[] | Matrix
+export type MatrixLike = number | number[] | TypedArray | Matrix
 export type MatrixOperateOutput = number[] | Matrix | Vector
 
 export abstract class Matrix extends Observable {
-  protected _array: number[] = []
+  readonly __matrix = true
+
+  protected _typedArray: Float64Array<ArrayBuffer>
+  protected _identityArray: Float64Array<ArrayBuffer>
 
   dirtyId = 0
 
-  get length(): number { return this.cols * this.rows }
+  readonly length: number
 
   constructor(
     readonly rows: number,
@@ -17,6 +21,20 @@ export abstract class Matrix extends Observable {
     array?: number[],
   ) {
     super()
+
+    this.length = cols * rows
+    this._typedArray = new Float64Array(this.length)
+    const identityArray = new Float64Array(this.length)
+    let x, y, ix, iy
+    for (x = 0; x < cols; x++) {
+      for (y = 0; y < rows; y++) {
+        iy = y * cols
+        ix = x + iy
+        identityArray[ix] = y + iy === ix ? 1 : 0
+      }
+    }
+    this._identityArray = identityArray
+
     if (array) {
       this.set(array)
     }
@@ -30,84 +48,77 @@ export abstract class Matrix extends Observable {
     target: MatrixLike | Vector,
     output?: MatrixOperateOutput,
   ): any {
-    const { cols, rows, length, _array: array } = this
+    const { cols, rows, length, _typedArray } = this
 
-    let targetArray: number[]
-    if (typeof target === 'number') {
-      targetArray = Array.from({ length }, () => target)
+    const isNumber = typeof target === 'number'
+    const isMatrix = !isNumber && Boolean((target as any).__matrix)
+    const isVector = !isNumber && Boolean((target as any).__vector)
+
+    let targetArray: number[] | TypedArray
+    if (isNumber) {
+      targetArray = new Float64Array(length).fill(target as number)
     }
-    else if (target instanceof Vector || target instanceof Matrix) {
-      targetArray = target.toArray()
+    else if (isMatrix || isVector) {
+      targetArray = (target as Vector | Matrix).toTypedArray()
     }
     else {
-      targetArray = target
+      targetArray = target as any
     }
 
     let outputObject: Vector | Matrix | undefined
     let outputArray: number[] = []
     if (!output) {
-      if (target instanceof Vector) {
+      if (isVector) {
         outputObject = (new (target.constructor as any)()) as Vector
       }
       else {
         outputObject = this as any
       }
     }
-    else if (output instanceof Vector) {
-      outputObject = output
-    }
-    else if (output instanceof Matrix) {
-      outputObject = output
+    else if (isVector || isMatrix) {
+      outputObject = output as Vector | Matrix
     }
     else {
-      outputArray = output
+      outputArray = output as any
     }
 
-    if (target instanceof Vector) {
-      const { dim } = target
+    if (isVector) {
+      const { dim } = target as Vector
 
       switch (operator) {
-        case '*':
-          for (let y = 0; y < dim; y++) {
-            let sum = 0
-            for (let i = 0; i < cols; i++) {
+        case '*': {
+          let y, i, sum
+          for (y = 0; y < dim; y++) {
+            sum = 0
+            for (i = 0; i < cols; i++) {
               if (i < dim) {
-                sum += array[y * cols + i] * (targetArray[i] ?? 0)
+                sum += _typedArray[y * cols + i] * (targetArray[i] ?? 0)
               }
             }
             outputArray[y] = sum
           }
           break
+        }
         default:
-          throw new Error(`Not support operator in '${this.toName()} ${operator} ${target.toName()}'`)
+          throw new Error(`Not support operator in '${this.toName()} ${operator} ${target}'`)
       }
     }
     else {
       switch (operator) {
-        case '*':
-          for (let x = 0; x < cols; x++) {
-            for (let y = 0; y < rows; y++) {
-              const iy = y * cols
-              let sum = 0
+        case '*': {
+          let x, y, iy, sum
+          for (x = 0; x < cols; x++) {
+            for (y = 0; y < rows; y++) {
+              iy = y * cols
+              sum = 0
               for (let i = 0; i < rows; i++) {
-                const a = iy + i
-                const b = i * cols + x
-                sum += array[a] * (targetArray[b] ?? 0)
+                sum += _typedArray[iy + i] * (targetArray[i * cols + x] ?? 0)
               }
               outputArray[iy + x] = sum
             }
           }
           break
-        case '=':
-          for (let i = 0; i < length; i++) {
-            const val = targetArray[i]
-            if (val !== undefined) {
-              array[i] = val
-            }
-          }
-          this._onUpdate(array)
-          this.emit('update', array)
-          return this
+        }
         default:
           throw new Error(`Not support operator in '${this.toName()} ${operator} Matrix2'`)
       }
@@ -117,24 +128,18 @@ export abstract class Matrix extends Observable {
   }
 
   identity(): this {
-    const { cols, rows } = this
-    const array = []
-    for (let x = 0; x < cols; x++) {
-      for (let y = 0; y < rows; y++) {
-        const iy = y * cols
-        const i = x + iy
-        array[i] = y + iy === i ? 1 : 0
-      }
-    }
-    return this.set(array)
+    return this.set(this._identityArray)
   }
 
-  set(value: MatrixLike): this {
-    return this.operate('=', value) as this
+  set(array: ArrayLike<number>, offset?: number): this {
+    this._typedArray.set(array, offset)
+    this._onUpdate(this._typedArray)
+    this.emit('update', this._typedArray)
+    return this
   }
 
-  copy(value: MatrixLike): this {
-    return this.set(value)
+  copy(value: Matrix): this {
+    return this.set(value.toTypedArray())
   }
 
   clone(): this {
@@ -150,12 +155,12 @@ export abstract class Matrix extends Observable {
     return this.operate('*', value, output)
   }
 
-  protected _onUpdate(_array: number[]): void {
+  protected _onUpdate(_typedArray: Float64Array): void {
     this.dirtyId++
   }
 
   toArray(transpose = false): number[] {
-    const { cols, rows, _array: array } = this
+    const { cols, rows, _typedArray: array } = this
     if (transpose) {
       const newArray: number[] = []
       for (let y = 0; y < rows; y++) {
@@ -165,11 +170,11 @@ export abstract class Matrix extends Observable {
       }
       return newArray
     }
-    return array.slice()
+    return Array.from(array)
   }
 
-  toFloat32Array(transpose?: boolean): Float32Array<ArrayBuffer> {
-    return new Float32Array(this.toArray(transpose))
+  toTypedArray(): Float64Array<ArrayBuffer> {
+    return this._typedArray
   }
 
   toName(): string {
@@ -177,6 +182,6 @@ export abstract class Matrix extends Observable {
   }
 
   toJSON(): number[] {
-    return this._array.slice()
+    return this.toArray()
   }
 }

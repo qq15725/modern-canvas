@@ -5,7 +5,6 @@ import type {
   CanvasItemProperties,
   Node,
 } from '../main'
-import { property } from 'modern-idoc'
 import { customNode, Transform2D, Vector2 } from '../../core'
 import { CanvasItem } from '../main'
 
@@ -26,7 +25,7 @@ export interface Node2D {
 
 @customNode('Node2D')
 export class Node2D extends CanvasItem {
-  @property({ internal: true, fallback: 0 }) declare rotation: number
+  rotation = 0
   readonly position = new Vector2().on('update', () => this.updateGlobalTransform())
   readonly scale = new Vector2(1, 1).on('update', () => this.updateGlobalTransform())
   readonly skew = new Vector2().on('update', () => this.updateGlobalTransform())
@@ -34,7 +33,7 @@ export class Node2D extends CanvasItem {
   readonly extraTransform = new Transform2D()
   readonly transform = new Transform2D()
   readonly globalPosition = new Vector2()
-  @property({ internal: true, fallback: 0 }) declare globalRotation: number
+  globalRotation = 0
   readonly globalScale = new Vector2()
   readonly globalSkew = new Vector2()
   readonly globalTransform = new Transform2D()
@@ -60,15 +59,30 @@ export class Node2D extends CanvasItem {
   }
 
   updateTransform(): void {
-    this.transform
-      .identity()
-      .translate(-this.pivot.x, -this.pivot.y)
-      .scale(this.scale.x, this.scale.y)
-      .skew(this.skew.x, this.skew.y)
-      .rotate(this.rotation)
-      .multiply(this.extraTransform)
-      .translate(this.position.x, this.position.y)
-      .translate(this.pivot.x, this.pivot.y)
+    const px = this.pivot.x
+    const py = this.pivot.y
+    const sx = this.scale.x
+    const sy = this.scale.y
+    const kx = this.skew.x
+    const ky = this.skew.y
+    const r = this.rotation
+    const cos = Math.cos(r)
+    const sin = Math.sin(r)
+    const a = cos * sx - sin * sy * ky
+    const b = sin * sx + cos * sy * ky
+    const c = -sin * sx + cos * sy * kx
+    const d = cos * sx + sin * sy * kx
+    const tx0 = -px * a - py * c
+    const ty0 = -px * b - py * d
+    const tx1 = tx0 + this.position.x + px
+    const ty1 = ty0 + this.position.y + py
+    const m = this.transform
+    m.set([
+      a, c, tx1,
+      b, d, ty1,
+      0, 0, 1,
+    ])
+    m.multiply(this.extraTransform)
   }
 
   updateGlobalTransform(): void {
@@ -101,17 +115,19 @@ export class Node2D extends CanvasItem {
 
   protected _transformVertices(batchable: CanvasBatchable): Float32Array {
     const { a, c, tx, b, d, ty } = this.globalTransform.toObject()
-    const vertices = batchable.vertices.slice()
+    const vertices = batchable.vertices
+    const len = batchable.vertices.length
+    const newVertices = new Float32Array(len)
     const transform = batchable.transformVertex ?? (() => {})
     let x, y
-    for (let len = vertices.length, i = 0; i < len; i += 2) {
+    for (let i = 0; i < len; i += 2) {
       x = vertices[i]
       y = vertices[i + 1]
-      vertices[i] = (a * x) + (c * y) + tx
-      vertices[i + 1] = (b * x) + (d * y) + ty
-      transform(vertices, i)
+      newVertices[i] = (a * x) + (c * y) + tx
+      newVertices[i + 1] = (b * x) + (d * y) + ty
+      transform(newVertices, i)
     }
-    return vertices
+    return newVertices
   }
 
   protected override _relayout(batchables: CanvasBatchable[]): CanvasBatchable[] {

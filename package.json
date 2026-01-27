@@ -57,14 +57,13 @@
     "release": "bumpp package.json --commit \"release: v%s\" --push --all --tag",
     "start": "esno src/index.ts",
     "test": "vitest",
-    "typecheck": "tsc --noEmit",
-    "prepare": "simple-git-hooks"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "colord": "^2.9.3",
     "earcut": "^3.0.2",
     "modern-font": "^0.4.4",
-    "modern-idoc": "^0.10.9",
+    "modern-idoc": "^0.10.14",
     "modern-path2d": "^1.4.16",
     "modern-text": "^1.10.15"
   },
@@ -85,26 +84,18 @@
     }
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^7.0.1",
+    "@antfu/eslint-config": "^7.2.0",
     "@types/earcut": "^3.0.0",
-    "@types/node": "^25.0.9",
+    "@types/node": "^25.0.10",
     "bumpp": "^10.4.0",
     "conventional-changelog-cli": "^5.0.0",
     "eslint": "^9.39.2",
-    "lint-staged": "^16.2.7",
     "lottie-web": "^5.13.0",
     "modern-gif": "^2.0.4",
-    "simple-git-hooks": "^2.13.1",
     "typescript": "^5.9.3",
     "unbuild": "^3.6.1",
     "vite": "^7.3.1",
-    "vitest": "^4.0.17",
+    "vitest": "^4.0.18",
     "yoga-layout": "^3.2.1"
-  },
-  "simple-git-hooks": {
-    "pre-commit": "pnpm lint-staged"
-  },
-  "lint-staged": {
-    "*": ""
   }
 }

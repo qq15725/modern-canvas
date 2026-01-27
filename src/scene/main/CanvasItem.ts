@@ -4,7 +4,7 @@ import type { CanvasBatchable } from './CanvasContext'
 import type { Node } from './Node'
 import type { TimelineNodeEvents, TimelineNodeProperties } from './TimelineNode'
 import { property } from 'modern-idoc'
-import { clamp, Color, customNode, Transform2D } from '../../core'
+import { clamp, customNode, Transform2D } from '../../core'
 import { ViewportTexture } from '../resources'
 import { CanvasContext } from './CanvasContext'
 import { TimelineNode } from './TimelineNode'
@@ -27,6 +27,8 @@ export interface CanvasItem {
 @customNode('CanvasItem')
 export class CanvasItem extends TimelineNode {
   @property() declare blendMode: GlBlendMode | undefined
+  protected _blendMode: GlBlendMode | undefined
+
   @property({ internal: true, fallback: true }) declare visible: boolean
   @property({ internal: true, fallback: 1 }) declare opacity: number
 
@@ -38,7 +40,7 @@ export class CanvasItem extends TimelineNode {
   protected _globalOpacity?: number
   get globalOpacity(): number { return this._globalOpacity ?? 1 }
 
-  protected _modulate = new Color(0xFFFFFFFF)
+  protected _modulate: number[] = [255, 255, 255, 255]
 
   // Batch render
   context = new CanvasContext()
@@ -63,16 +65,21 @@ export class CanvasItem extends TimelineNode {
 
     switch (key) {
       case 'blendMode':
+        this._blendMode = value
         this.requestPaint()
         break
       case 'opacity':
         this._updateGlobalOpacity()
         break
       case 'visible':
-      case 'insideTimeRange':
         this._updateGlobalVisible()
         break
     }
+  }
+
+  protected override _updateInsideTimeRange(): void {
+    super._updateInsideTimeRange()
+    this._updateGlobalVisible()
   }
 
   show(): void {
@@ -107,6 +114,10 @@ export class CanvasItem extends TimelineNode {
     this.requestRender()
   }
 
+  protected _updateModulate(): void {
+    this._modulate = [255, 255, 255, 255].map(v => v * this.globalOpacity)
+  }
+
   protected _updateGlobalVisible(): void {
     this._parentGlobalVisible = this.getParent<CanvasItem>()?.globalVisible
     this._globalVisible = (this._parentGlobalVisible ?? true)
@@ -121,6 +132,7 @@ export class CanvasItem extends TimelineNode {
       * (this._parentGlobalOpacity ?? 1)
     if (this._globalOpacity !== globalOpacity) {
       this._globalOpacity = globalOpacity
+      this._updateModulate()
       this.requestPaint()
       this.updateRenderable()
     }
@@ -149,7 +161,6 @@ export class CanvasItem extends TimelineNode {
   }
 
   protected _redraw(): CanvasBatchable[] {
-    this._tree?.log(this.name, 'drawing')
     this._draw()
     return this.context.toBatchables().map((batchable) => {
       return {
@@ -160,18 +171,15 @@ export class CanvasItem extends TimelineNode {
   }
 
   protected _relayout(batchables: CanvasBatchable[]): CanvasBatchable[] {
-    this._tree?.log(this.name, 'layouting')
     return batchables
   }
 
   protected _repaint(batchables: CanvasBatchable[]): CanvasBatchable[] {
-    this._tree?.log(this.name, 'painting')
-    const modulate = this._modulate.toInt8Array().map(v => v * this.globalOpacity)
     return batchables.map((batchable) => {
       return {
         ...batchable,
-        modulate,
-        blendMode: this.blendMode,
+        modulate: this._modulate,
+        blendMode: this._blendMode,
       }
     })
   }
