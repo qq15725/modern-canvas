@@ -1,7 +1,7 @@
 {
   "name": "modern-canvas",
   "type": "module",
-  "version": "0.14.40",
+  "version": "0.14.41",
   "packageManager": "pnpm@10.19.0",
   "description": "A JavaScript WebGL rendering engine. only the ESM.",
   "author": "wxm",
