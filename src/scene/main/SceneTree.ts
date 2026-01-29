@@ -47,7 +47,6 @@ export interface SceneTreeProperties extends MainLoopProperties {
   debug: boolean
   processPaused: boolean
   fonts: Fonts
-  timeline: Timeline
 }
 
 export class SceneTree extends MainLoop {
