@@ -228,6 +228,7 @@ export class Element2D extends Node2D implements Rectangulable {
         break
       case 'rotate':
         this.rotation = value * DEG_TO_RAD
+        this.updateGlobalTransform()
         break
       case 'scaleX':
         this.scale.x = value
