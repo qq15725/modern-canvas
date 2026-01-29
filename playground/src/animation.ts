@@ -3,15 +3,14 @@ import type {
 } from '../../src'
 import {
   Engine,
+  Timeline,
 } from '../../src'
 
 const engine = new Engine({
   autoStart: true,
   autoResize: true,
+  timeline: Timeline.from([0, 5000], true),
 })
-
-engine.timeline.endTime = 5000
-engine.timeline.loop = true
 
 ;(window as any).engine = engine
 

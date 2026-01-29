@@ -47,6 +47,7 @@ export interface SceneTreeProperties extends MainLoopProperties {
   debug: boolean
   processPaused: boolean
   fonts: Fonts
+  timeline: Timeline
 }
 
 export class SceneTree extends MainLoop {
@@ -61,7 +62,7 @@ export class SceneTree extends MainLoop {
   readonly input = new Input()
   readonly renderStack = new RenderStack()
   readonly root = new Window().setTree(this)
-  readonly timeline = new Timeline().setTree(this)
+  timeline = new Timeline().setTree(this)
 
   protected _backgroundColor = new Color()
   protected _previousViewport?: Viewport
@@ -88,6 +89,20 @@ export class SceneTree extends MainLoop {
         this._backgroundColor.value = value
         break
     }
+  }
+
+  override setProperties(properties?: Record<string, any>): this {
+    if (properties) {
+      const { timeline, ...rest } = properties
+
+      if (timeline) {
+        this.timeline = timeline?.setTree(this)
+      }
+
+      super.setProperties(rest)
+    }
+
+    return this
   }
 
   log(...args: any[]): void {

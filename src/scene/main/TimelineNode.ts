@@ -44,10 +44,10 @@ export class TimelineNode extends Node {
   /** Timeline */
   protected get _timeline(): Timeline | undefined { return this._tree?.timeline }
   protected get _globalCurrentTime(): number { return this._timeline?.currentTime ?? 0 }
-  private _loop = false
-  private _delay = 0
-  private _duration = 0
-  private _paused = false
+  protected _loop = false
+  protected _delay = 0
+  protected _duration = 0
+  protected _paused = false
   protected _currentTime = 0
   protected _globalStartTime = 0
   protected _globalDuration = 0

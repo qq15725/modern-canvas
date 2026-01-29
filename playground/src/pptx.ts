@@ -42,7 +42,7 @@ document.body.append(engine.view!)
 
 async function init(): Promise<void> {
   await fonts.loadFallbackFont({ family: 'fallbackFont', src: '/fonts/fallback.woff' })
-  const data = await fetch('/json/2.json').then(rep => rep.json())
+  const data = await fetch('/json/1.json').then(rep => rep.json())
   engine.root.append(data)
   console.warn(data)
 }
