@@ -1,3 +1,17 @@
+## [0.14.42](https://github.com/qq15725/modern-canvas/compare/v0.14.41...v0.14.42) (2026-01-29)
+
+
+### Bug Fixes
+
+* animation ([5dfeaf8](https://github.com/qq15725/modern-canvas/commit/5dfeaf801c46a2083ef9ab8bc450b51ecfa375ab))
+* bug ([0d60c3f](https://github.com/qq15725/modern-canvas/commit/0d60c3f0ad1dfc97d679f30dc01d2e2f3e5afbc3))
+* relayout ([2fb8c4a](https://github.com/qq15725/modern-canvas/commit/2fb8c4a734fc427033640ae4947220608cbba21a))
+* SceneTreeProperties ([0f2eac6](https://github.com/qq15725/modern-canvas/commit/0f2eac693a103354f9285d536fd5b74b4910af21))
+* timeline ([0bbbd98](https://github.com/qq15725/modern-canvas/commit/0bbbd98d63058b531809df8a0bdf80670a0eb74c))
+* timeline ([a78163d](https://github.com/qq15725/modern-canvas/commit/a78163d2cd8901fc97883979f77caf2ee393efb0))
+
+
+
 ## [0.14.41](https://github.com/qq15725/modern-canvas/compare/v0.14.40...v0.14.41) (2026-01-27)
 
 
