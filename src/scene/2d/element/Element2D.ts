@@ -299,6 +299,7 @@ export class Element2D extends Node2D implements Rectangulable {
         break
       case 'overflow':
         this._overflowHidden = value === 'hidden'
+        this._updateMask()
         break
       case 'pointerEvents':
         this._allowPointerEvents = !isNone(value)
