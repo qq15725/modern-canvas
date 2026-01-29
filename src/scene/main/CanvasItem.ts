@@ -175,10 +175,18 @@ export class CanvasItem extends TimelineNode {
 
   protected _relayout(batchables: CanvasBatchable[], oldBatchables: CanvasBatchable[]): CanvasBatchable[] {
     return batchables.map((batchable, index) => {
-      const oldBatchable = oldBatchables[index]
+      let vertices
+      const len = batchable.vertices.length
+      const oldVertices = oldBatchables[index]?.vertices
+      if (oldVertices && oldVertices.length === len) {
+        vertices = oldVertices
+      }
+      else {
+        vertices = new Float32Array(len)
+      }
       return {
         ...batchable,
-        vertices: oldBatchable?.vertices ?? new Float32Array(batchable.vertices.length),
+        vertices,
       }
     })
   }
