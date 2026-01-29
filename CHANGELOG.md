@@ -1,3 +1,12 @@
+## [0.14.43](https://github.com/qq15725/modern-canvas/compare/v0.14.42...v0.14.43) (2026-01-29)
+
+
+### Bug Fixes
+
+* removeChildren / globalTransform ([2fba711](https://github.com/qq15725/modern-canvas/commit/2fba711a24012130bc890c4f97eead3a9e0c2855))
+
+
+
 ## [0.14.42](https://github.com/qq15725/modern-canvas/compare/v0.14.41...v0.14.42) (2026-01-29)
 
 
