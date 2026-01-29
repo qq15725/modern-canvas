@@ -1,3 +1,12 @@
+## [0.14.45](https://github.com/qq15725/modern-canvas/compare/v0.14.44...v0.14.45) (2026-01-29)
+
+
+### Bug Fixes
+
+* style.rotate ([5c19bbf](https://github.com/qq15725/modern-canvas/commit/5c19bbfd0d5260fce2bba85c705c5ae86b110fb9))
+
+
+
 ## [0.14.44](https://github.com/qq15725/modern-canvas/compare/v0.14.43...v0.14.44) (2026-01-29)
 
 
