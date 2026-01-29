@@ -132,6 +132,9 @@ export class Animation extends TimelineNode {
     this
       .setProperties(properties)
       .append(children)
+
+    // TODO
+    this._duration = this.duration
   }
 
   protected override _parented(parent: Node): void {
