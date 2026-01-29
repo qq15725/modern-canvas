@@ -79,8 +79,8 @@ export class Node2D extends CanvasItem {
       this.globalSkew.set(globalSkew.x * this.skew.x, globalSkew.y * this.skew.y)
       this.globalRotation = globalRotation + this.rotation
       this.globalTransform.appendFrom(
-        parent.globalTransform,
         this.transform,
+        parent.globalTransform,
       )
     }
     else {

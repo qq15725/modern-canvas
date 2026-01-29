@@ -605,7 +605,7 @@ export class Node extends CoreObject {
   }
 
   removeChildren(): void {
-    const children = this._children.default
+    const children = this._children.default.slice()
     for (let i = 0, len = children.length; i < len; i++) {
       this.removeChild(children[i])
     }
