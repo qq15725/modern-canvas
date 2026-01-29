@@ -13,7 +13,8 @@ export class Color {
   protected declare _value: ColorValue
 
   get value(): ColorValue { return this._value }
-  set value(value: ColorValue | undefined) {
+  set value(value: ColorValue) {
+    this._value = value
     this._colord = parseColor(value ?? 'none')
   }
 

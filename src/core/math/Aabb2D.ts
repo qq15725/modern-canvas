@@ -36,7 +36,7 @@ export class Aabb2D implements RectangleLike {
   get height(): number { return this.size.y }
   set height(val) { this.size.y = Math.max(0, val) }
 
-  readonly max = new Vector2()
+  readonly max: Vector2
   readonly min: Vector2
   readonly size: Vector2
 
@@ -78,13 +78,22 @@ export class Aabb2D implements RectangleLike {
         size.set(Math.max(0, args[2]), Math.max(0, args[3]))
         break
     }
-    this.update = this.update.bind(this)
-    this.min = new Vector2(min.x, min.y, this.update)
-    this.size = new Vector2(size.x, size.y, this.update)
-    this.update()
+    this._updateMax = this._updateMax.bind(this)
+    this._updateSize = this._updateSize.bind(this)
+    this.min = new Vector2(min.x, min.y, this._updateMax)
+    this.size = new Vector2(size.x, size.y, this._updateMax)
+    this.max = new Vector2(min.x + size.x, min.y + size.y, this._updateSize)
   }
 
-  update(): this {
+  protected _updateSize(): this {
+    this.size.set(
+      this.max.x - this.min.x,
+      this.max.y - this.min.y,
+    )
+    return this
+  }
+
+  protected _updateMax(): this {
     this.max.set(
       this.min.x + this.size.x,
       this.min.y + this.size.y,

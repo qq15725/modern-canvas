@@ -115,10 +115,11 @@ export class Node2D extends CanvasItem {
     super._process(delta)
     const parent = this.getParent<Node2D>()
     if (
-      parent?.globalTransform
-      && this._parentTransformDirtyId !== parent?.transformDirtyId
+      parent
+      && parent.globalTransform
+      && this._parentTransformDirtyId !== parent.transformDirtyId
     ) {
-      this.requestLayout()
+      this.updateGlobalTransform()
     }
   }
 

@@ -5,12 +5,13 @@ import { CoreObject } from '../../core'
 export class Meta extends CoreObject {
   [key: string]: any
 
-  override getPropertyDeclarations(): Map<string, PropertyDeclaration> {
-    const declarations = new Map<string, PropertyDeclaration>()
-    this._properties.forEach((_value, key) => {
-      declarations.set(key, {
+  override getPropertyDeclarations(): Record<string, PropertyDeclaration> {
+    super.getPropertyDeclarations()
+    const declarations = {}
+    Object.keys(this._properties).forEach((key) => {
+      ;(declarations as any)[key] = {
         internalKey: `____${key}` as any,
-      })
+      }
     })
     return declarations
   }
