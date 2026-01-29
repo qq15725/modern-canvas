@@ -1,3 +1,12 @@
+## [0.14.44](https://github.com/qq15725/modern-canvas/compare/v0.14.43...v0.14.44) (2026-01-29)
+
+
+### Bug Fixes
+
+* style.overflow hidden ([f88fec0](https://github.com/qq15725/modern-canvas/commit/f88fec087146cd8c195bc52b12491f725419cd63))
+
+
+
 ## [0.14.43](https://github.com/qq15725/modern-canvas/compare/v0.14.42...v0.14.43) (2026-01-29)
 
 
