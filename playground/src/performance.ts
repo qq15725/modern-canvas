@@ -4,7 +4,7 @@ import {
 } from '../../src'
 
 class PerformanceTest {
-  count = 2000
+  count = 4000
   width = 1000
   height = 500
 

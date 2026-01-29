@@ -26,10 +26,10 @@ export interface Node2D {
 @customNode('Node2D')
 export class Node2D extends CanvasItem {
   rotation = 0
-  readonly position = new Vector2().on('update', () => this.updateGlobalTransform())
-  readonly scale = new Vector2(1, 1).on('update', () => this.updateGlobalTransform())
-  readonly skew = new Vector2().on('update', () => this.updateGlobalTransform())
-  readonly pivot = new Vector2().on('update', () => this.updateGlobalTransform())
+  readonly position = new Vector2(0, 0, () => this.updateGlobalTransform())
+  readonly scale = new Vector2(1, 1, () => this.updateGlobalTransform())
+  readonly skew = new Vector2(0, 0, () => this.updateGlobalTransform())
+  readonly pivot = new Vector2(0, 0, () => this.updateGlobalTransform())
   readonly extraTransform = new Transform2D()
   readonly transform = new Transform2D()
   readonly globalPosition = new Vector2()
@@ -38,6 +38,7 @@ export class Node2D extends CanvasItem {
   readonly globalSkew = new Vector2()
   readonly globalTransform = new Transform2D()
 
+  transformDirtyId = 0
   protected _parentTransformDirtyId?: number
 
   constructor(properties?: Partial<Node2DProperties>, nodes: Node[] = []) {
@@ -48,96 +49,65 @@ export class Node2D extends CanvasItem {
       .append(nodes)
   }
 
-  protected override _updateProperty(key: string, value: any, oldValue: any): void {
-    super._updateProperty(key, value, oldValue)
-
-    switch (key) {
-      case 'rotation':
-        this.updateGlobalTransform()
-        break
-    }
-  }
-
-  updateTransform(): void {
-    const px = this.pivot.x
-    const py = this.pivot.y
-    const sx = this.scale.x
-    const sy = this.scale.y
-    const kx = this.skew.x
-    const ky = this.skew.y
-    const r = this.rotation
-    const cos = Math.cos(r)
-    const sin = Math.sin(r)
-    const a = cos * sx - sin * sy * ky
-    const b = sin * sx + cos * sy * ky
-    const c = -sin * sx + cos * sy * kx
-    const d = cos * sx + sin * sy * kx
-    const tx0 = -px * a - py * c
-    const ty0 = -px * b - py * d
-    const tx1 = tx0 + this.position.x + px
-    const ty1 = ty0 + this.position.y + py
-    const m = this.transform
-    m.set([
-      a, c, tx1,
-      b, d, ty1,
-      0, 0, 1,
-    ])
-    m.multiply(this.extraTransform)
+  protected _updateTransform(): void {
+    this.transform
+      .identity()
+      .translate(-this.pivot.x, -this.pivot.y)
+      .scale(this.scale.x, this.scale.y)
+      .skew(this.skew.x, this.skew.y)
+      .rotate(this.rotation)
+      .append(this.extraTransform)
+      .translate(this.position.x, this.position.y)
+      .translate(this.pivot.x, this.pivot.y)
+    this.transformDirtyId++
   }
 
   updateGlobalTransform(): void {
-    this.updateTransform()
+    this._updateTransform()
     const parent = this.getParent<Node2D>()
     if (parent?.globalTransform) {
       const {
         globalPosition,
         globalScale,
         globalSkew,
-        globalTransform,
         globalRotation,
+        transformDirtyId,
       } = parent
-      this._parentTransformDirtyId = globalTransform.dirtyId
+      this._parentTransformDirtyId = transformDirtyId
       this.globalPosition.set(globalPosition.x + this.position.x, globalPosition.y + this.position.y)
       this.globalScale.set(globalScale.x * this.scale.x, globalScale.y * this.scale.y)
       this.globalSkew.set(globalSkew.x * this.skew.x, globalSkew.y * this.skew.y)
       this.globalRotation = globalRotation + this.rotation
-      parent.globalTransform.multiply(this.transform, this.globalTransform)
+      this.globalTransform.appendFrom(
+        parent.globalTransform,
+        this.transform,
+      )
     }
     else {
-      this.globalPosition.copy(this.position)
-      this.globalScale.copy(this.scale)
-      this.globalSkew.copy(this.skew)
+      this.globalPosition.copyFrom(this.position)
+      this.globalScale.copyFrom(this.scale)
+      this.globalSkew.copyFrom(this.skew)
       this.globalRotation = this.rotation
-      this.globalTransform.copy(this.transform)
+      this.globalTransform.copyFrom(this.transform)
     }
     this.requestLayout()
   }
 
-  protected _transformVertices(batchable: CanvasBatchable): Float32Array {
-    const { a, c, tx, b, d, ty } = this.globalTransform.toObject()
-    const vertices = batchable.vertices
-    const len = batchable.vertices.length
-    const newVertices = new Float32Array(len)
-    const transform = batchable.transformVertex ?? (() => {})
-    let x, y
-    for (let i = 0; i < len; i += 2) {
-      x = vertices[i]
-      y = vertices[i + 1]
-      newVertices[i] = (a * x) + (c * y) + tx
-      newVertices[i + 1] = (b * x) + (d * y) + ty
-      transform(newVertices, i)
-    }
-    return newVertices
-  }
-
-  protected override _relayout(batchables: CanvasBatchable[]): CanvasBatchable[] {
-    batchables = super._relayout(batchables)
-    this.updateGlobalTransform()
-    return batchables.map((batchable) => {
-      return {
-        ...batchable,
-        vertices: this._transformVertices(batchable),
+  protected override _relayout(batchables: CanvasBatchable[], oldBatchables: CanvasBatchable[]): CanvasBatchable[] {
+    return super._relayout(batchables, oldBatchables).map((newBatchable, index) => {
+      const vertices = batchables[index].vertices
+      const newVertices = newBatchable.vertices
+      const { a, c, tx, b, d, ty } = this.globalTransform
+      const transform = newBatchable.transformVertex ?? (() => {})
+      let x, y
+      for (let len = vertices.length, i = 0; i < len; i += 2) {
+        x = vertices[i]
+        y = vertices[i + 1]
+        newVertices[i] = (a * x) + (c * y) + tx
+        newVertices[i + 1] = (b * x) + (d * y) + ty
+        transform(newVertices, i)
       }
+      return newBatchable
     })
   }
 
@@ -146,7 +116,7 @@ export class Node2D extends CanvasItem {
     const parent = this.getParent<Node2D>()
     if (
       parent?.globalTransform
-      && this._parentTransformDirtyId !== parent?.globalTransform?.dirtyId
+      && this._parentTransformDirtyId !== parent?.transformDirtyId
     ) {
       this.requestLayout()
     }

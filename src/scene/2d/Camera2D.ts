@@ -39,7 +39,7 @@ export class Camera2D extends Node2D {
   readonly canvasTransform = new Transform2D()
   protected _screenOffset = { x: 0, y: 0 }
 
-  protected _zoom = new Vector2(1, 1).on('update', () => this.updateTransform())
+  protected _zoom = new Vector2(1, 1, () => this._updateTransform())
   get zoom(): Vector2 { return this._zoom }
   set zoom(val: Vector2Like) { this._zoom.set(val.x, val.y) }
 
@@ -130,10 +130,10 @@ export class Camera2D extends Node2D {
     else if (key === 'pointermove') {
       const e = event as PointerInputEvent
       if (this.grabbing) {
-        this.position.add(
-          Math.round(this._screenOffset.x - e.screenX),
-          Math.round(this._screenOffset.y - e.screenY),
-        )
+        this.position.add({
+          x: Math.round(this._screenOffset.x - e.screenX),
+          y: Math.round(this._screenOffset.y - e.screenY),
+        })
         this._screenOffset = { x: e.screenX, y: e.screenY }
       }
     }
@@ -163,13 +163,16 @@ export class Camera2D extends Node2D {
       const delta = -e.deltaY * (e.deltaMode === 1 ? 0.05 : e.deltaMode ? 1 : 0.002) * factor
       this.zoomWithWheel(delta)
       const newScreen = this.toScreen(oldGlobal)
-      this.position.add(newScreen.x - oldScreen.x, newScreen.y - oldScreen.y)
+      this.position.add({
+        x: newScreen.x - oldScreen.x,
+        y: newScreen.y - oldScreen.y,
+      })
     }
     else {
-      this.position.add(
-        Math.round(e.deltaX),
-        Math.round(e.deltaY),
-      )
+      this.position.add({
+        x: Math.round(e.deltaX),
+        y: Math.round(e.deltaY),
+      })
     }
   }
 
@@ -180,16 +183,16 @@ export class Camera2D extends Node2D {
     this.setZoom(Math.round(zoom * 10_000) / 10_000)
   }
 
-  override updateTransform(): void {
-    super.updateTransform()
-    this.updateCanvasTransform()
+  override _updateTransform(): void {
+    super._updateTransform()
+    this._updateCanvasTransform()
   }
 
-  updateCanvasTransform(): void {
+  protected _updateCanvasTransform(): void {
     this.canvasTransform
       .identity()
       .scale(this._zoom.x, this._zoom.y)
-      .premultiply(this.transform.affineInverse())
+      .prepend(this.transform.affineInverse())
 
     this.syncCanvasTransform()
 
@@ -197,7 +200,7 @@ export class Camera2D extends Node2D {
   }
 
   syncCanvasTransform(): void {
-    this.getViewport()?.canvasTransform.copy(this.canvasTransform)
+    this.getViewport()?.canvasTransform.copyFrom(this.canvasTransform)
   }
 
   protected override _treeEnter(tree: SceneTree): void {

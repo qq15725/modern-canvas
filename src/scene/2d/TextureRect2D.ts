@@ -25,7 +25,6 @@ export class TextureRect2D<T extends Texture2D = Texture2D> extends Element2D {
       this.context.fillStyle = this.texture
       const { a, c, tx, b, d, ty } = new Transform2D()
         .scale(1 / this.size.x, 1 / this.size.y)
-        .toObject()
       let _x, _y
       this.context.fill({
         transformUv: (uvs, i) => {

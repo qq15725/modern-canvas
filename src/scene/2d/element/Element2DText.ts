@@ -350,10 +350,9 @@ export class Element2DText extends CoreObject {
     const { left = 0, top = 0, width, height } = this.base.boundingBox
     ctx.fillStyle = this._texture
     ctx.rect(left, top, width, height)
-    const t2d = new Transform2D()
+    const { a, c, tx, b, d, ty } = new Transform2D()
       .translate(-left, -top)
       .scale(1 / width, 1 / height)
-    const { a, c, tx, b, d, ty } = t2d.toObject()
     let x, y
     ctx.fill({
       transformUv: (uvs, i) => {

@@ -284,10 +284,10 @@ export class Effect extends TimelineNode implements Rectangulable {
         const isRoot = currentViewport.renderTarget.isRoot
         this.viewport1.activateWithCopy(renderer, currentViewport)
         this.viewport1.renderTargets.forEach(t => t.isRoot = isRoot)
-        this.viewport1.canvasTransform.copy(currentViewport.canvasTransform)
+        this.viewport1.canvasTransform.copyFrom(currentViewport.canvasTransform)
         this.viewport2.resize(currentViewport.width, currentViewport.height)
         this.viewport2.renderTargets.forEach(t => t.isRoot = isRoot)
-        this.viewport2.canvasTransform.copy(currentViewport.canvasTransform)
+        this.viewport2.canvasTransform.copyFrom(currentViewport.canvasTransform)
         this.viewport2.renderStart(renderer)
       }
     }

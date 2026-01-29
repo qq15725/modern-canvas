@@ -1,7 +1,4 @@
-import { Matrix } from './Matrix'
-import { Matrix4 } from './Matrix4'
 import { clamp, lerp } from './utils'
-import { Vector4 } from './Vector4'
 
 /**
  * Matrix4(4x5)
@@ -11,9 +8,21 @@ import { Vector4 } from './Vector4'
  * | r2 | g2 | b2 | a2 | tb |
  * | r3 | g3 | b3 | a3 | ta |
  */
-export class ColorMatrix extends Matrix {
-  constructor(array?: number[]) {
-    super(4, 5, array)
+export class ColorMatrix {
+  protected _array = new Float32Array(4 * 5)
+
+  constructor() {
+    this.identity()
+  }
+
+  identity(): this {
+    this._array.set([
+      1, 0, 0, 0, 0,
+      0, 1, 0, 0, 0,
+      0, 0, 1, 0, 0,
+      0, 0, 0, 1, 0,
+    ])
+    return this
   }
 
   hueRotate(angle = 0): this {
@@ -143,10 +152,10 @@ export class ColorMatrix extends Matrix {
     ])
   }
 
-  override multiply(target: number[]): this {
+  multiply(target: number[]): this {
     const b = target
     const a = this._array
-    return this.set([
+    this._array.set([
       // Red Channel
       (a[0] * b[0]) + (a[1] * b[5]) + (a[2] * b[10]) + (a[3] * b[15]),
       (a[0] * b[1]) + (a[1] * b[6]) + (a[2] * b[11]) + (a[3] * b[16]),
@@ -172,20 +181,10 @@ export class ColorMatrix extends Matrix {
       (a[15] * b[3]) + (a[16] * b[8]) + (a[17] * b[13]) + (a[18] * b[18]),
       (a[15] * b[4]) + (a[16] * b[9]) + (a[17] * b[14]) + (a[18] * b[19]) + a[19],
     ])
+    return this
   }
 
-  toMatrix4(): Matrix4 {
-    const array = this._array
-    return new Matrix4([
-      array[0], array[1], array[2], array[3],
-      array[5], array[6], array[7], array[8],
-      array[10], array[11], array[12], array[13],
-      array[15], array[16], array[17], array[18],
-    ])
-  }
-
-  toVector4(): Vector4 {
-    const array = this._array
-    return new Vector4(array[4] / 255, array[9] / 255, array[14] / 255, array[19] / 255)
+  toArray(): Float32Array<ArrayBuffer> {
+    return this._array
   }
 }

@@ -3,7 +3,7 @@ import type { RenderTargetLike } from '../shared'
 import type { GlRenderer } from './GlRenderer'
 import { GlSystem } from './system'
 
-function applyMatrixToPoint(m: number[], x: number, y: number): { x: number, y: number } {
+function applyMatrixToPoint(m: Float32Array, x: number, y: number): { x: number, y: number } {
   const [a, d, g, b, e, h, c, f, i] = m
   const xp = a * x + b * y + c
   const yp = d * x + e * y + f
@@ -11,7 +11,7 @@ function applyMatrixToPoint(m: number[], x: number, y: number): { x: number, y: 
   return { x: xp / wp, y: yp / wp }
 }
 
-function transformRectToAABB(m: number[], rect: RectangleLike): RectangleLike {
+function transformRectToAABB(m: Float32Array, rect: RectangleLike): RectangleLike {
   const { x, y, width, height } = rect
   const p1 = applyMatrixToPoint(m, x, y)
   const p2 = applyMatrixToPoint(m, x + width, y)

@@ -1,28 +1,9 @@
-import type { VectorLike } from './Vector'
-import { Vector } from './Vector'
-
 export interface Vector2Like {
   x: number
   y: number
 }
 
-export class Vector2 extends Vector implements Vector2Like {
-  get x(): number { return this._array[0] }
-  set x(val) {
-    const [x, y] = this._array
-    if (x !== val) {
-      this.set(val, y)
-    }
-  }
-
-  get y(): number { return this._array[1] }
-  set y(val) {
-    const [x, y] = this._array
-    if (y !== val) {
-      this.set(x, val)
-    }
-  }
-
+export class Vector2 implements Vector2Like {
   get width(): number { return this.x }
   set width(val) { this.x = val }
 
@@ -35,27 +16,63 @@ export class Vector2 extends Vector implements Vector2Like {
   get top(): number { return this.y }
   set top(val) { this.y = val }
 
-  constructor(x: VectorLike = 0, y?: number) {
-    super(2)
-    this.set(typeof x === 'number' ? [x, y ?? x] : x)
+  get x(): number { return this._x }
+  set x(value: number) {
+    if (this._x !== value) {
+      this._x = value
+      this._onUpdate?.(this)
+    }
   }
 
-  update(x: number, y: number): this {
-    const [oldX, oldY] = this._array
-    if (oldX !== x || oldY !== y) {
-      this.set(x, y)
+  get y(): number { return this._y }
+  set y(value: number) {
+    if (this._y !== value) {
+      this._y = value
+      this._onUpdate?.(this)
     }
+  }
+
+  constructor(
+    protected _x = 0,
+    protected _y = 0,
+    protected readonly _onUpdate?: (vec: Vector2) => void,
+  ) {
+    //
+  }
+
+  set(x = 0, y = x): this {
+    if (this._x !== x || this._y !== y) {
+      this._x = x
+      this._y = y
+      this._onUpdate?.(this)
+    }
+
+    return this
+  }
+
+  add(vec: Vector2Like): this {
+    this.set(this._x + vec.x, this._y + vec.y)
+    return this
+  }
+
+  sub(vec: Vector2Like): this {
+    this.set(this._x - vec.x, this._y - vec.y)
+    return this
+  }
+
+  multiply(x = 0, y = x): this {
+    this.set(this._x * x, this._y * y)
     return this
   }
 
   getLength(): number {
-    const [x, y] = this._array
+    const x = this.x
+    const y = this.y
     return Math.sqrt(x * x + y * y)
   }
 
   getAngle(): number {
-    const [x, y] = this._array
-    return Math.atan2(-x, -y) + Math.PI
+    return Math.atan2(-this.x, -this.y) + Math.PI
   }
 
   distanceTo(point: Vector2Like): number {
@@ -63,17 +80,41 @@ export class Vector2 extends Vector implements Vector2Like {
   }
 
   normalize(): this {
-    const [x, y] = this._array
     const scalar = 1 / (this.getLength() || 1)
-    this.set(x * scalar, y * scalar)
+    this.set(this.x * scalar, this.y * scalar)
     return this
   }
 
-  static lerp(a: VectorLike, b: VectorLike, t: number): Vector2 {
-    return new Vector2(b)
+  copyFrom(p: Vector2Like): this {
+    if (this._x !== p.x || this._y !== p.y) {
+      this._x = p.x
+      this._y = p.y
+      this._onUpdate?.(this)
+    }
+    return this
+  }
+
+  copyTo<T extends Vector2>(p: T): T {
+    p.set(this._x, this._y)
+    return p
+  }
+
+  static lerp(a: Vector2Like, b: Vector2Like, t: number): Vector2 {
+    return new Vector2(b.x, b.y)
       .clone()
       .sub(a)
       .multiply(t)
       .add(a)
+  }
+
+  clone(_onUpdate?: (vec: Vector2) => void): Vector2 {
+    return new Vector2(this._x, this._y, _onUpdate ?? this._onUpdate)
+  }
+
+  toJSON(): Vector2Like {
+    return {
+      x: this.x,
+      y: this.y,
+    }
   }
 }

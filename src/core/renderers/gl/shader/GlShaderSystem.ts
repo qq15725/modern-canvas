@@ -16,8 +16,8 @@ export class GlShaderSystem extends GlSystem {
   readonly glProgramDatas = new Map<number, GlProgramData>()
   currentProgram: GlProgram | null = null
   uniforms = {
-    projectionMatrix: [1, 0, 0, 0, 1, 0, 0, 0, 1],
-    viewMatrix: [1, 0, 0, 0, 1, 0, 0, 0, 1],
+    projectionMatrix: new Float32Array([1, 0, 0, 0, 1, 0, 0, 0, 1]),
+    viewMatrix: new Float32Array([1, 0, 0, 0, 1, 0, 0, 0, 1]),
   }
 
   bind(source: ShaderLike | null): void {
@@ -152,9 +152,11 @@ export class GlShaderSystem extends GlSystem {
       if (!boundUniform)
         continue
 
-      const { type, isArray, value: oldValue, name } = boundUniform
-      if (oldValue === value)
-        continue
+      const { type, isArray, value: _oldValue, name } = boundUniform
+
+      // TODO
+      // if (oldValue === value)
+      //   continue
 
       boundUniform.value = value
 
@@ -237,8 +239,8 @@ export class GlShaderSystem extends GlSystem {
     this.glProgramDatas.clear()
     this.currentProgram = null
     this.uniforms = {
-      projectionMatrix: [1, 0, 0, 0, 1, 0, 0, 0, 1],
-      viewMatrix: [1, 0, 0, 0, 1, 0, 0, 0, 1],
+      projectionMatrix: new Float32Array([1, 0, 0, 0, 1, 0, 0, 0, 1]),
+      viewMatrix: new Float32Array([1, 0, 0, 0, 1, 0, 0, 0, 1]),
     }
   }
 

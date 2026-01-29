@@ -53,7 +53,6 @@ export type InternalMode = 'default' | 'front' | 'back'
 export interface NodeProperties {
   id: string
   name: string
-  mask: MaskLike
   processMode: ProcessMode
   processSortMode: ProcessSortMode
   renderMode: RenderMode
@@ -92,7 +91,7 @@ export class Node extends CoreObject {
   @property({ fallback: 'inherit' }) declare renderMode: RenderMode
   @property({ fallback: 'inherit' }) declare inputMode: InputMode
   @property({ fallback: 'default' }) declare internalMode: InternalMode
-  @property({ internal: true }) declare mask?: MaskLike
+  protected _mask?: MaskLike
 
   protected _meta = new Meta(this)
   get meta(): Meta { return this._meta }
@@ -279,27 +278,26 @@ export class Node extends CoreObject {
     this._ready()
   }
 
-  protected _onProcess(delta = 0): void {
+  _onProcess(delta = 0): void {
     const tree = this._tree
     const renderable = this.renderable
     const processable = this.processable
-
-    const childrenInBefore: Node[] = []
+    const children = this._children
     const childrenInAfter: Node[] = []
-    this._children.internal.forEach((child) => {
-      switch (child.processSortMode) {
-        case 'default':
-          childrenInAfter.push(child)
-          break
-        case 'parent-before':
-          childrenInBefore.push(child)
-          break
-      }
-    })
 
-    childrenInBefore.forEach((child) => {
-      child.emit('process', delta)
-    })
+    for (const key of ['front', 'default', 'back'] as const) {
+      for (let child, len = children[key].length, i = 0; i < len; i++) {
+        child = children[key][i]
+        switch (child.processSortMode) {
+          case 'default':
+            childrenInAfter.push(child)
+            break
+          case 'parent-before':
+            child._onProcess(delta)
+            break
+        }
+      }
+    }
 
     if (processable) {
       tree?.emit('nodeProcessing', this)
@@ -314,9 +312,9 @@ export class Node extends CoreObject {
       tree!.renderStack.currentCall = renderCall
     }
 
-    childrenInAfter.forEach((child) => {
-      child.emit('process', delta)
-    })
+    for (let len = childrenInAfter.length, i = 0; i < len; i++) {
+      childrenInAfter[i].emit('process', delta)
+    }
 
     if (renderable) {
       tree!.renderStack.currentCall = oldRenderCall
@@ -393,7 +391,7 @@ export class Node extends CoreObject {
   }
 
   render(renderer: GlRenderer, next?: () => void): void {
-    const mask = this.mask
+    const mask = this._mask
 
     if (mask) {
       renderer.flush()
@@ -607,7 +605,10 @@ export class Node extends CoreObject {
   }
 
   removeChildren(): void {
-    this.children.forEach(child => this.removeChild(child))
+    const children = this._children.default
+    for (let i = 0, len = children.length; i < len; i++) {
+      this.removeChild(children[i])
+    }
   }
 
   remove(): void {
@@ -615,7 +616,9 @@ export class Node extends CoreObject {
   }
 
   findOne<T extends Node = Node>(callbackfn: (value: Node) => boolean): T | undefined {
-    for (const child of this._children.default) {
+    const children = this._children.default
+    for (let child, len = children.length, i = 0; i < len; i++) {
+      child = children[i]
       if (callbackfn(child)) {
         return child as T
       }
@@ -629,7 +632,9 @@ export class Node extends CoreObject {
 
   findAll<T extends Node = Node>(callbackfn: (value: Node) => boolean): T[] {
     const items: Node[] = []
-    for (const child of this._children.default) {
+    const children = this._children.default
+    for (let child, len = children.length, i = 0; i < len; i++) {
+      child = children[i]
       if (callbackfn(child)) {
         items.push(child)
       }

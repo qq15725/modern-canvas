@@ -65,13 +65,15 @@ const textStyles = new Set(Object.keys(getDefaultTextStyle()))
 
 @customNode('Element2D')
 export class Element2D extends Node2D implements Rectangulable {
+  readonly flexbox = new Flexbox(this)
+  readonly aabb = new Aabb2D()
+  readonly globalAabb = new Aabb2D()
+
   protected _parentGlobalDisplay?: Display
   protected _globalDisplay?: Display
   get globalDisplay(): Display | undefined { return this._globalDisplay }
 
-  readonly flexbox = new Flexbox(this)
-
-  readonly size = new Vector2().on('update', () => {
+  readonly size = new Vector2(0, 0, () => {
     this.onUpdateStyleProperty('transformOrigin', this.style.transformOrigin, undefined)
     this.onUpdateStyleProperty('transform', this.style.transform, undefined)
     this.updateGlobalTransform()
@@ -160,6 +162,60 @@ export class Element2D extends Node2D implements Rectangulable {
     return this
   }
 
+  override _updateTransform(): void {
+    super._updateTransform()
+    this._updateAabb()
+  }
+
+  protected _updateAabb(): void {
+    const { a, b, c, d, tx, ty } = this.transform
+    const x: number[] = []
+    const y: number[] = []
+    this._getPointArray().forEach((p) => {
+      x.push((a * p.x) + (c * p.y) + tx)
+      y.push((b * p.x) + (d * p.y) + ty)
+    })
+    const min = { x: Math.min(...x), y: Math.min(...y) }
+    const max = { x: Math.max(...x), y: Math.max(...y) }
+    this.aabb.min.set(min.x, min.y)
+    this.aabb.size.set(max.x - min.x, max.y - min.y)
+  }
+
+  override updateGlobalTransform(): void {
+    super.updateGlobalTransform()
+    this._updateGlobalAabb()
+  }
+
+  protected _updateGlobalAabb(): void {
+    const { a, b, c, d, tx, ty } = this.globalTransform
+    const x: number[] = []
+    const y: number[] = []
+    this._getPointArray().forEach((p) => {
+      x.push((a * p.x) + (c * p.y) + tx)
+      y.push((b * p.x) + (d * p.y) + ty)
+    })
+    const min = { x: Math.min(...x), y: Math.min(...y) }
+    const max = { x: Math.max(...x), y: Math.max(...y) }
+    this.globalAabb.min.set(min.x, min.y)
+    this.globalAabb.size.set(max.x - min.x, max.y - min.y)
+    this._updateMask()
+  }
+
+  protected _updateMask(): void {
+    if (this._overflowHidden) {
+      this._mask = this.globalAabb
+    }
+    else {
+      this._mask = undefined
+    }
+  }
+
+  protected _updateGlobalDisplay(): void {
+    this._parentGlobalDisplay = this.getParent<Element2D>()?.globalDisplay
+    this._globalDisplay = this.style.display
+      ?? this._parentGlobalDisplay
+  }
+
   onUpdateStyleProperty(key: string, value: any, oldValue: any): void {
     this.emit('updateStyleProperty', key, value, oldValue)
     this._updateStyleProperty(key, value, oldValue)
@@ -168,7 +224,7 @@ export class Element2D extends Node2D implements Rectangulable {
   protected _updateStyleProperty(key: string, value: any, oldValue: any): void {
     switch (key) {
       case 'display':
-        this.updateGlobalDisplay()
+        this._updateGlobalDisplay()
         break
       case 'rotate':
         this.rotation = value * DEG_TO_RAD
@@ -279,12 +335,6 @@ export class Element2D extends Node2D implements Rectangulable {
     }
   }
 
-  updateGlobalDisplay(): void {
-    this._parentGlobalDisplay = this.getParent<Element2D>()?.globalDisplay
-    this._globalDisplay = this.style.display
-      ?? this._parentGlobalDisplay
-  }
-
   override requestLayout(): void {
     super.requestLayout()
     this.flexbox.update()
@@ -300,7 +350,7 @@ export class Element2D extends Node2D implements Rectangulable {
     const parent = this.getParent<Element2D>()
 
     if (this._parentGlobalDisplay !== parent?.globalDisplay) {
-      this.updateGlobalDisplay()
+      this._updateGlobalDisplay()
     }
 
     this.flexbox.update()
@@ -344,43 +394,18 @@ export class Element2D extends Node2D implements Rectangulable {
     }
   }
 
-  override updateGlobalTransform(): void {
-    super.updateGlobalTransform()
-    this._updateMask()
-  }
-
   protected _getPointArray(): Vector2Like[] {
     const { width, height } = this.size
-    const x1 = 0
-    const y1 = 0
-    const x2 = x1 + width
-    const y2 = y1 + height
     return [
-      { x: x1, y: y1 },
-      { x: x1, y: y2 },
-      { x: x2, y: y1 },
-      { x: x2, y: y2 },
+      { x: 0, y: 0 },
+      { x: 0, y: height },
+      { x: width, y: 0 },
+      { x: width, y: height },
     ]
   }
 
   getRect(): Aabb2D {
-    return this.getGlobalAabb()
-  }
-
-  getAabb(): Aabb2D {
-    return new Aabb2D(
-      this._getPointArray().map((p) => {
-        return this.transform.apply(p)
-      }),
-    )
-  }
-
-  getGlobalAabb(): Aabb2D {
-    return new Aabb2D(
-      this._getPointArray().map((p) => {
-        return this.globalTransform.apply(p)
-      }),
-    )
+    return this.globalAabb
   }
 
   getObb(): Obb2D {
@@ -447,15 +472,6 @@ export class Element2D extends Node2D implements Rectangulable {
   //   }
   //   return super.isVisibleInTree()
   // }
-
-  protected _updateMask(): void {
-    if (this._overflowHidden) {
-      this.mask = this.getRect()
-    }
-    else {
-      this.mask = undefined
-    }
-  }
 
   protected _draw(): void {
     super._draw()

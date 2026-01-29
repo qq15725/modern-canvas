@@ -78,8 +78,11 @@ export class CanvasItem extends TimelineNode {
   }
 
   protected override _updateInsideTimeRange(): void {
+    const oldValue = this.insideTimeRange
     super._updateInsideTimeRange()
-    this._updateGlobalVisible()
+    if (oldValue !== this.insideTimeRange) {
+      this._updateGlobalVisible()
+    }
   }
 
   show(): void {
@@ -170,16 +173,24 @@ export class CanvasItem extends TimelineNode {
     })
   }
 
-  protected _relayout(batchables: CanvasBatchable[]): CanvasBatchable[] {
-    return batchables
+  protected _relayout(batchables: CanvasBatchable[], oldBatchables: CanvasBatchable[]): CanvasBatchable[] {
+    return batchables.map((batchable, index) => {
+      const oldBatchable = oldBatchables[index]
+      return {
+        ...batchable,
+        vertices: oldBatchable?.vertices ?? new Float32Array(batchable.vertices.length),
+      }
+    })
   }
 
   protected _repaint(batchables: CanvasBatchable[]): CanvasBatchable[] {
+    const modulate = this._modulate
+    const blendMode = this._blendMode
     return batchables.map((batchable) => {
       return {
         ...batchable,
-        modulate: this._modulate,
-        blendMode: this._blendMode,
+        modulate,
+        blendMode,
       }
     })
   }
@@ -214,7 +225,7 @@ export class CanvasItem extends TimelineNode {
     }
 
     if (needsLayout) {
-      this._layoutBatchables = this._relayout(this._drawBatchables)
+      this._layoutBatchables = this._relayout(this._drawBatchables, this._layoutBatchables)
       needsPaint = true
     }
 
@@ -242,7 +253,7 @@ export class CanvasItem extends TimelineNode {
     const viewport = this.tree?.getPreviousViewport()
     if (viewport) {
       if ('getRect' in this) {
-        const { a, d, tx, ty } = viewport.canvasTransform.toObject()
+        const { a, d, tx, ty } = viewport.canvasTransform
         const { vertices } = batchable
         const uvTransform = new Transform2D()
           .scale(1 / viewport.width * a, -1 / viewport.height * d)
@@ -267,20 +278,22 @@ export class CanvasItem extends TimelineNode {
     this._updateBatchables()
 
     const pixelate = this._tree?.pixelate
+    const roundPixels = this._tree?.roundPixels
+    const batchables = this._batchables
 
-    this._batchables.forEach((batchable) => {
-      let texture = batchable.texture
+    for (let batchable, texture, len = batchables.length, i = 0; i < len; i++) {
+      batchable = batchables[i]
+      texture = batchable.texture
       if (texture instanceof ViewportTexture) {
         texture = this._handleViewportTexture(batchable)
       }
-
       renderer.batch2D.render({
         ...batchable,
-        roundPixels: this._tree?.roundPixels,
+        roundPixels,
         size: pixelate ? batchable.size : undefined,
         texture,
       })
-    })
+    }
 
     super._render(renderer)
   }

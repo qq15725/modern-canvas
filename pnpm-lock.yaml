@@ -18,8 +18,8 @@ importers:
         specifier: ^0.4.4
         version: 0.4.4
       modern-idoc:
-        specifier: ^0.10.14
-        version: 0.10.14
+        specifier: ^0.10.18
+        version: 0.10.18
       modern-path2d:
         specifier: ^1.4.16
         version: 1.4.16
@@ -1651,8 +1651,8 @@ packages:
     resolution: {integrity: sha512-c/c15i26VrJ4IRt5Z89DnIzCGDn9EcebibhAOjw5ibqEHsE1wLUgkPn9RDmNcUKyU87GeaL633nyJ+pplFR2ZQ==}
     engines: {node: '>=18'}
 
-  globals@17.1.0:
-    resolution: {integrity: sha512-8HoIcWI5fCvG5NADj4bDav+er9B9JMj2vyL2pI8D0eismKyUvPLTSs+Ln3wqhwcp306i73iyVnEKx3F6T47TGw==}
+  globals@17.2.0:
+    resolution: {integrity: sha512-tovnCz/fEq+Ripoq+p/gN1u7l6A7wwkoBT9pRCzTHzsD/LvADIzXZdjmRymh5Ztf0DYC3Rwg5cZRYjxzBmzbWg==}
     engines: {node: '>=18'}
 
   globrex@0.1.2:
@@ -2007,8 +2007,8 @@ packages:
   modern-gif@2.0.4:
     resolution: {integrity: sha512-q3Nf6X3kpnGwiKLzTzOjsbvM16/kPcfy0JrrC79TmuKLCWiOkwb0ztuVhZnqGCizSr4o84gFOaBeGDVaE/Bcgw==}
 
-  modern-idoc@0.10.14:
-    resolution: {integrity: sha512-bY8fp9u5xajs993cZ3A38z3AYocXQZG1SPaO3jktILMSa551sg1EJ8ffRmnt3pR/Ar7HubccTPD2TCnJBp8ySA==}
+  modern-idoc@0.10.18:
+    resolution: {integrity: sha512-iD0bFV9U0NJD06Mqp1KLBPPCWJLIi3JnMz5JeOk4lpW/v18tnWCq8W3giD60RAcXejdCxEIpmZa+mAbIxuZK5g==}
 
   modern-palette@2.0.0:
     resolution: {integrity: sha512-wKZcom2QzK6sS6h5RLYHEkd3V3maQLzgkI+ekDCimlk7dfXa63aekZcy+7KS+8JEqIDeY/yV1CAvA7l+7u6QHA==}
@@ -2750,7 +2750,7 @@ snapshots:
       eslint-plugin-vue: 10.7.0(@stylistic/eslint-plugin@5.7.1(eslint@9.39.2(jiti@2.6.1)))(@typescript-eslint/parser@8.54.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1))(vue-eslint-parser@10.2.0(eslint@9.39.2(jiti@2.6.1)))
       eslint-plugin-yml: 3.0.0(eslint@9.39.2(jiti@2.6.1))
       eslint-processor-vue-blocks: 2.0.0(@vue/compiler-sfc@3.5.13)(eslint@9.39.2(jiti@2.6.1))
-      globals: 17.1.0
+      globals: 17.2.0
       jsonc-eslint-parser: 2.4.2
       local-pkg: 1.1.2
       parse-gitignore: 2.0.0
@@ -4275,7 +4275,7 @@ snapshots:
 
   globals@16.5.0: {}
 
-  globals@17.1.0: {}
+  globals@17.2.0: {}
 
   globrex@0.1.2: {}
 
@@ -4779,7 +4779,7 @@ snapshots:
     dependencies:
       modern-palette: 2.0.0
 
-  modern-idoc@0.10.14:
+  modern-idoc@0.10.18:
     dependencies:
       colord: 2.9.3
       nanoid: 5.1.6
@@ -4794,7 +4794,7 @@ snapshots:
     dependencies:
       diff: 8.0.3
       modern-font: 0.4.4
-      modern-idoc: 0.10.14
+      modern-idoc: 0.10.18
       modern-path2d: 1.4.16
 
   ms@2.1.3: {}

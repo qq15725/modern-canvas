@@ -17,7 +17,8 @@ export class Children<T extends Node = Node> {
     this.front.length = 0
     this.default.length = 0
     this.back.length = 0
-    items.forEach((item) => {
+    for (let len = items.length, i = 0; i < len; i++) {
+      const item = items[i]
       switch (item.internalMode) {
         case 'front':
           this.front.push(item)
@@ -29,7 +30,7 @@ export class Children<T extends Node = Node> {
           this.back.push(item)
           break
       }
-    })
+    }
     return this
   }
 
@@ -47,11 +48,11 @@ export class Children<T extends Node = Node> {
       }
     }
     else {
-      return [
-        ...this.front,
-        ...this.default,
-        ...this.back,
-      ]
+      const result: T[] = []
+      result.push(...this.front)
+      result.push(...this.default)
+      result.push(...this.back)
+      return result
     }
   }
 

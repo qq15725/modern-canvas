@@ -73,7 +73,7 @@ export function parseCssTransform(
           output.skewY(values[0])
           break
         case 'matrix':
-          output.set(values)
+          output.set(values[0], values[1], values[2], values[3], values[4], values[5])
           break
       }
     })

@@ -63,7 +63,7 @@ export function getFillDrawOptions(
     clipOutsideUv = true
   }
 
-  const { a, c, tx, b, d, ty } = uvTransform.toObject()
+  const { a, c, tx, b, d, ty } = uvTransform
 
   let _x, _y
   return {

@@ -79,8 +79,8 @@ export class Aabb2D implements RectangleLike {
         break
     }
     this.update = this.update.bind(this)
-    this.min = min.on('update', this.update)
-    this.size = size.on('update', this.update)
+    this.min = new Vector2(min.x, min.y, this.update)
+    this.size = new Vector2(size.x, size.y, this.update)
     this.update()
   }
 

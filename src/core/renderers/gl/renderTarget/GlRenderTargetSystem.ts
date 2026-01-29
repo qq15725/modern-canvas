@@ -31,7 +31,7 @@ export class GlRenderTargetSystem extends GlSystem {
   protected _msaaSamples: number[] = []
   protected _hasMRT = true
   protected _writeDepthTexture = true
-  projectionMatrix = new Projection2D()
+  projection = new Projection2D()
 
   protected override _updateContext(gl: GlRenderingContext): void {
     super._updateContext(gl)
@@ -103,13 +103,13 @@ export class GlRenderTargetSystem extends GlSystem {
         viewport.height = texture.pixelHeight || texture.height
       }
 
-      this.projectionMatrix.flipY(renderTarget.isRoot ?? false)
-      this.projectionMatrix.translate(0, 0)
-      this.projectionMatrix.resize(
+      this.projection.flipY(renderTarget.isRoot ?? false)
+      this.projection.translate(0, 0)
+      this.projection.resize(
         viewport.width / pixelRatio,
         viewport.height / pixelRatio,
       )
-      this._renderer.shader.uniforms.projectionMatrix = this.projectionMatrix.toArray(true)
+      this._renderer.shader.uniforms.projectionMatrix = this.projection.toArray(true)
 
       this._renderer.viewport.bind(viewport)
 

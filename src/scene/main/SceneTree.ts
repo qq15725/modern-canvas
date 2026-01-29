@@ -58,11 +58,11 @@ export class SceneTree extends MainLoop {
   @property({ internal: true, fallback: false }) declare debug: boolean
   @property({ internal: true, fallback: false }) declare processPaused: boolean
   @property({ internal: true, default: () => fonts }) declare fonts: Fonts | undefined
-  @property({ internal: true, default: () => new Timeline() }) declare timeline: Timeline
 
   readonly input = new Input()
   readonly renderStack = new RenderStack()
   readonly root = new Window().setTree(this)
+  readonly timeline = new Timeline().setTree(this)
 
   protected _backgroundColor = new Color()
   protected _previousViewport?: Viewport
@@ -87,9 +87,6 @@ export class SceneTree extends MainLoop {
     switch (key) {
       case 'backgroundColor':
         this._backgroundColor.value = value
-        break
-      case 'timeline':
-        this.timeline.setTree(this)
         break
     }
   }
