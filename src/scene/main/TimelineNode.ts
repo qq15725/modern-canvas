@@ -33,14 +33,6 @@ export class TimelineNode extends Node {
   @property({ fallback: false }) declare paused: boolean
   insideTimeRange = false
 
-  constructor(properties?: Partial<TimelineNodeProperties>, nodes: Node[] = []) {
-    super()
-
-    this
-      .setProperties(properties)
-      .append(nodes)
-  }
-
   /** Timeline */
   protected get _timeline(): Timeline | undefined { return this._tree?.timeline }
   protected get _globalCurrentTime(): number { return this._timeline?.currentTime ?? 0 }
@@ -65,6 +57,20 @@ export class TimelineNode extends Node {
     else {
       return current >= 0
     }
+  }
+
+  constructor(properties?: Partial<TimelineNodeProperties>, nodes: Node[] = []) {
+    super()
+
+    this
+      .setProperties(properties)
+      .append(nodes)
+
+    // TODO
+    this._loop = this.loop
+    this._delay = this.delay
+    this._duration = this.duration
+    this._paused = this.paused
   }
 
   protected override _updateProperty(key: string, newValue: any, oldValue: any): void {
