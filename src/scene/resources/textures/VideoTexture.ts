@@ -288,7 +288,7 @@ export class VideoTexture extends Texture2D<HTMLVideoElement> {
     return this._sourceLoad
   }
 
-  override destroy(): void {
+  protected override _destroy(): void {
     this._setupAutoUpdate()
     const source = this.source
     if (source) {

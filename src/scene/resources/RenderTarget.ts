@@ -39,4 +39,9 @@ export class RenderTarget extends Resource implements RenderTargetLikeReactiveOb
     }
     return false
   }
+
+  protected override _destroy(): void {
+    super._destroy()
+    this.colorTextures.forEach(texture => texture.destroy())
+  }
 }

@@ -16,6 +16,7 @@ export interface CoreObject {
 
 export class CoreObject extends Reactivable {
   readonly instanceId = instanceId()
+  destroyed = false
 
   get json(): Record<string, any> { return this.toJSON() }
   set json(val) { this.setProperties(val) }
@@ -26,5 +27,15 @@ export class CoreObject extends Reactivable {
 
   equal(target: CoreObject | undefined | null): boolean {
     return Boolean(target && this.instanceId === target.instanceId)
+  }
+
+  protected _destroy(): void {}
+
+  override destroy(): void {
+    if (this.destroyed)
+      return
+    this.destroyed = true
+    this._destroy()
+    this.removeAllListeners()
   }
 }

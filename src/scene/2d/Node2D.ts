@@ -130,4 +130,18 @@ export class Node2D extends CanvasItem {
   toGlobal<P extends Vector2Like = Vector2>(localPos: Vector2Like, newPos?: P): P {
     return this.globalTransform.apply(localPos, newPos)
   }
+
+  protected override _destroy(): void {
+    super._destroy()
+    this.position.destroy()
+    this.scale.destroy()
+    this.skew.destroy()
+    this.pivot.destroy()
+    this.extraTransform.destroy()
+    this.transform.destroy()
+    this.globalPosition.destroy()
+    this.globalScale.destroy()
+    this.globalSkew.destroy()
+    this.globalTransform.destroy()
+  }
 }

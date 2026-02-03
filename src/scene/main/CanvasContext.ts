@@ -208,4 +208,8 @@ export class CanvasContext extends Path2D {
 
     return batchables
   }
+
+  destroy(): void {
+    this.reset()
+  }
 }

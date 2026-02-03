@@ -305,4 +305,12 @@ export class CanvasItem extends TimelineNode {
 
     super._render(renderer)
   }
+
+  protected override _destroy(): void {
+    super._destroy()
+    this.context.destroy()
+    this._drawBatchables = []
+    this._layoutBatchables = []
+    this._batchables = []
+  }
 }

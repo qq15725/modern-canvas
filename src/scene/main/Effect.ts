@@ -414,4 +414,10 @@ export class Effect extends TimelineNode implements Rectangulable {
       })
     }
   }
+
+  protected _destroy(): void {
+    super._destroy()
+    this.viewport1.destroy()
+    this.viewport2.destroy()
+  }
 }

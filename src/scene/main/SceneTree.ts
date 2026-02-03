@@ -143,9 +143,9 @@ export class SceneTree extends MainLoop {
     texture.inactivate(renderer)
   }
 
-  override destroy(): void {
+  protected override _destroy(): void {
+    super._destroy()
     this.root.destroy()
     this.input.destroy()
-    super.destroy()
   }
 }

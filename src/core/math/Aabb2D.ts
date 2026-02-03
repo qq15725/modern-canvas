@@ -36,9 +36,9 @@ export class Aabb2D implements RectangleLike {
   get height(): number { return this.size.y }
   set height(val) { this.size.y = Math.max(0, val) }
 
-  readonly max: Vector2
   readonly min: Vector2
   readonly size: Vector2
+  readonly max: Vector2
 
   constructor()
   constructor(rect: RectangleLike)
@@ -184,5 +184,11 @@ export class Aabb2D implements RectangleLike {
 
   clone(): Aabb2D {
     return new Aabb2D(this.toJSON())
+  }
+
+  destroy(): void {
+    this.min.destroy()
+    this.size.destroy()
+    this.max.destroy()
   }
 }

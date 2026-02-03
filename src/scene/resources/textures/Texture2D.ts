@@ -125,8 +125,8 @@ export class Texture2D<T extends TextureSource = TextureSource> extends Resource
     renderer.texture.unbind(this)
   }
 
-  override destroy(): void {
-    super.destroy()
+  protected override _destroy(): void {
+    super._destroy()
 
     if (SUPPORTS_IMAGE_BITMAP && this.source instanceof ImageBitmap) {
       this.source.close()

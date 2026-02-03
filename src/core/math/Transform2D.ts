@@ -365,4 +365,8 @@ export class Transform2D {
   toString(): string {
     return `[Transform2D a=${this.a} b=${this.b} c=${this.c} d=${this.d} tx=${this.tx} ty=${this.ty}]`
   }
+
+  destroy(): void {
+    this._array = undefined
+  }
 }

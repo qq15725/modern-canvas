@@ -35,6 +35,7 @@ export interface NodeEvents extends CoreObjectEvents, InputEvents {
   processed: [delta?: number]
   addChild: [child: Node, newIndex: number]
   removeChild: [child: Node, oldIndex: number]
+  destroyed: []
 }
 
 export interface Node {
@@ -686,8 +687,16 @@ export class Node extends CoreObject {
   }
 
   override destroy(): void {
-    super.destroy()
-    this._children.internal.forEach(node => this.removeChild(node))
+    if (this.destroyed)
+      return
+    this.destroyed = true
+    const children = this._children.internal
+    children.forEach(child => this.removeChild(child))
+    this.remove()
+    this._destroy()
+    this.emit('destroyed')
+    this.removeAllListeners()
+    children.forEach(child => child.destroy())
   }
 
   clone(): this {

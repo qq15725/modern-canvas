@@ -229,9 +229,9 @@ export class Engine extends SceneTree {
     return canvas2
   }
 
-  override destroy(): void {
+  protected override _destroy(): void {
+    super._destroy()
     this._resizeObserver?.disconnect()
     this.renderer.destroy()
-    super.destroy()
   }
 }

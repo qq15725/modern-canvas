@@ -64,8 +64,8 @@ export class MainLoop extends CoreObject {
     }
   }
 
-  override destroy(): void {
+  protected override _destroy(): void {
+    super._destroy()
     this.stop()
-    super.destroy()
   }
 }

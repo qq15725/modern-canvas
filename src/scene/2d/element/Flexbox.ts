@@ -90,7 +90,7 @@ export class Flexbox {
     this._yoga = await loadYoga()
   }
 
-  readonly node: YogaNode | undefined = Flexbox._yoga?.Node.create()
+  node: YogaNode | undefined = Flexbox._yoga?.Node.create()
 
   constructor(
     protected _parent: Element2D,
@@ -346,5 +346,10 @@ export class Flexbox {
         node.markLayoutSeen()
       }
     }
+  }
+
+  destroy(): void {
+    this.node?.free()
+    this.node = undefined
   }
 }

@@ -35,7 +35,7 @@ export class Vector2 implements Vector2Like {
   constructor(
     protected _x = 0,
     protected _y = 0,
-    protected readonly _onUpdate?: (vec: Vector2) => void,
+    protected _onUpdate?: (vec: Vector2) => void,
   ) {
     //
   }
@@ -116,5 +116,9 @@ export class Vector2 implements Vector2Like {
       x: this.x,
       y: this.y,
     }
+  }
+
+  destroy(): void {
+    this._onUpdate = undefined
   }
 }

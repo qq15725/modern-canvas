@@ -569,4 +569,22 @@ export class Element2D extends Node2D implements Rectangulable {
       shadow: notEmptyObjectOrUndef(this.shadow.toJSON()),
     })
   }
+
+  protected override _destroy(): void {
+    super._destroy()
+    this.flexbox.destroy()
+    this.aabb.destroy()
+    this.globalAabb.destroy()
+    this.size.destroy()
+    this.style.destroy()
+    this.background.destroy()
+    this.shape.destroy()
+    this.fill.destroy()
+    this.outline.destroy()
+    this.text.destroy()
+    this.foreground.destroy()
+    this.shadow.destroy()
+    this._colorFilterEffect = undefined
+    this._maskEffect = undefined
+  }
 }

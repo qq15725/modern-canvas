@@ -145,4 +145,10 @@ export class Viewport extends Node implements Rectangulable {
   toCanvasScreen<P extends Vector2Like = Vector2>(globalPos: Vector2Like, newPos?: P): P {
     return this.canvasTransform.apply(globalPos, newPos)
   }
+
+  protected override _destroy(): void {
+    super._destroy()
+    this.canvasTransform.destroy()
+    this.renderTargets.forEach(target => target.destroy())
+  }
 }
