@@ -4,7 +4,7 @@ import { nextTick } from '../global'
 import { instanceId } from '../shared'
 
 export interface CoreObjectEvents extends ReactivableEvents {
-  //
+  destroy: []
 }
 
 export interface CoreObject {
@@ -36,6 +36,7 @@ export class CoreObject extends Reactivable {
       return
     this.destroyed = true
     this._destroy()
+    this.emit('destroy')
     this.removeAllListeners()
   }
 }

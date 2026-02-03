@@ -63,7 +63,7 @@
     "colord": "^2.9.3",
     "earcut": "^3.0.2",
     "modern-font": "^0.4.4",
-    "modern-idoc": "^0.10.18",
+    "modern-idoc": "^0.10.19",
     "modern-path2d": "^1.4.16",
     "modern-text": "^1.10.15"
   },
@@ -86,7 +86,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^7.2.0",
     "@types/earcut": "^3.0.0",
-    "@types/node": "^25.1.0",
+    "@types/node": "^25.2.0",
     "bumpp": "^10.4.0",
     "conventional-changelog-cli": "^5.0.0",
     "eslint": "^9.39.2",

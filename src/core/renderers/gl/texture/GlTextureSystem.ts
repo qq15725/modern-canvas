@@ -94,7 +94,6 @@ export class GlTextureSystem extends GlSystem {
             case 'maxAnisotropy':
               this.updateStyle(texture)
               break
-            // texture.on('unload', this._sourceUnload)
             case 'mipmap':
             case 'mipLevelCount':
               this.updateMipmap(texture)

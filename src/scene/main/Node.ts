@@ -35,7 +35,6 @@ export interface NodeEvents extends CoreObjectEvents, InputEvents {
   processed: [delta?: number]
   addChild: [child: Node, newIndex: number]
   removeChild: [child: Node, oldIndex: number]
-  destroyed: []
 }
 
 export interface Node {
@@ -694,7 +693,7 @@ export class Node extends CoreObject {
     children.forEach(child => this.removeChild(child))
     this.remove()
     this._destroy()
-    this.emit('destroyed')
+    this.emit('destroy')
     this.removeAllListeners()
     children.forEach(child => child.destroy())
   }
