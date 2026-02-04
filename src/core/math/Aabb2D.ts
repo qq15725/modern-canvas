@@ -132,12 +132,10 @@ export class Aabb2D implements RectangleLike {
   }
 
   getIntersectionRect(target: Aabb2D): Aabb2D {
-    const a = this.toMinmax()
-    const b = target.toMinmax()
-    const minX = Math.max(a.min.x, b.min.x)
-    const minY = Math.max(a.min.y, b.min.y)
-    const maxX = Math.min(a.max.x, b.max.x)
-    const maxY = Math.min(a.max.y, b.max.y)
+    const minX = Math.max(this.min.x, target.min.x)
+    const minY = Math.max(this.min.y, target.min.y)
+    const maxX = Math.min(this.max.x, target.max.x)
+    const maxY = Math.min(this.max.y, target.max.y)
     if (maxX <= minX || maxY <= minY) {
       return new Aabb2D()
     }
@@ -153,11 +151,11 @@ export class Aabb2D implements RectangleLike {
     return this.width * this.height
   }
 
-  toMinmax(): { min: Vector2, max: Vector2 } {
-    return {
-      min: this.min.clone(),
-      max: this.max.clone(),
-    }
+  getCenter(): Vector2 {
+    return new Vector2(
+      this.min.x + this.size.x / 2,
+      this.min.y + this.size.y / 2,
+    )
   }
 
   toCssStyle(): { left: string, top: string, width: string, height: string } {

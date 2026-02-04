@@ -51,23 +51,29 @@ export class Vector2 implements Vector2Like {
   }
 
   add(vec: Vector2Like): this {
-    this.set(this._x + vec.x, this._y + vec.y)
-    return this
+    return this.set(this._x + vec.x, this._y + vec.y)
   }
 
   sub(vec: Vector2Like): this {
-    this.set(this._x - vec.x, this._y - vec.y)
-    return this
+    return this.set(this._x - vec.x, this._y - vec.y)
   }
 
   multiply(x = 0, y = x): this {
-    this.set(this._x * x, this._y * y)
-    return this
+    return this.set(this._x * x, this._y * y)
+  }
+
+  rotate(rad: number, origin: Vector2Like = { x: 0, y: 0 }): this {
+    const { x, y } = this
+    const cos = Math.cos(rad)
+    const sin = Math.sin(rad)
+    return this.set(
+      (x - origin.x) * cos - (y - origin.y) * sin + origin.x,
+      (x - origin.x) * sin + (y - origin.y) * cos + origin.y,
+    )
   }
 
   getLength(): number {
-    const x = this.x
-    const y = this.y
+    const { x, y } = this
     return Math.sqrt(x * x + y * y)
   }
 
