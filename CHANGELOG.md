@@ -1,3 +1,12 @@
+## [0.15.2](https://github.com/qq15725/modern-canvas/compare/v0.15.1...v0.15.2) (2026-02-04)
+
+
+### Features
+
+* add Aabb2D.getCenter / Vector2.rotate ([030a31d](https://github.com/qq15725/modern-canvas/commit/030a31d6b5f50e56637dbcba2e2c03b84762c8f0))
+
+
+
 ## [0.15.1](https://github.com/qq15725/modern-canvas/compare/v0.15.0...v0.15.1) (2026-02-03)
 
 
