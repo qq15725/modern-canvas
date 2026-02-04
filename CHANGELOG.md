@@ -1,3 +1,12 @@
+## [0.15.4](https://github.com/qq15725/modern-canvas/compare/v0.15.3...v0.15.4) (2026-02-04)
+
+
+### Bug Fixes
+
+* Projection2D ([5607406](https://github.com/qq15725/modern-canvas/commit/5607406a68e98c8d7e63bd0b68430303c5c42ea7))
+
+
+
 ## [0.15.3](https://github.com/qq15725/modern-canvas/compare/v0.15.2...v0.15.3) (2026-02-04)
 
 
