@@ -31,7 +31,7 @@ export class Projection2D {
 
     const array = out || this._array
 
-    const sign = !this.flipY ? 1 : -1
+    const sign = !this.flip ? 1 : -1
     const a = 1 / this.width * 2
     const b = 0
     const c = 0
