@@ -205,7 +205,7 @@ export class Camera2D extends Node2D {
 
   protected override _treeEnter(tree: SceneTree): void {
     super._treeEnter(tree)
-    this.syncCanvasTransform()
+    this.updateGlobalTransform()
   }
 
   toGlobal<P extends Vector2Like = Vector2>(screenPos: Vector2Like, newPos?: P): P {

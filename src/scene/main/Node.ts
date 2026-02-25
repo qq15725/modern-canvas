@@ -72,7 +72,7 @@ export interface SerializedNode {
 
 const iidMap: Record<string, number> = {}
 
-function getNodeIid(key: any): number {
+function getNodeUniqueNumber(key: any): number {
   let iid = iidMap[key] ?? 0
   iid++
   iidMap[key] = iid
@@ -81,6 +81,20 @@ function getNodeIid(key: any): number {
 
 @customNode('Node')
 export class Node extends CoreObject {
+  static parse(
+    value: SerializedNode | SerializedNode[],
+    defaultInCanvasIs: string = 'Node',
+  ): any {
+    if (Array.isArray(value)) {
+      return value.map(val => this.parse(val))
+    }
+    const { is, meta = {}, children, ...props } = value
+    const Class = (customNodes.get(is ?? meta.inCanvasIs ?? defaultInCanvasIs) ?? Node) as any
+    const node = new Class({ ...props, meta }) as Node
+    children?.forEach((child: Record<string, any>) => node.appendChild(this.parse(child)))
+    return node
+  }
+
   readonly declare is: string
 
   @property({ default: () => idGenerator() }) declare id: string
@@ -119,7 +133,7 @@ export class Node extends CoreObject {
 
     this
       .setProperties({
-        name: `${this.is}:${getNodeIid(this.is)}`,
+        name: this._defaultName(),
         ...properties,
       })
       .append(nodes)
@@ -134,6 +148,10 @@ export class Node extends CoreObject {
 
     this.updateProcessable()
     this.updateRenderable()
+  }
+
+  protected _defaultName(): string {
+    return `@${this.is}@${getNodeUniqueNumber(this.is)}`
   }
 
   override setProperties(properties?: Record<string, any>): this {
@@ -714,19 +732,5 @@ export class Node extends CoreObject {
         : undefined,
       meta: this.meta.toJSON(),
     })
-  }
-
-  static parse(
-    value: SerializedNode | SerializedNode[],
-    defaultInCanvasIs: string = 'Node',
-  ): any {
-    if (Array.isArray(value)) {
-      return value.map(val => this.parse(val))
-    }
-    const { is, meta = {}, children, ...props } = value
-    const Class = (customNodes.get(is ?? meta.inCanvasIs ?? defaultInCanvasIs) ?? Node) as any
-    const node = new Class({ ...props, meta }) as Node
-    children?.forEach((child: Record<string, any>) => node.appendChild(this.parse(child)))
-    return node
   }
 }

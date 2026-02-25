@@ -13,7 +13,7 @@ export interface Node2DProperties extends CanvasItemProperties {
 }
 
 export interface Node2DEvents extends CanvasItemEvents {
-  //
+  updateGlobalTransform: []
 }
 
 export interface Node2D {
@@ -38,8 +38,8 @@ export class Node2D extends CanvasItem {
   readonly globalSkew = new Vector2()
   readonly globalTransform = new Transform2D()
 
+  parentTransformDirtyId?: number
   transformDirtyId = 0
-  protected _parentTransformDirtyId?: number
 
   constructor(properties?: Partial<Node2DProperties>, nodes: Node[] = []) {
     super()
@@ -73,7 +73,7 @@ export class Node2D extends CanvasItem {
         globalRotation,
         transformDirtyId,
       } = parent
-      this._parentTransformDirtyId = transformDirtyId
+      this.parentTransformDirtyId = transformDirtyId
       this.globalPosition.set(globalPosition.x + this.position.x, globalPosition.y + this.position.y)
       this.globalScale.set(globalScale.x * this.scale.x, globalScale.y * this.scale.y)
       this.globalSkew.set(globalSkew.x * this.skew.x, globalSkew.y * this.skew.y)
@@ -91,6 +91,7 @@ export class Node2D extends CanvasItem {
       this.globalTransform.copyFrom(this.transform)
     }
     this.requestLayout()
+    this.emit('updateGlobalTransform')
   }
 
   protected override _relayout(batchables: CanvasBatchable[], oldBatchables: CanvasBatchable[]): CanvasBatchable[] {
@@ -117,7 +118,7 @@ export class Node2D extends CanvasItem {
     if (
       parent
       && parent.globalTransform
-      && this._parentTransformDirtyId !== parent.transformDirtyId
+      && this.parentTransformDirtyId !== parent.transformDirtyId
     ) {
       this.updateGlobalTransform()
     }
