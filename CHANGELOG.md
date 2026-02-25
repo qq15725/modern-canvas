@@ -1,3 +1,12 @@
+## [0.15.5](https://github.com/qq15725/modern-canvas/compare/v0.15.4...v0.15.5) (2026-02-25)
+
+
+### Features
+
+* change default node name ([8013a32](https://github.com/qq15725/modern-canvas/commit/8013a32f1b96f5f072487b3d98f8bc0ebefe8e76))
+
+
+
 ## [0.15.4](https://github.com/qq15725/modern-canvas/compare/v0.15.3...v0.15.4) (2026-02-04)
 
 
