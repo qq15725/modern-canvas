@@ -1,3 +1,12 @@
+## [0.15.6](https://github.com/qq15725/modern-canvas/compare/v0.15.5...v0.15.6) (2026-02-28)
+
+
+### Bug Fixes
+
+* batch render ([2da90fc](https://github.com/qq15725/modern-canvas/commit/2da90fcced613c3c4788414720a72c883e4e5e30))
+
+
+
 ## [0.15.5](https://github.com/qq15725/modern-canvas/compare/v0.15.4...v0.15.5) (2026-02-25)
 
 
