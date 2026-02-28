@@ -42,8 +42,8 @@ export function getFillDrawOptions(
     } = fill.tile
 
     uvTransform
-      .translate(-translateX, -translateY)
       .scale(1 / scaleX, 1 / scaleY)
+      .translate(-translateX, -translateY)
   }
   else if (fill.stretchRect) {
     const {

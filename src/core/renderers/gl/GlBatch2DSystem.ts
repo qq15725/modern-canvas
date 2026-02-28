@@ -119,24 +119,24 @@ in vec4 vModulate;
 
 uniform sampler2D samplers[${maxTextureUnits}];
 
-void main(void) {
-  vec2 uv = vUv;
-
+vec4 textureColor() {
   vec4 color = vec4(0.0);
-${Array.from({ length: maxTextureUnits }, (_, i) => {
-  const text = `if (vTextureId < ${i}.5) { color = texture(samplers[${i}], uv); }`
-  if (i === 0) {
-    return `\n  ${text}`
+  ${Array.from({ length: maxTextureUnits }, (_, i) => {
+    const text = `if (vTextureId < ${i}.5) { color = texture(samplers[${i}], vUv); }`
+    if (i === 0) {
+      return `\n  ${text}`
+    }
+    return `\n  else ${text}`
+  }).join('')}
+  color *= vModulate;
+  return color;
+}
+
+void main(void) {
+  vec4 color = textureColor();
+  if (vClipOutsideUv == 1. && (vUv.x < 0.0 || vUv.y < 0.0 || vUv.x > 1.0 || vUv.y > 1.0)) {
+    color = vec4(0.0);
   }
-  return `\n  else ${text}`
-}).join('')}
-
-  if (vClipOutsideUv == 1. && (uv.x < 0.0 || uv.y < 0.0 || uv.x > 1.0 || uv.y > 1.0)) {
-    color.a = 0.0;
-  }
-
-    color *= vModulate;
-
   finalColor = color;
 }`,
       }),

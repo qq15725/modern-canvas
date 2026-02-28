@@ -14,6 +14,9 @@ export class TextureLoader extends Loader {
             source: bitmap,
             uploadMethodId: 'image',
             mipmap: true,
+            addressModeU: 'repeat',
+            addressModeV: 'repeat',
+            addressModeW: 'repeat',
           })
         })
     }

@@ -136,12 +136,19 @@ export class Element2DFill extends CoreObject {
       ctx.fillStyle = new ViewportTexture()
     }
     else {
+      const texture = this.animatedTexture?.currentFrame.texture
+        ?? this.texture
+
       options = {
         ...options,
-        ...getFillDrawOptions(this, { x: 0, y: 0, width, height }),
+        ...getFillDrawOptions(
+          this,
+          this.tile && texture
+            ? { x: 0, y: 0, width: texture.sourceWidth, height: texture.sourceHeight }
+            : { x: 0, y: 0, width, height },
+        ),
       }
-      ctx.fillStyle = this.animatedTexture?.currentFrame.texture
-        ?? this.texture
+      ctx.fillStyle = texture
         ?? this.color
         ?? '#000000FF'
     }
