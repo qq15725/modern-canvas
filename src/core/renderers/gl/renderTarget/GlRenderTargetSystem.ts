@@ -147,17 +147,12 @@ export class GlRenderTargetSystem extends GlSystem {
   protected _createGlRenderTarget(renderTarget: RenderTargetLike): GlRenderTarget {
     const gl = this._gl
     const glRenderTarget = new GlRenderTarget(gl.createFramebuffer())
-    glRenderTarget.msaa = !!renderTarget.msaa
-
-    renderTarget.colorTextures.forEach((texture) => {
-      this._renderer.texture.unbind(texture)
-    })
-    gl.bindFramebuffer(gl.FRAMEBUFFER, glRenderTarget.framebuffer)
-
     this.glRenderTargets.set(renderTarget.instanceId, glRenderTarget)
 
     if (!this.renderTargets.get(renderTarget.instanceId)) {
       this.renderTargets.set(renderTarget.instanceId, renderTarget)
+
+      this._update(renderTarget, glRenderTarget)
 
       if ('on' in renderTarget) {
         renderTarget.on('updateProperty', (key) => {
@@ -167,11 +162,10 @@ export class GlRenderTargetSystem extends GlSystem {
               this.resizeGpuRenderTarget(renderTarget)
               break
             case 'msaa':
-              glRenderTarget.msaa = !!renderTarget.msaa
-              this._init(renderTarget)
+              this._update(renderTarget, glRenderTarget)
               break
             case 'colorTextures':
-              this._init(renderTarget)
+              this._update(renderTarget, glRenderTarget)
               break
           }
         })
@@ -180,8 +174,6 @@ export class GlRenderTargetSystem extends GlSystem {
           this.renderTargets.delete(renderTarget.instanceId)
         })
       }
-
-      this._init(renderTarget)
     }
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null)
@@ -189,13 +181,18 @@ export class GlRenderTargetSystem extends GlSystem {
     return glRenderTarget
   }
 
-  protected _init(renderTarget: RenderTargetLike): void {
-    this.bind(renderTarget)
+  protected _update(renderTarget: RenderTargetLike, glRenderTarget: GlRenderTarget): void {
+    const {
+      colorTextures,
+      mipLevel = 0,
+    } = renderTarget
 
     const gl = this._gl
-    const glRenderTarget = this.getGlRenderTarget(renderTarget)
 
-    const { colorTextures, mipLevel = 0 } = renderTarget
+    gl.bindFramebuffer(gl.FRAMEBUFFER, glRenderTarget.framebuffer)
+    glRenderTarget.msaa = Boolean(renderTarget.msaa)
+    glRenderTarget.width = colorTextures[0]?.pixelWidth ?? 1
+    glRenderTarget.height = colorTextures[0]?.pixelHeight ?? 1
 
     colorTextures?.forEach((texture, i) => {
       this._renderer.texture.bind(texture)
@@ -210,9 +207,9 @@ export class GlRenderTargetSystem extends GlSystem {
     })
 
     if (glRenderTarget.msaa) {
-      const viewFramebuffer = gl.createFramebuffer()
-      glRenderTarget.framebuffer2 = viewFramebuffer
-      gl.bindFramebuffer(gl.FRAMEBUFFER, viewFramebuffer)
+      glRenderTarget.framebuffer2 = glRenderTarget.framebuffer
+      glRenderTarget.framebuffer = gl.createFramebuffer()
+      gl.bindFramebuffer(gl.FRAMEBUFFER, glRenderTarget.framebuffer)
       colorTextures?.forEach((_, i) => {
         glRenderTarget.msaaRenderBuffer[i] = gl.createRenderbuffer()
       })
@@ -326,45 +323,46 @@ export class GlRenderTargetSystem extends GlSystem {
     if (glRenderTarget.msaa) {
       const renderer = this._renderer
       const gl = renderer.gl
-      gl.bindFramebuffer(gl.FRAMEBUFFER, glRenderTarget.framebuffer2!)
+      gl.bindFramebuffer(gl.FRAMEBUFFER, glRenderTarget.framebuffer)
       renderTarget.colorTextures.forEach((texture, i) => {
-        renderer.texture.bind(texture, 0)
-        const glTexture = renderer.texture.getGlTexture(texture)
-        const glInternalFormat = glTexture.internalFormat
-        const msaaRenderBuffer = glRenderTarget.msaaRenderBuffer[i]
-        gl.bindRenderbuffer(gl.RENDERBUFFER, msaaRenderBuffer)
-        gl.renderbufferStorageMultisample(
-          gl.RENDERBUFFER,
-          4,
-          glInternalFormat,
-          glRenderTarget.width,
-          glRenderTarget.height,
-        )
-        gl.framebufferRenderbuffer(
-          gl.FRAMEBUFFER,
-          gl.COLOR_ATTACHMENT0 + i,
-          gl.RENDERBUFFER,
-          msaaRenderBuffer,
-        )
+        const buffer = glRenderTarget.msaaRenderBuffer[i]
+        if (buffer) {
+          renderer.texture.bind(texture, 0)
+          gl.bindRenderbuffer(gl.RENDERBUFFER, buffer)
+          gl.renderbufferStorageMultisample(
+            gl.RENDERBUFFER,
+            4,
+            renderer.texture.getGlTexture(texture).internalFormat,
+            texture.pixelWidth ?? 1,
+            texture.pixelHeight ?? 1,
+          )
+          gl.framebufferRenderbuffer(
+            gl.FRAMEBUFFER,
+            gl.COLOR_ATTACHMENT0 + i,
+            gl.RENDERBUFFER,
+            buffer,
+          )
+        }
       })
     }
   }
 
   finishRenderPass(renderTarget: RenderTargetLike): void {
     const glRenderTarget = this.getGlRenderTarget(renderTarget)
-    if (!glRenderTarget.msaa || !glRenderTarget.framebuffer2)
-      return
-    const gl = this._renderer.gl as WebGL2RenderingContext
-    gl.bindFramebuffer(gl.FRAMEBUFFER, glRenderTarget.framebuffer)
-    gl.bindFramebuffer(gl.READ_FRAMEBUFFER, glRenderTarget.framebuffer2)
-    const width = renderTarget.width * this._renderer.pixelRatio
-    const height = renderTarget.height * this._renderer.pixelRatio
-    gl.blitFramebuffer(
-      0, 0, width, height,
-      0, 0, width, height,
-      gl.COLOR_BUFFER_BIT, gl.NEAREST,
-    )
-    gl.bindFramebuffer(gl.FRAMEBUFFER, glRenderTarget.framebuffer2)
+    const { msaa, framebuffer, framebuffer2 } = glRenderTarget
+    if (msaa && framebuffer2) {
+      const gl = this._renderer.gl as WebGL2RenderingContext
+      gl.bindFramebuffer(gl.READ_FRAMEBUFFER, framebuffer)
+      gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, framebuffer2)
+      const width = renderTarget.width * this._renderer.pixelRatio
+      const height = renderTarget.height * this._renderer.pixelRatio
+      gl.blitFramebuffer(
+        0, 0, width, height,
+        0, 0, width, height,
+        gl.COLOR_BUFFER_BIT, gl.NEAREST,
+      )
+      gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer)
+    }
   }
 
   copyToTexture(

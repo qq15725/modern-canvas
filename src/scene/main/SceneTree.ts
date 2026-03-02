@@ -129,6 +129,7 @@ export class SceneTree extends MainLoop {
   protected _renderScreen(renderer: GlRenderer): void {
     this.root.finish(renderer)
     renderer.state.reset()
+    renderer.renderTarget.unbind()
     if (this.backgroundColor) {
       renderer.gl.clearColor(...this._backgroundColor.toArray())
     }
@@ -136,7 +137,6 @@ export class SceneTree extends MainLoop {
     if (this.backgroundColor) {
       renderer.gl.clearColor(0, 0, 0, 0)
     }
-    renderer.renderTarget.unbind()
     const texture = this.root.texture
     texture.activate(renderer, 0)
     QuadUvGeometry.draw(renderer)

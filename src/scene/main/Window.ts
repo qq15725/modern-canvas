@@ -18,7 +18,7 @@ export class Window extends Viewport {
   }
 
   override flush(renderer: GlRenderer): void {
-    this.finish(renderer)
     super.flush(renderer)
+    this.finish(renderer)
   }
 }

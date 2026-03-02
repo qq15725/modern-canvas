@@ -87,9 +87,9 @@ export class Viewport extends Node implements Rectangulable {
 
   redraw(renderer: GlRenderer, cb: () => void): boolean {
     if (this.valid) {
+      this.flush(renderer)
       const texture = this.texture
       this.renderTargetIndex = (this.renderTargetIndex + 1) % this.renderTargets.length
-      this.flush(renderer)
       this.activate(renderer)
       renderer.clear()
       texture.activate(renderer, 0)
