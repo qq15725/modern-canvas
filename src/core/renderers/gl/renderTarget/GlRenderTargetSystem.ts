@@ -213,7 +213,7 @@ export class GlRenderTargetSystem extends GlSystem {
       const viewFramebuffer = gl.createFramebuffer()
       glRenderTarget.framebuffer2 = viewFramebuffer
       gl.bindFramebuffer(gl.FRAMEBUFFER, viewFramebuffer)
-      renderTarget.colorTextures.forEach((_, i) => {
+      colorTextures?.forEach((_, i) => {
         glRenderTarget.msaaRenderBuffer[i] = gl.createRenderbuffer()
       })
     }
@@ -350,21 +350,21 @@ export class GlRenderTargetSystem extends GlSystem {
     }
   }
 
-  finishRenderPass(viewport: RenderTargetLike): void {
-    if (!viewport.msaa)
+  finishRenderPass(renderTarget: RenderTargetLike): void {
+    const glRenderTarget = this.getGlRenderTarget(renderTarget)
+    if (!glRenderTarget.msaa || !glRenderTarget.framebuffer2)
       return
-    const glViewport = this.getGlRenderTarget(viewport)
     const gl = this._renderer.gl as WebGL2RenderingContext
-    gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, glViewport.framebuffer)
-    gl.bindFramebuffer(gl.READ_FRAMEBUFFER, glViewport.framebuffer2!)
-    const width = viewport.width * this._renderer.pixelRatio
-    const height = viewport.height * this._renderer.pixelRatio
+    gl.bindFramebuffer(gl.FRAMEBUFFER, glRenderTarget.framebuffer)
+    gl.bindFramebuffer(gl.READ_FRAMEBUFFER, glRenderTarget.framebuffer2)
+    const width = renderTarget.width * this._renderer.pixelRatio
+    const height = renderTarget.height * this._renderer.pixelRatio
     gl.blitFramebuffer(
       0, 0, width, height,
       0, 0, width, height,
       gl.COLOR_BUFFER_BIT, gl.NEAREST,
     )
-    gl.bindFramebuffer(gl.FRAMEBUFFER, glViewport.framebuffer)
+    gl.bindFramebuffer(gl.FRAMEBUFFER, glRenderTarget.framebuffer2)
   }
 
   copyToTexture(
