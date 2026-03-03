@@ -1,3 +1,13 @@
+## [0.15.8](https://github.com/qq15725/modern-canvas/compare/v0.15.7...v0.15.8) (2026-03-03)
+
+
+### Features
+
+* Camera2D setZoomAtOrigin ([8a156f5](https://github.com/qq15725/modern-canvas/commit/8a156f56a8295e4190a0fe3607ba4ac4582255c1))
+* Camera2D zoomIn / zoomOut ([2393afb](https://github.com/qq15725/modern-canvas/commit/2393afb5de95dab0aaa9dc04cab4a6ea18797710))
+
+
+
 ## [0.15.7](https://github.com/qq15725/modern-canvas/compare/v0.15.6...v0.15.7) (2026-03-03)
 
 
