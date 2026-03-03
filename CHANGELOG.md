@@ -1,3 +1,19 @@
+## [0.15.7](https://github.com/qq15725/modern-canvas/compare/v0.15.6...v0.15.7) (2026-03-03)
+
+
+### Bug Fixes
+
+* msaa ([1db1df6](https://github.com/qq15725/modern-canvas/commit/1db1df6c0304e52e7627a7f202511be66533f9e1))
+* msaa ([8840060](https://github.com/qq15725/modern-canvas/commit/88400608ee96ddfc10f0314606d821423d412ac5))
+
+
+### Features
+
+* rename to WebGLRenderer ([9b735b1](https://github.com/qq15725/modern-canvas/commit/9b735b1fb2b573a3d7f257d80e1281e986185af2))
+* rename to WebGLRenderer ([6353e4a](https://github.com/qq15725/modern-canvas/commit/6353e4abdc19dd7ffefb79cb8fa0178b3d30cf11))
+
+
+
 ## [0.15.6](https://github.com/qq15725/modern-canvas/compare/v0.15.5...v0.15.6) (2026-02-28)
 
 
