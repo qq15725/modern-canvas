@@ -1,9 +1,9 @@
 import type { TextureLike } from '../../shared'
-import type { GlRenderer } from '../GlRenderer'
 import type {
   GlRenderingContext,
   GlTextureLocation,
 } from '../types'
+import type { WebGLRenderer } from '../WebGLRenderer'
 import type { GlTextureUploader } from './GlTextureUploader'
 import { GlSystem } from '../system'
 import { GlTexture } from './GlTexture'
@@ -31,7 +31,7 @@ export class GlTextureSystem extends GlSystem {
   protected _location: GlTextureLocation = 0
   current: (TextureLike | null)[] = []
 
-  override install(renderer: GlRenderer): void {
+  override install(renderer: WebGLRenderer): void {
     super.install(renderer)
     renderer.texture = this
   }

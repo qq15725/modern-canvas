@@ -1,4 +1,4 @@
-import type { GlRenderer } from '../../core'
+import type { WebGLRenderer } from '../../core'
 import type { EffectProperties, Node, Viewport } from '../main'
 import { property } from 'modern-idoc'
 import { customNode } from '../../core'
@@ -100,7 +100,7 @@ void main() {
     this._kernels = kernels
   }
 
-  override apply(renderer: GlRenderer, viewport: Viewport): void {
+  override apply(renderer: WebGLRenderer, viewport: Viewport): void {
     const uvX = this.pixelSize[0] / viewport.width
     const uvY = this.pixelSize[1] / viewport.height
     this._kernels.forEach((kernel) => {

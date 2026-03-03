@@ -1,7 +1,7 @@
 import type {
-  GlRenderer,
   RectangleLike,
-  Vector2, Vector2Like,
+  Vector2,
+  Vector2Like, WebGLRenderer,
 } from '../../core'
 import type { Texture2D } from '../resources'
 import type { Rectangulable, RectangulableEvents } from './interfaces'
@@ -65,7 +65,7 @@ export class Viewport extends Node implements Rectangulable {
     })
   }
 
-  flush(renderer: GlRenderer): void {
+  flush(renderer: WebGLRenderer): void {
     renderer.flush()
   }
 
@@ -74,7 +74,7 @@ export class Viewport extends Node implements Rectangulable {
     this.height = height
   }
 
-  activate(renderer: GlRenderer, frame?: RectangleLike): boolean {
+  activate(renderer: WebGLRenderer, frame?: RectangleLike): boolean {
     if (this.valid) {
       this.flush(renderer)
       this.renderTarget.activate(renderer, frame)
@@ -85,7 +85,7 @@ export class Viewport extends Node implements Rectangulable {
     return false
   }
 
-  redraw(renderer: GlRenderer, cb: () => void): boolean {
+  redraw(renderer: WebGLRenderer, cb: () => void): boolean {
     if (this.valid) {
       this.flush(renderer)
       const texture = this.texture
@@ -99,7 +99,7 @@ export class Viewport extends Node implements Rectangulable {
     return false
   }
 
-  activateWithCopy(renderer: GlRenderer, target: Viewport): void {
+  activateWithCopy(renderer: WebGLRenderer, target: Viewport): void {
     this.resize(target.width, target.height)
     if (this.activate(renderer)) {
       renderer.clear()
@@ -110,13 +110,13 @@ export class Viewport extends Node implements Rectangulable {
     }
   }
 
-  renderStart(renderer: GlRenderer, frame?: RectangleLike): void {
+  renderStart(renderer: WebGLRenderer, frame?: RectangleLike): void {
     if (this.activate(renderer, frame)) {
       renderer.clear()
     }
   }
 
-  renderEnd(renderer: GlRenderer, oldViewport: Viewport | undefined): void {
+  renderEnd(renderer: WebGLRenderer, oldViewport: Viewport | undefined): void {
     this.flush(renderer)
     if (oldViewport) {
       oldViewport?.activate(renderer)
@@ -127,7 +127,7 @@ export class Viewport extends Node implements Rectangulable {
     }
   }
 
-  override render(renderer: GlRenderer, next?: () => void): void {
+  override render(renderer: WebGLRenderer, next?: () => void): void {
     const oldViewport = this._tree?.getCurrentViewport()
     this.renderStart(renderer)
     super.render(renderer, next)

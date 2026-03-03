@@ -1,4 +1,4 @@
-import type { GlRenderer } from '../../../core'
+import type { WebGLRenderer } from '../../../core'
 import type { Material } from '../materials'
 import { UvMaterial } from '../materials'
 import { Geometry } from './Geometry'
@@ -11,7 +11,7 @@ export class QuadUvGeometry extends Geometry {
   static get instance(): QuadUvGeometry { return this._instance ??= new this() }
 
   static draw(
-    renderer: GlRenderer,
+    renderer: WebGLRenderer,
     material: Material = UvMaterial.instance,
     uniforms?: Record<string, any>,
   ): void {

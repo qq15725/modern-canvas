@@ -1,11 +1,11 @@
 import type {
   AlphaMode,
-  GlRenderer,
   ScaleMode,
   TextureFormat,
   TextureLikeObject,
   TextureLikeReactiveObject,
-  TextureSource, WrapMode,
+  TextureSource,
+  WebGLRenderer, WrapMode,
 } from '../../../core'
 import { property } from 'modern-idoc'
 import { isPow2, Resource, SUPPORTS_IMAGE_BITMAP } from '../../../core'
@@ -113,7 +113,7 @@ export class Texture2D<T extends TextureSource = TextureSource> extends Resource
     }
   }
 
-  activate(renderer: GlRenderer, location?: number): boolean {
+  activate(renderer: WebGLRenderer, location?: number): boolean {
     if (this.isValid()) {
       renderer.texture.bind(this, location)
       return true
@@ -121,7 +121,7 @@ export class Texture2D<T extends TextureSource = TextureSource> extends Resource
     return false
   }
 
-  inactivate(renderer: GlRenderer): void {
+  inactivate(renderer: WebGLRenderer): void {
     renderer.texture.unbind(this)
   }
 

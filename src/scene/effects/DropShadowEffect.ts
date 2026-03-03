@@ -1,4 +1,4 @@
-import type { ColorValue, GlRenderer } from '../../core'
+import type { ColorValue, WebGLRenderer } from '../../core'
 import type { EffectProperties, Node } from '../main'
 import { property } from 'modern-idoc'
 import { Color, customNode } from '../../core'
@@ -63,7 +63,7 @@ void main(void) {
       .append(children)
   }
 
-  apply(renderer: GlRenderer, source: Viewport): void {
+  apply(renderer: WebGLRenderer, source: Viewport): void {
     this.viewport3.activateWithCopy(renderer, source)
 
     this.viewport3.redraw(renderer, () => {

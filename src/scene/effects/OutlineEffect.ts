@@ -1,4 +1,4 @@
-import type { ColorValue, GlRenderer } from '../../core'
+import type { ColorValue, WebGLRenderer } from '../../core'
 import type { EffectProperties, Node, Viewport } from '../main'
 import { property } from 'modern-idoc'
 import { Color, customNode } from '../../core'
@@ -100,7 +100,7 @@ void main() {
     })
   }
 
-  override apply(renderer: GlRenderer, source: Viewport): void {
+  override apply(renderer: WebGLRenderer, source: Viewport): void {
     source.redraw(renderer, () => {
       this._color.value = this.color
 

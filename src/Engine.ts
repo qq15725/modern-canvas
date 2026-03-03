@@ -3,9 +3,9 @@ import { property } from 'modern-idoc'
 import { assets } from './asset'
 import {
   DEVICE_PIXEL_RATIO,
-  GlRenderer,
   nextTick,
   SUPPORTS_RESIZE_OBSERVER,
+  WebGLRenderer,
 } from './core'
 import { SceneTree } from './scene'
 
@@ -45,7 +45,7 @@ export class Engine extends SceneTree {
   @property({ fallback: false }) declare autoResize: boolean
   @property({ fallback: false }) declare autoStart: boolean
 
-  readonly renderer: GlRenderer
+  readonly renderer: WebGLRenderer
   get view(): HTMLCanvasElement | undefined { return this.renderer.view }
   get gl(): WebGLRenderingContext | WebGL2RenderingContext { return this.renderer.gl }
   get screen(): { x: number, y: number, width: number, height: number } { return this.renderer.screen }
@@ -81,7 +81,7 @@ export class Engine extends SceneTree {
     } = properties
 
     super()
-    this.renderer = new GlRenderer(view, {
+    this.renderer = new WebGLRenderer(view, {
       alpha: defaultOptions.alpha ?? properties.alpha,
       stencil: defaultOptions.stencil ?? properties.stencil,
       antialias: defaultOptions.antialias ?? properties.antialias,
@@ -177,9 +177,14 @@ export class Engine extends SceneTree {
     this._render(this.renderer)
   }
 
-  render(delta = 0): void {
-    this._process(delta)
-    this._render(this.renderer)
+  render(node?: Node, delta = 0): void {
+    if (node) {
+      this.renderStack.push(node)
+    }
+    else {
+      this._process(delta)
+      this._render(this.renderer)
+    }
   }
 
   override async start(): Promise<void> {

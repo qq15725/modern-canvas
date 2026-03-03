@@ -1,4 +1,4 @@
-import type { Batchable2D, GlBlendMode, GlRenderer } from '../../core'
+import type { Batchable2D, GlBlendMode, WebGLRenderer } from '../../core'
 import type { Texture2D } from '../resources'
 import type { CanvasBatchable } from './CanvasContext'
 import type { Node } from './Node'
@@ -282,7 +282,7 @@ export class CanvasItem extends TimelineNode {
     return undefined
   }
 
-  protected override _render(renderer: GlRenderer): void {
+  protected override _render(renderer: WebGLRenderer): void {
     this._updateBatchables()
 
     const pixelate = this._tree?.pixelate

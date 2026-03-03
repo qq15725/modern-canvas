@@ -1,4 +1,4 @@
-import type { GlRenderer } from '../../core'
+import type { WebGLRenderer } from '../../core'
 import type { EffectProperties, Node, Viewport } from '../main'
 import { property } from 'modern-idoc'
 import { customNode } from '../../core'
@@ -114,7 +114,7 @@ void main() {
       .append(children)
   }
 
-  override apply(renderer: GlRenderer, source: Viewport): void {
+  override apply(renderer: WebGLRenderer, source: Viewport): void {
     source.redraw(renderer, () => {
       QuadUvGeometry.draw(renderer, ZoomBlurEffect.material, {
         sampler: 0,

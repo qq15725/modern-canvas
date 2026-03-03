@@ -1,10 +1,10 @@
 import type {
   CoreObjectEvents,
-  GlRenderer,
   InputEvent,
   InputEventKey,
   InputEvents,
   MaskLike,
+  WebGLRenderer,
 } from '../../core'
 import type { SceneTree } from './SceneTree'
 import type { Viewport } from './Viewport'
@@ -408,7 +408,7 @@ export class Node extends CoreObject {
     }
   }
 
-  render(renderer: GlRenderer, next?: () => void): void {
+  render(renderer: WebGLRenderer, next?: () => void): void {
     const mask = this._mask
 
     if (mask) {
@@ -699,7 +699,7 @@ export class Node extends CoreObject {
   // eslint-disable-next-line unused-imports/no-unused-vars
   protected _input(event: InputEvent, key: InputEventKey): void {}
   // eslint-disable-next-line unused-imports/no-unused-vars
-  protected _render(renderer: GlRenderer): void {
+  protected _render(renderer: WebGLRenderer): void {
     this.needsRender = false
   }
 

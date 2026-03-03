@@ -6,7 +6,7 @@ import type {
   ShaderLikeObject, TextureLike,
 } from '../shared'
 import type { GlDrawOptions } from './geometry'
-import type { GlRenderer } from './GlRenderer'
+import type { WebGLRenderer } from './WebGLRenderer'
 import { instanceId } from '../../shared'
 import { BufferUsage } from '../shared'
 import { GlProgram } from './shader'
@@ -38,7 +38,7 @@ interface Shader {
 }
 
 export class GlBatch2DSystem extends GlSystem {
-  override install(renderer: GlRenderer): void {
+  override install(renderer: WebGLRenderer): void {
     super.install(renderer)
     renderer.batch2D = this
   }

@@ -1,6 +1,6 @@
 import type { ObservableEvents } from 'modern-idoc'
-import type { GlRenderer } from '../GlRenderer'
 import type { GlRenderingContext } from '../types'
+import type { WebGLRenderer } from '../WebGLRenderer'
 import { Observable } from 'modern-idoc'
 
 export interface GlSystemEvents extends ObservableEvents {
@@ -16,7 +16,7 @@ export interface GlSystem {
 }
 
 export abstract class GlSystem extends Observable {
-  protected declare _renderer: GlRenderer
+  protected declare _renderer: WebGLRenderer
   protected get _gl(): GlRenderingContext { return this._renderer.gl }
 
   constructor() {
@@ -26,7 +26,7 @@ export abstract class GlSystem extends Observable {
     this.on('setup', this._setup.bind(this))
   }
 
-  install(renderer: GlRenderer): void { this._renderer = renderer }
+  install(renderer: WebGLRenderer): void { this._renderer = renderer }
   // eslint-disable-next-line unused-imports/no-unused-vars
   protected _updateContext(gl: GlRenderingContext): void { /** override */ }
   protected _setup(): void { /** override */ }

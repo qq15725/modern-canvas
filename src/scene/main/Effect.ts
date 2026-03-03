@@ -1,4 +1,4 @@
-import type { GlRenderer, RectangleLike } from '../../core'
+import type { RectangleLike, WebGLRenderer } from '../../core'
 import type { Material } from '../resources'
 import type { Rectangulable } from './interfaces'
 import type { Node } from './Node'
@@ -269,14 +269,14 @@ export class Effect extends TimelineNode implements Rectangulable {
     }
   }
 
-  protected _renderBefore(renderer: GlRenderer): void {
+  protected _renderBefore(renderer: WebGLRenderer): void {
     const currentViewport = this._tree?.getCurrentViewport()
     if (currentViewport) {
       this.apply(renderer, currentViewport, { redraw: true })
     }
   }
 
-  protected _renderTransition(renderer: GlRenderer): void {
+  protected _renderTransition(renderer: WebGLRenderer): void {
     const currentViewport = this._tree?.getCurrentViewport()
     if (this._renderId % 2 === 0) {
       this._renderViewport = currentViewport
@@ -315,7 +315,7 @@ export class Effect extends TimelineNode implements Rectangulable {
     this._renderId++
   }
 
-  protected _renderParentOrChildren(renderer: GlRenderer): void {
+  protected _renderParentOrChildren(renderer: WebGLRenderer): void {
     const currentViewport = this._tree?.getCurrentViewport()
     const rect = this._rect
     if (this.needsRender) {
@@ -373,7 +373,7 @@ export class Effect extends TimelineNode implements Rectangulable {
     }
   }
 
-  protected override _render(renderer: GlRenderer): void {
+  protected override _render(renderer: WebGLRenderer): void {
     switch (this._effectMode) {
       case 'before':
         this._renderBefore(renderer)
@@ -390,7 +390,7 @@ export class Effect extends TimelineNode implements Rectangulable {
     }
   }
 
-  apply(renderer: GlRenderer, viewport: Viewport, context?: EffectContext): void {
+  apply(renderer: WebGLRenderer, viewport: Viewport, context?: EffectContext): void {
     if (!this.material) {
       return
     }

@@ -1,4 +1,4 @@
-import type { GlRenderer } from '../../core'
+import type { WebGLRenderer } from '../../core'
 import type { Viewport } from '../main'
 import { customNode } from '../../core'
 import { Transition } from '../main/Transition'
@@ -64,7 +64,7 @@ void main(void) {
     },
   })
 
-  override apply(renderer: GlRenderer, source: Viewport): void {
+  override apply(renderer: WebGLRenderer, source: Viewport): void {
     const currentTimeProgress = this.currentTimeProgress
     let sampler: number
     let progress: number

@@ -1,12 +1,12 @@
 import type { RectangleLike } from '../../math'
-import type { GlRenderer } from './GlRenderer'
+import type { WebGLRenderer } from './WebGLRenderer'
 import { Aabb2D } from '../../math'
 import { GlSystem } from './system'
 
 export class GlViewportSystem extends GlSystem {
   readonly current = new Aabb2D(0, 0, 0, 0)
 
-  override install(renderer: GlRenderer): void {
+  override install(renderer: WebGLRenderer): void {
     super.install(renderer)
     renderer.viewport = this
   }

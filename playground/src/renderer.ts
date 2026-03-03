@@ -1,7 +1,7 @@
 import type { GeometryLikeObject } from '../../src'
-import { BufferUsage, GlProgram, GlRenderer } from '../../src'
+import { BufferUsage, GlProgram, WebGLRenderer } from '../../src'
 
-const renderer = new GlRenderer()
+const renderer = new WebGLRenderer()
 
 renderer.resize(500, 500)
 

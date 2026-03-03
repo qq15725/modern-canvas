@@ -1,12 +1,12 @@
 import type { BufferLike } from '../../shared'
-import type { GlRenderer } from '../GlRenderer'
+import type { WebGLRenderer } from '../WebGLRenderer'
 import { BufferUsage } from '../../shared'
 import { GlSystem } from '../system'
 import { GlBufferTarget } from './const'
 import { GlBuffer } from './GlBuffer'
 
 export class GlBufferSystem extends GlSystem {
-  override install(renderer: GlRenderer): void {
+  override install(renderer: WebGLRenderer): void {
     super.install(renderer)
     renderer.buffer = this
   }

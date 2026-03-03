@@ -1,4 +1,4 @@
-import type { ColorValue, GlRenderer } from '../../core'
+import type { ColorValue, WebGLRenderer } from '../../core'
 import type { EffectProperties, Node, Viewport } from '../main'
 import { property } from 'modern-idoc'
 import { Color, customNode } from '../../core'
@@ -70,7 +70,7 @@ void main(void) {
       .append(children)
   }
 
-  override apply(renderer: GlRenderer, source: Viewport): void {
+  override apply(renderer: WebGLRenderer, source: Viewport): void {
     const colors = this.colors.map((val) => {
       this._color.value = val[0]
       const color0 = this._color.toArray().slice(0, 3)

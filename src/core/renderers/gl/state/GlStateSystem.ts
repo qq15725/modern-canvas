@@ -1,5 +1,5 @@
-import type { GlRenderer } from '../GlRenderer'
 import type { GlRenderingContext } from '../types'
+import type { WebGLRenderer } from '../WebGLRenderer'
 import { GlSystem } from '../system'
 import { GlBlendMode, mapGlBlendModes } from './GlBlendMode'
 
@@ -75,7 +75,7 @@ export class GlState {
 GlState._init()
 
 export class GlStateSystem extends GlSystem {
-  override install(renderer: GlRenderer): void {
+  override install(renderer: WebGLRenderer): void {
     super.install(renderer)
     renderer.state = this
   }

@@ -1,6 +1,6 @@
 import type { RectangleLike } from '../../math'
 import type { RenderTargetLike } from '../shared'
-import type { GlRenderer } from './GlRenderer'
+import type { WebGLRenderer } from './WebGLRenderer'
 import { GlSystem } from './system'
 
 function applyMatrixToPoint(m: Float32Array, x: number, y: number): { x: number, y: number } {
@@ -33,7 +33,7 @@ function transformRectToAABB(m: Float32Array, rect: RectangleLike): RectangleLik
 }
 
 export class GlScissorSystem extends GlSystem {
-  override install(renderer: GlRenderer): void {
+  override install(renderer: WebGLRenderer): void {
     super.install(renderer)
     renderer.scissor = this
   }

@@ -1,5 +1,5 @@
 import type { ShaderLike } from '../../shared'
-import type { GlRenderer } from '../GlRenderer'
+import type { WebGLRenderer } from '../WebGLRenderer'
 import type { GlAttribute, GlProgram, GlUniform } from './GlProgram'
 import { getAttributeInfoFromFormat } from '../../shared/geometry/getAttributeInfoFromFormat'
 import { GlSystem } from '../system'
@@ -8,7 +8,7 @@ import { GlProgramData } from './GlProgramData'
 import { mapGlToVertexFormat, mapType } from './mapType'
 
 export class GlShaderSystem extends GlSystem {
-  override install(renderer: GlRenderer): void {
+  override install(renderer: WebGLRenderer): void {
     super.install(renderer)
     renderer.shader = this
   }

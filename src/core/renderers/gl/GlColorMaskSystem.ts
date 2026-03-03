@@ -1,8 +1,8 @@
-import type { GlRenderer } from './GlRenderer'
+import type { WebGLRenderer } from './WebGLRenderer'
 import { GlSystem } from './system'
 
 export class GlColorMaskSystem extends GlSystem {
-  override install(renderer: GlRenderer): void {
+  override install(renderer: WebGLRenderer): void {
     super.install(renderer)
     renderer.colorMask = this
   }

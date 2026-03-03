@@ -1,4 +1,4 @@
-import type { GlRenderer } from '../../core'
+import type { WebGLRenderer } from '../../core'
 import type { EffectProperties, Node, Viewport } from '../main'
 import { property } from 'modern-idoc'
 import { ColorMatrix, customNode, parseCssFunctions, PI_2 } from '../../core'
@@ -62,7 +62,7 @@ void main(void) {
     }
   }
 
-  override apply(renderer: GlRenderer, source: Viewport): void {
+  override apply(renderer: WebGLRenderer, source: Viewport): void {
     if (!this.filter)
       return
 

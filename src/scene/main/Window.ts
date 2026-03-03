@@ -1,4 +1,4 @@
-import type { GlRenderer } from '../../core'
+import type { WebGLRenderer } from '../../core'
 import { customNode } from '../../core'
 import { Viewport } from './Viewport'
 
@@ -13,11 +13,11 @@ export class Window extends Viewport {
     this.renderTargets.forEach(r => r.isRoot = true)
   }
 
-  finish(renderer: GlRenderer): void {
+  finish(renderer: WebGLRenderer): void {
     renderer.renderTarget.finishRenderPass(this.renderTarget)
   }
 
-  override flush(renderer: GlRenderer): void {
+  override flush(renderer: WebGLRenderer): void {
     super.flush(renderer)
     this.finish(renderer)
   }

@@ -1,5 +1,5 @@
 import type { Node2D } from '../2d'
-import type { GlRenderer } from '../../core'
+import type { WebGLRenderer } from '../../core'
 import type { EffectContext, EffectProperties, Node, Viewport } from '../main'
 import type { Texture2D } from '../resources'
 import { property } from 'modern-idoc'
@@ -81,7 +81,7 @@ void main(void) {
     }
   }
 
-  override apply(renderer: GlRenderer, source: Viewport, context: EffectContext): void {
+  override apply(renderer: WebGLRenderer, source: Viewport, context: EffectContext): void {
     if (this.texture) {
       source.redraw(renderer, () => {
         this.texture!.activate(renderer, 1)

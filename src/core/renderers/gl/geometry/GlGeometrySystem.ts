@@ -1,7 +1,7 @@
 import type { BufferLike, GeometryLike, Topology } from '../../shared'
 import type { GlBuffer } from '../buffer'
-import type { GlRenderer } from '../GlRenderer'
 import type { GlProgram } from '../shader'
+import type { WebGLRenderer } from '../WebGLRenderer'
 import { getAttributeInfoFromFormat } from '../../shared/geometry/getAttributeInfoFromFormat'
 import { GlSystem } from '../system'
 import { getGlTypeFromFormat } from './getGlTypeFromFormat'
@@ -28,7 +28,7 @@ export class GlGeometrySystem extends GlSystem {
   current: GeometryLike | null = null
   currentVao: WebGLVertexArrayObject | null = null
 
-  override install(renderer: GlRenderer): void {
+  override install(renderer: WebGLRenderer): void {
     super.install(renderer)
     renderer.geometry = this
   }

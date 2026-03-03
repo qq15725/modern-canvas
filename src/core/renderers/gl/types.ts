@@ -1,4 +1,4 @@
-import type { GlRenderer } from './GlRenderer'
+import type { WebGLRenderer } from './WebGLRenderer'
 
 export type GlRenderingContext = WebGL2RenderingContext
 
@@ -9,7 +9,7 @@ type Pick<T> = T extends string
   : never
 
 export interface GlRenderable {
-  render: (renderer: GlRenderer) => void
+  render: (renderer: WebGLRenderer) => void
 }
 
 export type GlTarget = Pick<keyof WebGL2RenderingContext>

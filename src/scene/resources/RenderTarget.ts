@@ -1,8 +1,8 @@
 import type {
-  GlRenderer,
   RectangleLike,
   RenderTargetLikeReactiveObject,
   ResourceEvents,
+  WebGLRenderer,
 } from '../../core'
 import { property } from 'modern-idoc'
 import { Resource } from '../../core'
@@ -32,7 +32,7 @@ export class RenderTarget extends Resource implements RenderTargetLikeReactiveOb
   get valid(): boolean { return Boolean(this.width && this.height) }
   get colorTexture(): Texture2D<null> { return this.colorTextures[0] }
 
-  activate(renderer: GlRenderer, frame?: RectangleLike): boolean {
+  activate(renderer: WebGLRenderer, frame?: RectangleLike): boolean {
     if (this.valid) {
       renderer.renderTarget.bind(this, frame)
       return true

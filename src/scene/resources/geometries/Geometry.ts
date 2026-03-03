@@ -1,4 +1,4 @@
-import type { GeometryLikeObject, GeometryLikeReactiveObject, GlRenderer, Topology } from '../../../core'
+import type { GeometryLikeObject, GeometryLikeReactiveObject, Topology, WebGLRenderer } from '../../../core'
 import type { Material } from '../materials/Material'
 import type { VertexAttribute } from './VertexAttribute'
 import { property } from 'modern-idoc'
@@ -21,7 +21,7 @@ export class Geometry extends Resource implements GeometryLikeReactiveObject {
     this.setProperties(properties)
   }
 
-  draw(renderer: GlRenderer, material: Material, uniforms?: Record<string, any>): void {
+  draw(renderer: WebGLRenderer, material: Material, uniforms?: Record<string, any>): void {
     renderer.flush()
     material.activate(renderer, uniforms)
     renderer.geometry.bind(this, material.glProgram)

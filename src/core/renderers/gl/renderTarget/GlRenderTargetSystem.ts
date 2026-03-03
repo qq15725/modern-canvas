@@ -1,8 +1,8 @@
 import type { RectangleLike } from '../../../math'
 import type { RenderTargetLike, TextureLike } from '../../shared'
-import type { GlRenderer } from '../GlRenderer'
 import type { GlSystemEvents } from '../system'
 import type { GlRenderingContext } from '../types'
+import type { WebGLRenderer } from '../WebGLRenderer'
 import { Projection2D } from '../../../math'
 import { GlSystem } from '../system'
 import { GlRenderTarget } from './GlRenderTarget'
@@ -19,7 +19,7 @@ export interface GlRenderTargetSystem {
 }
 
 export class GlRenderTargetSystem extends GlSystem {
-  override install(renderer: GlRenderer): void {
+  override install(renderer: WebGLRenderer): void {
     super.install(renderer)
     renderer.renderTarget = this
   }

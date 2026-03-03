@@ -1,4 +1,4 @@
-import type { GlRenderer } from '../../core'
+import type { WebGLRenderer } from '../../core'
 import { customNode } from '../../core'
 import { Transition } from '../main/Transition'
 import { Material, QuadUvGeometry } from '../resources'
@@ -37,7 +37,7 @@ void main() {
     },
   })
 
-  override apply(renderer: GlRenderer): void {
+  override apply(renderer: WebGLRenderer): void {
     QuadUvGeometry.draw(renderer, LeftEraseTransition.material, {
       previous: 0,
       next: 1,

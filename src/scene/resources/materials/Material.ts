@@ -1,4 +1,4 @@
-import type { GlProgramOptions, GlRenderer, ShaderLikeReactiveObject } from '../../../core'
+import type { GlProgramOptions, ShaderLikeReactiveObject, WebGLRenderer } from '../../../core'
 import { property } from 'modern-idoc'
 import { GlProgram, Resource } from '../../../core'
 
@@ -42,7 +42,7 @@ void main(void) {
     })
   }
 
-  activate(renderer: GlRenderer, uniforms: Record<string, any> = {}): void {
+  activate(renderer: WebGLRenderer, uniforms: Record<string, any> = {}): void {
     renderer.shader.bind(this)
     this.uniforms = {
       ...this.uniforms,

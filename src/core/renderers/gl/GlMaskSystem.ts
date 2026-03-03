@@ -1,6 +1,6 @@
 import type { RectangleLike } from '../../math'
-import type { GlRenderer } from './GlRenderer'
 import type { GlRenderable } from './types'
+import type { WebGLRenderer } from './WebGLRenderer'
 import { Clear, StencilMode } from './const'
 import { GlSystem } from './system'
 
@@ -14,7 +14,7 @@ export interface MaskStackItem {
 }
 
 export class GlMaskSystem extends GlSystem {
-  override install(renderer: GlRenderer): void {
+  override install(renderer: WebGLRenderer): void {
     super.install(renderer)
     renderer.mask = this
   }

@@ -1,10 +1,10 @@
 import type { Fonts } from 'modern-font'
 import type { Hex8Color } from 'modern-idoc'
 import type {
-  GlRenderer,
   InputEvents,
   MainLoopEvents,
   MainLoopProperties,
+  WebGLRenderer,
 } from '../../core'
 import type { Node } from './Node'
 import type { Viewport } from './Viewport'
@@ -119,14 +119,14 @@ export class SceneTree extends MainLoop {
     this.emit('processed')
   }
 
-  protected _render(renderer: GlRenderer): void {
+  protected _render(renderer: WebGLRenderer): void {
     this.emit('rendering')
     this.renderStack.render(renderer)
     this._renderScreen(renderer)
     this.emit('rendered')
   }
 
-  protected _renderScreen(renderer: GlRenderer): void {
+  protected _renderScreen(renderer: WebGLRenderer): void {
     this.root.finish(renderer)
     renderer.state.reset()
     renderer.renderTarget.unbind()

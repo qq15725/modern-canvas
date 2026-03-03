@@ -1,6 +1,6 @@
 import type { RenderTargetLike } from '../shared'
-import type { GlRenderer } from './GlRenderer'
 import type { GlRenderingContext } from './types'
+import type { WebGLRenderer } from './WebGLRenderer'
 import { StencilMode } from './const'
 import { GlSystem } from './system'
 
@@ -68,7 +68,7 @@ stencilModeMap[StencilMode.inverseMaskActive] = {
 }
 
 export class GlStencilSystem extends GlSystem {
-  override install(renderer: GlRenderer): void {
+  override install(renderer: WebGLRenderer): void {
     super.install(renderer)
     renderer.stencil = this
   }
