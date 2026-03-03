@@ -101,7 +101,30 @@ export class Camera2D extends Node2D {
     return this
   }
 
-  protected _preferredZoomStep(val: number): number {
+  setZoomAtOrigin(x: number, y: number, origin: Vector2Like | 'screenCenter'): void {
+    let oldOrigin
+    if (origin === 'screenCenter') {
+      const root = this._tree?.root
+      if (root) {
+        oldOrigin = { x: root.width / 2, y: root.height / 2 }
+      }
+      else {
+        oldOrigin = { x: 0, y: 0 }
+      }
+    }
+    else {
+      oldOrigin = origin
+    }
+    const globalOrigin = this.toGlobal(oldOrigin)
+    this.setZoom(x, y)
+    const newOrigin = this.toScreen(globalOrigin)
+    this.position.add({
+      x: newOrigin.x - oldOrigin.x,
+      y: newOrigin.y - oldOrigin.y,
+    })
+  }
+
+  protected _zoomStep(val: number): number {
     if (val < 0.15) {
       return 0.05
     }
@@ -117,15 +140,17 @@ export class Camera2D extends Node2D {
   }
 
   zoomIn(): void {
-    const step = this._preferredZoomStep(this._zoom.x)
-    const val = this._zoom.x + step
-    this.setZoom(Math.floor(val / step) * step)
+    const step = this._zoomStep(this._zoom.x)
+    let val = this._zoom.x + step
+    val = Math.floor(val / step) * step
+    this.setZoomAtOrigin(val, val, 'screenCenter')
   }
 
   zoomOut(): void {
-    const step = this._preferredZoomStep(this._zoom.x)
-    const val = this._zoom.x - step
-    this.setZoom(Math.ceil(val / step) * step)
+    const step = this._zoomStep(this._zoom.x)
+    let val = this._zoom.x - step
+    val = Math.ceil(val / step) * step
+    this.setZoomAtOrigin(val, val, 'screenCenter')
   }
 
   protected override _input(event: InputEvent, key: InputEventKey): void {
@@ -184,16 +209,8 @@ export class Camera2D extends Node2D {
   protected _onWheel(e: WheelInputEvent): void {
     e.preventDefault()
     if (e.ctrlKey || e.metaKey) {
-      const oldScreen = { x: e.screenX, y: e.screenY }
-      const oldGlobal = this.toGlobal(oldScreen)
-      const factor = e.ctrlKey && IN_MAC_OS ? 10 : 1
-      const delta = -e.deltaY * (e.deltaMode === 1 ? 0.05 : e.deltaMode ? 1 : 0.002) * factor
-      this.zoomWithWheel(delta)
-      const newScreen = this.toScreen(oldGlobal)
-      this.position.add({
-        x: newScreen.x - oldScreen.x,
-        y: newScreen.y - oldScreen.y,
-      })
+      const val = this._getZoomByWheel(e, this._zoom.x)
+      this.setZoomAtOrigin(val, val, { x: e.screenX, y: e.screenY })
     }
     else {
       this.position.add({
@@ -203,11 +220,13 @@ export class Camera2D extends Node2D {
     }
   }
 
-  zoomWithWheel(delta: number): void {
-    const logCur = Math.log(this._zoom.x)
+  protected _getZoomByWheel(e: WheelInputEvent, val: number): number {
+    const factor = e.ctrlKey && IN_MAC_OS ? 10 : 1
+    const delta = -e.deltaY * (e.deltaMode === 1 ? 0.05 : e.deltaMode ? 1 : 0.002) * factor
+    const logCur = Math.log(val)
     const logNew = logCur + delta
     const zoom = Math.exp(logNew)
-    this.setZoom(Math.round(zoom * 10_000) / 10_000)
+    return Math.round(zoom * 10_000) / 10_000
   }
 
   override _updateTransform(): void {
