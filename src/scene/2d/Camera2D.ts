@@ -101,6 +101,33 @@ export class Camera2D extends Node2D {
     return this
   }
 
+  protected _preferredZoomStep(val: number): number {
+    if (val < 0.15) {
+      return 0.05
+    }
+    else if (val < 0.5) {
+      return 0.1
+    }
+    else if (val < 3) {
+      return 0.25
+    }
+    else {
+      return 1
+    }
+  }
+
+  zoomIn(): void {
+    const step = this._preferredZoomStep(this._zoom.x)
+    const val = this._zoom.x + step
+    this.setZoom(Math.floor(val / step) * step)
+  }
+
+  zoomOut(): void {
+    const step = this._preferredZoomStep(this._zoom.x)
+    const val = this._zoom.x - step
+    this.setZoom(Math.ceil(val / step) * step)
+  }
+
   protected override _input(event: InputEvent, key: InputEventKey): void {
     super._input(event, key)
 
