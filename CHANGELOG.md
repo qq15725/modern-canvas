@@ -1,3 +1,10 @@
+## [0.16.1](https://github.com/qq15725/modern-canvas/compare/v0.16.0...v0.16.1) (2026-04-20)
+
+
+### Features
+
+* getRenderEngine ([63ed75f](https://github.com/qq15725/modern-canvas/commit/63ed75fd02257ed98f93d4e6ca44b806006a25a2))
+* needsChunkReadPixels ([ef36c28](https://github.com/qq15725/modern-canvas/commit/ef36c281513276c850de375265127850261969c8))
 # [0.16.0](https://github.com/qq15725/modern-canvas/compare/v0.15.9...v0.16.0) (2026-04-20)
 
 
