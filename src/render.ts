@@ -82,7 +82,7 @@ async function task(options: RenderOptions): Promise<RenderResult> {
   engine.fonts = fonts
   engine.timeline.currentTime = 0
   engine.resize(width, height, true)
-  engine.root.removeChildren()
+  engine.root.removeChildren(true)
   engine.root.append(data)
 
   // render

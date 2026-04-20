@@ -622,8 +622,8 @@ export class Node extends CoreObject {
     return child
   }
 
-  removeChildren(): void {
-    const children = this._children.default.slice()
+  removeChildren(internalMode: InternalMode | true = 'default'): void {
+    const children = this.getChildren(internalMode).slice()
     for (let i = 0, len = children.length; i < len; i++) {
       this.removeChild(children[i])
     }

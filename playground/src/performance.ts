@@ -48,7 +48,7 @@ class PerformanceTest {
 
   render(): void {
     this.engine.stop()
-    this.engine.root.removeChildren()
+    this.engine.root.removeChildren(true)
     this.rects = []
     for (let i = 0; i < this.count; i++) {
       const x = Math.random() * this.width
