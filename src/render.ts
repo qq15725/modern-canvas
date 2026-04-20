@@ -52,14 +52,17 @@ async function task(options: RenderOptions): Promise<RenderResult> {
   const {
     debug = false,
     fonts,
-    width,
-    height,
+    width: _width,
+    height: _height,
     data,
     keyframes = [],
     onBefore,
     onKeyframe,
     ...properties
   } = options
+
+  const width = Math.floor(_width)
+  const height = Math.floor(_height)
 
   engine ??= new Engine({
     pixelRatio: 1,
@@ -114,9 +117,16 @@ async function task(options: RenderOptions): Promise<RenderResult> {
   }
 }
 
-export async function render(options: RenderOptions): Promise<RenderResult> {
+export async function render(options: RenderOptions): Promise<HTMLCanvasElement> {
   return new Promise((r) => {
-    queue.push(async () => r(await task(options)))
+    queue.push(async () => r(await task(options).then(rep => rep.toCanvas2D())))
+    start()
+  })
+}
+
+export async function renderPixels(options: RenderOptions): Promise<Uint8ClampedArray<ArrayBuffer>> {
+  return new Promise((r) => {
+    queue.push(async () => r(await task(options).then(rep => rep.pixels)))
     start()
   })
 }
