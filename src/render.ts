@@ -18,13 +18,22 @@ export interface RenderOptions extends Partial<EngineProperties> {
 }
 
 export interface RenderResult {
-  pixels: Uint8ClampedArray
+  pixels: Uint8ClampedArray<ArrayBuffer>
   toCanvas2D: () => HTMLCanvasElement
 }
 
 let engine: Engine | undefined
 const queue: (() => Promise<void>)[] = []
 let starting = false
+
+export function getRenderEngine(): Engine {
+  return engine ??= new Engine({
+    pixelRatio: 1,
+    width: 1,
+    height: 1,
+    preserveDrawingBuffer: true,
+  })
+}
 
 async function start(sleep = 100): Promise<void> {
   if (starting) {
@@ -64,12 +73,7 @@ async function task(options: RenderOptions): Promise<RenderResult> {
   const width = Math.floor(_width)
   const height = Math.floor(_height)
 
-  engine ??= new Engine({
-    pixelRatio: 1,
-    width: 1,
-    height: 1,
-    preserveDrawingBuffer: true,
-  })
+  const engine = getRenderEngine()
 
   // reset
   engine.resetProperties()
