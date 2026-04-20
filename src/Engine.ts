@@ -196,19 +196,52 @@ export class Engine extends SceneTree {
   }
 
   toPixels(): Uint8ClampedArray<ArrayBuffer> {
-    return this.renderer.toPixels()
+    const { width, height } = this.root
+    const { drawingBufferWidth: chunkWidth, drawingBufferHeight: chunkHeight } = this.gl
+    const canvasTransform = this.root.canvasTransform.clone()
+
+    const pixels = new Uint8ClampedArray(width * height * 4)
+    const cols = Math.ceil(width / chunkWidth)
+    const rows = Math.ceil(height / chunkHeight)
+
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        const x = col * chunkWidth
+        const y = row * chunkHeight
+        const w = Math.min(chunkWidth, width - x)
+        const h = Math.min(chunkHeight, height - y)
+
+        this.resize(w, h)
+        this.root.canvasTransform.copyFrom(canvasTransform.clone().translate(x, y))
+        this.render()
+        const _pixels = this.renderer.toPixels(0, 0, w, h)
+
+        for (let r = 0; r < h; r++) {
+          const src = r * w * 4
+          const dst = ((y + r) * width + x) * 4
+          pixels.set(_pixels.subarray(src, src + w * 4), dst)
+        }
+      }
+    }
+
+    if (cols > 1 || rows > 1) {
+      this.resize(width, height)
+      this.root.canvasTransform.copyFrom(canvasTransform)
+      this.render()
+    }
+
+    return pixels
   }
 
   toImageData(): ImageData {
     return new ImageData(
       this.toPixels(),
-      this.gl.drawingBufferWidth,
-      this.gl.drawingBufferHeight,
+      this.root.width,
+      this.root.height,
     )
   }
 
-  toCanvas2D(): HTMLCanvasElement {
-    const imageData = this.toImageData()
+  toCanvas2D(imageData = this.toImageData()): HTMLCanvasElement {
     const canvas1 = document.createElement('canvas')
     canvas1.width = imageData.width
     canvas1.height = imageData.height
@@ -219,8 +252,8 @@ export class Engine extends SceneTree {
       ctx1.putImageData(imageData, 0, 0)
     }
     const canvas2 = document.createElement('canvas')
-    canvas2.width = this.width
-    canvas2.height = this.height
+    canvas2.width = imageData.width
+    canvas2.height = imageData.height
     const ctx2 = canvas2.getContext('2d')
     if (ctx2) {
       ctx2.fillStyle = 'rgba(0, 0, 0, 0)'

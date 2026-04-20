@@ -17,6 +17,11 @@ export interface RenderOptions extends Partial<EngineProperties> {
   }) => void | Promise<void>
 }
 
+export interface RenderResult {
+  pixels: Uint8ClampedArray
+  toCanvas2D: () => HTMLCanvasElement
+}
+
 let engine: Engine | undefined
 const queue: (() => Promise<void>)[] = []
 let starting = false
@@ -43,7 +48,7 @@ async function start(sleep = 100): Promise<void> {
   starting = false
 }
 
-async function task(options: RenderOptions): Promise<HTMLCanvasElement> {
+async function task(options: RenderOptions): Promise<RenderResult> {
   const {
     debug = false,
     fonts,
@@ -101,10 +106,15 @@ async function task(options: RenderOptions): Promise<HTMLCanvasElement> {
     })
   }
 
-  return engine.toCanvas2D()
+  const pixels = engine.toPixels()
+
+  return {
+    pixels,
+    toCanvas2D: () => engine!.toCanvas2D(new ImageData(pixels, width, height)),
+  }
 }
 
-export async function render(options: RenderOptions): Promise<HTMLCanvasElement> {
+export async function render(options: RenderOptions): Promise<RenderResult> {
   return new Promise((r) => {
     queue.push(async () => r(await task(options)))
     start()
