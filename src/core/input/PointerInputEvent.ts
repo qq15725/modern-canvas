@@ -7,6 +7,7 @@ export class PointerInputEvent extends MouseInputEvent implements PointerEvent {
   width = 0
   height = 0
   isPrimary = false
+  declare persistentDeviceId: number
   declare pointerType: string
   declare pressure: number
   declare tangentialPressure: number
