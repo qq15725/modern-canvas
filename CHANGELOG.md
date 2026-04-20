@@ -1,3 +1,9 @@
+# [0.16.0](https://github.com/qq15725/modern-canvas/compare/v0.15.9...v0.16.0) (2026-04-20)
+
+
+### Features
+
+* chunked render ([c43bb01](https://github.com/qq15725/modern-canvas/commit/c43bb016ebca4d06e41e09a5a6356b7f19bc041a))
 ## [0.15.9](https://github.com/qq15725/modern-canvas/compare/v0.15.8...v0.15.9) (2026-03-11)
 
 
