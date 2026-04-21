@@ -204,7 +204,9 @@ export class Engine extends SceneTree {
     if (this.needsChunkReadPixels()) {
       const { width, height } = this.root
       const { drawingBufferWidth: chunkWidth, drawingBufferHeight: chunkHeight } = this.gl
-      const canvasTransform = this.root.canvasTransform.clone()
+      const canvasTransform = this.root.canvasTransform
+        .clone()
+        .translate(0, height - chunkHeight)
 
       const pixels = new Uint8ClampedArray(width * height * 4)
       const cols = Math.ceil(width / chunkWidth)
@@ -217,8 +219,12 @@ export class Engine extends SceneTree {
           const w = Math.min(chunkWidth, width - x)
           const h = Math.min(chunkHeight, height - y)
 
-          this.resize(w, h)
-          this.root.canvasTransform.copyFrom(canvasTransform.clone().translate(x, y))
+          this.root.canvasTransform.copyFrom(
+            canvasTransform
+              .clone()
+              .translate(-x, -y),
+          )
+
           this.render()
           const _pixels = this.renderer.toPixels(0, 0, w, h)
 
@@ -231,7 +237,6 @@ export class Engine extends SceneTree {
       }
 
       if (cols > 1 || rows > 1) {
-        this.resize(width, height)
         this.root.canvasTransform.copyFrom(canvasTransform)
         this.render()
       }

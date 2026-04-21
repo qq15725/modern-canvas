@@ -299,7 +299,15 @@ export class WebGLRenderer extends Renderer {
     const end = (height - 1) * row
     const flipedPixels = new Uint8Array(length)
     const pixels = new Uint8ClampedArray(length)
-    this.gl.readPixels(x, y, width, height, this.gl.RGBA, this.gl.UNSIGNED_BYTE, flipedPixels)
+    this.gl.readPixels(
+      x,
+      this.gl.drawingBufferHeight - y - height,
+      width,
+      height,
+      this.gl.RGBA,
+      this.gl.UNSIGNED_BYTE,
+      flipedPixels,
+    )
     for (let i = 0; i < length; i += row) {
       pixels.set(flipedPixels.subarray(i, i + row), end - i)
     }
