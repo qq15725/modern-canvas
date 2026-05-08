@@ -18,8 +18,8 @@ importers:
         specifier: ^0.5.0
         version: 0.5.0
       modern-idoc:
-        specifier: ^0.11.2
-        version: 0.11.2
+        specifier: ^0.11.3
+        version: 0.11.3
       modern-path2d:
         specifier: ^1.5.6
         version: 1.5.6
@@ -29,13 +29,13 @@ importers:
     devDependencies:
       '@antfu/eslint-config':
         specifier: ^8.2.0
-        version: 8.2.0(@typescript-eslint/rule-tester@8.56.1(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3))(@typescript-eslint/typescript-estree@8.59.2(typescript@6.0.3))(@typescript-eslint/utils@8.59.2(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3))(@vue/compiler-sfc@3.5.13)(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3)(vitest@4.1.5(@types/node@25.6.0)(vite@8.0.11(@types/node@25.6.0)(esbuild@0.27.3)(jiti@2.7.0)(yaml@2.8.4)))
+        version: 8.2.0(@typescript-eslint/rule-tester@8.56.1(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3))(@typescript-eslint/typescript-estree@8.59.2(typescript@6.0.3))(@typescript-eslint/utils@8.59.2(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3))(@vue/compiler-sfc@3.5.13)(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3)(vitest@4.1.5(@types/node@25.6.2)(vite@8.0.11(@types/node@25.6.2)(esbuild@0.27.3)(jiti@2.7.0)(yaml@2.8.4)))
       '@types/earcut':
         specifier: ^3.0.0
         version: 3.0.0
       '@types/node':
-        specifier: ^25.6.0
-        version: 25.6.0
+        specifier: ^25.6.2
+        version: 25.6.2
       bumpp:
         specifier: ^11.1.0
         version: 11.1.0
@@ -59,10 +59,10 @@ importers:
         version: 3.6.1(typescript@6.0.3)
       vite:
         specifier: ^8.0.11
-        version: 8.0.11(@types/node@25.6.0)(esbuild@0.27.3)(jiti@2.7.0)(yaml@2.8.4)
+        version: 8.0.11(@types/node@25.6.2)(esbuild@0.27.3)(jiti@2.7.0)(yaml@2.8.4)
       vitest:
         specifier: ^4.1.5
-        version: 4.1.5(@types/node@25.6.0)(vite@8.0.11(@types/node@25.6.0)(esbuild@0.27.3)(jiti@2.7.0)(yaml@2.8.4))
+        version: 4.1.5(@types/node@25.6.2)(vite@8.0.11(@types/node@25.6.2)(esbuild@0.27.3)(jiti@2.7.0)(yaml@2.8.4))
       yoga-layout:
         specifier: ^3.2.1
         version: 3.2.1
@@ -965,8 +965,8 @@ packages:
   '@types/ms@2.1.0':
     resolution: {integrity: sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA==}
 
-  '@types/node@25.6.0':
-    resolution: {integrity: sha512-+qIYRKdNYJwY3vRCZMdJbPLJAtGjQBudzZzdzwQYkEPQd+PJGixUL5QfvCLDaULoLv+RhT3LDkwEfKaAkgSmNQ==}
+  '@types/node@25.6.2':
+    resolution: {integrity: sha512-sokuT28dxf9JT5Kady1fsXOvI4HVpjZa95NKT5y9PNTIrs2AsobR4GFAA90ZG8M+nxVRLysCXsVj6eGC7Vbrlw==}
 
   '@types/normalize-package-data@2.4.4':
     resolution: {integrity: sha512-37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==}
@@ -1086,8 +1086,8 @@ packages:
     resolution: {integrity: sha512-NwjLUnGy8/Zfx23fl50tRC8rYaYnM52xNRYFAXvmiil9yh1+K6aRVQMnzW6gQB/1DLgWt977lYQn7C+wtgXZiA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@vitest/eslint-plugin@1.6.16':
-    resolution: {integrity: sha512-2pBN1F1JXq6zTSaYC58CMJa7pGxXIRsLfOioeZM4cPE3pRdSh1ySTSoHPQlOTEF5WgoVzWZQxhGQ3ygT78hOVg==}
+  '@vitest/eslint-plugin@1.6.17':
+    resolution: {integrity: sha512-sIVY9ZeVcXyPxFCNRkIt8Yw4keKIcUyp9/8qnmuomPwE+ST1htw5sZsbqdUMTiah9SmCg1JYoK9RqdDtPeNYYg==}
     engines: {node: '>=18'}
     peerDependencies:
       '@typescript-eslint/eslint-plugin': '*'
@@ -1476,12 +1476,12 @@ packages:
   electron-to-chromium@1.5.352:
     resolution: {integrity: sha512-9wHk8x6dyuimoe18EdiDPWKExNdxYqo4fn4FwOVVper6RxT3cmpBwBkWWfSOCYJjQdIco/nPhJhNLmn4Ufg1Yg==}
 
-  empathic@2.0.0:
-    resolution: {integrity: sha512-i6UzDscO/XfAcNYD75CfICkmfLedpyPDdozrLMmQc5ORaQcdMoc21OnlEylMIqI7U8eniKrPMxxtj8k0vhmJhA==}
+  empathic@2.0.1:
+    resolution: {integrity: sha512-YGRs8knHhKHVShLkFET/rWAU8kmHbOV5LwN938RHI0pljAJ1Gf6SzXsSmRaEzcXTtOOmVqJ5+WtQPL5uigY50Q==}
     engines: {node: '>=14'}
 
-  enhanced-resolve@5.21.0:
-    resolution: {integrity: sha512-otxSQPw4lkOZWkHpB3zaEQs6gWYEsmX4xQF68ElXC/TWvGxGMSGOvoNbaLXm6/cS/fSfHtsEdw90y20PCd+sCA==}
+  enhanced-resolve@5.21.1:
+    resolution: {integrity: sha512-8p7DUVq6XJnZEz9W4oSwiwycxBIjHjRzYb3Je3zVN+geKTRQKzAkR/K4PBExlS0090d9nshak6phMUxr3PDjmQ==}
     engines: {node: '>=10.13.0'}
 
   entities@4.5.0:
@@ -2238,8 +2238,8 @@ packages:
   modern-gif@2.1.0:
     resolution: {integrity: sha512-9ZGD5b4jNUge0fvFP1bd9Hsqz5CSZI1al3EhCJ+WFkZgmn5NO1yvVwXJA/LTqro85l2Gt0+S0dDFgVYhYtLLWg==}
 
-  modern-idoc@0.11.2:
-    resolution: {integrity: sha512-4waCpXb539Pp4p1hIxa64RuJpcwQb9DuCyI4vxjeARhlr33VT+jX5YMm/WzpDpUmUVTi0LKW/B9zkFo0q4UdAA==}
+  modern-idoc@0.11.3:
+    resolution: {integrity: sha512-wWICEBp6Vv6dBiKrrPiWtG/Q7/6lSQYto08SdMYGqeuSVqu3iE1YyV6SbuIR6tIBLSBULTfrNVUb3mTtWzj7YA==}
 
   modern-palette@2.0.0:
     resolution: {integrity: sha512-wKZcom2QzK6sS6h5RLYHEkd3V3maQLzgkI+ekDCimlk7dfXa63aekZcy+7KS+8JEqIDeY/yV1CAvA7l+7u6QHA==}
@@ -2945,7 +2945,7 @@ packages:
 
 snapshots:
 
-  '@antfu/eslint-config@8.2.0(@typescript-eslint/rule-tester@8.56.1(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3))(@typescript-eslint/typescript-estree@8.59.2(typescript@6.0.3))(@typescript-eslint/utils@8.59.2(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3))(@vue/compiler-sfc@3.5.13)(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3)(vitest@4.1.5(@types/node@25.6.0)(vite@8.0.11(@types/node@25.6.0)(esbuild@0.27.3)(jiti@2.7.0)(yaml@2.8.4)))':
+  '@antfu/eslint-config@8.2.0(@typescript-eslint/rule-tester@8.56.1(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3))(@typescript-eslint/typescript-estree@8.59.2(typescript@6.0.3))(@typescript-eslint/utils@8.59.2(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3))(@vue/compiler-sfc@3.5.13)(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3)(vitest@4.1.5(@types/node@25.6.2)(vite@8.0.11(@types/node@25.6.2)(esbuild@0.27.3)(jiti@2.7.0)(yaml@2.8.4)))':
     dependencies:
       '@antfu/install-pkg': 1.1.0
       '@clack/prompts': 1.3.0
@@ -2955,7 +2955,7 @@ snapshots:
       '@stylistic/eslint-plugin': 5.10.0(eslint@10.3.0(jiti@2.7.0))
       '@typescript-eslint/eslint-plugin': 8.59.2(@typescript-eslint/parser@8.59.2(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3)
       '@typescript-eslint/parser': 8.59.2(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3)
-      '@vitest/eslint-plugin': 1.6.16(@typescript-eslint/eslint-plugin@8.59.2(@typescript-eslint/parser@8.59.2(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3)(vitest@4.1.5(@types/node@25.6.0)(vite@8.0.11(@types/node@25.6.0)(esbuild@0.27.3)(jiti@2.7.0)(yaml@2.8.4)))
+      '@vitest/eslint-plugin': 1.6.17(@typescript-eslint/eslint-plugin@8.59.2(@typescript-eslint/parser@8.59.2(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3)(vitest@4.1.5(@types/node@25.6.2)(vite@8.0.11(@types/node@25.6.2)(esbuild@0.27.3)(jiti@2.7.0)(yaml@2.8.4)))
       ansis: 4.2.0
       cac: 7.0.0
       eslint: 10.3.0(jiti@2.7.0)
@@ -3586,7 +3586,7 @@ snapshots:
 
   '@types/ms@2.1.0': {}
 
-  '@types/node@25.6.0':
+  '@types/node@25.6.2':
     dependencies:
       undici-types: 7.19.2
 
@@ -3764,7 +3764,7 @@ snapshots:
       '@typescript-eslint/types': 8.59.2
       eslint-visitor-keys: 5.0.1
 
-  '@vitest/eslint-plugin@1.6.16(@typescript-eslint/eslint-plugin@8.59.2(@typescript-eslint/parser@8.59.2(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3)(vitest@4.1.5(@types/node@25.6.0)(vite@8.0.11(@types/node@25.6.0)(esbuild@0.27.3)(jiti@2.7.0)(yaml@2.8.4)))':
+  '@vitest/eslint-plugin@1.6.17(@typescript-eslint/eslint-plugin@8.59.2(@typescript-eslint/parser@8.59.2(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3)(vitest@4.1.5(@types/node@25.6.2)(vite@8.0.11(@types/node@25.6.2)(esbuild@0.27.3)(jiti@2.7.0)(yaml@2.8.4)))':
     dependencies:
       '@typescript-eslint/scope-manager': 8.59.2
       '@typescript-eslint/utils': 8.59.2(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3)
@@ -3772,7 +3772,7 @@ snapshots:
     optionalDependencies:
       '@typescript-eslint/eslint-plugin': 8.59.2(@typescript-eslint/parser@8.59.2(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3)
       typescript: 6.0.3
-      vitest: 4.1.5(@types/node@25.6.0)(vite@8.0.11(@types/node@25.6.0)(esbuild@0.27.3)(jiti@2.7.0)(yaml@2.8.4))
+      vitest: 4.1.5(@types/node@25.6.2)(vite@8.0.11(@types/node@25.6.2)(esbuild@0.27.3)(jiti@2.7.0)(yaml@2.8.4))
     transitivePeerDependencies:
       - supports-color
 
@@ -3785,13 +3785,13 @@ snapshots:
       chai: 6.2.2
       tinyrainbow: 3.1.0
 
-  '@vitest/mocker@4.1.5(vite@8.0.11(@types/node@25.6.0)(esbuild@0.27.3)(jiti@2.7.0)(yaml@2.8.4))':
+  '@vitest/mocker@4.1.5(vite@8.0.11(@types/node@25.6.2)(esbuild@0.27.3)(jiti@2.7.0)(yaml@2.8.4))':
     dependencies:
       '@vitest/spy': 4.1.5
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 8.0.11(@types/node@25.6.0)(esbuild@0.27.3)(jiti@2.7.0)(yaml@2.8.4)
+      vite: 8.0.11(@types/node@25.6.2)(esbuild@0.27.3)(jiti@2.7.0)(yaml@2.8.4)
 
   '@vitest/pretty-format@4.1.5':
     dependencies:
@@ -4186,9 +4186,9 @@ snapshots:
 
   electron-to-chromium@1.5.352: {}
 
-  empathic@2.0.0: {}
+  empathic@2.0.1: {}
 
-  enhanced-resolve@5.21.0:
+  enhanced-resolve@5.21.1:
     dependencies:
       graceful-fs: 4.2.11
       tapable: 2.3.3
@@ -4305,7 +4305,7 @@ snapshots:
 
   eslint-plugin-depend@1.5.0(eslint@10.3.0(jiti@2.7.0)):
     dependencies:
-      empathic: 2.0.0
+      empathic: 2.0.1
       eslint: 10.3.0(jiti@2.7.0)
       module-replacements: 2.11.0
       semver: 7.7.4
@@ -4359,7 +4359,7 @@ snapshots:
   eslint-plugin-n@17.24.0(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3):
     dependencies:
       '@eslint-community/eslint-utils': 4.9.1(eslint@10.3.0(jiti@2.7.0))
-      enhanced-resolve: 5.21.0
+      enhanced-resolve: 5.21.1
       eslint: 10.3.0(jiti@2.7.0)
       eslint-plugin-es-x: 7.8.0(eslint@10.3.0(jiti@2.7.0))
       get-tsconfig: 4.14.0
@@ -4384,7 +4384,7 @@ snapshots:
 
   eslint-plugin-pnpm@1.6.0(eslint@10.3.0(jiti@2.7.0)):
     dependencies:
-      empathic: 2.0.0
+      empathic: 2.0.1
       eslint: 10.3.0(jiti@2.7.0)
       jsonc-eslint-parser: 3.1.0
       pathe: 2.0.3
@@ -5201,7 +5201,7 @@ snapshots:
     dependencies:
       modern-palette: 2.0.0
 
-  modern-idoc@0.11.2:
+  modern-idoc@0.11.3:
     dependencies:
       colord: 2.9.3
       nanoid: 5.1.11
@@ -5216,7 +5216,7 @@ snapshots:
     dependencies:
       diff: 9.0.0
       modern-font: 0.5.0
-      modern-idoc: 0.11.2
+      modern-idoc: 0.11.3
       modern-path2d: 1.5.6
 
   module-replacements@2.11.0: {}
@@ -5820,7 +5820,7 @@ snapshots:
       spdx-correct: 3.2.0
       spdx-expression-parse: 3.0.1
 
-  vite@8.0.11(@types/node@25.6.0)(esbuild@0.27.3)(jiti@2.7.0)(yaml@2.8.4):
+  vite@8.0.11(@types/node@25.6.2)(esbuild@0.27.3)(jiti@2.7.0)(yaml@2.8.4):
     dependencies:
       lightningcss: 1.32.0
       picomatch: 4.0.4
@@ -5828,16 +5828,16 @@ snapshots:
       rolldown: 1.0.0-rc.18
       tinyglobby: 0.2.16
     optionalDependencies:
-      '@types/node': 25.6.0
+      '@types/node': 25.6.2
       esbuild: 0.27.3
       fsevents: 2.3.3
       jiti: 2.7.0
       yaml: 2.8.4
 
-  vitest@4.1.5(@types/node@25.6.0)(vite@8.0.11(@types/node@25.6.0)(esbuild@0.27.3)(jiti@2.7.0)(yaml@2.8.4)):
+  vitest@4.1.5(@types/node@25.6.2)(vite@8.0.11(@types/node@25.6.2)(esbuild@0.27.3)(jiti@2.7.0)(yaml@2.8.4)):
     dependencies:
       '@vitest/expect': 4.1.5
-      '@vitest/mocker': 4.1.5(vite@8.0.11(@types/node@25.6.0)(esbuild@0.27.3)(jiti@2.7.0)(yaml@2.8.4))
+      '@vitest/mocker': 4.1.5(vite@8.0.11(@types/node@25.6.2)(esbuild@0.27.3)(jiti@2.7.0)(yaml@2.8.4))
       '@vitest/pretty-format': 4.1.5
       '@vitest/runner': 4.1.5
       '@vitest/snapshot': 4.1.5
@@ -5854,10 +5854,10 @@ snapshots:
       tinyexec: 1.1.2
       tinyglobby: 0.2.16
       tinyrainbow: 3.1.0
-      vite: 8.0.11(@types/node@25.6.0)(esbuild@0.27.3)(jiti@2.7.0)(yaml@2.8.4)
+      vite: 8.0.11(@types/node@25.6.2)(esbuild@0.27.3)(jiti@2.7.0)(yaml@2.8.4)
       why-is-node-running: 2.3.0
     optionalDependencies:
-      '@types/node': 25.6.0
+      '@types/node': 25.6.2
     transitivePeerDependencies:
       - msw
 
