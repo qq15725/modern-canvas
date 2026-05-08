@@ -21,7 +21,7 @@ import { getFillDrawOptions } from './utils'
 
 export type TextDrawMode = 'auto' | 'texture' | 'path'
 
-export class Element2DText extends CoreObject {
+export class Element2DText extends CoreObject implements NormalizedText {
   @property({ fallback: true }) declare enabled: NormalizedText['enabled']
   @property({ fallback: () => [] }) declare content: NormalizedText['content']
   @property({ alias: '_parent.style.json' }) declare style: NormalizedText['style']

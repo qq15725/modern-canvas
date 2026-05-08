@@ -4,7 +4,7 @@ import { ViewportTexture } from '../../resources'
 import { Element2DFill } from './Element2DFill'
 import { getFillDrawOptions } from './utils'
 
-export class Element2DOutline extends Element2DFill {
+export class Element2DOutline extends Element2DFill implements NormalizedOutline {
   @property() declare color?: NormalizedOutline['color']
   @property() declare width?: NormalizedOutline['width']
   @property({ fallback: 'solid' }) declare style: NormalizedOutline['style']

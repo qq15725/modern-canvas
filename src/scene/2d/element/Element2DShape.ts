@@ -10,7 +10,7 @@ import {
 } from 'modern-path2d'
 import { CoreObject } from '../../../core'
 
-export class Element2DShape extends CoreObject {
+export class Element2DShape extends CoreObject implements NormalizedShape {
   @property({ fallback: true }) declare enabled: boolean
   @property() declare preset: NormalizedShape['preset']
   @property() declare svg: NormalizedShape['svg']

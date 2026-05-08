@@ -11,7 +11,7 @@ export interface Element2DFill extends NormalizedFill {
   //
 }
 
-export class Element2DFill extends CoreObject {
+export class Element2DFill extends CoreObject implements NormalizedFill {
   @property({ fallback: true }) declare enabled: boolean
   @property() declare color?: NormalizedFill['color']
   @property() declare image?: NormalizedFill['image']

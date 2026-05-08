@@ -4,7 +4,7 @@ import { isNone, normalizeShadow, property } from 'modern-idoc'
 import { CoreObject } from '../../../core'
 import { DropShadowEffect } from '../../effects'
 
-export class Element2DShadow extends CoreObject {
+export class Element2DShadow extends CoreObject implements NormalizedShadow {
   @property({ fallback: true }) declare enabled: boolean
   @property({ fallback: '#000000FF' }) declare color: NormalizedShadow['color']
   @property({ fallback: 0 }) declare blur: NormalizedShadow['blur']

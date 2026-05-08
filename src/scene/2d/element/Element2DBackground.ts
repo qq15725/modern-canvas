@@ -2,7 +2,7 @@ import type { Background, NormalizedBackground } from 'modern-idoc'
 import { isNone, normalizeBackground, property } from 'modern-idoc'
 import { Element2DFill } from './Element2DFill'
 
-export class Element2DBackground extends Element2DFill {
+export class Element2DBackground extends Element2DFill implements NormalizedBackground {
   @property() declare fillWithShape: NormalizedBackground['fillWithShape']
 
   override setProperties(properties?: Background): this {
