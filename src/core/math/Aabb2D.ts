@@ -1,5 +1,5 @@
-import type { Vector2Like } from './Vector2'
-import { Vector2 } from './Vector2'
+import type { Vector2Like } from 'modern-path2d'
+import { Vector2 } from 'modern-path2d'
 
 export interface RectangleLike {
   x: number

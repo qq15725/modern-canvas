@@ -2,11 +2,11 @@ import type { NormalizedShape, Shape } from 'modern-idoc'
 import type { Element2D } from './Element2D'
 import { isNone, normalizeShape, property } from 'modern-idoc'
 import {
-  Matrix3,
   Path2D,
   Path2DSet,
   svgToDom,
   svgToPath2DSet,
+  Transform2D,
 } from 'modern-path2d'
 import { CoreObject } from '../../../core'
 
@@ -26,11 +26,11 @@ export class Element2DShape extends CoreObject {
     this._updatePath2DSet()
   }
 
-  override setProperties(properties?: Shape): this {
+  override setProperties(properties?: Record<string, any>): this {
     return super.setProperties(
       isNone(properties)
         ? undefined
-        : normalizeShape(properties),
+        : normalizeShape(properties as Shape),
     )
   }
 
@@ -81,7 +81,7 @@ export class Element2DShape extends CoreObject {
     }
     const [x, y, w, h] = viewBox
     this._path2DSet.paths.forEach((path) => {
-      path.applyTransform(new Matrix3().translate(-x, -y).scale(1 / w, 1 / h))
+      path.applyTransform(new Transform2D().translate(-x, -y).scale(1 / w, 1 / h))
     })
   }
 
@@ -90,7 +90,7 @@ export class Element2DShape extends CoreObject {
       const ctx = this._parent.context
       const { width, height } = this._parent.size
       this._path2DSet.paths.forEach((path) => {
-        ctx.addPath(path.clone().applyTransform(new Matrix3().scale(width, height)))
+        ctx.addPath(path.clone().applyTransform(new Transform2D().scale(width, height)))
       })
     }
     else {

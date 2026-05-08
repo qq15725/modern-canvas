@@ -8,23 +8,24 @@ import type {
   Shape,
   Text,
 } from 'modern-idoc'
+import type { Vector2Like } from 'modern-path2d'
 import type {
   InputEvent,
   InputEventKey,
   PointerInputEvent,
-  Vector2Like } from '../../../core'
+} from '../../../core'
 import type { Node, Rectangulable, RectangulableEvents, SceneTree } from '../../main'
 import type { Node2DEvents, Node2DProperties } from '../Node2D'
 import type { Element2DStyleProperties } from './Element2DStyle'
 import { clearUndef, getDefaultLayoutStyle, getDefaultTextStyle, isNone } from 'modern-idoc'
+import { Vector2 } from 'modern-path2d'
 import {
   Aabb2D,
   customNode,
   DEG_TO_RAD,
   Obb2D,
-  Vector2,
 } from '../../../core'
-import { parseCssTransform, parseCssTransformOrigin } from '../../../css'
+import { parseCssTransformOrigin } from '../../../css'
 import { ColorFilterEffect, MaskEffect } from '../../effects'
 import { Node2D } from '../Node2D'
 import { Element2DBackground } from './Element2DBackground'
@@ -96,7 +97,7 @@ export class Element2D extends Node2D implements Rectangulable {
 
   protected _shape = new Element2DShape(this)
   get shape(): Element2DShape { return this._shape }
-  set shape(value: Element2DProperties['shape'] | undefined) { this._shape.resetProperties().setProperties(value) }
+  set shape(value: Element2DProperties['shape'] | undefined) { this._shape.resetProperties().setProperties(value as Record<string, any>) }
 
   protected _fill = new Element2DFill(this)
   get fill(): Element2DFill { return this._fill }
@@ -227,7 +228,7 @@ export class Element2D extends Node2D implements Rectangulable {
         this._updateGlobalDisplay()
         break
       case 'rotate':
-        this.rotation = value * DEG_TO_RAD
+        this.rotation = (value || 0) * DEG_TO_RAD
         this.updateGlobalTransform()
         break
       case 'scaleX':
@@ -251,12 +252,10 @@ export class Element2D extends Node2D implements Rectangulable {
       case 'transform':
         this.extraTransform.identity()
         this.extraTransform.translate(-this.pivot.x, -this.pivot.y)
-        parseCssTransform(
-          value ?? '',
-          this.size.width,
-          this.size.height,
-          this.extraTransform,
-        )
+        this.extraTransform.prependCssTransform(value ?? '', {
+          width: this.size.width,
+          height: this.size.height,
+        })
         this.extraTransform.translate(this.pivot.x, this.pivot.y)
         this.updateGlobalTransform()
         break

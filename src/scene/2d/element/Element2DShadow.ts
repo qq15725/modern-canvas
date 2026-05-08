@@ -29,6 +29,7 @@ export class Element2DShadow extends CoreObject {
     super._updateProperty(key, value, oldValue)
 
     switch (key) {
+      case 'enabled':
       case 'color':
       case 'blur':
       case 'offsetX':
@@ -42,9 +43,10 @@ export class Element2DShadow extends CoreObject {
     const name = '__$shadow'
     let effect = this._parent.getNode<DropShadowEffect>(name)
     if (
-      this.blur
-      || this.offsetX
-      || this.offsetY
+      this.enabled
+      && (this.blur
+        || this.offsetX
+        || this.offsetY)
     ) {
       if (!effect) {
         effect = new DropShadowEffect({ name })

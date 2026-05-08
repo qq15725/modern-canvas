@@ -1,5 +1,5 @@
+import type { Vector2Like } from 'modern-path2d'
 import type { RectangleLike } from './Aabb2D'
-import type { Vector2Like } from './Vector2'
 import { Aabb2D } from './Aabb2D'
 import { DEG_TO_RAD } from './utils'
 

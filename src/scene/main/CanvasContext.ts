@@ -139,8 +139,8 @@ export class CanvasContext extends Path2D {
     this.resetStatus()
   }
 
-  override copy(source: CanvasContext): this {
-    super.copy(source)
+  override copyFrom(source: CanvasContext): this {
+    super.copyFrom(source)
     this.strokeStyle = source.strokeStyle
     this.fillStyle = source.fillStyle
     this.transformUv = source.transformUv

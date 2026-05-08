@@ -12,17 +12,17 @@ import type { CanvasContext, TransformVertex } from '../../main'
 import type { Texture2D } from '../../resources'
 import type { Element2D } from './Element2D'
 import { isNone, normalizeFill, normalizeText, normalizeTextContent, property } from 'modern-idoc'
-import { BoundingBox } from 'modern-path2d'
+import { BoundingBox, Transform2D } from 'modern-path2d'
 import { Character, Text } from 'modern-text'
 import { assets } from '../../../asset'
-import { CoreObject, Transform2D } from '../../../core'
+import { CoreObject } from '../../../core'
 import { CanvasTexture, GradientTexture } from '../../resources'
 import { getFillDrawOptions } from './utils'
 
 export type TextDrawMode = 'auto' | 'texture' | 'path'
 
 export class Element2DText extends CoreObject {
-  @property({ fallback: true }) declare enabled: boolean
+  @property({ fallback: true }) declare enabled: NormalizedText['enabled']
   @property({ fallback: () => [] }) declare content: NormalizedText['content']
   @property({ alias: '_parent.style.json' }) declare style: NormalizedText['style']
   @property() declare effects: NormalizedText['effects']

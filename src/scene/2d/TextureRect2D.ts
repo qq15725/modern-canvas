@@ -1,7 +1,7 @@
 import type { Node } from '../main'
 import type { Texture2D } from '../resources'
 import type { Element2DProperties } from './element'
-import { Transform2D } from '../../core'
+import { Transform2D } from 'modern-path2d'
 import { Element2D } from './element'
 
 export interface TextureRect2DProperties extends Element2DProperties {

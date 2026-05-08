@@ -1,7 +1,7 @@
 import type { NormalizedFill } from 'modern-idoc'
 import type { RectangleLike } from '../../../core'
 import type { CanvasBatchable } from '../../main'
-import { Transform2D } from '../../../core'
+import { Transform2D } from 'modern-path2d'
 
 export function getFillDrawOptions(
   fill: NormalizedFill,

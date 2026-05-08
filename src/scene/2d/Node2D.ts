@@ -1,11 +1,12 @@
-import type { Vector2Like } from '../../core'
+import type { Vector2Like } from 'modern-path2d'
 import type {
   CanvasBatchable,
   CanvasItemEvents,
   CanvasItemProperties,
   Node,
 } from '../main'
-import { customNode, Transform2D, Vector2 } from '../../core'
+import { Transform2D, Vector2 } from 'modern-path2d'
+import { customNode } from '../../core'
 import { CanvasItem } from '../main'
 
 export interface Node2DProperties extends CanvasItemProperties {

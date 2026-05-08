@@ -1,14 +1,16 @@
+import type { Vector2Like } from 'modern-path2d'
 import type {
   InputEvent,
   InputEventKey,
   KeyboardInputEvent,
   PointerInputEvent,
-  Vector2Like,
-  WheelInputEvent } from '../../core'
+  WheelInputEvent,
+} from '../../core'
 import type { Node, SceneTree } from '../main'
 import type { Node2DEvents, Node2DProperties } from './Node2D'
 import { property } from 'modern-idoc'
-import { clamp, customNode, IN_MAC_OS, Transform2D, Vector2 } from '../../core'
+import { Transform2D, Vector2 } from 'modern-path2d'
+import { clamp, customNode, IN_MAC_OS } from '../../core'
 import { Node2D } from './Node2D'
 
 export interface Camera2DProperties extends Node2DProperties {

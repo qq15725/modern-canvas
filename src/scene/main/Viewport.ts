@@ -1,13 +1,11 @@
-import type {
-  RectangleLike,
-  Vector2,
-  Vector2Like, WebGLRenderer,
-} from '../../core'
+import type { Vector2, Vector2Like } from 'modern-path2d'
+import type { RectangleLike, WebGLRenderer } from '../../core'
 import type { Texture2D } from '../resources'
 import type { Rectangulable, RectangulableEvents } from './interfaces'
 import type { NodeEvents } from './Node'
 import { property } from 'modern-idoc'
-import { Aabb2D, customNode, Transform2D } from '../../core'
+import { Transform2D } from 'modern-path2d'
+import { Aabb2D, customNode } from '../../core'
 import { QuadUvGeometry, RenderTarget, UvMaterial } from '../resources'
 import { Node } from './Node'
 
