@@ -12,6 +12,7 @@ package-lock.json
 .idea/
 .vs/
 .claude/
+.codex/
 
 # Logs
 yarn-error.log
