@@ -1,3 +1,10 @@
+## [0.17.2](https://github.com/qq15725/modern-canvas/compare/v0.17.1...v0.17.2) (2026-05-09)
+
+
+### Features
+
+* add connection support for Element2D and scene-level nodeMap ([020958b](https://github.com/qq15725/modern-canvas/commit/020958bd07a85ecbbda486c45e31b309cde75d5d))
+* up deps ([d29ffb2](https://github.com/qq15725/modern-canvas/commit/d29ffb256c004777dede89a6f8e2132588762db3))
 ## [0.17.1](https://github.com/qq15725/modern-canvas/compare/v0.16.2...v0.17.1) (2026-05-08)
 
 
