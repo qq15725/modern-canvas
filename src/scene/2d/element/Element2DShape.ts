@@ -16,6 +16,7 @@ export class Element2DShape extends CoreObject implements NormalizedShape {
   @property() declare svg: NormalizedShape['svg']
   @property() declare viewBox: NormalizedShape['viewBox']
   @property() declare paths: NormalizedShape['paths']
+  @property() declare connectionPoints: NormalizedShape['connectionPoints']
 
   protected _path2DSet: Path2DSet = new Path2DSet()
 

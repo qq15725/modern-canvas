@@ -64,6 +64,8 @@ export class SceneTree extends MainLoop {
   readonly root = new Window().setTree(this)
   timeline = new Timeline().setTree(this)
 
+  readonly nodeMap = new Map<string, Node>()
+
   protected _backgroundColor = new Color()
   protected _previousViewport?: Viewport
   protected _currentViewport?: Viewport
@@ -76,8 +78,14 @@ export class SceneTree extends MainLoop {
     this._currentViewport = viewport
   }
 
+  getNodeById<T extends Node = Node>(id: string): T | undefined {
+    return this.nodeMap.get(id) as T | undefined
+  }
+
   constructor(properties?: Partial<SceneTreeProperties>) {
     super()
+    this.on('nodeEnter', node => this.nodeMap.set(node.id, node))
+    this.on('nodeExit', node => this.nodeMap.delete(node.id))
     this.setProperties(properties)
   }
 
@@ -147,5 +155,6 @@ export class SceneTree extends MainLoop {
     super._destroy()
     this.root.destroy()
     this.input.destroy()
+    this.nodeMap.clear()
   }
 }

@@ -1,5 +1,6 @@
 export * from './Element2D'
 export * from './Element2DBackground'
+export * from './Element2DConnection'
 export * from './Element2DFill'
 export * from './Element2DForeground'
 export * from './Element2DOutline'

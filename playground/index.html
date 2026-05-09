@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Modern canvas</title>
   <meta name="referrer" content="no-referrer" />
-<!--  <script src="https://unpkg.com/stats.js"></script>-->
   <style>
     body, html {
       margin: 0;
@@ -14,19 +13,81 @@
     * {
       box-sizing: border-box;
     }
+
+    #launcher {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background: #1a1a2e;
+      font-family: monospace;
+      z-index: 9999;
+    }
+
+    #launcher h1 {
+      color: #e0e0e0;
+      font-size: 18px;
+      margin: 0 0 8px;
+      letter-spacing: 0.05em;
+    }
+
+    #launcher-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      max-width: 720px;
+      padding: 0 24px;
+    }
+
+    #launcher button {
+      padding: 10px 16px;
+      background: #16213e;
+      color: #a8d8ea;
+      border: 1px solid #0f3460;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    #launcher button:hover {
+      background: #0f3460;
+      border-color: #a8d8ea;
+      color: #fff;
+    }
   </style>
 </head>
 <body style="width: 100dvw; height: 100dvh; overflow: hidden;">
+  <div id="launcher">
+    <h1>modern-canvas playground</h1>
+  </div>
+  <script type="module">
+    const modules = import.meta.glob('./src/*.ts')
 
-<!--  <script>-->
-<!--    window.onload = function() {-->
-<!--      const stats = new window.Stats()-->
-<!--      document.body.appendChild(stats.dom)-->
-<!--      stats.dom.style.left = ''-->
-<!--      stats.dom.style.right = '100px'-->
-<!--      requestAnimationFrame(function loop() { stats.update(); requestAnimationFrame(loop) })-->
-<!--    }-->
-<!--  </script>-->
-  <script type="module" src="./src/performance.ts"></script>
+    const scene = new URLSearchParams(location.search).get('scene')
+    const path = scene && `./src/${scene}.ts`
+
+    if (path && modules[path]) {
+      document.getElementById('launcher').remove()
+      modules[path]()
+    } else {
+      const grid = document.createElement('div')
+      grid.id = 'launcher-grid'
+      document.getElementById('launcher').appendChild(grid)
+
+      for (const p of Object.keys(modules).sort()) {
+        const name = p.replace('./src/', '').replace('.ts', '')
+        const btn = document.createElement('button')
+        btn.textContent = name
+        btn.onclick = () => { location.href = `?scene=${name}` }
+        grid.appendChild(btn)
+      }
+    }
+  </script>
 </body>
 </html>

@@ -1,5 +1,6 @@
 import type {
   Background,
+  Connection,
   Display,
   Fill,
   Foreground,
@@ -29,6 +30,7 @@ import { parseCssTransformOrigin } from '../../../css'
 import { ColorFilterEffect, MaskEffect } from '../../effects'
 import { Node2D } from '../Node2D'
 import { Element2DBackground } from './Element2DBackground'
+import { Element2DConnection } from './Element2DConnection'
 import { Element2DFill } from './Element2DFill'
 import { Element2DForeground } from './Element2DForeground'
 import { Element2DOutline } from './Element2DOutline'
@@ -59,6 +61,7 @@ export interface Element2DProperties extends Node2DProperties {
   foreground: Foreground
   text: Text
   shadow: Shadow
+  connection: Connection
 }
 
 const layoutStyle = new Set(Object.keys(getDefaultLayoutStyle()))
@@ -119,6 +122,10 @@ export class Element2D extends Node2D implements Rectangulable {
   get shadow(): Element2DShadow { return this._shadow }
   set shadow(value: Element2DProperties['shadow'] | undefined) { this._shadow.resetProperties().setProperties(value) }
 
+  protected _connection = new Element2DConnection(this)
+  get connection(): Element2DConnection { return this._connection }
+  set connection(value: Element2DProperties['connection'] | undefined) { this._connection.resetProperties().setProperties(value) }
+
   protected _colorFilterEffect?: ColorFilterEffect
   protected _maskEffect?: MaskEffect
 
@@ -148,6 +155,7 @@ export class Element2D extends Node2D implements Rectangulable {
         outline,
         foreground,
         shadow,
+        connection,
         ...restProperties
       } = properties
       style && this.style.setProperties(style)
@@ -158,6 +166,7 @@ export class Element2D extends Node2D implements Rectangulable {
       text && this.text.setProperties(text)
       foreground && this.foreground.setProperties(foreground)
       shadow && this.shadow.setProperties(shadow)
+      connection && this.connection.setProperties(connection)
       super.setProperties(restProperties)
     }
     return this
@@ -348,6 +357,10 @@ export class Element2D extends Node2D implements Rectangulable {
     this.outline.process(delta)
     this.background.process(delta)
 
+    if (this._connection.isValid()) {
+      this._updateConnectionTransform()
+    }
+
     const parent = this.getParent<Element2D>()
 
     if (this._parentGlobalDisplay !== parent?.globalDisplay) {
@@ -357,6 +370,29 @@ export class Element2D extends Node2D implements Rectangulable {
     this.flexbox.update()
 
     super._process(delta)
+  }
+
+  protected _updateConnectionTransform(): void {
+    const startPt = this._connection.resolveAnchor(this._connection.start)
+    const endPt = this._connection.resolveAnchor(this._connection.end)
+
+    if (!startPt && !endPt)
+      return
+
+    const s = startPt ?? endPt!
+    const e = endPt ?? startPt!
+
+    const minX = Math.min(s.x, e.x)
+    const minY = Math.min(s.y, e.y)
+    const w = Math.max(Math.abs(e.x - s.x), 1)
+    const h = Math.max(Math.abs(e.y - s.y), 1)
+
+    // write directly to avoid triggering the style→position feedback loop
+    this.position.x = minX
+    this.position.y = minY
+    this.size.width = w
+    this.size.height = h
+    this.updateGlobalTransform()
   }
 
   protected _updateStyleFilter(value?: string): void {
@@ -566,6 +602,7 @@ export class Element2D extends Node2D implements Rectangulable {
       text: notEmptyObjectOrUndef(this.text.toJSON()),
       foreground: notEmptyObjectOrUndef(this.foreground.toJSON()),
       shadow: notEmptyObjectOrUndef(this.shadow.toJSON()),
+      connection: notEmptyObjectOrUndef(this.connection.toJSON()),
     })
   }
 
@@ -583,6 +620,7 @@ export class Element2D extends Node2D implements Rectangulable {
     this.text.destroy()
     this.foreground.destroy()
     this.shadow.destroy()
+    this.connection.destroy()
     this._colorFilterEffect = undefined
     this._maskEffect = undefined
   }
