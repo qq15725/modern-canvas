@@ -351,6 +351,8 @@ export class Element2D extends Node2D implements Rectangulable {
   }
 
   protected override _process(delta: number): void {
+    super._process(delta)
+
     this.foreground.process(delta)
     this.fill.process(delta)
     this.text.process(delta)
@@ -368,8 +370,6 @@ export class Element2D extends Node2D implements Rectangulable {
     }
 
     this.flexbox.update()
-
-    super._process(delta)
   }
 
   protected _updateConnectionTransform(): void {
