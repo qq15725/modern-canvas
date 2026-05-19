@@ -164,13 +164,12 @@ export class Assets extends Observable<AssetsEvents> {
     this._handled.set(id, handled)
   }
 
-  async awaitBy(handler: () => Promise<void>): Promise<string> {
+  async awaitBy<T = any>(handler: () => Promise<T>): Promise<T> {
     const promise = handler()
     const id = idGenerator()
     promise.finally(() => this._handleing.delete(id))
     this._handleing.set(id, promise)
-    await promise
-    return id
+    return await promise
   }
 
   async loadBy<T = Blob>(

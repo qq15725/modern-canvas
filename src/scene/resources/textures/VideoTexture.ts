@@ -54,6 +54,7 @@ export class VideoTexture extends Texture2D<HTMLVideoElement> {
   protected _requestId?: number
   protected _resolve?: (val: this) => void
   protected _reject?: (event: ErrorEvent) => void
+  protected _seekResolves: Array<() => void> = []
 
   constructor(
     source: HTMLVideoElement
@@ -186,6 +187,37 @@ export class VideoTexture extends Texture2D<HTMLVideoElement> {
       this.requestUpload()
       this._nextTime = 0
     }
+    this._flushSeekResolves()
+  }
+
+  protected _flushSeekResolves(): void {
+    if (this._seekResolves.length === 0)
+      return
+    const resolves = this._seekResolves
+    this._seekResolves = []
+    resolves.forEach(r => r())
+  }
+
+  waitSeek(signal?: AbortSignal): Promise<void> {
+    if (!this.seeking || signal?.aborted) {
+      return Promise.resolve()
+    }
+    return new Promise<void>((resolve) => {
+      let onAbort: (() => void) | undefined
+      const wrapped = (): void => {
+        if (onAbort)
+          signal?.removeEventListener('abort', onAbort)
+        resolve()
+      }
+      onAbort = (): void => {
+        const idx = this._seekResolves.indexOf(wrapped)
+        if (idx >= 0)
+          this._seekResolves.splice(idx, 1)
+        resolve()
+      }
+      signal?.addEventListener('abort', onAbort, { once: true })
+      this._seekResolves.push(wrapped)
+    })
   }
 
   protected _setupAutoUpdate(): void {
@@ -290,6 +322,7 @@ export class VideoTexture extends Texture2D<HTMLVideoElement> {
 
   protected override _destroy(): void {
     this._setupAutoUpdate()
+    this._flushSeekResolves()
     const source = this.source
     if (source) {
       source.removeEventListener('play', this._onPlayStart)

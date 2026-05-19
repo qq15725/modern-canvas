@@ -17,6 +17,7 @@ export class Video2D extends TextureRect2D<VideoTexture> {
   get videoDuration(): number { return (this.texture?.duration ?? 0) * 1000 }
 
   protected _wait = Promise.resolve()
+  protected _loadAbort?: AbortController
 
   constructor(properties?: Partial<Video2DProperties>, children: Node[] = []) {
     super()
@@ -37,8 +38,27 @@ export class Video2D extends TextureRect2D<VideoTexture> {
   waitLoad(): Promise<void> { return this._wait }
 
   protected async _load(src: string): Promise<void> {
-    this.texture = await assets.video.load(src)
+    this._loadAbort?.abort()
+    const ac = new AbortController()
+    this._loadAbort = ac
+    const { signal } = ac
+
+    const texture = await assets.video.load(src)
+    if (signal.aborted)
+      return
+    this.texture = texture
+    this._updateVideoCurrentTime()
+    if (texture.seeking) {
+      await assets.awaitBy(() => texture.waitSeek(signal))
+      if (signal.aborted)
+        return
+    }
     this.requestDraw()
+  }
+
+  protected override _destroy(): void {
+    this._loadAbort?.abort()
+    super._destroy()
   }
 
   protected _updateVideoCurrentTime(): void {

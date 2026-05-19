@@ -7,7 +7,9 @@ export class VideoLoader extends Loader {
 
   install(assets: Assets): this {
     this.load = (url) => {
-      return new VideoTexture(url).load()
+      return assets.awaitBy(() => {
+        return new VideoTexture(url).load()
+      })
     }
 
     assets.video = this
