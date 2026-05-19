@@ -1,3 +1,9 @@
+## [0.18.1](https://github.com/qq15725/modern-canvas/compare/v0.18.0...v0.18.1) (2026-05-19)
+
+
+### Bug Fixes
+
+* ensure video frame is up-to-date when rendering keyframes ([ff49c88](https://github.com/qq15725/modern-canvas/commit/ff49c88ee995863b96043d8cd7537804de873e40))
 # [0.18.0](https://github.com/qq15725/modern-canvas/compare/v0.17.2...v0.18.0) (2026-05-19)
 
 
