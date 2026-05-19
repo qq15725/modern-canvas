@@ -207,13 +207,15 @@ export class Assets extends Observable<AssetsEvents> {
   }
 
   async waitUntilLoad(): Promise<void> {
-    await Promise.all(
-      Array.from(this._handleing.values())
-        .map(v => v.catch((err) => {
-          console.error(err)
-          return undefined
-        })),
-    )
+    while (this._handleing.size > 0) {
+      await Promise.all(
+        Array.from(this._handleing.values())
+          .map(v => v.catch((err) => {
+            console.error(err)
+            return undefined
+          })),
+      )
+    }
   }
 
   gc(): void {

@@ -173,6 +173,7 @@ export class Engine extends SceneTree {
   async waitAndRender(delta = 0): Promise<void> {
     await assets.waitUntilLoad()
     this._process(delta)
+    await assets.waitUntilLoad()
     await this.nextTick()
     this._render(this.renderer)
   }

@@ -48,11 +48,6 @@ export class Video2D extends TextureRect2D<VideoTexture> {
       return
     this.texture = texture
     this._updateVideoCurrentTime()
-    if (texture.seeking) {
-      await assets.awaitBy(() => texture.waitSeek(signal))
-      if (signal.aborted)
-        return
-    }
     this.requestDraw()
   }
 
@@ -70,6 +65,7 @@ export class Video2D extends TextureRect2D<VideoTexture> {
       const videoCurrentTime = ~~Math.max(0, this.currentTime % this.videoDuration) / 1000
       if (texture.currentTime !== videoCurrentTime) {
         texture.currentTime = videoCurrentTime
+        assets.awaitBy(() => texture.waitSeek(this._loadAbort?.signal))
       }
     }
   }

@@ -90,27 +90,20 @@ async function task(options: RenderOptions): Promise<RenderResult> {
   await engine.waitAndRender()
 
   if (keyframes.length) {
-    await new Promise<void>((resolve) => {
-      let i = 0
-      const len = keyframes.length
-      const last = keyframes[len - 1]
-      async function handle(): Promise<void> {
-        if (i === len)
-          return resolve()
-        const currentTime = keyframes[i++]
-        const next = keyframes[i] || currentTime
-        const duration = next - currentTime
-        engine!.timeline.currentTime = currentTime
-        engine!.render()
-        await onKeyframe?.(engine!.toPixels(), {
-          currentTime,
-          duration,
-          progress: last !== 0 ? currentTime / last : 1,
-        })
-        requestAnimationFrame(handle)
-      }
-      handle()
-    })
+    const len = keyframes.length
+    const last = keyframes[len - 1]
+    for (let i = 0; i < len; i++) {
+      const currentTime = keyframes[i]
+      const next = keyframes[i + 1] || currentTime
+      const duration = next - currentTime
+      engine.timeline.currentTime = currentTime
+      await engine.waitAndRender()
+      await onKeyframe?.(engine.toPixels(), {
+        currentTime,
+        duration,
+        progress: last !== 0 ? currentTime / last : 1,
+      })
+    }
   }
 
   const pixels = engine.toPixels()
