@@ -1,3 +1,9 @@
+# [0.18.0](https://github.com/qq15725/modern-canvas/compare/v0.17.2...v0.18.0) (2026-05-19)
+
+
+### Bug Fixes
+
+* ensure Video2D waits for first-frame seek and handle load reentrancy ([6c608ff](https://github.com/qq15725/modern-canvas/commit/6c608ffa8e89314b7571d3a81a94a3ebc7f20d1f))
 ## [0.17.2](https://github.com/qq15725/modern-canvas/compare/v0.17.1...v0.17.2) (2026-05-09)
 
 
