@@ -64,8 +64,8 @@
     "earcut": "^3.0.2",
     "modern-font": "^0.5.0",
     "modern-idoc": "^0.11.4",
-    "modern-path2d": "^1.5.6",
-    "modern-text": "^1.11.0"
+    "modern-path2d": "^1.6.0",
+    "modern-text": "^1.11.1"
   },
   "peerDependencies": {
     "lottie-web": "^5",
@@ -84,18 +84,18 @@
     }
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^8.2.0",
+    "@antfu/eslint-config": "^9.0.0",
     "@types/earcut": "^3.0.0",
-    "@types/node": "^25.6.2",
+    "@types/node": "^25.9.0",
     "bumpp": "^11.1.0",
     "conventional-changelog-cli": "^5.0.0",
-    "eslint": "^10.3.0",
+    "eslint": "^10.4.0",
     "lottie-web": "^5.13.0",
     "modern-gif": "^2.1.0",
     "typescript": "^6.0.3",
     "unbuild": "^3.6.1",
-    "vite": "^8.0.11",
-    "vitest": "^4.1.5",
+    "vite": "^8.0.13",
+    "vitest": "^4.1.6",
     "yoga-layout": "^3.2.1"
   }
 }
