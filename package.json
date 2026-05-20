@@ -63,9 +63,9 @@
     "colord": "^2.9.3",
     "earcut": "^3.0.2",
     "modern-font": "^0.5.0",
-    "modern-idoc": "^0.11.4",
+    "modern-idoc": "^0.11.5",
     "modern-path2d": "^1.6.0",
-    "modern-text": "^1.11.1"
+    "modern-text": "^1.12.0"
   },
   "peerDependencies": {
     "lottie-web": "^5",
@@ -86,7 +86,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^9.0.0",
     "@types/earcut": "^3.0.0",
-    "@types/node": "^25.9.0",
+    "@types/node": "^25.9.1",
     "bumpp": "^11.1.0",
     "conventional-changelog-cli": "^5.0.0",
     "eslint": "^10.4.0",
@@ -95,7 +95,7 @@
     "typescript": "^6.0.3",
     "unbuild": "^3.6.1",
     "vite": "^8.0.13",
-    "vitest": "^4.1.6",
+    "vitest": "^4.1.7",
     "yoga-layout": "^3.2.1"
   }
 }
