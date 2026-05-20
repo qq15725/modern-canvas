@@ -1,3 +1,17 @@
+## [0.18.2](https://github.com/qq15725/modern-canvas/compare/v0.18.1...v0.18.2) (2026-05-20)
+
+
+### Bug Fixes
+
+* blank render — seed uniform shadow as "unset" so the first upload always runs ([70dad5d](https://github.com/qq15725/modern-canvas/commit/70dad5d5f9d9093985e3ddb3cf7106674fc5d8c8))
+* correct WebGL renderer batching, resource lifecycle and state sync ([24ed3f9](https://github.com/qq15725/modern-canvas/commit/24ed3f9ee6c4c9abfb7e82d3ca4a22cf7d80ca12))
+* infinite loop freezing first render in GlStateSystem.reset ([5a695b5](https://github.com/qq15725/modern-canvas/commit/5a695b5541fecf3763fd58067bc6c722e1a6a22f))
+* run super._process before child sub-process so currentTime is fresh when fill/text read it (gif frames were off by one) ([6b7fccb](https://github.com/qq15725/modern-canvas/commit/6b7fccb6b3ab5a1be98c63562608f3aa78014566))
+
+
+### Performance Improvements
+
+* skip redundant uniform uploads via shadow compare and shared dirty-tracked groups ([dfa2f70](https://github.com/qq15725/modern-canvas/commit/dfa2f70e1aa09f82067cb08d770c8db7a78be21c))
 ## [0.18.1](https://github.com/qq15725/modern-canvas/compare/v0.18.0...v0.18.1) (2026-05-19)
 
 
