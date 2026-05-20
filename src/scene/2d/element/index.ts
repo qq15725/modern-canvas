@@ -1,3 +1,4 @@
+export * from './connectionRouter'
 export * from './Element2D'
 export * from './Element2DBackground'
 export * from './Element2DConnection'

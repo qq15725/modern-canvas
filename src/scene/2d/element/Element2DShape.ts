@@ -20,12 +20,27 @@ export class Element2DShape extends CoreObject implements NormalizedShape {
 
   protected _path2DSet: Path2DSet = new Path2DSet()
 
+  /**
+   * A derived path in the element's local pixel space (NOT normalized to the unit
+   * box). Used by connections so the routed polyline is drawn 1:1 — going through
+   * the normalize→size scaling would distort the stroke width non-uniformly.
+   */
+  protected _localPath?: Path2D
+
   constructor(
     protected _parent: Element2D,
   ) {
     super()
     this._updatePath2DSet()
   }
+
+  /** Set/clear the local-space derived path (e.g. a connection route). */
+  setLocalPath(path: Path2D | undefined): void {
+    this._localPath = path
+    this._parent.requestDraw()
+  }
+
+  get localPath(): Path2D | undefined { return this._localPath }
 
   override setProperties(properties?: Record<string, any>): this {
     return super.setProperties(
@@ -87,7 +102,11 @@ export class Element2DShape extends CoreObject implements NormalizedShape {
   }
 
   draw(rect = false): void {
-    if (!rect && this.isValid()) {
+    if (!rect && this._localPath && this._localPath.getLength()) {
+      // already in local pixel space — add as-is (no normalize/size scaling)
+      this._parent.context.addPath(this._localPath.clone())
+    }
+    else if (!rect && this.isValid()) {
       const ctx = this._parent.context
       const { width, height } = this._parent.size
       this._path2DSet.paths.forEach((path) => {

@@ -19,7 +19,7 @@ import type { Node, Rectangulable, RectangulableEvents, SceneTree } from '../../
 import type { Node2DEvents, Node2DProperties } from '../Node2D'
 import type { Element2DStyleProperties } from './Element2DStyle'
 import { clearUndef, getDefaultLayoutStyle, getDefaultTextStyle, isNone } from 'modern-idoc'
-import { Vector2 } from 'modern-path2d'
+import { Transform2D, Vector2 } from 'modern-path2d'
 import {
   Aabb2D,
   customNode,
@@ -360,7 +360,7 @@ export class Element2D extends Node2D implements Rectangulable {
     this.background.process(delta)
 
     if (this._connection.isValid()) {
-      this._updateConnectionTransform()
+      this._updateConnection()
     }
 
     const parent = this.getParent<Element2D>()
@@ -372,27 +372,27 @@ export class Element2D extends Node2D implements Rectangulable {
     this.flexbox.update()
   }
 
-  protected _updateConnectionTransform(): void {
-    const startPt = this._connection.resolveAnchor(this._connection.start)
-    const endPt = this._connection.resolveAnchor(this._connection.end)
-
-    if (!startPt && !endPt)
+  protected _updateConnection(): void {
+    const path = this._connection.route()
+    if (!path || !path.getLength())
       return
 
-    const s = startPt ?? endPt!
-    const e = endPt ?? startPt!
-
-    const minX = Math.min(s.x, e.x)
-    const minY = Math.min(s.y, e.y)
-    const w = Math.max(Math.abs(e.x - s.x), 1)
-    const h = Math.max(Math.abs(e.y - s.y), 1)
+    // size the element to the route's own bounding box (orthogonal/curved routes
+    // can extend past the endpoints), so the local path draws 1:1 under the transform
+    const bbox = path.getBoundingBox()
+    const w = Math.max(bbox.width, 1)
+    const h = Math.max(bbox.height, 1)
 
     // write directly to avoid triggering the style→position feedback loop
-    this.position.x = minX
-    this.position.y = minY
+    this.position.x = bbox.x
+    this.position.y = bbox.y
     this.size.width = w
     this.size.height = h
     this.updateGlobalTransform()
+
+    // move the world-space path into local pixel space and hand it to the shape
+    path.applyTransform(new Transform2D().translate(-bbox.x, -bbox.y))
+    this._shape.setLocalPath(path)
   }
 
   protected _updateStyleFilter(value?: string): void {

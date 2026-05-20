@@ -1,3 +1,4 @@
+import type { ConnectionMode } from '../../src'
 import { Element2D, Node } from '../../src'
 
 async function init(): Promise<void> {
@@ -6,85 +7,68 @@ async function init(): Promise<void> {
   ;(window as any).engine = engine
   document.body.append(engine.view!)
 
-  const nodeA = engine.root.appendChild(Node.parse({
-    is: 'Element2D',
-    id: 'node-a',
-    style: { left: 150, top: 200, width: 120, height: 80 },
-    fill: { color: '#4A90D9FF' },
-    outline: { color: '#1A5FA8FF', width: 2 },
-    shape: {
-      connectionPoints: [
-        { idx: 0, x: 0.5, y: 0 },
-        { idx: 1, x: 1,   y: 0.5 },
-        { idx: 2, x: 0.5, y: 1 },
-        { idx: 3, x: 0,   y: 0.5 },
-      ],
-    },
-  }) as Element2D)
+  // four side connection points on every node
+  const connectionPoints = [
+    { idx: 0, x: 0.5, y: 0 }, // top
+    { idx: 1, x: 1, y: 0.5 }, // right
+    { idx: 2, x: 0.5, y: 1 }, // bottom
+    { idx: 3, x: 0, y: 0.5 }, // left
+  ]
 
-  const nodeB = engine.root.appendChild(Node.parse({
-    is: 'Element2D',
-    id: 'node-b',
-    style: { left: 500, top: 400, width: 120, height: 80 },
-    fill: { color: '#5CB85CFF' },
-    outline: { color: '#3A7A3AFF', width: 2 },
-    shape: {
-      connectionPoints: [
-        { idx: 0, x: 0.5, y: 0 },
-        { idx: 1, x: 1,   y: 0.5 },
-        { idx: 2, x: 0.5, y: 1 },
-        { idx: 3, x: 0,   y: 0.5 },
-      ],
-    },
-  }) as Element2D)
+  // one row per mode, identical geometry so the three render styles compare directly
+  const rows: { mode: ConnectionMode, color: string, y: number }[] = [
+    { mode: 'straight', color: '#4A90D9FF', y: 60 },
+    { mode: 'orthogonal', color: '#FF6B35FF', y: 240 },
+    { mode: 'curved', color: '#5CB85CFF', y: 420 },
+  ]
 
-  // 连接线 1：A 右侧 → B 左侧
-  engine.root.appendChild(Node.parse({
-    is: 'Element2D',
-    id: 'line-ab',
-    fill: { color: '#FF6B35FF' },
-    outline: { color: '#FF6B35FF', width: 3 },
-    connection: { start: { id: 'node-a', idx: 1 }, end: { id: 'node-b', idx: 3 } },
-  }))
+  const movers: Element2D[] = []
 
-  const nodeC = engine.root.appendChild(Node.parse({
-    is: 'Element2D',
-    id: 'node-c',
-    style: { left: 500, top: 150, width: 100, height: 100, borderRadius: 50 },
-    fill: { color: '#9B59B6FF' },
-    outline: { color: '#6C3483FF', width: 2 },
-  }) as Element2D)
+  for (const { mode, color, y } of rows) {
+    engine.root.appendChild(Node.parse({
+      is: 'Element2D',
+      id: `from-${mode}`,
+      style: { left: 120, top: y, width: 130, height: 70 },
+      fill: { color: '#EEEEEEFF' },
+      outline: { color: '#AAAAAAFF', width: 1 },
+      shape: { connectionPoints },
+    }) as Element2D)
 
-  // 连接线 2：A 上侧 → C 中心（无 idx，fallback）
-  engine.root.appendChild(Node.parse({
-    is: 'Element2D',
-    id: 'line-ac',
-    fill: { color: '#E74C3CFF' },
-    outline: { color: '#E74C3CFF', width: 2 },
-    connection: { start: { id: 'node-a', idx: 0 }, end: { id: 'node-c' } },
-  }))
+    const to = engine.root.appendChild(Node.parse({
+      is: 'Element2D',
+      id: `to-${mode}`,
+      style: { left: 460, top: y + 40, width: 130, height: 70 },
+      fill: { color: '#EEEEEEFF' },
+      outline: { color: '#AAAAAAFF', width: 1 },
+      shape: { connectionPoints },
+    }) as Element2D)
+    movers.push(to)
 
-  console.log('nodeMap size:', engine.nodeMap.size)
-  console.log('node-a in map:', engine.nodeMap.get('node-a') === nodeA)
-  console.log('node-b in map:', engine.nodeMap.get('node-b') === nodeB)
-  console.log('node-c in map:', engine.nodeMap.get('node-c') === nodeC)
+    // connection: source right anchor -> target left anchor, in this row's mode
+    engine.root.appendChild(Node.parse({
+      is: 'Element2D',
+      id: `line-${mode}`,
+      outline: { color, width: 3 },
+      connection: { start: { id: `from-${mode}`, idx: 1 }, end: { id: `to-${mode}`, idx: 3 }, mode },
+    }))
+  }
 
+  // eslint-disable-next-line no-console
+  console.log('connection modes — blue: straight, orange: orthogonal, green: curved')
+
+  // move the targets so the connectors re-route live
   let t = 0
   engine.on('process', (delta) => {
     t += delta * 0.001
-    nodeB.style = {
-      left: 500 + Math.cos(t) * 100,
-      top:  400 + Math.sin(t) * 80,
-      width: 120,
-      height: 80,
-    }
+    movers.forEach((to, i) => {
+      to.style = {
+        left: 460 + Math.cos(t + i) * 70,
+        top: rows[i].y + 40 + Math.sin(t + i) * 60,
+        width: 130,
+        height: 70,
+      }
+    })
   })
-
-  setTimeout(() => {
-    const id = nodeC.id
-    nodeC.remove()
-    console.log('after remove node-c, still in map:', engine.nodeMap.has(id))
-  }, 3000)
 }
 
 init()
