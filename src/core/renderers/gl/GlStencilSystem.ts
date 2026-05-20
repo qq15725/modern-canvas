@@ -5,8 +5,8 @@ import { StencilMode } from './const'
 import { GlSystem } from './system'
 
 export interface StencilState {
-  stencilWriteMask?: number
-  stencilReadMask?: number
+  // Stencil writes are controlled entirely by `passOp` below; the GL stencil
+  // write/read masks are left at their default 0xFF (see GlStencilSystem.bind).
   stencilFront?: {
     compare: 'always' | 'equal' | 'not-equal'
     passOp: 'increment-clamp' | 'decrement-clamp' | 'keep' | 'replace'
@@ -20,10 +20,7 @@ export interface StencilState {
 /** @internal */
 export const stencilModeMap: StencilState[] = []
 stencilModeMap[StencilMode.none] = {}
-stencilModeMap[StencilMode.disabled] = {
-  stencilWriteMask: 0,
-  stencilReadMask: 0,
-}
+stencilModeMap[StencilMode.disabled] = {}
 stencilModeMap[StencilMode.renderingMaskAdd] = {
   stencilFront: {
     compare: 'equal',
@@ -45,7 +42,6 @@ stencilModeMap[StencilMode.renderingMaskRemove] = {
   },
 }
 stencilModeMap[StencilMode.maskActive] = {
-  stencilWriteMask: 0,
   stencilFront: {
     compare: 'equal',
     passOp: 'keep',
@@ -56,7 +52,6 @@ stencilModeMap[StencilMode.maskActive] = {
   },
 }
 stencilModeMap[StencilMode.inverseMaskActive] = {
-  stencilWriteMask: 0,
   stencilFront: {
     compare: 'not-equal',
     passOp: 'keep',

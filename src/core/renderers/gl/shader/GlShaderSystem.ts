@@ -152,15 +152,18 @@ export class GlShaderSystem extends GlSystem {
       if (!boundUniform)
         continue
 
-      const { type, isArray, value: _oldValue, name } = boundUniform
+      const { type, isArray, name } = boundUniform
 
-      // TODO
-      // if (oldValue === value)
-      //   continue
-
+      // Note: values are often the same Float32Array mutated in place, so a
+      // reference compare can't reliably skip unchanged uniforms — always upload.
       boundUniform.value = value
 
-      const location = gl.getUniformLocation(glProgramData.native, name)
+      // cache the location: getUniformLocation is comparatively expensive and the
+      // location is stable for the lifetime of the linked program
+      if (boundUniform.location === undefined) {
+        boundUniform.location = gl.getUniformLocation(glProgramData.native, name)
+      }
+      const location = boundUniform.location
 
       switch (type) {
         case 'float':
@@ -236,6 +239,10 @@ export class GlShaderSystem extends GlSystem {
 
   override reset(): void {
     super.reset()
+    if (!this._renderer.contextLost) {
+      const gl = this._gl
+      this.glProgramDatas.forEach(glProgramData => gl.deleteProgram(glProgramData.native))
+    }
     this.glProgramDatas.clear()
     this.currentProgram = null
     this.uniforms = {

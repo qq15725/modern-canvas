@@ -18,6 +18,8 @@ export interface GlUniform {
   size: number
   isArray: boolean
   value: any
+  /** cached uniform location, looked up lazily on first upload (undefined = not yet resolved) */
+  location?: WebGLUniformLocation | null
 }
 
 const cached: Record<string, GlProgram> = Object.create(null)

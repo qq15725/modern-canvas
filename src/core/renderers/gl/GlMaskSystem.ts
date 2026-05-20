@@ -69,7 +69,7 @@ export class GlMaskSystem extends GlSystem {
     if ('x' in mask) {
       this._renderer.scissor.pop()
     }
-    if ('render' in mask) {
+    else if ('render' in mask) {
       // popMaskBegin
       this._renderer.flush()
       if (index !== 0) {

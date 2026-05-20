@@ -227,13 +227,19 @@ export class GlTextureSystem extends GlSystem {
 
   override reset(): void {
     super.reset()
+    const gl = this._gl
+    if (!this._renderer.contextLost) {
+      this.glTextures.forEach(glTexture => gl.deleteTexture(glTexture.native))
+    }
     this.textures.clear()
     this.glTextures.clear()
-    this.maxTextureImageUnits = 0
+    // keep maxTextureImageUnits: it is a context capability (re-read on updateContext),
+    // zeroing it here would make the batch build a 0-sampler shader
     this._location = 0
     this.current.length = 0
-    const gl = this._gl
     this._premultiplyAlpha = false
-    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this._premultiplyAlpha)
+    if (!this._renderer.contextLost) {
+      gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this._premultiplyAlpha)
+    }
   }
 }

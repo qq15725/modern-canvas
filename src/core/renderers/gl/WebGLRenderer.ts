@@ -247,8 +247,12 @@ export class WebGLRenderer extends Renderer {
   }
 
   protected _contextRestored(): void {
+    // Drop the stale GPU-handle caches (textures/buffers/programs/VAOs/framebuffers)
+    // while still flagged as lost, so each system's reset() skips gl.delete* on the
+    // now-invalid handles and just forgets them. They get lazily recreated on next use.
+    this._systems.forEach(system => system.reset())
     this.contextLost = false
-    this._setupExtensions()
+    this._setupExtensions()._setupSupports()
     this._systems.forEach(system => system.emit('updateContext', this.gl))
   }
 

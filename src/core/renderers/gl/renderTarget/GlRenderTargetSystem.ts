@@ -384,6 +384,9 @@ export class GlRenderTargetSystem extends GlSystem {
 
   override reset(): void {
     super.reset()
+    if (!this._renderer.contextLost) {
+      this.glRenderTargets.forEach(glRenderTarget => this.destroyGpuRenderTarget(glRenderTarget))
+    }
     this.renderTargets.clear()
     this.glRenderTargets.clear()
     this.current = null

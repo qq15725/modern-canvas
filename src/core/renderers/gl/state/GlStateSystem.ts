@@ -154,8 +154,12 @@ export class GlStateSystem extends GlSystem {
 
   reset(): void {
     super.reset()
-    this.bind(this.defaultState)
+    // Force a full re-sync to defaultState: flip every tracked bit so each setter
+    // re-runs, and clear boundBlendMode so setBlendMode actually re-applies (it
+    // early-returns when value === boundBlendMode).
+    this.boundStateBitmap = ~this.defaultState.bitmap >>> 0
+    this.boundBlendMode = undefined
     this._blendEq = true
-    this.setBlendMode(GlBlendMode.normal)
+    this.bind(this.defaultState)
   }
 }

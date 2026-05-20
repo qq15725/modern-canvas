@@ -43,6 +43,13 @@ export class GlBufferSystem extends GlSystem {
         })
         buffer.on('destroy', () => {
           this.buffers.delete(buffer.instanceId)
+          const glBuffer = this.glBuffers.get(buffer.instanceId)
+          if (glBuffer) {
+            if (!this._renderer.contextLost) {
+              this._gl.deleteBuffer(glBuffer.native)
+            }
+            this.glBuffers.delete(buffer.instanceId)
+          }
         })
       }
       this.buffers.set(buffer.instanceId, buffer)
@@ -94,6 +101,10 @@ export class GlBufferSystem extends GlSystem {
 
   override reset(): void {
     super.reset()
+    if (!this._renderer.contextLost) {
+      const gl = this._gl
+      this.glBuffers.forEach(glBuffer => gl.deleteBuffer(glBuffer.native))
+    }
     this.buffers.clear()
     this.glBuffers.clear()
   }

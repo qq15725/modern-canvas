@@ -276,6 +276,7 @@ void main(void) {
             start = i
             drawCall = { id: ++drawCallUid } as DrawCall
             drawCall.textures = textures
+            drawCall.textureLocationMap = textureLocationMap
             drawCall.start = iIndex
           }
 
@@ -329,7 +330,11 @@ void main(void) {
 
     const shader = this._getShader(textureMaxUnits)
 
-    shader.update(float32View, indexBufferData)
+    // only upload the portion actually written this flush, not the whole rounded-up buffer
+    shader.update(
+      float32View.subarray(0, vertexCount * this._vertexSize),
+      indexBufferData.subarray(0, indexCount),
+    )
 
     for (let len = drawCalls.length, i = 0; i < len; i++) {
       const drawCall = drawCalls[i]
@@ -360,13 +365,13 @@ void main(void) {
     const roundedSize = roundedP2 * 8
 
     if (this._attributeBuffer.length <= roundedSizeIndex) {
-      this._indexBuffers.length = roundedSizeIndex + 1
+      this._attributeBuffer.length = roundedSizeIndex + 1
     }
 
-    let buffer = this._attributeBuffer[roundedSize]
+    let buffer = this._attributeBuffer[roundedSizeIndex]
 
     if (!buffer) {
-      this._attributeBuffer[roundedSize] = buffer = new ArrayBuffer(roundedSize * this._vertexSize * 4)
+      this._attributeBuffer[roundedSizeIndex] = buffer = new ArrayBuffer(roundedSize * this._vertexSize * 4)
     }
 
     return buffer

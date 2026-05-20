@@ -121,12 +121,22 @@ export class GlGeometrySystem extends GlSystem {
         geometry.on('destroy', () => {
           const vaoObjectHash = this._geometryVaoHash[geometry.instanceId]
           if (vaoObjectHash) {
-            if (this._renderer.contextLost) {
+            // delete the GPU VAOs while the context is still alive; if it is lost
+            // the objects are gone already and gl.deleteVertexArray would be a no-op
+            if (!this._renderer.contextLost) {
+              // the same VAO is stored under both its signature and program.id keys,
+              // so dedupe to avoid double-deleting the same object
+              const deleted = new Set<WebGLVertexArrayObject>()
               for (const i in vaoObjectHash) {
-                if (this.currentVao !== vaoObjectHash[i]) {
+                const vao = vaoObjectHash[i]
+                if (deleted.has(vao)) {
+                  continue
+                }
+                deleted.add(vao)
+                if (this.currentVao === vao) {
                   this.unbind()
                 }
-                gl.deleteVertexArray(vaoObjectHash[i])
+                gl.deleteVertexArray(vao)
               }
             }
             delete this._geometryVaoHash[geometry.instanceId]
@@ -233,7 +243,11 @@ export class GlGeometrySystem extends GlSystem {
     // eslint-disable-next-line no-unreachable-loop
     for (const i in geometry.attributes) {
       const attribute = geometry.attributes[i]
-      return attribute.buffer.data.length / ((attribute.stride ?? 0) / 4)
+      const strideInFloats = (attribute.stride ?? 0) / 4
+      if (!strideInFloats) {
+        return 0
+      }
+      return attribute.buffer.data.length / strideInFloats
     }
     return 0
   }
@@ -280,6 +294,22 @@ export class GlGeometrySystem extends GlSystem {
 
   override reset(): void {
     super.reset()
+    if (!this._renderer.contextLost) {
+      const gl = this._gl
+      const deleted = new Set<WebGLVertexArrayObject>()
+      for (const id in this._geometryVaoHash) {
+        const vaoObjectHash = this._geometryVaoHash[id]
+        for (const key in vaoObjectHash) {
+          const vao = vaoObjectHash[key]
+          if (deleted.has(vao)) {
+            continue
+          }
+          deleted.add(vao)
+          gl.deleteVertexArray(vao)
+        }
+      }
+    }
+    this._geometryVaoHash = {}
     this.current = null
     this.currentVao = null
   }
