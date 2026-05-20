@@ -110,6 +110,7 @@ export class GlRenderTargetSystem extends GlSystem {
         viewport.height / pixelRatio,
       )
       this._renderer.shader.uniforms.projectionMatrix = this.projection.toArray(true)
+      this._renderer.shader.markGlobalUniformsDirty()
 
       this._renderer.viewport.bind(viewport)
 

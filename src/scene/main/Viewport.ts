@@ -77,6 +77,7 @@ export class Viewport extends Node implements Rectangulable {
       this.flush(renderer)
       this.renderTarget.activate(renderer, frame)
       renderer.shader.uniforms.viewMatrix = this.canvasTransform.toArray(true)
+      renderer.shader.markGlobalUniformsDirty()
       this._tree?.setCurrentViewport(this)
       return true
     }

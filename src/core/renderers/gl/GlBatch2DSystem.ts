@@ -182,9 +182,10 @@ void main(void) {
             renderer.gl.drawingBufferWidth / renderer.pixelRatio,
             renderer.gl.drawingBufferHeight / renderer.pixelRatio,
           ],
-          ...renderer.shader.uniforms,
         }
         renderer.shader.updateUniforms(shader)
+        // projection/view are a shared group: only re-uploaded to this program when changed
+        renderer.shader.updateUniformGroup(renderer.shader.globalUniforms, shader.glProgram)
         renderer.geometry.bind(geometry, shader.glProgram)
         renderer.geometry.draw(options)
       },

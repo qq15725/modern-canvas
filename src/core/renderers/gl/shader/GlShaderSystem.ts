@@ -2,6 +2,7 @@ import type { ShaderLike } from '../../shared'
 import type { WebGLRenderer } from '../WebGLRenderer'
 import type { GlAttribute, GlProgram, GlUniform } from './GlProgram'
 import { getAttributeInfoFromFormat } from '../../shared/geometry/getAttributeInfoFromFormat'
+import { UniformGroup } from '../../shared/shader'
 import { GlSystem } from '../system'
 import { defaultValue } from './defaultValue'
 import { GlProgramData } from './GlProgramData'
@@ -15,9 +16,26 @@ export class GlShaderSystem extends GlSystem {
 
   readonly glProgramDatas = new Map<number, GlProgramData>()
   currentProgram: GlProgram | null = null
-  uniforms = {
+
+  /**
+   * Global uniforms (projection/view) shared by every shader. Held as a
+   * UniformGroup so each program only re-uploads them when they actually change
+   * (tracked via the group's `_dirtyId`). Call {@link markGlobalUniformsDirty}
+   * after mutating `uniforms.projectionMatrix` / `uniforms.viewMatrix`.
+   */
+  readonly globalUniforms = new UniformGroup({
     projectionMatrix: new Float32Array([1, 0, 0, 0, 1, 0, 0, 0, 1]),
     viewMatrix: new Float32Array([1, 0, 0, 0, 1, 0, 0, 0, 1]),
+  }, { isStatic: true })
+
+  /** Backwards-compatible accessor for the global uniform values. */
+  get uniforms(): { projectionMatrix: Float32Array, viewMatrix: Float32Array } {
+    return this.globalUniforms.uniforms
+  }
+
+  /** Flag the global uniforms as changed so they are re-uploaded on next use. */
+  markGlobalUniformsDirty(): void {
+    this.globalUniforms.update()
   }
 
   bind(source: ShaderLike | null): void {
@@ -136,11 +154,31 @@ export class GlShaderSystem extends GlSystem {
   }
 
   updateUniforms(source: ShaderLike): void {
-    const gl = this._gl
     this.bind(source)
     const { glProgram, uniforms = {} } = source
-    const glProgramData = this.getGlProgramData(glProgram)
+    this._uploadUniforms(glProgram, this.getGlProgramData(glProgram), uniforms)
+  }
 
+  /**
+   * Upload a shared uniform group to a program, skipping the work entirely when
+   * the group has not changed since it was last synced to this program.
+   */
+  updateUniformGroup(group: UniformGroup, glProgram: GlProgram): void {
+    const glProgramData = this.getGlProgramData(glProgram)
+    if (group.isStatic && glProgramData.uniformDirtyGroups[group.uid] === group._dirtyId) {
+      return
+    }
+    glProgramData.uniformDirtyGroups[group.uid] = group._dirtyId
+    this.useProgram(glProgram)
+    this._uploadUniforms(glProgram, glProgramData, group.uniforms)
+  }
+
+  protected _uploadUniforms(
+    glProgram: GlProgram,
+    glProgramData: GlProgramData,
+    uniforms: Record<string, any>,
+  ): void {
+    const gl = this._gl
     const {
       uniforms: boundUniforms,
     } = glProgram
@@ -154,16 +192,21 @@ export class GlShaderSystem extends GlSystem {
 
       const { type, isArray, name } = boundUniform
 
-      // Note: values are often the same Float32Array mutated in place, so a
-      // reference compare can't reliably skip unchanged uniforms — always upload.
-      boundUniform.value = value
-
       // cache the location: getUniformLocation is comparatively expensive and the
       // location is stable for the lifetime of the linked program
       if (boundUniform.location === undefined) {
         boundUniform.location = gl.getUniformLocation(glProgramData.native, name)
       }
       const location = boundUniform.location
+
+      // Skip the GPU call when the value is unchanged. Values are frequently the
+      // same array mutated in place, so a reference compare is useless — instead
+      // compare component-wise against an independent shadow copy held in
+      // boundUniform.value (which mirrors what is currently uploaded to the program).
+      if (!uniformValueChanged(boundUniform.value, value)) {
+        continue
+      }
+      boundUniform.value = writeUniformShadow(boundUniform.value, value)
 
       switch (type) {
         case 'float':
@@ -245,14 +288,53 @@ export class GlShaderSystem extends GlSystem {
     }
     this.glProgramDatas.clear()
     this.currentProgram = null
-    this.uniforms = {
-      projectionMatrix: new Float32Array([1, 0, 0, 0, 1, 0, 0, 0, 1]),
-      viewMatrix: new Float32Array([1, 0, 0, 0, 1, 0, 0, 0, 1]),
-    }
+    this.globalUniforms.uniforms.projectionMatrix = new Float32Array([1, 0, 0, 0, 1, 0, 0, 0, 1])
+    this.globalUniforms.uniforms.viewMatrix = new Float32Array([1, 0, 0, 0, 1, 0, 0, 0, 1])
+    this.markGlobalUniformsDirty()
   }
 
   destroy(): void {
     super.destroy()
     this.bind(null)
   }
+}
+
+/**
+ * Returns true if `value` differs from the shadow copy of the last uploaded value.
+ * Arrays/typed-arrays are compared component-wise (the same array is often mutated
+ * in place, so a reference compare would wrongly report "unchanged").
+ */
+function uniformValueChanged(shadow: any, value: any): boolean {
+  if (value !== null && typeof value === 'object') {
+    const len = value.length
+    if (shadow === null || typeof shadow !== 'object' || shadow.length !== len) {
+      return true
+    }
+    for (let i = 0; i < len; i++) {
+      if (shadow[i] !== value[i]) {
+        return true
+      }
+    }
+    return false
+  }
+  return shadow !== value
+}
+
+/**
+ * Writes `value` into the shadow copy and returns the shadow to store back.
+ * For arrays the existing shadow is mutated in place (so it stays independent of
+ * the caller's array); scalars are returned directly.
+ */
+function writeUniformShadow(shadow: any, value: any): any {
+  if (value !== null && typeof value === 'object') {
+    const len = value.length
+    if (shadow !== null && typeof shadow === 'object' && shadow.length === len) {
+      for (let i = 0; i < len; i++) {
+        shadow[i] = value[i]
+      }
+      return shadow
+    }
+    return value.slice ? value.slice() : Array.prototype.slice.call(value)
+  }
+  return value
 }
