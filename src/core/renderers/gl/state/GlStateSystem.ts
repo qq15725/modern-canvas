@@ -136,13 +136,13 @@ export class GlStateSystem extends GlSystem {
 
   bind(state: GlState): void {
     if (this.boundStateBitmap !== state.bitmap) {
-      let diff = this.boundStateBitmap ^ state.bitmap
+      let diff = (this.boundStateBitmap ^ state.bitmap) >>> 0
       let i = 0
       while (diff) {
         if (diff & 1) {
           this._setters[i]?.call(this, !!(state.bitmap & (1 << i)))
         }
-        diff = diff >> 1
+        diff >>>= 1
         i++
       }
       this.boundStateBitmap = state.bitmap
@@ -154,10 +154,12 @@ export class GlStateSystem extends GlSystem {
 
   reset(): void {
     super.reset()
-    // Force a full re-sync to defaultState: flip every tracked bit so each setter
+    // Force a full re-sync to defaultState: flip every tracked bit (only within the
+    // valid property range, so the bind() diff loop stays bounded) so each setter
     // re-runs, and clear boundBlendMode so setBlendMode actually re-applies (it
     // early-returns when value === boundBlendMode).
-    this.boundStateBitmap = ~this.defaultState.bitmap >>> 0
+    const stateMask = (1 << GlState._properties.length) - 1
+    this.boundStateBitmap = (~this.defaultState.bitmap) & stateMask
     this.boundBlendMode = undefined
     this._blendEq = true
     this.bind(this.defaultState)
