@@ -4,7 +4,6 @@ import type { GlAttribute, GlProgram, GlUniform } from './GlProgram'
 import { getAttributeInfoFromFormat } from '../../shared/geometry/getAttributeInfoFromFormat'
 import { UniformGroup } from '../../shared/shader'
 import { GlSystem } from '../system'
-import { defaultValue } from './defaultValue'
 import { GlProgramData } from './GlProgramData'
 import { mapGlToVertexFormat, mapType } from './mapType'
 
@@ -130,7 +129,10 @@ export class GlShaderSystem extends GlSystem {
         type,
         size,
         isArray: !!(uniform.name.match(/\[.*?\]$/)),
-        value: defaultValue(type, size),
+        // shadow copy of the last uploaded value; undefined means "nothing uploaded
+        // yet", which forces the first upload (GL uniforms start as all-zeros, NOT
+        // the sensible defaults defaultValue() would give, so we must not seed it).
+        value: undefined,
       }
     }
     glProgram.uniforms = uniforms
