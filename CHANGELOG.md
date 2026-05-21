@@ -1,3 +1,9 @@
+## [0.18.3](https://github.com/qq15725/modern-canvas/compare/v0.18.2...v0.18.3) (2026-05-21)
+
+
+### Features
+
+* connection routing modes (straight/orthogonal/curved) ([b9b13b8](https://github.com/qq15725/modern-canvas/commit/b9b13b8ee312d85f89025b2b2ae0fbb629dd88f3))
 ## [0.18.2](https://github.com/qq15725/modern-canvas/compare/v0.18.1...v0.18.2) (2026-05-20)
 
 
