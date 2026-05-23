@@ -62,10 +62,10 @@
   "dependencies": {
     "colord": "^2.9.3",
     "earcut": "^3.0.2",
-    "modern-font": "^0.5.0",
+    "modern-font": "^0.6.0",
     "modern-idoc": "^0.11.5",
-    "modern-path2d": "^1.6.0",
-    "modern-text": "^1.12.0"
+    "modern-path2d": "^1.7.0",
+    "modern-text": "^2.0.2"
   },
   "peerDependencies": {
     "lottie-web": "^5",
@@ -94,7 +94,7 @@
     "modern-gif": "^2.1.0",
     "typescript": "^6.0.3",
     "unbuild": "^3.6.1",
-    "vite": "^8.0.13",
+    "vite": "^8.0.14",
     "vitest": "^4.1.7",
     "yoga-layout": "^3.2.1"
   }
