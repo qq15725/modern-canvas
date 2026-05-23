@@ -1,3 +1,9 @@
+# [0.19.0](https://github.com/qq15725/modern-canvas/compare/v0.18.3...v0.19.0) (2026-05-23)
+
+
+### Features
+
+* hit-test shapes against real geometry ([84622dd](https://github.com/qq15725/modern-canvas/commit/84622dddc0ab7611a387c33294b35acc99bb16ea))
 ## [0.18.3](https://github.com/qq15725/modern-canvas/compare/v0.18.2...v0.18.3) (2026-05-21)
 
 
