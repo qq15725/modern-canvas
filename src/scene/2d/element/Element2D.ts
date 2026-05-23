@@ -557,10 +557,24 @@ export class Element2D extends Node2D implements Rectangulable {
   // eslint-disable-next-line unused-imports/no-unused-vars
   protected _positionInput(localPos: Vector2Like, key: InputEventKey): boolean {
     const { width, height } = this.size
-    return localPos.x >= 0
-      && localPos.x < width
-      && localPos.y >= 0
-      && localPos.y < height
+    // Cheap AABB reject first. Shapes (and connection routes) live inside the size
+    // box; stroke/tolerance can spill out by up to half the outline width, so widen
+    // the bounds by that much before the precise geometry test.
+    const slack = (Number(this._outline.width) || 0) / 2 + 1
+    if (
+      localPos.x < -slack || localPos.x >= width + slack
+      || localPos.y < -slack || localPos.y >= height + slack
+    ) {
+      return false
+    }
+    // With real geometry (a filled/outlined shape or a connection route), hit-test
+    // the actual path; otherwise fall back to the plain rectangle.
+    if (this._shape.isValid() || this._shape.localPath) {
+      return this._shape.isPointInside(localPos, {
+        strokeWidth: Number(this._outline.width) || 1,
+      })
+    }
+    return localPos.x >= 0 && localPos.x < width && localPos.y >= 0 && localPos.y < height
   }
 
   protected override _input(event: InputEvent, key: InputEventKey): void {

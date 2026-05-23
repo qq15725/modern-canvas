@@ -1,4 +1,5 @@
 import type { NormalizedShape, Shape } from 'modern-idoc'
+import type { Vector2Like } from 'modern-path2d'
 import type { Element2D } from './Element2D'
 import { isNone, normalizeShape, property } from 'modern-idoc'
 import {
@@ -26,6 +27,15 @@ export class Element2DShape extends CoreObject implements NormalizedShape {
    * the normalize→size scaling would distort the stroke width non-uniformly.
    */
   protected _localPath?: Path2D
+
+  /**
+   * Pixel-space copy of `_path2DSet` (scaled to the element size), used for hit
+   * testing so fill/stroke slack stay in pixel units. Rebuilt when the size
+   * changes; cleared by `_updatePath2DSet` when the paths themselves change.
+   */
+  protected _hitPath2DSet?: Path2DSet
+  protected _hitWidth = 0
+  protected _hitHeight = 0
 
   constructor(
     protected _parent: Element2D,
@@ -72,6 +82,56 @@ export class Element2DShape extends CoreObject implements NormalizedShape {
     )
   }
 
+  /**
+   * Hit-test a point given in the element's local pixel space against the real
+   * geometry, mirroring {@link draw}'s path selection:
+   *
+   * - a connection route (`_localPath`, already in pixel space) → stroke hit
+   * - a normalized shape (`_path2DSet`) → fill hit, falling back to stroke for
+   *   `fill: none` outlines (handled by {@link Path2DSet.hitTest})
+   *
+   * `strokeWidth` should be the element's outline width (pixels) so line/stroke
+   * hits line up with what's drawn. Returns `false` when there's no valid geometry
+   * — callers then fall back to the element's rectangle.
+   */
+  isPointInside(localPos: Vector2Like, options?: { strokeWidth?: number, tolerance?: number }): boolean {
+    const strokeWidth = options?.strokeWidth ?? 1
+    const tolerance = options?.tolerance ?? 0
+    const local = this._localPath
+    if (local && local.getLength()) {
+      return local.isPointInStroke(localPos, { strokeWidth, tolerance, closed: false })
+    }
+    const set = this._getHitPath2DSet()
+    if (!set) {
+      return false
+    }
+    // fill hits are exact; the stroke slack covers the outline's outer half + tolerance
+    return Boolean(set.hitTest(localPos, { stroke: true, tolerance: tolerance + strokeWidth / 2 }))
+  }
+
+  /**
+   * Lazily build the pixel-space path set. `_path2DSet` is normalized to the unit
+   * box, so it's scaled to the element size here. Rebuilt only on size change.
+   */
+  protected _getHitPath2DSet(): Path2DSet | undefined {
+    if (!this.isValid()) {
+      return undefined
+    }
+    const { width, height } = this._parent.size
+    if (!width || !height) {
+      return undefined
+    }
+    if (!this._hitPath2DSet || this._hitWidth !== width || this._hitHeight !== height) {
+      const transform = new Transform2D().scale(width, height)
+      this._hitPath2DSet = new Path2DSet(
+        this._path2DSet.paths.map(path => path.clone().applyTransform(transform)),
+      )
+      this._hitWidth = width
+      this._hitHeight = height
+    }
+    return this._hitPath2DSet
+  }
+
   protected _updatePath2DSet(): void {
     let viewBox: number[] | undefined
     if (this.svg) {
@@ -99,6 +159,7 @@ export class Element2DShape extends CoreObject implements NormalizedShape {
     this._path2DSet.paths.forEach((path) => {
       path.applyTransform(new Transform2D().translate(-x, -y).scale(1 / w, 1 / h))
     })
+    this._hitPath2DSet = undefined
   }
 
   draw(rect = false): void {
