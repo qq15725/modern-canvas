@@ -40,6 +40,8 @@ export class CanvasContext extends Path2D {
   transformVertex?: TransformVertex
 
   protected _draws: (StrokeDraw | FillDraw)[] = []
+  // per-draw triangulation cache, reused across frames while geometry is unchanged
+  protected _triCache: { sig: string, vertices: Float32Array, indices: Uint32Array }[] = []
 
   protected _parseDrawStyle(source?: ColorValue | Texture2D): { texture?: Texture2D } {
     if (source) {
@@ -178,38 +180,47 @@ export class CanvasContext extends Path2D {
 
     for (let len = this._draws.length, i = 0; i < len; i++) {
       const current = this._draws[i]
-      const vertices: number[] = []
-      const indices: number[] = []
-
       const { path, ...batchable } = current
 
-      if (batchable.type === 'fill') {
-        path.fillTriangulate({
-          vertices,
-          indices,
-        })
-      }
-      else {
-        path.strokeTriangulate({
-          vertices,
-          indices,
-          lineStyle: batchable.lineStyle,
-          flipAlignment: false,
-          closed: path.getPoint(0).equals(path.getPoint(1)),
-        })
+      // reuse the previous triangulation when this draw's geometry is unchanged
+      // (e.g. only the fill/stroke color changed) — skips earcut + typed-array alloc.
+      // downstream only reads batchable.vertices (slice in _transformUvs, length in
+      // _relayout), so sharing the cached arrays is safe.
+      const ls = batchable.type === 'stroke' ? batchable.lineStyle : undefined
+      const sig = `${batchable.type}|${path.toData()}|${ls ? `${ls.width},${ls.cap},${ls.join},${ls.alignment},${ls.miterLimit}` : ''}`
+      let cached = this._triCache[i]
+      if (!cached || cached.sig !== sig) {
+        const vertices: number[] = []
+        const indices: number[] = []
+        if (batchable.type === 'fill') {
+          path.fillTriangulate({ vertices, indices })
+        }
+        else {
+          path.strokeTriangulate({
+            vertices,
+            indices,
+            lineStyle: batchable.lineStyle,
+            flipAlignment: false,
+            closed: path.getPoint(0).equals(path.getPoint(1)),
+          })
+        }
+        cached = { sig, vertices: new Float32Array(vertices), indices: new Uint32Array(indices) }
+        this._triCache[i] = cached
       }
 
       batchables.push({
         ...batchable,
-        vertices: new Float32Array(vertices),
-        indices: new Uint32Array(indices),
+        vertices: cached.vertices,
+        indices: cached.indices,
       })
     }
 
+    this._triCache.length = this._draws.length
     return batchables
   }
 
   destroy(): void {
     this.reset()
+    this._triCache.length = 0
   }
 }

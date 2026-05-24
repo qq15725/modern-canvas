@@ -7,15 +7,16 @@ import type {
   Outline,
   Shadow,
   Shape,
+  Table,
   Text,
 } from 'modern-idoc'
-import type { Vector2Like } from 'modern-path2d'
+import type { Path2D, Vector2Like } from 'modern-path2d'
 import type {
   InputEvent,
   InputEventKey,
   PointerInputEvent,
 } from '../../../core'
-import type { Node, Rectangulable, RectangulableEvents, SceneTree } from '../../main'
+import type { Node, Rectangulable, RectangulableEvents, SceneTree, Viewport } from '../../main'
 import type { Node2DEvents, Node2DProperties } from '../Node2D'
 import type { Element2DStyleProperties } from './Element2DStyle'
 import { clearUndef, getDefaultLayoutStyle, getDefaultTextStyle, isNone } from 'modern-idoc'
@@ -37,6 +38,7 @@ import { Element2DOutline } from './Element2DOutline'
 import { Element2DShadow } from './Element2DShadow'
 import { Element2DShape } from './Element2DShape'
 import { Element2DStyle } from './Element2DStyle'
+import { Element2DTable } from './Element2DTable'
 import { Element2DText } from './Element2DText'
 import { Flexbox } from './Flexbox'
 
@@ -62,10 +64,15 @@ export interface Element2DProperties extends Node2DProperties {
   text: Text
   shadow: Shadow
   connection: Connection
+  table: Table
 }
 
 const layoutStyle = new Set(Object.keys(getDefaultLayoutStyle()))
 const textStyles = new Set(Object.keys(getDefaultTextStyle()))
+
+// reusable scratch for viewport culling (avoids per-frame allocation)
+const _cullVec = new Vector2()
+const _cullCorners: [number, number][] = [[0, 0], [1, 0], [1, 1], [0, 1]]
 
 @customNode('Element2D')
 export class Element2D extends Node2D implements Rectangulable {
@@ -92,7 +99,15 @@ export class Element2D extends Node2D implements Rectangulable {
   })
 
   get style(): Element2DStyle { return this._style }
-  set style(value: Element2DProperties['style'] | undefined) { this._style.resetProperties().setProperties(value) }
+  set style(value: Element2DProperties['style'] | undefined) {
+    this._beginBatch()
+    try {
+      this._style.resetProperties().setProperties(value)
+    }
+    finally {
+      this._endBatch()
+    }
+  }
 
   protected _background = new Element2DBackground(this)
   get background(): Element2DBackground { return this._background }
@@ -126,6 +141,16 @@ export class Element2D extends Node2D implements Rectangulable {
   get connection(): Element2DConnection { return this._connection }
   set connection(value: Element2DProperties['connection'] | undefined) { this._connection.resetProperties().setProperties(value) }
 
+  protected _table = new Element2DTable(this)
+  get table(): Element2DTable { return this._table }
+  set table(value: Element2DProperties['table'] | undefined) { this._table.resetProperties().setProperties(value as Record<string, any>) }
+
+  /** Last routed connection path; identity-compared to skip re-layout when unchanged. */
+  protected _lastRoutePath?: Path2D
+  // batch depth for setProperties / style setter — defers the heavy text relayout
+  // so setting many text/layout style props at once relayouts the text only once
+  protected _batchDepth = 0
+  protected _pendingTextUpdate = false
   protected _colorFilterEffect?: ColorFilterEffect
   protected _maskEffect?: MaskEffect
 
@@ -146,28 +171,36 @@ export class Element2D extends Node2D implements Rectangulable {
 
   override setProperties(properties?: Record<string, any>): this {
     if (properties) {
-      const {
-        style,
-        text,
-        shape,
-        background,
-        fill,
-        outline,
-        foreground,
-        shadow,
-        connection,
-        ...restProperties
-      } = properties
-      style && this.style.setProperties(style)
-      background && this.background.setProperties(background)
-      shape && this.shape.setProperties(shape)
-      fill && this.fill.setProperties(fill)
-      outline && this.outline.setProperties(outline)
-      text && this.text.setProperties(text)
-      foreground && this.foreground.setProperties(foreground)
-      shadow && this.shadow.setProperties(shadow)
-      connection && this.connection.setProperties(connection)
-      super.setProperties(restProperties)
+      this._beginBatch()
+      try {
+        const {
+          style,
+          text,
+          shape,
+          background,
+          fill,
+          outline,
+          foreground,
+          shadow,
+          connection,
+          table,
+          ...restProperties
+        } = properties
+        style && this.style.setProperties(style)
+        background && this.background.setProperties(background)
+        shape && this.shape.setProperties(shape)
+        fill && this.fill.setProperties(fill)
+        outline && this.outline.setProperties(outline)
+        text && this.text.setProperties(text)
+        foreground && this.foreground.setProperties(foreground)
+        shadow && this.shadow.setProperties(shadow)
+        connection && this.connection.setProperties(connection)
+        table && this.table.setProperties(table)
+        super.setProperties(restProperties)
+      }
+      finally {
+        this._endBatch()
+      }
     }
     return this
   }
@@ -224,6 +257,23 @@ export class Element2D extends Node2D implements Rectangulable {
     this._parentGlobalDisplay = this.getParent<Element2D>()?.globalDisplay
     this._globalDisplay = this.style.display
       ?? this._parentGlobalDisplay
+  }
+
+  protected _beginBatch(): void {
+    this._batchDepth++
+  }
+
+  protected _endBatch(): void {
+    if (--this._batchDepth > 0) {
+      return
+    }
+    this._batchDepth = 0
+    if (this._pendingTextUpdate) {
+      this._pendingTextUpdate = false
+      if (this.text.isValid()) {
+        this.text.update()
+      }
+    }
   }
 
   onUpdateStyleProperty(key: string, value: any, oldValue: any): void {
@@ -320,7 +370,12 @@ export class Element2D extends Node2D implements Rectangulable {
 
     if (textStyles.has(key) || layoutStyle.has(key)) {
       if (this.text.isValid()) {
-        this.text.update()
+        if (this._batchDepth > 0) {
+          this._pendingTextUpdate = true
+        }
+        else {
+          this.text.update()
+        }
       }
     }
 
@@ -377,6 +432,12 @@ export class Element2D extends Node2D implements Rectangulable {
     if (!path || !path.getLength())
       return
 
+    // route() returns the same instance while endpoints/mode are unchanged —
+    // skip the per-frame reroute + relayout + redraw when nothing moved
+    if (path === this._lastRoutePath)
+      return
+    this._lastRoutePath = path
+
     // size the element to the route's own bounding box (orthogonal/curved routes
     // can extend past the endpoints), so the local path draws 1:1 under the transform
     const bbox = path.getBoundingBox()
@@ -390,9 +451,56 @@ export class Element2D extends Node2D implements Rectangulable {
     this.size.height = h
     this.updateGlobalTransform()
 
-    // move the world-space path into local pixel space and hand it to the shape
-    path.applyTransform(new Transform2D().translate(-bbox.x, -bbox.y))
-    this._shape.setLocalPath(path)
+    // clone before transforming so the connection's cached path stays in world space
+    const local = path.clone().applyTransform(new Transform2D().translate(-bbox.x, -bbox.y))
+    this._shape.setLocalPath(local)
+  }
+
+  protected override _cullsRender(): boolean {
+    // conservative: never cull nodes whose visible area can exceed their AABB
+    // (filters/masks spill outside it; connection routes are sized to their bbox
+    // but we keep them to be safe), so culling only drops clearly off-screen content
+    if (
+      this._colorFilterEffect
+      || this._maskEffect
+      || this._overflowHidden
+      || this._connection.isValid()
+    ) {
+      return false
+    }
+    const viewport = this.tree?.getCurrentViewport()
+    if (!viewport?.valid) {
+      return false
+    }
+    return !this._intersectsViewport(viewport)
+  }
+
+  protected _intersectsViewport(viewport: Viewport): boolean {
+    // the viewport's screen rect → world-space AABB (globalAabb is in world space)
+    const t = viewport.canvasTransform
+    const vw = viewport.width
+    const vh = viewport.height
+    let minX = Infinity
+    let maxX = -Infinity
+    let minY = Infinity
+    let maxY = -Infinity
+    for (const [ux, uy] of _cullCorners) {
+      t.applyAffineInverse({ x: ux * vw, y: uy * vh }, _cullVec)
+      minX = Math.min(minX, _cullVec.x)
+      maxX = Math.max(maxX, _cullVec.x)
+      minY = Math.min(minY, _cullVec.y)
+      maxY = Math.max(maxY, _cullVec.y)
+    }
+    // generous margin (one viewport span each axis) so panning never clips visibly
+    const mx = maxX - minX
+    const my = maxY - minY
+    const { min, size } = this.globalAabb
+    return !(
+      min.x > maxX + mx
+      || min.x + size.x < minX - mx
+      || min.y > maxY + my
+      || min.y + size.y < minY - my
+    )
   }
 
   protected _updateStyleFilter(value?: string): void {
@@ -617,6 +725,7 @@ export class Element2D extends Node2D implements Rectangulable {
       foreground: notEmptyObjectOrUndef(this.foreground.toJSON()),
       shadow: notEmptyObjectOrUndef(this.shadow.toJSON()),
       connection: notEmptyObjectOrUndef(this.connection.toJSON()),
+      table: notEmptyObjectOrUndef(this.table.toJSON()),
     })
   }
 

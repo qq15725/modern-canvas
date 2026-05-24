@@ -13,6 +13,11 @@ export class Element2DConnection extends CoreObject implements NormalizedConnect
   /** Routing mode: `straight` | `orthogonal` | `curved` (normalized by modern-idoc). */
   @property({ fallback: 'straight' }) declare mode: ConnectionMode
 
+  // cache the routed path; while endpoints + mode are unchanged, route() returns
+  // the same instance so callers can skip re-layout via identity comparison.
+  protected _routeSig?: string
+  protected _routePath?: Path2D
+
   constructor(protected _parent: Element2D) {
     super()
   }
@@ -86,13 +91,23 @@ export class Element2DConnection extends CoreObject implements NormalizedConnect
     return { point: new Vector2(min.x + size.x / 2, min.y + size.y / 2) }
   }
 
-  /** Resolve both ends and return the routed world-space path. */
+  /** Resolve both ends and return the routed world-space path (cached while unchanged). */
   route(): Path2D | undefined {
     const s = this.resolveEndpoint(this.start)
     const e = this.resolveEndpoint(this.end)
-    if (!s && !e)
+    if (!s && !e) {
+      this._routeSig = undefined
+      this._routePath = undefined
       return undefined
-    return routeConnection(this.mode, s ?? e!, e ?? s!)
+    }
+    const fmt = (p?: ConnectionEndpoint): string =>
+      p ? `${p.point.x},${p.point.y},${p.dir?.x ?? ''},${p.dir?.y ?? ''}` : '-'
+    const sig = `${this.mode}|${fmt(s)}|${fmt(e)}`
+    if (sig !== this._routeSig || !this._routePath) {
+      this._routeSig = sig
+      this._routePath = routeConnection(this.mode, s ?? e!, e ?? s!)
+    }
+    return this._routePath
   }
 }
 

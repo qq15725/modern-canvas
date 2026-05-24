@@ -16,6 +16,7 @@ import {
   MainLoop,
 } from '../../core'
 import { QuadUvGeometry } from '../resources'
+import { resetBatchPool } from './CanvasItem'
 import { RenderStack } from './RenderStack'
 import { Timeline } from './Timeline'
 import { Window } from './Window'
@@ -129,6 +130,9 @@ export class SceneTree extends MainLoop {
 
   protected _render(renderer: WebGLRenderer): void {
     this.emit('rendering')
+    // reset the batch wrapper pool at frame start — last frame's render finished
+    // synchronously, so all pooled references have already been consumed by flush
+    resetBatchPool()
     this.renderStack.render(renderer)
     this._renderScreen(renderer)
     this.emit('rendered')

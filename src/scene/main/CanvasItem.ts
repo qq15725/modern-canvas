@@ -14,6 +14,36 @@ export interface CanvasItemProperties extends TimelineNodeProperties {
   blendMode: GlBlendMode
 }
 
+// per-frame pool of batch wrappers passed to batch2D.render(). The batcher holds
+// each reference until flush, so we can't reuse one object across draws within a
+// frame — but the pool grows to the frame's peak and is reset once per frame (after
+// all flushes), avoiding a fresh object per batchable every frame.
+const _batchPool: Record<string, any>[] = []
+let _batchPoolIndex = 0
+
+export function resetBatchPool(): void {
+  _batchPoolIndex = 0
+}
+
+function acquireBatch(
+  batchable: CanvasBatchable,
+  roundPixels: boolean | undefined,
+  size: { width: number, height: number } | undefined,
+  texture: Texture2D | undefined,
+): any {
+  let o = _batchPool[_batchPoolIndex]
+  if (!o) {
+    o = {}
+    _batchPool[_batchPoolIndex] = o
+  }
+  _batchPoolIndex++
+  Object.assign(o, batchable)
+  o.roundPixels = roundPixels
+  o.size = size
+  o.texture = texture
+  return o
+}
+
 export interface CanvasItemEvents extends TimelineNodeEvents {
   draw: []
 }
@@ -286,6 +316,13 @@ export class CanvasItem extends TimelineNode {
   protected override _render(renderer: WebGLRenderer): void {
     this._updateBatchables()
 
+    // batchables are kept current above; culling only skips submitting them, so a
+    // node re-entering the viewport renders immediately without a rebuild
+    if (this._cullsRender()) {
+      super._render(renderer)
+      return
+    }
+
     const pixelate = this._tree?.pixelate
     const roundPixels = this._tree?.roundPixels
     const batchables = this._batchables
@@ -296,15 +333,23 @@ export class CanvasItem extends TimelineNode {
       if (texture instanceof ViewportTexture) {
         texture = this._handleViewportTexture(batchable)
       }
-      renderer.batch2D.render({
-        ...batchable,
+      renderer.batch2D.render(acquireBatch(
+        batchable,
         roundPixels,
-        size: pixelate ? batchable.size : undefined,
+        pixelate ? batchable.size : undefined,
         texture,
-      })
+      ))
     }
 
     super._render(renderer)
+  }
+
+  /**
+   * Hook for subclasses to skip submitting this node's batches this frame (e.g.
+   * viewport culling). Returning `true` keeps batchables current but draws nothing.
+   */
+  protected _cullsRender(): boolean {
+    return false
   }
 
   protected override _destroy(): void {

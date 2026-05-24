@@ -301,18 +301,14 @@ export class Node extends CoreObject {
     const renderable = this.renderable
     const processable = this.processable
     const children = this._children
-    const childrenInAfter: Node[] = []
 
+    // first pass: 'parent-before' children process before the parent.
+    // (two passes by sort mode avoid allocating a per-frame `childrenInAfter` array)
     for (const key of ['front', 'default', 'back'] as const) {
-      for (let child, len = children[key].length, i = 0; i < len; i++) {
-        child = children[key][i]
-        switch (child.processSortMode) {
-          case 'default':
-            childrenInAfter.push(child)
-            break
-          case 'parent-before':
-            child._onProcess(delta)
-            break
+      const list = children[key]
+      for (let len = list.length, i = 0; i < len; i++) {
+        if (list[i].processSortMode === 'parent-before') {
+          list[i]._onProcess(delta)
         }
       }
     }
@@ -330,8 +326,14 @@ export class Node extends CoreObject {
       tree!.renderStack.currentCall = renderCall
     }
 
-    for (let len = childrenInAfter.length, i = 0; i < len; i++) {
-      childrenInAfter[i].emit('process', delta)
+    // second pass: 'default' children process after the parent (same order as before)
+    for (const key of ['front', 'default', 'back'] as const) {
+      const list = children[key]
+      for (let len = list.length, i = 0; i < len; i++) {
+        if (list[i].processSortMode === 'default') {
+          list[i].emit('process', delta)
+        }
+      }
     }
 
     if (renderable) {

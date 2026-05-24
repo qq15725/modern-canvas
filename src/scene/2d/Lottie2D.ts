@@ -17,6 +17,7 @@ export class Lottie2D extends TextureRect2D {
 
   readonly texture = new CanvasTexture()
   animation?: AnimationItem
+  protected _lastTime = Number.NaN
 
   constructor(properties?: Partial<Lottie2DProperties>, children: Node[] = []) {
     super()
@@ -54,9 +55,14 @@ export class Lottie2D extends TextureRect2D {
   }
 
   protected override _process(delta: number): void {
-    this.animation?.goToAndStop(this.currentTime, false)
-    this.texture.requestUpdate('source')
-    this.requestDraw()
+    // only re-rasterize + re-upload when the playback time actually changed,
+    // so a paused/static Lottie doesn't repaint the GPU texture every frame
+    if (this.currentTime !== this._lastTime) {
+      this._lastTime = this.currentTime
+      this.animation?.goToAndStop(this.currentTime, false)
+      this.texture.requestUpdate('source')
+      this.requestDraw()
+    }
     super._process(delta)
   }
 }
