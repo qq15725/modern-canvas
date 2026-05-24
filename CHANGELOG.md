@@ -1,3 +1,9 @@
+## [0.20.1](https://github.com/qq15725/modern-canvas/compare/v0.20.0...v0.20.1) (2026-05-24)
+
+
+### Bug Fixes
+
+* **ci:** resolve pnpm version conflict and publish access flag ([eb1a952](https://github.com/qq15725/modern-canvas/commit/eb1a9523dc658b37a7c87299edf25cda6ebea9ce))
 # [0.20.0](https://github.com/qq15725/modern-canvas/compare/v0.19.1...v0.20.0) (2026-05-24)
 
 
