@@ -1,5 +1,6 @@
 import type {
   Background,
+  Chart,
   Connection,
   Display,
   Fill,
@@ -31,6 +32,7 @@ import { parseCssTransformOrigin } from '../../../css'
 import { ColorFilterEffect, MaskEffect } from '../../effects'
 import { Node2D } from '../Node2D'
 import { Element2DBackground } from './Element2DBackground'
+import { Element2DChart } from './Element2DChart'
 import { Element2DConnection } from './Element2DConnection'
 import { Element2DFill } from './Element2DFill'
 import { Element2DForeground } from './Element2DForeground'
@@ -65,6 +67,7 @@ export interface Element2DProperties extends Node2DProperties {
   shadow: Shadow
   connection: Connection
   table: Table
+  chart: Chart
 }
 
 const layoutStyle = new Set(Object.keys(getDefaultLayoutStyle()))
@@ -145,6 +148,10 @@ export class Element2D extends Node2D implements Rectangulable {
   get table(): Element2DTable { return this._table }
   set table(value: Element2DProperties['table'] | undefined) { this._table.resetProperties().setProperties(value as Record<string, any>) }
 
+  protected _chart = new Element2DChart(this)
+  get chart(): Element2DChart { return this._chart }
+  set chart(value: Element2DProperties['chart'] | undefined) { this._chart.resetProperties().setProperties(value as Record<string, any>) }
+
   /** Last routed connection path; identity-compared to skip re-layout when unchanged. */
   protected _lastRoutePath?: Path2D
   // batch depth for setProperties / style setter — defers the heavy text relayout
@@ -184,6 +191,7 @@ export class Element2D extends Node2D implements Rectangulable {
           shadow,
           connection,
           table,
+          chart,
           ...restProperties
         } = properties
         style && this.style.setProperties(style)
@@ -196,6 +204,7 @@ export class Element2D extends Node2D implements Rectangulable {
         shadow && this.shadow.setProperties(shadow)
         connection && this.connection.setProperties(connection)
         table && this.table.setProperties(table)
+        chart && this.chart.setProperties(chart)
         super.setProperties(restProperties)
       }
       finally {
@@ -726,6 +735,7 @@ export class Element2D extends Node2D implements Rectangulable {
       shadow: notEmptyObjectOrUndef(this.shadow.toJSON()),
       connection: notEmptyObjectOrUndef(this.connection.toJSON()),
       table: notEmptyObjectOrUndef(this.table.toJSON()),
+      chart: notEmptyObjectOrUndef(this.chart.toJSON()),
     })
   }
 
