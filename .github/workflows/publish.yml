@@ -33,4 +33,4 @@ jobs:
       - name: 📦 Build
         run: pnpm run build
       - name: 🔀 Publish package
-        run: pnpm run publish
+        run: npm publish --access public
