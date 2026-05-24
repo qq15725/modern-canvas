@@ -1,3 +1,11 @@
+# [0.20.0](https://github.com/qq15725/modern-canvas/compare/v0.19.1...v0.20.0) (2026-05-24)
+
+
+### Features
+
+* idoc table rendering and render performance optimizations ([15708d9](https://github.com/qq15725/modern-canvas/commit/15708d9f56542031e613ab6126f2b5219692eecc))
+* render idoc charts ([38da268](https://github.com/qq15725/modern-canvas/commit/38da2689db49dbe9eced9e9344679c4677d6853c))
+* support headless/SSR rendering ([a29c207](https://github.com/qq15725/modern-canvas/commit/a29c20724e69a4923ccd62e74242870d21859c61))
 ## [0.19.1](https://github.com/qq15725/modern-canvas/compare/v0.19.0...v0.19.1) (2026-05-23)
 # [0.19.0](https://github.com/qq15725/modern-canvas/compare/v0.18.3...v0.19.0) (2026-05-23)
 
