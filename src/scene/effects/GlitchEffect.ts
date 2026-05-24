@@ -1,7 +1,7 @@
 import type { WebGLRenderer } from '../../core'
 import type { EffectProperties, Node, Viewport } from '../main'
 import { property } from 'modern-idoc'
-import { customNode } from '../../core'
+import { createHTMLCanvas, customNode } from '../../core'
 import { Effect } from '../main/Effect'
 import { Material, QuadUvGeometry, Texture2D } from '../resources'
 
@@ -148,9 +148,11 @@ void main(void) {
       .setProperties(properties)
       .append(children)
 
-    this._canvas = document.createElement('canvas')
-    this._canvas.width = 4
-    this._canvas.height = this.sampleSize
+    const canvas = createHTMLCanvas(4, this.sampleSize)
+    if (!canvas) {
+      throw new Error('GlitchEffect requires a canvas; call setCanvasFactory() in non-browser environments.')
+    }
+    this._canvas = canvas
     this._texture = new Texture2D(this._canvas)
     this._sizes = new Float32Array(this.slices)
     this._offsets = new Float32Array(this.slices)

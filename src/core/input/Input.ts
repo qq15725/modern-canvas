@@ -96,9 +96,11 @@ export class Input extends Observable {
     }
 
     this.target.removeEventListener('wheel', this._onWheel)
-    document.removeEventListener('keydown', this._onKeyDown)
-    document.removeEventListener('keypress', this._onKeyPress)
-    document.removeEventListener('keyup', this._onKeyUp)
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('keydown', this._onKeyDown)
+      document.removeEventListener('keypress', this._onKeyPress)
+      document.removeEventListener('keyup', this._onKeyUp)
+    }
     this.target = undefined
     this.setuped = false
   }
@@ -142,9 +144,11 @@ export class Input extends Observable {
     }
 
     this.target.addEventListener('wheel', this._onWheel)
-    document.addEventListener('keydown', this._onKeyDown)
-    document.addEventListener('keypress', this._onKeyPress)
-    document.addEventListener('keyup', this._onKeyUp)
+    if (typeof document !== 'undefined') {
+      document.addEventListener('keydown', this._onKeyDown)
+      document.addEventListener('keypress', this._onKeyPress)
+      document.addEventListener('keyup', this._onKeyUp)
+    }
     this.setuped = true
   }
 

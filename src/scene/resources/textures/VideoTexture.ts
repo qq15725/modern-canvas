@@ -70,6 +70,9 @@ export class VideoTexture extends Texture2D<HTMLVideoElement> {
       }
       const firstSrc = (source[0] as VideoTextureLike).src || source[0] as string
 
+      if (typeof document === 'undefined') {
+        throw new TypeError('VideoTexture requires a DOM <video> element and is not supported in non-browser environments.')
+      }
       const videoElement = document.createElement('video')
       resolved.autoLoad && videoElement.setAttribute('preload', 'auto')
       if (resolved.playsinline) {

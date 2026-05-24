@@ -1,7 +1,7 @@
 import type { Element2DProperties } from '../2d'
 import { property } from 'modern-idoc'
 import { Element2D } from '../2d'
-import { customNode, IN_BROWSER } from '../../core'
+import { createHTMLCanvas, customNode } from '../../core'
 import { Texture2D } from '../resources'
 import { WebAudioContext } from './web'
 
@@ -18,11 +18,10 @@ export class AudioWaveform extends Element2D {
   @property({ fallback: '#000000' }) declare color: string
 
   protected _audioBuffer?: AudioBuffer
-  protected _src = IN_BROWSER
-    ? new Texture2D({
-        source: document.createElement('canvas'),
-      })
-    : undefined
+  protected _src = (() => {
+    const canvas = createHTMLCanvas()
+    return canvas ? new Texture2D({ source: canvas }) : undefined
+  })()
 
   protected _needsUpdateTexture = false
 

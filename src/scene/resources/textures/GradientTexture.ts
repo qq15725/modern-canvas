@@ -1,6 +1,7 @@
 import type { LinearGradient, RadialGradient } from 'modern-idoc'
 import type { Texture2DProperties } from './Texture2D'
 import { isGradient } from 'modern-idoc'
+import { createHTMLCanvas } from '../../../core'
 import { Texture2D } from './Texture2D'
 
 export class GradientTexture extends Texture2D {
@@ -11,9 +12,10 @@ export class GradientTexture extends Texture2D {
   static linearGradient(linearGradient: LinearGradient, width: number, height: number): Texture2DProperties {
     width = width || 1
     height = height || 1
-    const canvas = document.createElement('canvas')
-    canvas.width = width
-    canvas.height = height
+    const canvas = createHTMLCanvas(width, height)
+    if (!canvas) {
+      throw new Error('GradientTexture requires a canvas; call setCanvasFactory() in non-browser environments.')
+    }
     const ctx = canvas.getContext('2d')
     if (!ctx) {
       throw new Error('Failed to parse linear gradient, get canvas context is null.')

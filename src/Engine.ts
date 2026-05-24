@@ -2,6 +2,7 @@ import type { Node, SceneTreeEvents, SceneTreeProperties } from './scene'
 import { property } from 'modern-idoc'
 import { assets } from './asset'
 import {
+  createHTMLCanvas,
   DEVICE_PIXEL_RATIO,
   nextTick,
   SUPPORTS_RESIZE_OBSERVER,
@@ -250,6 +251,9 @@ export class Engine extends SceneTree {
   }
 
   toImageData(): ImageData {
+    if (typeof ImageData === 'undefined') {
+      throw new TypeError('toImageData requires a global ImageData; polyfill it (e.g. from node-canvas) in non-browser environments, or use toPixels() for a raw buffer.')
+    }
     return new ImageData(
       this.toPixels(),
       this.root.width,
@@ -258,20 +262,19 @@ export class Engine extends SceneTree {
   }
 
   toCanvas2D(imageData = this.toImageData()): HTMLCanvasElement {
-    const canvas1 = document.createElement('canvas')
-    canvas1.width = imageData.width
-    canvas1.height = imageData.height
-    const ctx1 = canvas1.getContext('2d')
-    if (ctx1) {
+    const canvas1 = createHTMLCanvas(imageData.width, imageData.height)
+    const ctx1 = canvas1?.getContext('2d')
+    if (canvas1 && ctx1) {
       ctx1.fillStyle = 'rgba(0, 0, 0, 0)'
       ctx1.clearRect(0, 0, canvas1.width, canvas1.height)
       ctx1.putImageData(imageData, 0, 0)
     }
-    const canvas2 = document.createElement('canvas')
-    canvas2.width = imageData.width
-    canvas2.height = imageData.height
+    const canvas2 = createHTMLCanvas(imageData.width, imageData.height)
+    if (!canvas2) {
+      throw new Error('toCanvas2D requires a canvas; call setCanvasFactory() in non-browser environments.')
+    }
     const ctx2 = canvas2.getContext('2d')
-    if (ctx2) {
+    if (ctx2 && canvas1) {
       ctx2.fillStyle = 'rgba(0, 0, 0, 0)'
       ctx2.clearRect(0, 0, canvas2.width, canvas2.height)
       ctx2.drawImage(

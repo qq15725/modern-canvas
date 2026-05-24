@@ -1,4 +1,5 @@
 import type { Texture2DProperties } from './Texture2D'
+import { createHTMLCanvas } from '../../../core'
 import { Texture2D } from './Texture2D'
 
 export interface CanvasTextureProperties extends Texture2DProperties<HTMLCanvasElement> {
@@ -10,7 +11,7 @@ export class CanvasTexture extends Texture2D<HTMLCanvasElement> {
     super({
       pixelRatio: 2,
       ...properties,
-      source: properties.source ?? document.createElement('canvas'),
+      source: properties.source ?? createHTMLCanvas(),
       uploadMethodId: 'image',
     })
   }
@@ -18,10 +19,14 @@ export class CanvasTexture extends Texture2D<HTMLCanvasElement> {
   protected override _updateProperty(key: string, value: any, oldValue: any): void {
     switch (key) {
       case 'width':
-        this.source.width = Math.max(1, Math.ceil(value * this.pixelRatio))
+        if (this.source) {
+          this.source.width = Math.max(1, Math.ceil(value * this.pixelRatio))
+        }
         break
       case 'height':
-        this.source.height = Math.max(1, Math.ceil(value * this.pixelRatio))
+        if (this.source) {
+          this.source.height = Math.max(1, Math.ceil(value * this.pixelRatio))
+        }
         break
     }
 

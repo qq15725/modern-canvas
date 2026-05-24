@@ -30,23 +30,60 @@ export function isWebgl2(gl: unknown): gl is WebGL2RenderingContext {
   return SUPPORTS_WEBGL2
     && gl instanceof globalThis.WebGL2RenderingContext
 }
-export function createHTMLCanvas(): HTMLCanvasElement | undefined {
-  if (IN_BROWSER) {
-    return globalThis.document.createElement('canvas')
+export type CanvasFactory = (width?: number, height?: number) => HTMLCanvasElement
+
+let _canvasFactory: CanvasFactory | undefined
+
+/**
+ * Inject a canvas factory for non-browser environments (e.g. node-canvas's
+ * `createCanvas`). Lets the engine create offscreen 2D canvases — used for
+ * gradients, text/canvas textures and pixel output — without a DOM.
+ * Pass `undefined` to clear it.
+ */
+export function setCanvasFactory(factory: CanvasFactory | undefined): void {
+  _canvasFactory = factory
+}
+
+export function getCanvasFactory(): CanvasFactory | undefined {
+  return _canvasFactory
+}
+
+/**
+ * Create an (offscreen) canvas via the injected factory, falling back to
+ * `document.createElement('canvas')` in the browser. Returns `undefined` when
+ * neither is available (non-browser with no factory) — callers must guard.
+ */
+export function createHTMLCanvas(width?: number, height?: number): HTMLCanvasElement | undefined {
+  let canvas: HTMLCanvasElement | undefined
+  if (_canvasFactory) {
+    canvas = _canvasFactory(width, height)
   }
-  return undefined
+  else if (IN_BROWSER) {
+    canvas = globalThis.document.createElement('canvas')
+  }
+  if (canvas) {
+    if (width !== undefined) {
+      canvas.width = width
+    }
+    if (height !== undefined) {
+      canvas.height = height
+    }
+  }
+  return canvas
 }
 
 export function determineCrossOrigin(
   url: string,
-  loc: Location = globalThis.location,
+  loc: Location | undefined = globalThis.location,
 ): string {
   // data: and javascript: urls are considered same-origin
   if (url.startsWith('data:')) {
     return ''
   }
-  // default is window.location
-  loc = loc || globalThis.location
+  // non-browser (or no document/location): cross-origin has no meaning
+  if (!loc || typeof document === 'undefined') {
+    return ''
+  }
   const parsedUrl = new URL(url, document.baseURI)
   // if cross origin
   if (parsedUrl.hostname !== loc.hostname || parsedUrl.port !== loc.port || parsedUrl.protocol !== loc.protocol) {

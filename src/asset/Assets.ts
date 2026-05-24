@@ -2,7 +2,7 @@ import type { ObservableEvents } from 'modern-idoc'
 import type { Resource } from '../core'
 import type { Loader } from './loaders'
 import { idGenerator, Observable } from 'modern-idoc'
-import { Ticker } from '../core'
+import { createHTMLCanvas, Ticker } from '../core'
 import {
   FontLoader,
   GifLoader,
@@ -79,6 +79,9 @@ export class Assets extends Observable<AssetsEvents> {
       // ;charset=utf-8,
       xml = decodeURIComponent(dataURI.split(',')[1])
     }
+    if (typeof DOMParser === 'undefined') {
+      throw new TypeError('SVG handling requires a global DOMParser; polyfill it (e.g. from jsdom/xmldom) in non-browser environments.')
+    }
     const svg = new DOMParser().parseFromString(xml, 'image/svg+xml').documentElement
     const width = svg.getAttribute('width')
     const height = svg.getAttribute('height')
@@ -97,6 +100,9 @@ export class Assets extends Observable<AssetsEvents> {
   }
 
   async fetchImageBitmap(url: string | Blob, options?: ImageBitmapOptions): Promise<ImageBitmap> {
+    if (typeof createImageBitmap === 'undefined') {
+      throw new TypeError('fetchImageBitmap requires a global createImageBitmap; polyfill it in non-browser environments or provide image textures as raw buffers.')
+    }
     if (
       url instanceof Blob
       || (typeof url === 'string' && url.startsWith('http'))
@@ -119,6 +125,9 @@ export class Assets extends Observable<AssetsEvents> {
       if (url.startsWith('data:image/svg+xml;')) {
         url = this._fixSVG(url)
       }
+      if (typeof Image === 'undefined') {
+        throw new TypeError('Image loading requires a global Image constructor; polyfill it in non-browser environments.')
+      }
       return new Promise<HTMLImageElement>((resolve) => {
         const img = new Image()
         img.onerror = () => {
@@ -136,9 +145,10 @@ export class Assets extends Observable<AssetsEvents> {
           return createImageBitmap(img, options)
         }
         else {
-          const canvas = document.createElement('canvas')
-          canvas.width = 1
-          canvas.height = 1
+          const canvas = createHTMLCanvas(1, 1)
+          if (!canvas) {
+            throw new Error('createImageBitmap fallback requires a canvas; call setCanvasFactory() in non-browser environments.')
+          }
           return createImageBitmap(canvas)
         }
       })
