@@ -1,15 +1,13 @@
 import type { Chart, NormalizedChart } from 'modern-idoc'
-import type { TextureRect2D } from '../TextureRect2D'
 import type { Element2D } from './Element2D'
 import { isNone, normalizeChart, property } from 'modern-idoc'
+import { Transform2D } from 'modern-path2d'
 import { CoreObject } from '../../../core'
-import { Node } from '../../main'
 import { CanvasTexture } from '../../resources'
 
 // echarts is an optional peer dependency, loaded lazily so it's never bundled or
-// required unless charts are actually used. Module-level cache across all charts.
-// single shared import promise so concurrent charts all await the same load
-// (avoids a race where the 2nd+ chart sees "tried but not loaded yet" → undefined)
+// required unless charts are actually used. A single shared import promise so
+// concurrent charts all await the same load.
 let _echartsPromise: Promise<any> | undefined
 
 function loadECharts(): Promise<any> {
@@ -35,11 +33,11 @@ function legendOption(legend: NormalizedChart['legend']): Record<string, any> {
 }
 
 /**
- * Renders an idoc chart with echarts (optional dependency): echarts draws into an
- * offscreen canvas which is uploaded as a CanvasTexture on a TextureRect2D child in
- * the parent's `back` layer (same "library → canvas → texture" pattern as Lottie2D).
- * Updates are microtask-coalesced. Without echarts installed, charts render nothing
- * (a one-time warning is logged).
+ * Renders an idoc chart with echarts (optional dependency). echarts draws into an
+ * offscreen canvas, which is uploaded as a CanvasTexture and drawn directly onto the
+ * parent element in `draw()` — the same way fill/background paint a texture, so the
+ * chart is the element's own content (no extra child node). Updates are
+ * microtask-coalesced. Without echarts installed, charts render nothing (warned once).
  */
 export class Element2DChart extends CoreObject implements NormalizedChart {
   @property({ fallback: true }) declare enabled: boolean
@@ -55,7 +53,6 @@ export class Element2DChart extends CoreObject implements NormalizedChart {
   protected _instance?: any // echarts instance
   protected _container?: HTMLElement
   protected _texture?: CanvasTexture
-  protected _node?: TextureRect2D
   protected _dirty = false
   protected _scheduled = false
 
@@ -109,6 +106,7 @@ export class Element2DChart extends CoreObject implements NormalizedChart {
     return Boolean(this.enabled && this.series.some(s => s.values.length))
   }
 
+  /** Render with echarts into the offscreen canvas backing `_texture`. */
   async update(): Promise<void> {
     this._dirty = false
     const { width, height } = this._parent.size
@@ -152,15 +150,32 @@ export class Element2DChart extends CoreObject implements NormalizedChart {
         return
       }
       this._texture = new CanvasTexture({ source: canvas, pixelRatio: 1 })
-      const node = Node.parse({ is: 'TextureRect2D', style: { left: 0, top: 0, width, height } }, 'Element2D') as unknown as TextureRect2D
-      node.texture = this._texture
-      this._node = node
-      this._parent.appendChild(node as unknown as Node, 'back')
     }
 
-    this._node?.size.set(width, height)
-    this._texture?.requestUpdate('source')
+    this._texture.requestUpdate('source')
     this._parent.requestDraw()
+  }
+
+  /** Paint the echarts texture onto the element, like fill/background do. */
+  draw(): void {
+    const texture = this._texture
+    if (!texture?.isValid()) {
+      return
+    }
+    const { width, height } = this._parent.size
+    const ctx = this._parent.context
+    this._parent.shape.draw(true) // element rect geometry
+    ctx.fillStyle = texture
+    const { a, c, tx, b, d, ty } = new Transform2D().scale(1 / width, 1 / height)
+    let x, y
+    ctx.fill({
+      transformUv: (uvs, i) => {
+        x = uvs[i]
+        y = uvs[i + 1]
+        uvs[i] = (a * x) + (c * y) + tx
+        uvs[i + 1] = (b * x) + (d * y) + ty
+      },
+    })
   }
 
   /** Map the normalized idoc chart to an echarts option. */
@@ -226,11 +241,6 @@ export class Element2DChart extends CoreObject implements NormalizedChart {
     this._instance = undefined
     this._container = undefined
     this._texture = undefined
-    if (this._node) {
-      this._parent.removeChild(this._node as unknown as Node)
-      this._node.destroy()
-      this._node = undefined
-    }
   }
 
   protected override _destroy(): void {

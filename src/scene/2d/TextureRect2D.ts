@@ -2,14 +2,12 @@ import type { Node } from '../main'
 import type { Texture2D } from '../resources'
 import type { Element2DProperties } from './element'
 import { Transform2D } from 'modern-path2d'
-import { customNode } from '../../core'
 import { Element2D } from './element'
 
 export interface TextureRect2DProperties extends Element2DProperties {
   //
 }
 
-@customNode('TextureRect2D')
 export class TextureRect2D<T extends Texture2D = Texture2D> extends Element2D {
   texture?: T
 

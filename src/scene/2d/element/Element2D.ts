@@ -654,6 +654,10 @@ export class Element2D extends Node2D implements Rectangulable {
       this._text.draw()
     }
 
+    if (this._chart.isValid()) {
+      this._chart.draw()
+    }
+
     this._drawContent()
   }
 
