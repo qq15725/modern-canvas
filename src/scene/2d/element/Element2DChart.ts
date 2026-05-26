@@ -1,18 +1,45 @@
-import type { Chart, NormalizedChart, NormalizedChartSeries } from 'modern-idoc'
+import type { Chart, NormalizedChart } from 'modern-idoc'
+import type { TextureRect2D } from '../TextureRect2D'
 import type { Element2D } from './Element2D'
 import { isNone, normalizeChart, property } from 'modern-idoc'
 import { CoreObject } from '../../../core'
 import { Node } from '../../main'
+import { CanvasTexture } from '../../resources'
 
-const PALETTE = ['#4A90D9FF', '#5CB85CFF', '#FF6B35FF', '#9B59B6FF', '#F0AD4EFF', '#1ABC9CFF', '#E74C3CFF']
-const PADDING = 16
+// echarts is an optional peer dependency, loaded lazily so it's never bundled or
+// required unless charts are actually used. Module-level cache across all charts.
+// single shared import promise so concurrent charts all await the same load
+// (avoids a race where the 2nd+ chart sees "tried but not loaded yet" → undefined)
+let _echartsPromise: Promise<any> | undefined
+
+function loadECharts(): Promise<any> {
+  if (!_echartsPromise) {
+    _echartsPromise = import('echarts')
+      .then((mod: any) => (mod?.init ? mod : mod?.default))
+      .catch(() => undefined)
+  }
+  return _echartsPromise
+}
+
+function legendOption(legend: NormalizedChart['legend']): Record<string, any> {
+  if (!legend) {
+    return { show: false }
+  }
+  switch (legend) {
+    case 'bottom': return { show: true, bottom: 8 }
+    case 'left': return { show: true, left: 8, orient: 'vertical' }
+    case 'right': return { show: true, right: 8, orient: 'vertical' }
+    case 'top':
+    default: return { show: true, top: 8 }
+  }
+}
 
 /**
- * Renders an idoc chart by expanding it into positioned Element2D nodes placed in
- * the parent's `back` layer (like Element2DTable) — bars use a background rect, while
- * line/area/pie use a shape SVG path sized 1:1 to the element. Updates are
- * microtask-coalesced. Supports column/bar/line/area/pie/doughnut; scatter/radar
- * fall back to no render. Axis lines / legend / title are not drawn yet.
+ * Renders an idoc chart with echarts (optional dependency): echarts draws into an
+ * offscreen canvas which is uploaded as a CanvasTexture on a TextureRect2D child in
+ * the parent's `back` layer (same "library → canvas → texture" pattern as Lottie2D).
+ * Updates are microtask-coalesced. Without echarts installed, charts render nothing
+ * (a one-time warning is logged).
  */
 export class Element2DChart extends CoreObject implements NormalizedChart {
   @property({ fallback: true }) declare enabled: boolean
@@ -25,7 +52,10 @@ export class Element2DChart extends CoreObject implements NormalizedChart {
   @property() declare categoryAxis: NormalizedChart['categoryAxis']
   @property() declare valueAxis: NormalizedChart['valueAxis']
 
-  protected _nodes: Node[] = []
+  protected _instance?: any // echarts instance
+  protected _container?: HTMLElement
+  protected _texture?: CanvasTexture
+  protected _node?: TextureRect2D
   protected _dirty = false
   protected _scheduled = false
 
@@ -70,7 +100,7 @@ export class Element2DChart extends CoreObject implements NormalizedChart {
     queueMicrotask(() => {
       this._scheduled = false
       if (this._dirty && !this.destroyed) {
-        this.update()
+        void this.update()
       }
     })
   }
@@ -79,192 +109,131 @@ export class Element2DChart extends CoreObject implements NormalizedChart {
     return Boolean(this.enabled && this.series.some(s => s.values.length))
   }
 
-  protected _color(i: number, series: NormalizedChartSeries): string {
-    return series.color ?? PALETTE[i % PALETTE.length]
-  }
-
-  protected _clear(): void {
-    for (const node of this._nodes) {
-      this._parent.removeChild(node)
-      node.destroy()
-    }
-    this._nodes.length = 0
-  }
-
-  protected _add(props: Record<string, any>): void {
-    const node = Node.parse({ is: 'Element2D', ...props }, 'Element2D') as Node
-    this._parent.appendChild(node, 'back')
-    this._nodes.push(node)
-  }
-
-  /** Value range across all series, honoring axis min/max; baseline defaults to 0. */
-  protected _range(): [number, number] {
-    let lo = Infinity
-    let hi = -Infinity
-    for (const s of this.series) {
-      for (const v of s.values) {
-        lo = Math.min(lo, v)
-        hi = Math.max(hi, v)
-      }
-    }
-    if (!Number.isFinite(lo)) {
-      lo = 0
-      hi = 1
-    }
-    const min = this.valueAxis?.min ?? Math.min(0, lo)
-    let max = this.valueAxis?.max ?? hi
-    if (max <= min) {
-      max = min + 1
-    }
-    return [min, max]
-  }
-
-  update(): void {
+  async update(): Promise<void> {
     this._dirty = false
-    this._clear()
-
-    if (!this.isValid()) {
-      this._parent.requestDraw()
-      return
-    }
     const { width, height } = this._parent.size
-    if (!width || !height) {
+
+    if (!this.isValid() || !width || !height) {
+      this._teardown()
       this._parent.requestDraw()
       return
     }
 
-    const x = PADDING
-    const y = PADDING
-    const w = Math.max(width - PADDING * 2, 1)
-    const h = Math.max(height - PADDING * 2, 1)
-
-    switch (this.type) {
-      case 'bar':
-        this._drawBars(x, y, w, h, true)
-        break
-      case 'line':
-      case 'area':
-        this._drawLines(width, height, x, y, w, h, this.type === 'area')
-        break
-      case 'pie':
-      case 'doughnut':
-        this._drawPie(width, height, x, y, w, h, this.type === 'doughnut')
-        break
-      case 'column':
-        this._drawBars(x, y, w, h, false)
-        break
-      default:
-        // scatter / radar not supported yet
-        break
+    const echarts = await loadECharts()
+    if (!echarts) {
+      console.warn('[modern-canvas] chart rendering requires the optional "echarts" dependency (e.g. `pnpm add echarts`)')
+      return
+    }
+    // a later update / destroy may have run while awaiting the import
+    if (this.destroyed || !this.isValid()) {
+      return
     }
 
+    if (!this._instance) {
+      if (typeof document === 'undefined') {
+        console.warn('[modern-canvas] echarts chart rendering requires a DOM environment')
+        return
+      }
+      this._container = document.createElement('div')
+      this._instance = echarts.init(this._container, undefined, { renderer: 'canvas', width, height })
+      this._instance.on('finished', () => {
+        this._texture?.requestUpdate('source')
+        this._parent.requestDraw()
+      })
+    }
+
+    this._instance.resize({ width, height })
+    this._instance.setOption(this._toOption(), true) // builds + renders the canvas
+
+    if (!this._texture) {
+      // echarts builds its canvas lazily on first render, so grab it after setOption
+      const canvas = this._container!.querySelector('canvas') as HTMLCanvasElement | null
+      if (!canvas) {
+        return
+      }
+      this._texture = new CanvasTexture({ source: canvas, pixelRatio: 1 })
+      const node = Node.parse({ is: 'TextureRect2D', style: { left: 0, top: 0, width, height } }, 'Element2D') as unknown as TextureRect2D
+      node.texture = this._texture
+      this._node = node
+      this._parent.appendChild(node as unknown as Node, 'back')
+    }
+
+    this._node?.size.set(width, height)
+    this._texture?.requestUpdate('source')
     this._parent.requestDraw()
   }
 
-  protected _drawBars(x: number, y: number, w: number, h: number, horizontal: boolean): void {
-    const [min, max] = this._range()
-    const span = max - min
-    const count = Math.max(this.categories.length, ...this.series.map(s => s.values.length), 1)
-    const seriesCount = this.series.length || 1
-    const axisLen = horizontal ? h : w
-    const group = axisLen / count
-    const barThickness = (group * 0.8) / seriesCount
-    const groupPad = (group * 0.2) / 2
+  /** Map the normalized idoc chart to an echarts option. */
+  protected _toOption(): Record<string, any> {
+    const { type, categories: cat } = this
+    const pie = type === 'pie' || type === 'doughnut'
+    const horizontal = type === 'bar'
+    const stack = this.grouping === 'stacked' || this.grouping === 'percentStacked'
 
-    for (let si = 0; si < this.series.length; si++) {
-      const s = this.series[si]
-      const color = this._color(si, s)
-      for (let ci = 0; ci < s.values.length; ci++) {
-        const ratio = (s.values[ci] - min) / span
-        const length = Math.max(ratio * (horizontal ? w : h), 0)
-        const offset = ci * group + groupPad + si * barThickness
-        const style = horizontal
-          ? { left: x, top: y + offset, width: length, height: barThickness }
-          : { left: x + offset, top: y + h - length, width: barThickness, height: length }
-        this._add({ style, background: { color } })
-      }
+    const option: Record<string, any> = {
+      title: this.title ? { text: this.title, left: 'center' } : undefined,
+      legend: legendOption(this.legend),
+      tooltip: {},
     }
+
+    if (pie) {
+      const s = this.series[0]
+      option.series = [{
+        type: 'pie',
+        radius: type === 'doughnut' ? ['45%', '70%'] : '70%',
+        data: (s?.values ?? []).map((v, i) => ({ value: v, name: cat[i] ?? String(i) })),
+      }]
+      return option
+    }
+
+    const valueAxis = {
+      type: 'value',
+      show: this.valueAxis?.visible !== false,
+      name: this.valueAxis?.title,
+      min: this.valueAxis?.min,
+      max: this.valueAxis?.max,
+    }
+    const categoryAxis = {
+      type: 'category',
+      data: cat,
+      show: this.categoryAxis?.visible !== false,
+      name: this.categoryAxis?.title,
+    }
+    option.xAxis = horizontal ? valueAxis : categoryAxis
+    option.yAxis = horizontal ? categoryAxis : valueAxis
+
+    const seriesType = type === 'column' || type === 'bar'
+      ? 'bar'
+      : type === 'area'
+        ? 'line'
+        : type // line / scatter / radar pass through
+
+    option.series = this.series.map(s => ({
+      name: s.name,
+      type: seriesType,
+      data: type === 'scatter' && s.xValues
+        ? s.values.map((v, i) => [s.xValues![i], v])
+        : s.values,
+      stack: stack ? 'total' : undefined,
+      areaStyle: type === 'area' ? {} : undefined,
+      itemStyle: s.color ? { color: s.color } : undefined,
+    }))
+    return option
   }
 
-  protected _drawLines(vw: number, vh: number, x: number, y: number, w: number, h: number, area: boolean): void {
-    const [min, max] = this._range()
-    const span = max - min
-    const count = Math.max(...this.series.map(s => s.values.length), 1)
-    const stepX = count > 1 ? w / (count - 1) : 0
-
-    for (let si = 0; si < this.series.length; si++) {
-      const s = this.series[si]
-      const color = this._color(si, s)
-      const pts = s.values.map((v, i) => {
-        const px = x + (count > 1 ? i * stepX : w / 2)
-        const py = y + h - ((v - min) / span) * h
-        return [px, py] as const
-      })
-      if (!pts.length) {
-        continue
-      }
-      let d = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p[0]} ${p[1]}`).join(' ')
-      if (area) {
-        d += ` L ${pts[pts.length - 1][0]} ${y + h} L ${pts[0][0]} ${y + h} Z`
-      }
-      // viewBox matches the element so absolute pixel coords render 1:1
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${vw} ${vh}"><path d="${d}"/></svg>`
-      this._add({
-        style: { left: 0, top: 0, width: vw, height: vh },
-        shape: { svg },
-        ...(area
-          ? { fill: { color }, outline: { color, width: 2 } }
-          : { outline: { color, width: 2 } }),
-      })
-    }
-  }
-
-  protected _drawPie(vw: number, vh: number, x: number, y: number, w: number, h: number, doughnut: boolean): void {
-    // pie uses the first series' values as slices
-    const s = this.series[0]
-    if (!s?.values.length) {
-      return
-    }
-    const total = s.values.reduce((sum, v) => sum + Math.max(v, 0), 0) || 1
-    const cx = x + w / 2
-    const cy = y + h / 2
-    const r = Math.min(w, h) / 2
-    const ir = doughnut ? r * 0.55 : 0
-    let angle = -Math.PI / 2 // start at top
-
-    for (let i = 0; i < s.values.length; i++) {
-      const value = Math.max(s.values[i], 0)
-      const sweep = (value / total) * Math.PI * 2
-      const a0 = angle
-      const a1 = angle + sweep
-      angle = a1
-      const large = sweep > Math.PI ? 1 : 0
-      const ox0 = cx + r * Math.cos(a0)
-      const oy0 = cy + r * Math.sin(a0)
-      const ox1 = cx + r * Math.cos(a1)
-      const oy1 = cy + r * Math.sin(a1)
-      let d: string
-      if (doughnut) {
-        const ix1 = cx + ir * Math.cos(a1)
-        const iy1 = cy + ir * Math.sin(a1)
-        const ix0 = cx + ir * Math.cos(a0)
-        const iy0 = cy + ir * Math.sin(a0)
-        d = `M ${ox0} ${oy0} A ${r} ${r} 0 ${large} 1 ${ox1} ${oy1} L ${ix1} ${iy1} A ${ir} ${ir} 0 ${large} 0 ${ix0} ${iy0} Z`
-      }
-      else {
-        d = `M ${cx} ${cy} L ${ox0} ${oy0} A ${r} ${r} 0 ${large} 1 ${ox1} ${oy1} Z`
-      }
-      const color = s.color && s.values.length === 1 ? s.color : PALETTE[i % PALETTE.length]
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${vw} ${vh}"><path d="${d}"/></svg>`
-      this._add({
-        style: { left: 0, top: 0, width: vw, height: vh },
-        shape: { svg },
-        fill: { color },
-      })
+  protected _teardown(): void {
+    this._instance?.dispose()
+    this._instance = undefined
+    this._container = undefined
+    this._texture = undefined
+    if (this._node) {
+      this._parent.removeChild(this._node as unknown as Node)
+      this._node.destroy()
+      this._node = undefined
     }
   }
 
   protected override _destroy(): void {
-    this._clear()
+    this._teardown()
   }
 }

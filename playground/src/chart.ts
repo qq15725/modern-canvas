@@ -1,8 +1,9 @@
 import { Engine } from '../../src'
 
-// Demonstrates the idoc `chart` structure: Element2DChart expands a chart into
-// positioned Element2D nodes (bars = background rects, line/area/pie = shape paths)
-// in the parent's back layer. Covers column / bar / line / area / pie / doughnut.
+// Demonstrates the idoc `chart` structure: Element2DChart renders via echarts
+// (optional dependency) into an offscreen canvas uploaded as a texture in the
+// parent's back layer. Covers column / bar / line / area / pie / doughnut.
+// Requires `echarts` to be installed (it's an optional peer dependency).
 
 async function init(): Promise<void> {
   const engine = new Engine({ autoStart: true, autoResize: true })
