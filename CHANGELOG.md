@@ -1,3 +1,9 @@
+# [0.21.0](https://github.com/qq15725/modern-canvas/compare/v0.20.1...v0.21.0) (2026-05-26)
+
+
+### Features
+
+* render charts via echarts (optional dependency) ([97847b3](https://github.com/qq15725/modern-canvas/commit/97847b3c5b71b384ce7161a8fe76ca9e571e1aac))
 ## [0.20.1](https://github.com/qq15725/modern-canvas/compare/v0.20.0...v0.20.1) (2026-05-24)
 
 
