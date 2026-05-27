@@ -1,5 +1,5 @@
-import type { ConnectionMode } from '../../src'
-import { Element2D, Node } from '../../src'
+import type { ConnectionMode, Element2D } from '../../src'
+import { Node } from '../../src'
 
 async function init(): Promise<void> {
   const { Engine } = await import('../../src')
@@ -17,18 +17,31 @@ async function init(): Promise<void> {
 
   // one row per mode, identical geometry so the three render styles compare directly
   const rows: { mode: ConnectionMode, color: string, y: number }[] = [
-    { mode: 'straight', color: '#4A90D9FF', y: 60 },
-    { mode: 'orthogonal', color: '#FF6B35FF', y: 240 },
-    { mode: 'curved', color: '#5CB85CFF', y: 420 },
+    { mode: 'straight', color: '#4A90D9FF', y: 80 },
+    { mode: 'orthogonal', color: '#FF6B35FF', y: 320 },
+    { mode: 'curved', color: '#5CB85CFF', y: 560 },
   ]
 
   const movers: Element2D[] = []
 
   for (const { mode, color, y } of rows) {
+    // connection: source right anchor -> target left anchor, in this row's mode.
+    // appended BEFORE the two nodes so it sits lower in the render tree and the
+    // boxes paint on top of the line instead of the line overlapping them.
+    engine.root.appendChild(Node.parse({
+      is: 'Element2D',
+      id: `line-${mode}`,
+      outline: { color, width: 3 },
+      connection: { start: { id: `from-${mode}`, idx: 1 }, end: { id: `to-${mode}`, idx: 3 }, mode },
+    }))
+
+    // source sits centred; the target orbits all the way around it (below), so the
+    // fixed right/left anchors sweep through forward (facing) AND reverse (facing
+    // away) layouts — the reverse case is where orthogonal routing used to fold back.
     engine.root.appendChild(Node.parse({
       is: 'Element2D',
       id: `from-${mode}`,
-      style: { left: 120, top: y, width: 130, height: 70 },
+      style: { left: 320, top: y, width: 130, height: 70 },
       fill: { color: '#EEEEEEFF' },
       outline: { color: '#AAAAAAFF', width: 1 },
       shape: { connectionPoints },
@@ -37,33 +50,26 @@ async function init(): Promise<void> {
     const to = engine.root.appendChild(Node.parse({
       is: 'Element2D',
       id: `to-${mode}`,
-      style: { left: 460, top: y + 40, width: 130, height: 70 },
+      style: { left: 560, top: y, width: 130, height: 70 },
       fill: { color: '#EEEEEEFF' },
       outline: { color: '#AAAAAAFF', width: 1 },
       shape: { connectionPoints },
     }) as Element2D)
     movers.push(to)
-
-    // connection: source right anchor -> target left anchor, in this row's mode
-    engine.root.appendChild(Node.parse({
-      is: 'Element2D',
-      id: `line-${mode}`,
-      outline: { color, width: 3 },
-      connection: { start: { id: `from-${mode}`, idx: 1 }, end: { id: `to-${mode}`, idx: 3 }, mode },
-    }))
   }
 
   // eslint-disable-next-line no-console
   console.log('connection modes — blue: straight, orange: orthogonal, green: curved')
 
-  // move the targets so the connectors re-route live
+  // orbit the targets fully around each (centred) source so the connectors
+  // re-route live through both forward and reverse-direction layouts
   let t = 0
   engine.on('process', (delta) => {
     t += delta * 0.001
     movers.forEach((to, i) => {
       to.style = {
-        left: 460 + Math.cos(t + i) * 70,
-        top: rows[i].y + 40 + Math.sin(t + i) * 60,
+        left: 320 + Math.cos(t + i) * 240,
+        top: rows[i].y + Math.sin(t + i) * 60,
         width: 130,
         height: 70,
       }
