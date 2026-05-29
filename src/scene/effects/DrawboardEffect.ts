@@ -8,7 +8,7 @@ import { Effect } from '../main/Effect'
 import { Material, QuadUvGeometry } from '../resources'
 import fragment from './DrawboardEffect.frag?raw'
 
-export type CheckerboardStyle = 'grid' | 'gridDark' | 'dot'
+export type CheckerboardStyle = 'grid' | 'gridDark' | 'dot' | 'dotDark'
 
 export interface DrawboardEffectProperties extends EffectProperties {
   checkerboard?: boolean
@@ -62,6 +62,13 @@ void main() {
       case 'watermark':
         this._loadWatermark(value)
         break
+      case 'checkerboard':
+      case 'checkerboardStyle':
+      case 'pixelGrid':
+        // these only feed the fragment shader; nothing else marks the effect
+        // dirty, so request a re-render to reflect the change next frame
+        this.requestRender()
+        break
     }
   }
 
@@ -78,6 +85,14 @@ void main() {
     grid: 1,
     gridDark: 2,
     dot: 3,
+    dotDark: 4,
+  }
+
+  // dot grid colours per theme: light keeps the original near-white surface with
+  // darker dots; dark mirrors `gridDark`'s surface with lighter dots on top.
+  protected _dotColors: Record<'light' | 'dark', { base: number, zoomedOut: number, diff: number }> = {
+    light: { base: 0.9608, zoomedOut: 0.6667, diff: 0.1020 },
+    dark: { base: 0.1216, zoomedOut: 0.3137, diff: 0.1020 },
   }
 
   override apply(renderer: WebGLRenderer, source: Viewport): void {
@@ -97,6 +112,10 @@ void main() {
         : [0, 0]
       const watermarkMaxWh = Math.max(watermarkSize[0], watermarkSize[1])
 
+      const dot = this.checkerboardStyle === 'dotDark'
+        ? this._dotColors.dark
+        : this._dotColors.light
+
       QuadUvGeometry.draw(renderer, DrawboardEffect.material, {
         uTexture: 0,
         inputSize: [source.width, source.height],
@@ -113,9 +132,9 @@ void main() {
         ],
         checkerboard: this.checkerboard ? 1 : 0,
         checkerboardStyle: this._checkerboardStyleMap[this.checkerboardStyle] ?? 0,
-        dotBackgroundBaseColor: 0.9608,
-        dotBackgroundZoomedOutColor: 0.6667,
-        dotColorDiff: 0.1020,
+        dotBackgroundBaseColor: dot.base,
+        dotBackgroundZoomedOutColor: dot.zoomedOut,
+        dotColorDiff: dot.diff,
         pixelGrid: this.pixelGrid ? 1 : 0,
         watermark: this._watermark ? 1 : 0,
         watermarkTexture: 1,

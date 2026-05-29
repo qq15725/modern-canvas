@@ -29,6 +29,7 @@ const int CHECKERBOARD_STYLE_NONE = 0;
 const int CHECKERBOARD_STYLE_GRID = 1;
 const int CHECKERBOARD_STYLE_GRID_DARK = 2;
 const int CHECKERBOARD_STYLE_DOTS = 3;
+const int CHECKERBOARD_STYLE_DOTS_DARK = 4;
 
 float _round(float val) {
   return floor(val + .5);
@@ -69,7 +70,9 @@ vec4 renderCheckerboard(vec2 coord, vec4 color) {
     vec2 fractValue = fract(coord * vec2(gridScale) * zoom) - 0.5;
     value = fractValue.x * fractValue.y < 0.0 ? 0.12 : 0.17;
   }
-  else if (checkerboardStyle == CHECKERBOARD_STYLE_DOTS) {
+  else if (checkerboardStyle == CHECKERBOARD_STYLE_DOTS || checkerboardStyle == CHECKERBOARD_STYLE_DOTS_DARK) {
+    // light vs dark dots share this path; the base/dot colours are supplied as
+    // uniforms (set per style on the CPU side), so only the values differ.
     float zoomScale = zoom.x;
     float gridPixelSize = scaledGridSize(zoomScale);
     float zoomInterpolationFactor = smoothstep(0.5, 1.0, zoomScale);
