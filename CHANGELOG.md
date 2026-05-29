@@ -1,3 +1,9 @@
+# [0.22.0](https://github.com/qq15725/modern-canvas/compare/v0.21.3...v0.22.0) (2026-05-29)
+
+
+### Features
+
+* **drawboard:** add dotDark checkerboard style for dark mode ([f7a75cf](https://github.com/qq15725/modern-canvas/commit/f7a75cf962179a18137a932a557796df34fcc7e4))
 ## [0.21.3](https://github.com/qq15725/modern-canvas/compare/v0.21.2...v0.21.3) (2026-05-27)
 
 
