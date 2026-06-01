@@ -21,8 +21,8 @@ importers:
         specifier: ^0.11.8
         version: 0.11.8
       modern-path2d:
-        specifier: ^1.8.0
-        version: 1.8.0
+        specifier: ^1.8.2
+        version: 1.8.2
       modern-text:
         specifier: ^2.0.3
         version: 2.0.3
@@ -2256,8 +2256,8 @@ packages:
   modern-palette@2.0.0:
     resolution: {integrity: sha512-wKZcom2QzK6sS6h5RLYHEkd3V3maQLzgkI+ekDCimlk7dfXa63aekZcy+7KS+8JEqIDeY/yV1CAvA7l+7u6QHA==}
 
-  modern-path2d@1.8.0:
-    resolution: {integrity: sha512-eLhC2qsC2cFZB5EtNjSXi2WtCFQ2mVPzoqcI9xjV8Nc5pNPu9jRQ0abmLuB+sX2UG2zBS1v8uIZHMk0FSQcfnQ==}
+  modern-path2d@1.8.2:
+    resolution: {integrity: sha512-yeYGc10ze/EwdNZxJhLcL4/8u2fPVqkmmNCpA93B/aeNeNcQohweSuQZz9zXF8duwxxN2zgYG8uKed5dxhE07A==}
 
   modern-text@2.0.3:
     resolution: {integrity: sha512-B13Klwhpo3YZHNLeOrb4MQ2n+SNALLmf/GDxxB2nOYC6IBZrznNNHTXbh14/Gazgwbmx0PRs431I5Y+nxGf8bg==}
@@ -5238,7 +5238,7 @@ snapshots:
 
   modern-palette@2.0.0: {}
 
-  modern-path2d@1.8.0:
+  modern-path2d@1.8.2:
     dependencies:
       earcut: 3.0.2
       polygon-clipping: 0.15.7
@@ -5248,7 +5248,7 @@ snapshots:
       diff: 9.0.0
       modern-font: 0.6.0
       modern-idoc: 0.11.8
-      modern-path2d: 1.8.0
+      modern-path2d: 1.8.2
 
   module-replacements@3.0.0-beta.7: {}
 

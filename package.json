@@ -64,7 +64,7 @@
     "earcut": "^3.0.2",
     "modern-font": "^0.6.0",
     "modern-idoc": "^0.11.8",
-    "modern-path2d": "^1.8.0",
+    "modern-path2d": "^1.8.2",
     "modern-text": "^2.0.3"
   },
   "peerDependencies": {
