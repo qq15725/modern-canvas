@@ -59,6 +59,57 @@ pixelBtn.onclick = () => {
 }
 bar.append(pixelBtn)
 
+// ---- second row: per-property dot colour overrides (light/dark presets are
+// chosen by the style above; setting any slider here overrides the preset for
+// that single channel, clearing it returns to the preset value) ----
+const colorBar = document.createElement('div')
+colorBar.style.cssText = 'position:fixed;top:52px;left:12px;display:flex;gap:12px;'
+  + 'align-items:center;font-family:monospace;font-size:12px;z-index:10;'
+  + 'background:#ffffffcc;padding:6px 10px;border-radius:6px;'
+document.body.append(colorBar)
+
+const colorProps = [
+  { key: 'dotBaseColor', label: 'base' },
+  { key: 'dotColor', label: 'dot' },
+  { key: 'dotZoomDiff', label: 'diff' },
+] as const
+
+const sliders = colorProps.map(({ key, label }) => {
+  const wrap = document.createElement('label')
+  wrap.style.cssText = 'display:flex;align-items:center;gap:4px;'
+  const text = document.createElement('span')
+  text.textContent = label
+  const slider = document.createElement('input')
+  slider.type = 'range'
+  slider.min = '0'
+  slider.max = '1'
+  slider.step = '0.01'
+  slider.value = ''
+  slider.style.width = '120px'
+  const out = document.createElement('span')
+  out.style.width = '40px'
+  out.textContent = '—'
+  slider.oninput = () => {
+    ;(board as any)[key] = Number(slider.value)
+    out.textContent = Number(slider.value).toFixed(2)
+  }
+  wrap.append(text, slider, out)
+  colorBar.append(wrap)
+  return { slider, out, key }
+})
+
+const resetBtn = document.createElement('button')
+resetBtn.textContent = 'reset to preset'
+resetBtn.style.cssText = 'padding:4px 10px;border-radius:4px;border:1px solid #888;cursor:pointer;'
+resetBtn.onclick = () => {
+  for (const { slider, out, key } of sliders) {
+    ;(board as any)[key] = undefined
+    slider.value = ''
+    out.textContent = '—'
+  }
+}
+colorBar.append(resetBtn)
+
 function refresh(): void {
   styleButtons.forEach((btn, i) => {
     const active = board.checkerboardStyle === styles[i]
