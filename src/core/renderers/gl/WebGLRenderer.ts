@@ -4,7 +4,7 @@ import type {
   GlRenderingContext,
   GlTarget,
 } from './types'
-import { createHTMLCanvas, isCanvasElement, isWebgl2 } from '../../shared'
+import { createHTMLCanvas, getGlContextProvider, isCanvasElement, isWebgl2 } from '../../shared'
 import { Renderer } from '../shared'
 import { GlBufferSystem } from './buffer'
 import { Clear } from './const'
@@ -102,12 +102,19 @@ export class WebGLRenderer extends Renderer {
 
   protected _setupContext(view: HTMLCanvasElement, options?: WebGLContextAttributes): this {
     this.view = view
-    let gl = <any>(
-      view.getContext('webgl2', options)
-      || view.getContext('experimental-webgl2', options)
-    )
-    let version: 1 | 2 = 2
 
+    // Headless / SSR consumers can register a `setGlContextProvider(...)` to
+    // supply a context (e.g. from `headless-gl`) when the canvas can't yield
+    // one itself. Browser callers fall through to the standard getContext path.
+    const provider = getGlContextProvider()
+    let gl: any = provider?.(view, options)
+    let version: 1 | 2 = gl && isWebgl2(gl) ? 2 : 1
+
+    if (!gl) {
+      gl = view.getContext('webgl2', options)
+        || view.getContext('experimental-webgl2', options)
+      version = 2
+    }
     if (!gl) {
       gl = view.getContext('webgl', options)
         || view.getContext('experimental-webgl', options)
@@ -124,8 +131,12 @@ export class WebGLRenderer extends Renderer {
     this._contextLost = this._contextLost.bind(this)
     this._contextRestored = this._contextRestored.bind(this)
 
-    view.addEventListener('webglcontextlost', this._contextLost as any, false)
-    view.addEventListener('webglcontextrestored', this._contextRestored as any, false)
+    // Headless contexts don't dispatch DOM events; only wire the listeners when
+    // the canvas actually supports them.
+    if (typeof view.addEventListener === 'function') {
+      view.addEventListener('webglcontextlost', this._contextLost as any, false)
+      view.addEventListener('webglcontextrestored', this._contextRestored as any, false)
+    }
 
     return this
   }

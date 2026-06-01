@@ -48,6 +48,32 @@ export function getCanvasFactory(): CanvasFactory | undefined {
   return _canvasFactory
 }
 
+export type GlContextProvider = (
+  canvas: HTMLCanvasElement | undefined,
+  options?: WebGLContextAttributes,
+) => WebGL2RenderingContext | WebGLRenderingContext | undefined
+
+let _glContextProvider: GlContextProvider | undefined
+
+/**
+ * Inject a WebGL2 context provider for non-browser environments
+ * (e.g. `headless-gl`, `gl`, or other off-DOM bindings). Lets the engine source
+ * its main rendering context when `canvas.getContext('webgl2')` isn't viable —
+ * the provider is consulted before falling back to the canvas's own getContext.
+ * Pass `undefined` to clear.
+ *
+ * Note: callers can also keep passing a fully-constructed `gl` instance via
+ * `new Engine({ view: gl })`; this provider is for the implicit case where the
+ * engine creates its own canvas.
+ */
+export function setGlContextProvider(provider: GlContextProvider | undefined): void {
+  _glContextProvider = provider
+}
+
+export function getGlContextProvider(): GlContextProvider | undefined {
+  return _glContextProvider
+}
+
 /**
  * Create an (offscreen) canvas via the injected factory, falling back to
  * `document.createElement('canvas')` in the browser. Returns `undefined` when
