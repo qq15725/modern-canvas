@@ -12,6 +12,8 @@ export class Element2DConnection extends CoreObject implements NormalizedConnect
   @property() declare end: NormalizedConnection['end']
   /** Routing mode: `straight` | `orthogonal` | `curved` (normalized by modern-idoc). */
   @property({ fallback: 'straight' }) declare mode: ConnectionMode
+  /** Fraction (0..1) along the routed path used by {@link getLabelPoint}. */
+  @property({ fallback: 0.5 }) declare labelPosition: number
 
   // cache the routed path; while endpoints + mode are unchanged, route() returns
   // the same instance so callers can skip re-layout via identity comparison.
@@ -67,6 +69,9 @@ export class Element2DConnection extends CoreObject implements NormalizedConnect
     if (!target)
       return undefined
 
+    const aabb = target.globalAabb
+    const bbox = { min: { x: aabb.min.x, y: aabb.min.y }, size: { x: aabb.size.x, y: aabb.size.y } }
+
     if (anchor.idx !== undefined) {
       const cp = target.shape.connectionPoints?.find(
         (p: ShapeConnectionPoint) => p.idx === anchor.idx,
@@ -83,12 +88,24 @@ export class Element2DConnection extends CoreObject implements NormalizedConnect
           // infer outward normal from the point's position on the unit shape
           dir = axisDir(cp.x - 0.5, cp.y - 0.5)
         }
-        return { point, dir: rotateDir(dir, target.globalRotation) }
+        return { point, dir: rotateDir(dir, target.globalRotation), bbox }
       }
     }
 
-    const { min, size } = target.globalAabb
-    return { point: new Vector2(min.x + size.x / 2, min.y + size.y / 2) }
+    return { point: new Vector2(aabb.min.x + aabb.size.x / 2, aabb.min.y + aabb.size.y / 2), bbox }
+  }
+
+  /**
+   * World-space point at the configured {@link labelPosition} along the current
+   * route — handy for anchoring an external label / badge to the line. Returns
+   * `undefined` when the endpoints haven't resolved yet.
+   */
+  getLabelPoint(): Vector2 | undefined {
+    const path = this.route()
+    if (!path || !path.getLength())
+      return undefined
+    const t = Math.max(0, Math.min(1, this.labelPosition ?? 0.5))
+    return path.getPointAt(t) as Vector2
   }
 
   /** Resolve both ends and return the routed world-space path (cached while unchanged). */

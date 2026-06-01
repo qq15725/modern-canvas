@@ -82,4 +82,66 @@ describe('orthogonal connection routing', () => {
     const path = routeConnection('orthogonal', ep(0, 0, 1, 0), ep(-200, 200, 0, 1))
     assertNoBacktrack(points(path))
   })
+
+  it('loops around when same-direction anchors are exactly collinear', () => {
+    // both right anchors on the same y, end to the LEFT — without the collinear
+    // guard the perpendicular split would degenerate to a flat backtrack
+    const path = routeConnection('orthogonal', ep(0, 0, 1, 0), ep(-200, 0, 1, 0))
+    const pts = points(path)
+    assertNoBacktrack(pts)
+    // the route must leave its straight axis at some point (otherwise it is the
+    // degenerate flat backtrack the guard exists to prevent)
+    const ys = pts.map(p => p.y)
+    expect(Math.max(...ys) - Math.min(...ys)).toBeGreaterThan(0)
+  })
+
+  it('does not let curved overshoot when anchors face away from the target', () => {
+    // reverse direction: start LEFT anchor, end RIGHT anchor, target offset below
+    // (the orange swoop in the original bug screenshot). Old code pushed the
+    // control points along the anchor directions by ~dist*0.4, looping the curve
+    // far past the source/target. Aligned scaling must keep the swing reasonable.
+    const path = routeConnection('curved', ep(0, 0, -1, 0), ep(40, 300, 1, 0))
+    const pts = points(path)
+    const dist = Math.hypot(40, 300)
+    const minX = Math.min(...pts.map(p => p.x))
+    const maxX = Math.max(...pts.map(p => p.x))
+    // curve may extend somewhat outside the s-e x range, but well under the old
+    // ~dist*0.4 overshoot on each side
+    expect(minX).toBeGreaterThan(-dist * 0.25)
+    expect(maxX).toBeLessThan(40 + dist * 0.25)
+  })
+
+  it('loops around when same-direction vertical anchors are exactly collinear', () => {
+    const path = routeConnection('orthogonal', ep(0, 0, 0, 1), ep(0, -200, 0, 1))
+    const pts = points(path)
+    assertNoBacktrack(pts)
+    const xs = pts.map(p => p.x)
+    expect(Math.max(...xs) - Math.min(...xs)).toBeGreaterThan(0)
+  })
+
+  it('routes around endpoint bboxes instead of cutting through them', () => {
+    // Two same-direction anchors (both right-facing) with the target laid to
+    // the LEFT of the source — the non-facing perpendicular split kicks in
+    // here. Without bbox awareness the connecting segment runs straight across
+    // the source body at the anchor's y.
+    const start = {
+      point: { x: 100, y: 50 },
+      dir: { x: 1, y: 0 },
+      bbox: { min: { x: 0, y: 0 }, size: { x: 100, y: 100 } },
+    }
+    const end = {
+      point: { x: -100, y: 50 },
+      dir: { x: 1, y: 0 },
+      bbox: { min: { x: -200, y: 0 }, size: { x: 100, y: 100 } },
+    }
+    const path = routeConnection('orthogonal', start, end)
+    const pts = points(path)
+    assertNoBacktrack(pts)
+    // the perpendicular run sits at some midY; that midY must clear the source
+    // box's y-band so the segment doesn't cut through it
+    const inner = pts.slice(2, -2) // drop anchor + stub points on either side
+    for (const p of inner) {
+      expect(p.y <= 0 || p.y >= 100, `inner point at y=${p.y} is inside the source box`).toBe(true)
+    }
+  })
 })

@@ -23,17 +23,20 @@ async function init(): Promise<void> {
   ]
 
   const movers: Element2D[] = []
+  const lines: Element2D[] = []
+  const labels: Element2D[] = []
 
   for (const { mode, color, y } of rows) {
     // connection: source right anchor -> target left anchor, in this row's mode.
     // appended BEFORE the two nodes so it sits lower in the render tree and the
     // boxes paint on top of the line instead of the line overlapping them.
-    engine.root.appendChild(Node.parse({
+    const line = engine.root.appendChild(Node.parse({
       is: 'Element2D',
       id: `line-${mode}`,
-      outline: { color, width: 3 },
+      outline: { color, width: 3, headEnd: { type: 'triangle' } },
       connection: { start: { id: `from-${mode}`, idx: 1 }, end: { id: `to-${mode}`, idx: 3 }, mode },
-    }))
+    }) as Element2D)
+    lines.push(line)
 
     // source sits centred; the target orbits all the way around it (below), so the
     // fixed right/left anchors sweep through forward (facing) AND reverse (facing
@@ -56,6 +59,25 @@ async function init(): Promise<void> {
       shape: { connectionPoints },
     }) as Element2D)
     movers.push(to)
+
+    // small label that follows the midpoint of the routed path each frame
+    labels.push(engine.root.appendChild(Node.parse({
+      is: 'Element2D',
+      style: {
+        left: 0,
+        top: 0,
+        width: 36,
+        height: 20,
+        borderRadius: 4,
+        justifyContent: 'center',
+        alignItems: 'center',
+        textAlign: 'center',
+        textColor: '#FFFFFFFF',
+        fontSize: 12,
+      },
+      fill: { color },
+      text: mode.slice(0, 3),
+    }) as Element2D))
   }
 
   // eslint-disable-next-line no-console
@@ -72,6 +94,25 @@ async function init(): Promise<void> {
         top: rows[i].y + Math.sin(t + i) * 60,
         width: 130,
         height: 70,
+      }
+    })
+    // anchor each label to the midpoint of its line's current route
+    lines.forEach((line, i) => {
+      const p = line.connection.getLabelPoint()
+      const label = labels[i]
+      if (p && label) {
+        label.style = {
+          left: p.x - 18,
+          top: p.y - 10,
+          width: 36,
+          height: 20,
+          borderRadius: 4,
+          justifyContent: 'center',
+          alignItems: 'center',
+          textAlign: 'center',
+          textColor: '#FFFFFFFF',
+          fontSize: 12,
+        }
       }
     })
   })
