@@ -1,4 +1,5 @@
-import { Element2D, Engine, Node } from '../../src'
+import type { Element2D } from '../../src'
+import { Engine, Node } from '../../src'
 
 // Visual hit-test bench: verifies pointer hits follow the *real* shape geometry,
 // not the bounding box. White frames = each element's bbox (non-interactive

@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest'
 import { Transform2D } from 'modern-path2d'
+import { describe, expect, it } from 'vitest'
 import { Element2D } from '../src'
 
 // _intersectsViewport compares the node's world-space globalAabb against the
