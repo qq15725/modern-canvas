@@ -21,8 +21,8 @@ importers:
         specifier: ^0.11.8
         version: 0.11.8
       modern-path2d:
-        specifier: ^1.7.0
-        version: 1.7.0
+        specifier: ^1.8.0
+        version: 1.8.0
       modern-text:
         specifier: ^2.0.3
         version: 2.0.3
@@ -2256,8 +2256,8 @@ packages:
   modern-palette@2.0.0:
     resolution: {integrity: sha512-wKZcom2QzK6sS6h5RLYHEkd3V3maQLzgkI+ekDCimlk7dfXa63aekZcy+7KS+8JEqIDeY/yV1CAvA7l+7u6QHA==}
 
-  modern-path2d@1.7.0:
-    resolution: {integrity: sha512-9BIk0manYEmJRMknVdhumn4Sn7JCR7b2oC4Oc5geAfPFMEaySFXiPbhCrBLLkJ65Ty4WWzwOnvSzslBGeBNeLQ==}
+  modern-path2d@1.8.0:
+    resolution: {integrity: sha512-eLhC2qsC2cFZB5EtNjSXi2WtCFQ2mVPzoqcI9xjV8Nc5pNPu9jRQ0abmLuB+sX2UG2zBS1v8uIZHMk0FSQcfnQ==}
 
   modern-text@2.0.3:
     resolution: {integrity: sha512-B13Klwhpo3YZHNLeOrb4MQ2n+SNALLmf/GDxxB2nOYC6IBZrznNNHTXbh14/Gazgwbmx0PRs431I5Y+nxGf8bg==}
@@ -2366,6 +2366,9 @@ packages:
 
   pnpm-workspace-yaml@1.6.1:
     resolution: {integrity: sha512-yTeZntGWi8m9WNuhoVsP0DpFc4sC1U0+rr/qR6Zi9n2g3sxXY+JfccjXjjruNz96tM8I09yaJUA86doRnNLkbg==}
+
+  polygon-clipping@0.15.7:
+    resolution: {integrity: sha512-nhfdr83ECBg6xtqOAJab1tbksbBAOMUltN60bU+llHVOL0e5Onm1WpAXXWXVB39L8AJFssoIhEVuy/S90MmotA==}
 
   postcss-calc@10.1.1:
     resolution: {integrity: sha512-NYEsLHh8DgG/PRH2+G9BTuUdtf9ViS+vdoQ0YA5OQdGsfN4ztiwtDWNtBl9EKeqNMFnIu8IKZ0cLxEQ5r5KVMw==}
@@ -2597,6 +2600,9 @@ packages:
     engines: {node: '>= 0.4'}
     hasBin: true
 
+  robust-predicates@3.0.3:
+    resolution: {integrity: sha512-NS3levdsRIUOmiJ8FZWCP7LG3QpJyrs/TE0Zpf1yvZu8cAJJ6QMW92H1c7kWpdIHo8RvmLxN/o2JXTKHp74lUA==}
+
   rolldown@1.0.2:
     resolution: {integrity: sha512-oZx5zVDtVB44AW3eaifgDml1gWRDZGvjcfdxonE4swNPG98PrrXjaO/KrnUjzlMnztCCRVlUueA1kCXhARGk6g==}
     engines: {node: ^20.19.0 || >=22.12.0}
@@ -2666,6 +2672,10 @@ packages:
 
   spdx-license-ids@3.0.23:
     resolution: {integrity: sha512-CWLcCCH7VLu13TgOH+r8p1O/Znwhqv/dbb6lqWy67G+pT1kHmeD/+V36AVb/vq8QMIQwVShJ6Ssl5FPh0fuSdw==}
+
+  splaytree@3.2.3:
+    resolution: {integrity: sha512-7OXrNWzy6CK+r7Ch9OLPBDTKfB6XlWHjX4P0RU5B3IgFuWPeYN0XtRtlexGRjgbQxpfaUve6jTAwBGWuGntz/w==}
+    engines: {node: '>=18.20 || >=20'}
 
   stackback@0.0.2:
     resolution: {integrity: sha512-1XMJE5fQo1jGH6Y/7ebnwPOBEkIEnT4QF32d5R1+VXdXveM0IBMJt8zfaxX1P3QhVwrYe+576+jkANtSS2mBbw==}
@@ -5228,16 +5238,17 @@ snapshots:
 
   modern-palette@2.0.0: {}
 
-  modern-path2d@1.7.0:
+  modern-path2d@1.8.0:
     dependencies:
       earcut: 3.0.2
+      polygon-clipping: 0.15.7
 
   modern-text@2.0.3:
     dependencies:
       diff: 9.0.0
       modern-font: 0.6.0
       modern-idoc: 0.11.8
-      modern-path2d: 1.7.0
+      modern-path2d: 1.8.0
 
   module-replacements@3.0.0-beta.7: {}
 
@@ -5331,6 +5342,11 @@ snapshots:
   pnpm-workspace-yaml@1.6.1:
     dependencies:
       yaml: 2.9.0
+
+  polygon-clipping@0.15.7:
+    dependencies:
+      robust-predicates: 3.0.3
+      splaytree: 3.2.3
 
   postcss-calc@10.1.1(postcss@8.5.15):
     dependencies:
@@ -5549,6 +5565,8 @@ snapshots:
       path-parse: 1.0.7
       supports-preserve-symlinks-flag: 1.0.0
 
+  robust-predicates@3.0.3: {}
+
   rolldown@1.0.2:
     dependencies:
       '@oxc-project/types': 0.132.0
@@ -5656,6 +5674,8 @@ snapshots:
       spdx-license-ids: 3.0.23
 
   spdx-license-ids@3.0.23: {}
+
+  splaytree@3.2.3: {}
 
   stackback@0.0.2: {}
 
