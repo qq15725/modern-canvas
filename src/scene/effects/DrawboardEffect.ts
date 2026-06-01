@@ -14,6 +14,12 @@ export interface DrawboardEffectProperties extends EffectProperties {
   checkerboard?: boolean
   checkerboardStyle?: CheckerboardStyle
   pixelGrid?: boolean
+  /** Override dot grid surface colour (0..1). Defaults to the dot/dotDark preset. */
+  dotBaseColor?: number
+  /** Override dot fill colour at the zoomed-out limit (0..1). */
+  dotColor?: number
+  /** Extra brightening of the dot when zooming in (0..1). */
+  dotZoomDiff?: number
   watermark?: string
   watermarkWidth?: number
   watermarkAlpha?: number
@@ -25,6 +31,9 @@ export class DrawboardEffect extends Effect {
   @property({ fallback: false }) declare checkerboard: boolean
   @property({ fallback: 'grid' }) declare checkerboardStyle: CheckerboardStyle
   @property({ fallback: false }) declare pixelGrid: boolean
+  @property() declare dotBaseColor?: number
+  @property() declare dotColor?: number
+  @property() declare dotZoomDiff?: number
   @property() declare watermark?: string
   @property({ fallback: 100 }) declare watermarkWidth: number
   @property({ fallback: 0.05 }) declare watermarkAlpha: number
@@ -65,6 +74,9 @@ void main() {
       case 'checkerboard':
       case 'checkerboardStyle':
       case 'pixelGrid':
+      case 'dotBaseColor':
+      case 'dotColor':
+      case 'dotZoomDiff':
         // these only feed the fragment shader; nothing else marks the effect
         // dirty, so request a re-render to reflect the change next frame
         this.requestRender()
@@ -112,9 +124,16 @@ void main() {
         : [0, 0]
       const watermarkMaxWh = Math.max(watermarkSize[0], watermarkSize[1])
 
-      const dot = this.checkerboardStyle === 'dotDark'
+      // pick the preset from the style, then allow per-property overrides so
+      // callers can theme freely without picking a new style enum
+      const preset = this.checkerboardStyle === 'dotDark'
         ? this._dotColors.dark
         : this._dotColors.light
+      const dot = {
+        base: this.dotBaseColor ?? preset.base,
+        zoomedOut: this.dotColor ?? preset.zoomedOut,
+        diff: this.dotZoomDiff ?? preset.diff,
+      }
 
       QuadUvGeometry.draw(renderer, DrawboardEffect.material, {
         uTexture: 0,
