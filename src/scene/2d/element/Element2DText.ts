@@ -28,6 +28,7 @@ export class Element2DText extends CoreObject implements NormalizedText {
   @property() declare effects: NormalizedText['effects']
   @property() declare fill: NormalizedText['fill']
   @property() declare outline: NormalizedText['outline']
+  @property() declare deformation: NormalizedText['deformation']
   @property({ alias: 'base.measureDom' }) declare measureDom: HTMLElement
   @property({ alias: 'base.fonts' }) declare fonts: Fonts
   @property({ fallback: 'auto' }) declare drawMode: TextDrawMode
@@ -80,6 +81,7 @@ export class Element2DText extends CoreObject implements NormalizedText {
       case 'fill':
       case 'outline':
       case 'content':
+      case 'deformation':
         this.load().then(() => {
           this._updateTextureMap()
         })
