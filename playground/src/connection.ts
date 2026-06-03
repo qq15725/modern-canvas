@@ -1,7 +1,10 @@
 import type { ConnectionMode, Element2D } from '../../src'
+import { fonts } from 'modern-font'
 import { Node } from '../../src'
 
 async function init(): Promise<void> {
+  // load a fallback font so the per-line label pills render legible glyphs
+  await fonts.loadFallbackFont({ family: 'fallbackFont', src: '/fonts/fallback.woff' })
   const { Engine } = await import('../../src')
   const engine = new Engine({ autoStart: true, autoResize: true })
   ;(window as any).engine = engine
