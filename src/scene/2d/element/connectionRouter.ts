@@ -173,9 +173,11 @@ function avoidObstacles(
     }
   }
   if (coord > zoneMin && coord < zoneMax) {
-    const above = zoneMin - stub
-    const below = zoneMax + stub
-    return Math.abs(coord - above) < Math.abs(coord - below) ? above : below
+    // Always step to the same side of the obstacle zone (toward smaller axis
+    // values). Picking the "closer" side would flip as the route's natural
+    // midpoint moved across the zone centre, making the route visibly twitch
+    // between top and bottom routings each frame as the target orbits.
+    return zoneMin - stub
   }
   return coord
 }
