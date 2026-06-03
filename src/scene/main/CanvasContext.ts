@@ -1,4 +1,4 @@
-import type { LineCap, LineJoin, LineStyle } from 'modern-path2d'
+import type { FillRule, LineCap, LineJoin, LineStyle } from 'modern-path2d'
 import type { Batchable2D, ColorValue } from '../../core'
 import { isColorFillObject } from 'modern-idoc'
 import { Path2D } from 'modern-path2d'
@@ -28,6 +28,7 @@ export interface FillDraw extends Partial<CanvasBatchable> {
 
 export class CanvasContext extends Path2D {
   fillStyle?: ColorValue | Texture2D
+  fillRule?: FillRule
   strokeStyle?: ColorValue | Texture2D
   strokeAlignment?: number
   lineCap?: LineCap
@@ -129,13 +130,24 @@ export class CanvasContext extends Path2D {
       }
     }
 
+    // capture the current sub-path geometry as the fill draw's path. `new
+    // Path2D(this)` copies only the curves, so we also carry over `fillRule`
+    // (set explicitly on this ctx or inherited from the source path's style)
+    // — without this, modern-path2d's fillTriangulate would always fall back
+    // to 'nonzero' and SVG <path fill-rule="evenodd"> holes would not punch.
+    const path = new Path2D(this)
+    const fillRule = this.fillRule ?? this.style.fillRule
+    if (fillRule) {
+      path.style.fillRule = fillRule
+    }
+
     this._draws.push({
       transformUv: this.transformUv,
       transformVertex: this.transformVertex,
       ...options,
       ...this._parseDrawStyle(fillStyle),
       type: 'fill',
-      path: new Path2D(this),
+      path,
     })
 
     this.resetStatus()
@@ -145,6 +157,7 @@ export class CanvasContext extends Path2D {
     super.copyFrom(source)
     this.strokeStyle = source.strokeStyle
     this.fillStyle = source.fillStyle
+    this.fillRule = source.fillRule
     this.transformUv = source.transformUv
     this.transformVertex = source.transformVertex
     this.strokeAlignment = source.strokeAlignment
@@ -160,6 +173,7 @@ export class CanvasContext extends Path2D {
     super.reset()
     this.strokeStyle = undefined
     this.fillStyle = undefined
+    this.fillRule = undefined
     this.transformUv = undefined
     this.transformVertex = undefined
     this.strokeAlignment = undefined

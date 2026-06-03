@@ -171,6 +171,13 @@ export class Element2DShape extends CoreObject implements NormalizedShape {
       const ctx = this._parent.context
       const { width, height } = this._parent.size
       this._path2DSet.paths.forEach((path) => {
+        // `ctx.addPath` only copies the path's curves, so any per-path style
+        // (currently just `fillRule`, set by svgToPath2DSet from a `fill-rule`
+        // attribute) has to be promoted onto the ctx explicitly — otherwise
+        // the subsequent fill always triangulates as 'nonzero'.
+        if (path.style?.fillRule) {
+          ctx.fillRule = path.style.fillRule
+        }
         ctx.addPath(path.clone().applyTransform(new Transform2D().scale(width, height)))
       })
     }
