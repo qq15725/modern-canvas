@@ -1,3 +1,20 @@
+# [0.23.0](https://github.com/qq15725/modern-canvas/compare/v0.22.0...v0.23.0) (2026-06-03)
+
+
+### Bug Fixes
+
+* **connection:** pick a stable side when routing around endpoint bboxes ([937e104](https://github.com/qq15725/modern-canvas/commit/937e104072eb34517a7c80684a116dc00c3d5ed4))
+* **deps:** bump modern-path2d to 1.8.0 ([5e05aeb](https://github.com/qq15725/modern-canvas/commit/5e05aeb95d32f42be2bfe696a59e338275a64bed))
+* **deps:** bump modern-path2d to 1.8.5 ([ea8cb76](https://github.com/qq15725/modern-canvas/commit/ea8cb76e64721fecdf736780ab449e7c3d0d24bb))
+* **shape:** propagate path fillRule through the fill pipeline ([eec5f4b](https://github.com/qq15725/modern-canvas/commit/eec5f4bc318d0493d20f94929f6c46d536888321))
+
+
+### Features
+
+* **connection:** arrowheads, labels, and obstacle-aware routing polish ([44e05f0](https://github.com/qq15725/modern-canvas/commit/44e05f00ac9a52220c8622f0255101dd6023b81e))
+* **drawboard:** expose dot grid colours and cover with tests ([b5beae6](https://github.com/qq15725/modern-canvas/commit/b5beae649d2f008c13ed2b7da7d3895fa23b6cb6))
+* **renderer:** injectable WebGL2 context provider for headless ([45d2cca](https://github.com/qq15725/modern-canvas/commit/45d2cca3d59d74e29e07883ea0723391c061d673))
+* **text:** expose deformation property on Element2DText ([632406f](https://github.com/qq15725/modern-canvas/commit/632406f2ded08bd4c15a3f9b632d1b5068bcc22d))
 # [0.22.0](https://github.com/qq15725/modern-canvas/compare/v0.21.3...v0.22.0) (2026-05-29)
 
 
