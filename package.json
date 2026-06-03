@@ -54,7 +54,7 @@
     "dev": "vite playground",
     "lint": "eslint src playground test",
     "version": "conventional-changelog -p angular -i CHANGELOG.md -s && git add CHANGELOG.md",
-    "release": "pnpm typecheck && pnpm lint && pnpm test --run && bumpp package.json --commit \"release: v%s\" --push --all --tag",
+    "release": "pnpm typecheck && pnpm lint && pnpm vitest run && bumpp package.json --commit \"release: v%s\" --push --all --tag",
     "start": "esno src/index.ts",
     "test": "vitest",
     "typecheck": "tsc --noEmit"
