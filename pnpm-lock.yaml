@@ -18,8 +18,8 @@ importers:
         specifier: ^0.6.0
         version: 0.6.0
       modern-idoc:
-        specifier: ^0.11.8
-        version: 0.11.8
+        specifier: ^0.11.9
+        version: 0.11.9
       modern-path2d:
         specifier: ^1.8.5
         version: 1.8.5
@@ -2247,8 +2247,8 @@ packages:
   modern-gif@2.1.0:
     resolution: {integrity: sha512-9ZGD5b4jNUge0fvFP1bd9Hsqz5CSZI1al3EhCJ+WFkZgmn5NO1yvVwXJA/LTqro85l2Gt0+S0dDFgVYhYtLLWg==}
 
-  modern-idoc@0.11.8:
-    resolution: {integrity: sha512-wOwGx2PCr/FeC1BjgEMf9gW68VfzE3IPlrfuBJnrHiPmE/V9UqtsOTt1+4NaRWJAP1uylWRj//xB2Az+NqsfHQ==}
+  modern-idoc@0.11.9:
+    resolution: {integrity: sha512-MM/FUzhcCs8kjWE7blFM8vh1rQc5kkpfvbk3X34oIJGz7coz6CObbet4I9GxvFHChTaLdDviiHlT62UhFwHQBQ==}
 
   modern-palette@2.0.0:
     resolution: {integrity: sha512-wKZcom2QzK6sS6h5RLYHEkd3V3maQLzgkI+ekDCimlk7dfXa63aekZcy+7KS+8JEqIDeY/yV1CAvA7l+7u6QHA==}
@@ -3664,8 +3664,8 @@ snapshots:
 
   '@typescript-eslint/project-service@8.56.1(typescript@6.0.3)':
     dependencies:
-      '@typescript-eslint/tsconfig-utils': 8.56.1(typescript@6.0.3)
-      '@typescript-eslint/types': 8.56.1
+      '@typescript-eslint/tsconfig-utils': 8.60.1(typescript@6.0.3)
+      '@typescript-eslint/types': 8.60.1
       debug: 4.4.3
       typescript: 6.0.3
     transitivePeerDependencies:
@@ -5227,7 +5227,7 @@ snapshots:
     dependencies:
       modern-palette: 2.0.0
 
-  modern-idoc@0.11.8:
+  modern-idoc@0.11.9:
     dependencies:
       colord: 2.9.3
       nanoid: 5.1.11
@@ -5243,7 +5243,7 @@ snapshots:
     dependencies:
       diff: 9.0.0
       modern-font: 0.6.0
-      modern-idoc: 0.11.8
+      modern-idoc: 0.11.9
       modern-path2d: 1.8.5
 
   module-replacements@3.0.0-beta.8: {}

@@ -5,6 +5,7 @@ import type {
   Display,
   Fill,
   Foreground,
+  NormalizedFilter,
   Outline,
   Shadow,
   Shape,
@@ -20,7 +21,7 @@ import type {
 import type { Node, Rectangulable, RectangulableEvents, SceneTree, Viewport } from '../../main'
 import type { Node2DEvents, Node2DProperties } from '../Node2D'
 import type { Element2DStyleProperties } from './Element2DStyle'
-import { clearUndef, getDefaultLayoutStyle, getDefaultTextStyle, isNone } from 'modern-idoc'
+import { clearUndef, getDefaultLayoutStyle, getDefaultTextStyle, isNone, stringifyFilter } from 'modern-idoc'
 import { Transform2D, Vector2 } from 'modern-path2d'
 import {
   Aabb2D,
@@ -68,6 +69,8 @@ export interface Element2DProperties extends Node2DProperties {
   connection: Connection
   table: Table
   chart: Chart
+  /** 元素级结构化滤镜（Effect.filter），转成 CSS filter 后与 style.filter 合并 */
+  filter: NormalizedFilter
 }
 
 const layoutStyle = new Set(Object.keys(getDefaultLayoutStyle()))
@@ -192,6 +195,7 @@ export class Element2D extends Node2D implements Rectangulable {
           connection,
           table,
           chart,
+          filter,
           ...restProperties
         } = properties
         style && this.style.setProperties(style)
@@ -205,6 +209,7 @@ export class Element2D extends Node2D implements Rectangulable {
         connection && this.connection.setProperties(connection)
         table && this.table.setProperties(table)
         chart && this.chart.setProperties(chart)
+        this._updateElementFilter(filter)
         super.setProperties(restProperties)
       }
       finally {
@@ -512,8 +517,26 @@ export class Element2D extends Node2D implements Rectangulable {
     )
   }
 
+  // style.filter（CSS 字符串）
+  protected _styleFilter?: string
+  // element.filter（结构化 Filter）转成的 CSS 字符串
+  protected _elementFilter?: string
+
   protected _updateStyleFilter(value?: string): void {
-    if (!isNone(value)) {
+    this._styleFilter = isNone(value) ? undefined : value
+    this._applyColorFilter()
+  }
+
+  /** 元素级结构化滤镜 Effect.filter → CSS filter，与 style.filter 合并 */
+  protected _updateElementFilter(filter?: NormalizedFilter): void {
+    const css = filter ? stringifyFilter(filter) : ''
+    this._elementFilter = css || undefined
+    this._applyColorFilter()
+  }
+
+  protected _applyColorFilter(): void {
+    const filter = [this._styleFilter, this._elementFilter].filter(Boolean).join(' ').trim()
+    if (filter) {
       if (!this._colorFilterEffect) {
         this._colorFilterEffect = new ColorFilterEffect({
           name: 'styleFilter',
@@ -521,7 +544,7 @@ export class Element2D extends Node2D implements Rectangulable {
         })
         this.append(this._colorFilterEffect)
       }
-      this._colorFilterEffect.filter = value
+      this._colorFilterEffect.filter = filter
     }
     else {
       this._colorFilterEffect?.remove()
