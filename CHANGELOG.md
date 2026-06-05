@@ -1,3 +1,14 @@
+## [0.23.1](https://github.com/qq15725/modern-canvas/compare/v0.23.0...v0.23.1) (2026-06-05)
+
+
+### Bug Fixes
+
+* **tooling:** use `pnpm vitest run` in the release pre-gate ([018c8de](https://github.com/qq15725/modern-canvas/commit/018c8deb8a34b384a80f2d9bbbf53d0366e6d13f))
+
+
+### Features
+
+* render Effect.filter and bake foreground.effects layers ([84a58ed](https://github.com/qq15725/modern-canvas/commit/84a58ed3f0c4793a745896b60a54bed6e7f0b8be))
 # [0.23.0](https://github.com/qq15725/modern-canvas/compare/v0.22.0...v0.23.0) (2026-06-03)
 
 
