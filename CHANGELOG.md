@@ -1,3 +1,9 @@
+## [0.23.5](https://github.com/qq15725/modern-canvas/compare/v0.23.4...v0.23.5) (2026-06-06)
+
+
+### Bug Fixes
+
+* **2d:** always decode foreground bake source independently of texture.source ([8cd2f5c](https://github.com/qq15725/modern-canvas/commit/8cd2f5c9f0e79a44669e94274085d5b9d1ee3066))
 ## [0.23.4](https://github.com/qq15725/modern-canvas/compare/v0.23.3...v0.23.4) (2026-06-06)
 
 
