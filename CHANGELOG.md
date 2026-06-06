@@ -1,3 +1,9 @@
+## [0.23.3](https://github.com/qq15725/modern-canvas/compare/v0.23.2...v0.23.3) (2026-06-06)
+
+
+### Bug Fixes
+
+* **2d:** decode an independent CPU copy for foreground effect baking ([d251c31](https://github.com/qq15725/modern-canvas/commit/d251c31878e28fe4f65b55e6028dce6d272a5e10))
 ## [0.23.2](https://github.com/qq15725/modern-canvas/compare/v0.23.1...v0.23.2) (2026-06-06)
 
 
