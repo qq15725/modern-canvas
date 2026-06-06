@@ -1,3 +1,9 @@
+## [0.23.2](https://github.com/qq15725/modern-canvas/compare/v0.23.1...v0.23.2) (2026-06-06)
+
+
+### Bug Fixes
+
+* **2d:** bake foreground effects from a CPU snapshot to avoid detached ImageBitmap ([393109b](https://github.com/qq15725/modern-canvas/commit/393109b6c6b74bbeccdcc0395083ffa3e23b5b4d))
 ## [0.23.1](https://github.com/qq15725/modern-canvas/compare/v0.23.0...v0.23.1) (2026-06-05)
 
 
