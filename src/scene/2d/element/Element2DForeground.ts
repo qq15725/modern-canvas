@@ -2,7 +2,7 @@ import type { Foreground, NormalizedEffect, NormalizedForeground } from 'modern-
 import { isNone, normalizeForeground, property } from 'modern-idoc'
 import { assets } from '../../../asset'
 import { createHTMLCanvas, SUPPORTS_IMAGE_BITMAP } from '../../../core'
-import { CanvasTexture } from '../../resources'
+import { Texture2D } from '../../resources'
 import { bakeImageEffects } from './bakeImageEffects'
 import { Element2DFill } from './Element2DFill'
 
@@ -65,7 +65,9 @@ export class Element2DForeground extends Element2DFill implements NormalizedFore
     const w = base.width
     const h = base.height
     const canvas = bakeImageEffects(base, this.effects, w, h)
-    this.texture = new CanvasTexture({ source: canvas, width: w, height: h })
+    // 必须用普通 Texture2D 包裹烘焙结果，不能用 CanvasTexture：后者在设置
+    // width/height 时会 `source.width = ...` 重设 canvas，从而清空已烘焙的像素 → 前景空白。
+    this.texture = new Texture2D({ source: canvas, width: w, height: h, uploadMethodId: 'image' })
   }
 
   /**
