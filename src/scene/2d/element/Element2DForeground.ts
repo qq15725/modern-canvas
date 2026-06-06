@@ -1,9 +1,12 @@
 import type { Foreground, NormalizedEffect, NormalizedForeground } from 'modern-idoc'
 import { isNone, normalizeForeground, property } from 'modern-idoc'
-import { createHTMLCanvas } from '../../../core'
+import { assets } from '../../../asset'
+import { createHTMLCanvas, SUPPORTS_IMAGE_BITMAP } from '../../../core'
 import { CanvasTexture } from '../../resources'
 import { bakeImageEffects } from './bakeImageEffects'
 import { Element2DFill } from './Element2DFill'
+
+type Snapshotable = CanvasImageSource & { width: number, height: number }
 
 export class Element2DForeground extends Element2DFill implements NormalizedForeground {
   @property() declare fillWithShape: NormalizedForeground['fillWithShape']
@@ -11,12 +14,16 @@ export class Element2DForeground extends Element2DFill implements NormalizedFore
   @property() declare effects?: NormalizedEffect[]
 
   /**
-   * 原图的 CPU 副本（HTMLCanvas），在纹理刚加载、source 仍存活时拍下。
-   * 用于烘焙 effects：纹理的 ImageBitmap source 上传 GPU 后可能被
-   * `close()`（detached，width/height 归零），此时直接 drawImage 会抛
-   * InvalidStateError，故始终从这份不会失效的副本烘焙。
+   * 原图的 CPU 副本（HTMLCanvas），供烘焙 effects 使用。
+   *
+   * 不能依赖 `this.texture.source`：那是张 ImageBitmap，经 GPU 上传 / 资源 GC 后
+   * 会被 `close()`（detached，width/height 归零），此时 drawImage 会抛
+   * `InvalidStateError`。实测纹理加载返回时 source 往往已是 detached，故这份副本
+   * 必须从图片自身独立解码（见 `_resolveSourceCanvas`），与 GPU 纹理生命周期解耦。
    */
   protected _sourceCanvas?: HTMLCanvasElement
+  /** `_sourceCanvas` 对应的图片地址，image 变更时用于失效旧副本 */
+  protected _sourceImage?: string
 
   override setProperties(properties?: Foreground): this {
     return super._setProperties(
@@ -42,32 +49,69 @@ export class Element2DForeground extends Element2DFill implements NormalizedFore
 
   override async loadTexture(): Promise<void> {
     await super.loadTexture()
-    this._applyEffects()
+    await this._applyEffects()
   }
 
-  /** 把原纹理 + effects 烘焙成一张运行时 canvas，包成 CanvasTexture（gif/无 effects 时跳过） */
-  protected _applyEffects(): void {
-    if (!this.effects?.length || this.animatedTexture || !this.texture)
+  /** 把原图 + effects 烘焙成一张运行时 canvas，包成 CanvasTexture（gif/无 effects 时跳过） */
+  protected async _applyEffects(): Promise<void> {
+    if (!this.effects?.length || this.animatedTexture || !this.texture) {
+      this._sourceCanvas = undefined
+      this._sourceImage = undefined
       return
-    const source = this.texture.source as any
-    // source 存活（未被 close）时刷新 CPU 副本；detached 的 ImageBitmap
-    // 其 width/height 为 0，此时退回上一份副本，避免 drawImage 抛错。
-    if (source && source.width > 0 && source.height > 0) {
-      const w = Math.max(1, Math.round(source.width))
-      const h = Math.max(1, Math.round(source.height))
-      const snapshot = createHTMLCanvas(w, h)
-      const ctx = snapshot?.getContext('2d')
-      if (snapshot && ctx) {
-        ctx.drawImage(source, 0, 0, w, h)
-        this._sourceCanvas = snapshot
-      }
     }
-    const base = this._sourceCanvas
+    const base = await this._resolveSourceCanvas()
     if (!base)
       return
     const w = base.width
     const h = base.height
     const canvas = bakeImageEffects(base, this.effects, w, h)
     this.texture = new CanvasTexture({ source: canvas, width: w, height: h })
+  }
+
+  /**
+   * 取得用于烘焙的 CPU 副本：
+   * 1) 若纹理 source 仍存活（width>0），直接快照（省一次解码）；
+   * 2) 否则从 image 重新解码一份（资源层按 url 缓存复用，避免重复烘焙时反复解码）。
+   */
+  protected async _resolveSourceCanvas(): Promise<HTMLCanvasElement | undefined> {
+    if (this._sourceImage !== this.image) {
+      this._sourceCanvas = undefined
+      this._sourceImage = this.image
+    }
+
+    const live = this.texture?.source as Snapshotable | undefined
+    if (live && live.width > 0 && live.height > 0) {
+      return (this._sourceCanvas = this._snapshot(live))
+    }
+
+    if (this._sourceCanvas)
+      return this._sourceCanvas
+
+    if (isNone(this.image) || this.image === 'viewport')
+      return undefined
+
+    const url = this.image
+    const canvas = await assets.loadBy(`${url}#mc-foreground-source`, async () => {
+      const bitmap = await assets.fetchImageBitmap(url)
+      const snapshot = this._snapshot(bitmap as unknown as Snapshotable)
+      if (SUPPORTS_IMAGE_BITMAP && bitmap instanceof ImageBitmap)
+        bitmap.close()
+      return snapshot
+    })
+    if (this._sourceImage === url)
+      this._sourceCanvas = canvas
+    return canvas
+  }
+
+  /** 把一张存活的图源画进新 canvas（不会被 close，可反复用于烘焙） */
+  protected _snapshot(source: Snapshotable): HTMLCanvasElement | undefined {
+    const w = Math.max(1, Math.round(source.width))
+    const h = Math.max(1, Math.round(source.height))
+    const canvas = createHTMLCanvas(w, h)
+    const ctx = canvas?.getContext('2d')
+    if (!canvas || !ctx)
+      return undefined
+    ctx.drawImage(source, 0, 0, w, h)
+    return canvas
   }
 }
