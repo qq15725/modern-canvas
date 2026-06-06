@@ -16,10 +16,11 @@ export class Element2DForeground extends Element2DFill implements NormalizedFore
   /**
    * 原图的 CPU 副本（HTMLCanvas），供烘焙 effects 使用。
    *
-   * 不能依赖 `this.texture.source`：那是张 ImageBitmap，经 GPU 上传 / 资源 GC 后
-   * 会被 `close()`（detached，width/height 归零），此时 drawImage 会抛
-   * `InvalidStateError`。实测纹理加载返回时 source 往往已是 detached，故这份副本
-   * 必须从图片自身独立解码（见 `_resolveSourceCanvas`），与 GPU 纹理生命周期解耦。
+   * 刻意不读 `this.texture.source`：那张 ImageBitmap 由纹理管线持有，会经 GPU
+   * 上传（premultiply）/ 资源 GC 而被消费或 `close()`，其内容与尺寸随运行环境
+   * （含 headless / 自定义 canvas factory）漂移——实测过空白、尺寸异常（如
+   * 3552×3552 全透明）。这份副本一律由 `_resolveSourceCanvas` 从 image 独立解码，
+   * 与 GPU 纹理生命周期彻底解耦。
    */
   protected _sourceCanvas?: HTMLCanvasElement
   /** `_sourceCanvas` 对应的图片地址，image 变更时用于失效旧副本 */
@@ -52,7 +53,7 @@ export class Element2DForeground extends Element2DFill implements NormalizedFore
     await this._applyEffects()
   }
 
-  /** 把原图 + effects 烘焙成一张运行时 canvas，包成 CanvasTexture（gif/无 effects 时跳过） */
+  /** 把原图 + effects 烘焙成一张运行时纹理（gif/无 effects 时跳过） */
   protected async _applyEffects(): Promise<void> {
     if (!this.effects?.length || this.animatedTexture || !this.texture) {
       this._sourceCanvas = undefined
@@ -71,19 +72,14 @@ export class Element2DForeground extends Element2DFill implements NormalizedFore
   }
 
   /**
-   * 取得用于烘焙的 CPU 副本：
-   * 1) 若纹理 source 仍存活（width>0），直接快照（省一次解码）；
-   * 2) 否则从 image 重新解码一份（资源层按 url 缓存复用，避免重复烘焙时反复解码）。
+   * 取得用于烘焙的 CPU 副本：始终从 image 独立解码一份（createImageBitmap 保证解码
+   * 就绪），快照进 canvas，按 url 在资源层缓存复用。不读 `this.texture.source`——见
+   * `_sourceCanvas` 注释。只缓存真正拿到的副本，避免把空/未就绪结果钉死。
    */
   protected async _resolveSourceCanvas(): Promise<HTMLCanvasElement | undefined> {
     if (this._sourceImage !== this.image) {
       this._sourceCanvas = undefined
       this._sourceImage = this.image
-    }
-
-    const live = this.texture?.source as Snapshotable | undefined
-    if (live && live.width > 0 && live.height > 0) {
-      return (this._sourceCanvas = this._snapshot(live))
     }
 
     if (this._sourceCanvas)
@@ -100,7 +96,8 @@ export class Element2DForeground extends Element2DFill implements NormalizedFore
         bitmap.close()
       return snapshot
     })
-    if (this._sourceImage === url)
+    // 只缓存真正拿到的副本，避免把空/未就绪结果钉死
+    if (this._sourceImage === url && canvas)
       this._sourceCanvas = canvas
     return canvas
   }
