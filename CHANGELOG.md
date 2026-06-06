@@ -1,3 +1,9 @@
+## [0.23.4](https://github.com/qq15725/modern-canvas/compare/v0.23.3...v0.23.4) (2026-06-06)
+
+
+### Bug Fixes
+
+* **2d:** wrap baked foreground effects in Texture2D, not CanvasTexture ([a10569f](https://github.com/qq15725/modern-canvas/commit/a10569f8c7755394813c81c1dcc260af7cb94b91))
 ## [0.23.3](https://github.com/qq15725/modern-canvas/compare/v0.23.2...v0.23.3) (2026-06-06)
 
 
