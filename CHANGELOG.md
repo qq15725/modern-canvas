@@ -1,3 +1,9 @@
+## [0.23.6](https://github.com/qq15725/modern-canvas/compare/v0.23.5...v0.23.6) (2026-06-10)
+
+
+### Bug Fixes
+
+* **2d:** fall back to solid color when gradient size/angle is non-finite ([9fd18da](https://github.com/qq15725/modern-canvas/commit/9fd18da34e76a730aa2225cb7476f929473f76c8))
 ## [0.23.5](https://github.com/qq15725/modern-canvas/compare/v0.23.4...v0.23.5) (2026-06-06)
 
 
