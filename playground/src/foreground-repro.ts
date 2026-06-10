@@ -37,7 +37,7 @@ function opaqueFrac(source: any): number {
     }
     return op / (data.length / 4)
   }
-  catch (e) {
+  catch {
     return Number.NaN
   }
 }
