@@ -18,11 +18,11 @@ interface Case {
 const cases: Case[] = [
   // 同一张 url 既无 effects（先上传）又带 effects（后烘焙）——正是触发 detached 的组合
   { label: 'no effects', image: '/example.png' },
-  { label: 'outline', image: '/mask1.png', effects: [{ outline: { width: 8, color: '#FF3366' } }] },
-  { label: 'fill recolor', image: '/mask1.png', effects: [{ fill: { color: '#22CCAA' } }] },
+  { label: 'outline', image: '/example.png', effects: [{ outline: { width: 8, color: '#FF3366' } }] },
+  { label: 'fill recolor', image: '/example.png', effects: [{ fill: { color: '#22CCAA' } }] },
   {
     label: 'fill gradient',
-    image: '/mask1.png',
+    image: '/example.png',
     effects: [{
       fill: {
         linearGradient: {
@@ -38,7 +38,7 @@ const cases: Case[] = [
   { label: 'shadow', image: '/example.png', effects: [{ shadow: { color: '#000000AA', blur: 16, offsetX: 8, offsetY: 8 } }] },
   {
     label: 'translate ghost',
-    image: '/mask1.png',
+    image: '/example.png',
     effects: [
       { fill: { color: '#FF8800' }, transform: 'translate(16px, 16px)' },
       {}, // 末层不变换 → destination-over 把原图铺在幽灵之后
@@ -46,7 +46,7 @@ const cases: Case[] = [
   },
   {
     label: 'double outline',
-    image: '/mask1.png',
+    image: '/example.png',
     effects: [
       { outline: { width: 6, color: '#FFFFFF' } }, // 先画细白边（在上）
       { outline: { width: 16, color: '#0EA5E9' } }, // 粗青边 destination-over 落在其后 → 同心双描边
@@ -54,7 +54,7 @@ const cases: Case[] = [
   },
   {
     label: 'outline + shadow',
-    image: '/mask1.png',
+    image: '/example.png',
     effects: [
       { outline: { width: 6, color: '#FACC15' } },
       { shadow: { color: '#00000099', blur: 14, offsetX: 6, offsetY: 6 } },
