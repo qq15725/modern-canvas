@@ -41,8 +41,8 @@ describe('bakeImageEffects compositing', () => {
   function bake(effects: any[]): any {
     setCanvasFactory(recordingCanvas)
     const source: any = { width: 100, height: 100 }
-    bakeImageEffects(source, effects, 100, 100)
-    return created[0] // out 是首个创建的 canvas
+    // 直接用返回值：含描边/位移时会先建 inset canvas 内缩主体留边距，created[0] 不再是 out
+    return bakeImageEffects(source, effects, 100, 100)
   }
 
   it('每层都以 destination-over 合成', () => {

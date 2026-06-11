@@ -104,11 +104,29 @@ export function bakeImageEffects(
 ): HTMLCanvasElement {
   const w = Math.max(1, Math.round(width))
   const h = Math.max(1, Math.round(height))
+
+  // 实心图填满画布时，描边会超出画布被裁、位移阴影被主图盖住而完全不可见（来源编辑器靠把主体内缩留边距解决）。
+  // 故按各层最大描边宽 / 位移量内缩主体、四周留出边距，让描边/位移落在可见区（边距上限 20%，防主体过小）。
+  let pad = 0
+  for (const e of effects) {
+    if (e.outline?.width && e.outline.color)
+      pad = Math.max(pad, e.outline.width)
+    const t = parseTranslate(e.transform)
+    pad = Math.max(pad, Math.abs(t.x), Math.abs(t.y))
+  }
+  pad = Math.min(Math.ceil(pad), Math.floor(Math.min(w, h) * 0.2))
+  let base: Drawable = source
+  if (pad > 0) {
+    const inset = createHTMLCanvas(w, h)!
+    ctxOf(inset).drawImage(source, pad, pad, Math.max(1, w - pad * 2), Math.max(1, h - pad * 2))
+    base = inset
+  }
+
   const out = createHTMLCanvas(w, h)!
   const ctx = ctxOf(out)
 
   for (const effect of effects) {
-    let layer: Drawable = source
+    let layer: Drawable = base
 
     if (effect.fill && (effect.fill.color || effect.fill.linearGradient || effect.fill.image)) {
       layer = fillSilhouette(layer, w, h, effect.fill, patterns)
