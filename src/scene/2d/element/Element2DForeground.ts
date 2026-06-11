@@ -65,10 +65,34 @@ export class Element2DForeground extends Element2DFill implements NormalizedFore
       return
     const w = base.width
     const h = base.height
-    const canvas = bakeImageEffects(base, this.effects, w, h)
+    const patterns = await this._resolvePatterns()
+    const canvas = bakeImageEffects(base, this.effects, w, h, patterns)
     // 必须用普通 Texture2D 包裹烘焙结果，不能用 CanvasTexture：后者在设置
     // width/height 时会 `source.width = ...` 重设 canvas，从而清空已烘焙的像素 → 前景空白。
     this.texture = new Texture2D({ source: canvas, width: w, height: h, uploadMethodId: 'image' })
+  }
+
+  /**
+   * 预解码 effects 里 fill.image 用到的图案。烘焙是同步的，图案须先就绪；
+   * 按 url 在资源层缓存复用，未提供的图案在烘焙时会被跳过（不重上色）。
+   */
+  protected async _resolvePatterns(): Promise<Record<string, HTMLCanvasElement>> {
+    const patterns: Record<string, HTMLCanvasElement> = {}
+    for (const effect of this.effects ?? []) {
+      const image = (effect.fill as { image?: string } | undefined)?.image
+      if (!image || isNone(image) || patterns[image])
+        continue
+      const canvas = await assets.loadBy(`${image}#mc-foreground-pattern`, async () => {
+        const bitmap = await assets.fetchImageBitmap(image)
+        const snapshot = this._snapshot(bitmap as unknown as Snapshotable)
+        if (SUPPORTS_IMAGE_BITMAP && bitmap instanceof ImageBitmap)
+          bitmap.close()
+        return snapshot
+      })
+      if (canvas)
+        patterns[image] = canvas
+    }
+    return patterns
   }
 
   /**

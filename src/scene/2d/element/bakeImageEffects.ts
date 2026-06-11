@@ -87,7 +87,11 @@ function parseTranslate(transform?: string): { x: number, y: number } {
 
 /**
  * 把 `原图 + effects` 烘焙到一张运行时 canvas（不持久化、不转存图片）。
- * 每层按顺序：fill 重上色 → outline 描边 → 按 transform 位移 / shadow 投影合成。
+ * 每层按顺序：fill 重上色 → outline 描边 → 按 transform 位移 / shadow 投影后合成。
+ *
+ * 合成统一用 destination-over：数组按「前 → 后」堆叠（第 0 层在最上，后续依次落到其后），
+ * transform translate 只决定该层落点、不改变堆叠次序。于是「原图层 `{}` 在前 + 位移填充层在后」
+ * 即得到「主图在上、彩色副本作为阴影/重影偏移到背后」——与来源编辑器的图片样式一致。
  *
  * 注意：图案填充（fill.image）需异步预加载，未在 patterns 中提供则跳过该填充。
  */
@@ -117,19 +121,15 @@ export function bakeImageEffects(
     const { x, y } = parseTranslate(effect.transform)
 
     ctx.save()
+    // 统一 destination-over：层按数组顺序前→后堆叠，translate 仅决定落点（含位移阴影/重影）。
+    ctx.globalCompositeOperation = 'destination-over'
     if (effect.shadow) {
       ctx.shadowColor = effect.shadow.color
       ctx.shadowBlur = effect.shadow.blur ?? 0
       ctx.shadowOffsetX = effect.shadow.offsetX ?? 0
       ctx.shadowOffsetY = effect.shadow.offsetY ?? 0
     }
-    if (x || y) {
-      ctx.drawImage(layer, x, y, w, h)
-    }
-    else {
-      ctx.globalCompositeOperation = 'destination-over'
-      ctx.drawImage(layer, 0, 0, w, h)
-    }
+    ctx.drawImage(layer, x, y, w, h)
     ctx.restore()
   }
 
