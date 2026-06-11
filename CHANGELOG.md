@@ -1,3 +1,9 @@
+## [0.23.9](https://github.com/qq15725/modern-canvas/compare/v0.23.8...v0.23.9) (2026-06-11)
+
+
+### Bug Fixes
+
+* **2d:** inset baked subject to keep stroke/offset visible on opaque images ([22bbc97](https://github.com/qq15725/modern-canvas/commit/22bbc9712c3e5c668100e058bc10a60907f4bc0e))
 ## [0.23.8](https://github.com/qq15725/modern-canvas/compare/v0.23.7...v0.23.8) (2026-06-11)
 
 
