@@ -1,3 +1,9 @@
+## [0.23.8](https://github.com/qq15725/modern-canvas/compare/v0.23.7...v0.23.8) (2026-06-11)
+
+
+### Bug Fixes
+
+* **2d:** composite foreground effect layers behind via destination-over and preload pattern fills ([0cc00c0](https://github.com/qq15725/modern-canvas/commit/0cc00c09b95dcb0aec3ad72f484bff37e6a7daf5))
 ## [0.23.7](https://github.com/qq15725/modern-canvas/compare/v0.23.6...v0.23.7) (2026-06-10)
 ## [0.23.6](https://github.com/qq15725/modern-canvas/compare/v0.23.5...v0.23.6) (2026-06-10)
 
