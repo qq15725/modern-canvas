@@ -1,3 +1,9 @@
+## [0.23.10](https://github.com/qq15725/modern-canvas/compare/v0.23.9...v0.23.10) (2026-06-16)
+
+
+### Features
+
+* **2d:** render offset-path motion animation (offsetPath/offsetDistance/offsetRotate) ([62e37b2](https://github.com/qq15725/modern-canvas/commit/62e37b218dd44b828c9b4987213e374b75297c4e))
 ## [0.23.9](https://github.com/qq15725/modern-canvas/compare/v0.23.8...v0.23.9) (2026-06-11)
 
 
