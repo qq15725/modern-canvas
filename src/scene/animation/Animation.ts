@@ -1,9 +1,45 @@
 import type { CssFunction, CssFunctionArg } from '../../core'
 import type { Node, TimelineNodeProperties } from '../main'
 import { property, RawWeakMap } from 'modern-idoc'
+import { Path2D, PathMeasure } from 'modern-path2d'
 import { Element2D } from '../2d'
 import { clamp, customNode, getDefaultCssPropertyValue, lerp, parseCssProperty } from '../../core'
 import { TimelineNode } from '../main'
+
+/** offsetDistance（"100%" / "50%" / 数字）→ 0..1 比例（运动路径进度） */
+function parseOffsetDistance(value: unknown): number {
+  if (value == null)
+    return 0
+  const s = String(value).trim()
+  const n = Number.parseFloat(s)
+  // 数据约定按百分比（"100%" / 100 都按百分比处理）
+  return Number.isNaN(n) ? 0 : n / 100
+}
+
+/** 解析 offset-rotate：auto=沿切线、reverse=切线+180、auto<deg>=切线+偏移、<deg>=固定角。返回角度(deg) */
+function resolveOffsetRotate(value: unknown, angleRad: number): number {
+  const tangentDeg = (angleRad * 180) / Math.PI
+  if (value == null || value === 'auto')
+    return tangentDeg
+  const s = String(value).trim()
+  if (s === 'reverse')
+    return tangentDeg + 180
+  if (s.startsWith('auto'))
+    return tangentDeg + (Number.parseFloat(s.slice(4)) || 0)
+  const n = Number.parseFloat(s)
+  return Number.isNaN(n) ? tangentDeg : n
+}
+
+/** 从 offsetPath（`path("M ...")` 或裸 d 字符串）取出 svg path data */
+function parseOffsetPathData(value: string): string {
+  let s = value.trim()
+  const m = /^path\((.*)\)$/s.exec(s)
+  if (m)
+    s = m[1].trim()
+  if (s.length >= 2 && (s[0] === '"' || s[0] === '\'') && s[s.length - 1] === s[0])
+    s = s.slice(1, -1)
+  return s.trim()
+}
 
 export const linear = (amount: number): number => amount
 export const ease = cubicBezier(0.25, 0.1, 0.25, 1)
@@ -125,6 +161,8 @@ export class Animation extends TimelineNode {
   protected _isFirstUpdatePosition = false
   protected _cachedProps = new RawWeakMap<any, Map<string, any>>()
   protected _stoped = false
+  // 运动路径测量缓存（按 svg path data 字符串复用：构造 Path2D + 量取起点开销大）
+  protected _pathMeasures = new Map<string, { measure: PathMeasure, startX: number, startY: number }>()
 
   constructor(properties?: Partial<AnimationProperties>, children: Node[] = []) {
     super()
@@ -175,6 +213,7 @@ export class Animation extends TimelineNode {
   }
 
   protected _updateKeyframes(): void {
+    this._pathMeasures.clear() // 关键帧变了，运动路径缓存失效
     const keyframes: NormalizedKeyframe[] = []
     const items = this.keyframes
     for (let len = items.length, i = 0; i < len; i++) {
@@ -248,6 +287,8 @@ export class Animation extends TimelineNode {
 
   protected _updateCachedProps(): void {
     this.cancel()
+    // 运动路径动画用 transform 实现位移：缓存原始 transform，使其随其它属性一起被还原（cancel）
+    const hasOffsetPath = this._keyframes.some(k => 'offsetPath' in k.props)
     this._getTargets().forEach((target) => {
       const startProps = new Map<string, any>()
       const keyframes = this._keyframes
@@ -256,6 +297,8 @@ export class Animation extends TimelineNode {
           startProps.set(name, (target.style as any)[name])
         })
       }
+      if (hasOffsetPath)
+        startProps.set('transform', (target.style as any).transform)
       this._cachedProps.set(target, startProps)
     })
   }
@@ -319,7 +362,19 @@ export class Animation extends TimelineNode {
       fontSize: target.style.fontSize,
     }
 
+    // 运动路径：offsetPath/offsetDistance/offsetRotate 不是真实 style，按路径采样合成 transform 位移(+旋转)
+    const offsetPath = currentProps.offsetPath ?? previousProps.offsetPath
+    const hasOffsetPath = offsetPath != null
+    if (hasOffsetPath) {
+      this._commitOffsetPath(target, String(offsetPath), startProps, previousProps, currentProps, weight)
+    }
+
     startProps.forEach((_, name) => {
+      // offset-* 由 _commitOffsetPath 处理；transform 在路径动画里由其独占，避免被插值清掉
+      if (name === 'offsetPath' || name === 'offsetDistance' || name === 'offsetRotate')
+        return
+      if (hasOffsetPath && name === 'transform')
+        return
       target.onUpdateStyleProperty(
         name,
         this._getDiffValue(
@@ -332,6 +387,41 @@ export class Animation extends TimelineNode {
         undefined,
       )
     })
+  }
+
+  /** 按运动路径采样：在 offsetPath 上取 offsetDistance 处的点，合成为 transform 的位移(+offsetRotate 旋转) */
+  protected _commitOffsetPath(
+    target: Element2D,
+    offsetPath: string,
+    startProps: Map<string, any>,
+    previousProps: Record<string, any>,
+    currentProps: Record<string, any>,
+    weight: number,
+  ): void {
+    const d = parseOffsetPathData(offsetPath)
+    if (!d)
+      return
+    let cached = this._pathMeasures.get(d)
+    if (!cached) {
+      const measure = new PathMeasure(new Path2D(d) as any)
+      const start = measure.getPosTanAtProgress(0).position
+      cached = { measure, startX: start.x, startY: start.y }
+      this._pathMeasures.set(d, cached)
+    }
+    const from = parseOffsetDistance(previousProps.offsetDistance ?? currentProps.offsetDistance)
+    const to = parseOffsetDistance(currentProps.offsetDistance ?? previousProps.offsetDistance)
+    const t = clamp(lerp(from, to, weight), 0, 1)
+    const { position, angle } = cached.measure.getPosTanAtProgress(t)
+    // path data 以元素中心为起点（M w/2 h/2），故位移 = 当前点 - 起点
+    const dx = position.x - cached.startX
+    const dy = position.y - cached.startY
+    const rotate = resolveOffsetRotate(currentProps.offsetRotate ?? previousProps.offsetRotate, angle)
+    const base = startProps.get('transform')
+    target.onUpdateStyleProperty(
+      'transform',
+      `${base ? `${base} ` : ''}translate(${dx}px, ${dy}px) rotate(${rotate}deg)`,
+      undefined,
+    )
   }
 
   protected _getDiffValue(
