@@ -120,6 +120,8 @@ export class Element2DChart extends CoreObject implements NormalizedChart {
     const echarts = await loadECharts()
     if (!echarts) {
       console.warn('[modern-canvas] chart rendering requires the optional "echarts" dependency (e.g. `pnpm add echarts`)')
+      // 不再静默空白：画一个占位提示，让缺少可选依赖这件事在画布上可见。
+      this._renderPlaceholder(width, height)
       return
     }
     // a later update / destroy may have run while awaiting the import
@@ -152,6 +154,38 @@ export class Element2DChart extends CoreObject implements NormalizedChart {
       this._texture = new CanvasTexture({ source: canvas, pixelRatio: 1 })
     }
 
+    this._texture.requestUpdate('source')
+    this._parent.requestDraw()
+  }
+
+  /** echarts 缺失时画一个虚线框 + 文案的占位纹理，而非静默空白。 */
+  protected _renderPlaceholder(width: number, height: number): void {
+    if (typeof document === 'undefined' || !width || !height) {
+      return
+    }
+    const canvas = document.createElement('canvas')
+    canvas.width = Math.ceil(width)
+    canvas.height = Math.ceil(height)
+    const ctx = canvas.getContext('2d')
+    if (!ctx) {
+      return
+    }
+    ctx.fillStyle = '#f3f4f6'
+    ctx.fillRect(0, 0, width, height)
+    ctx.strokeStyle = '#d1d5db'
+    ctx.setLineDash([6, 4])
+    ctx.strokeRect(1, 1, width - 2, height - 2)
+    ctx.fillStyle = '#9ca3af'
+    ctx.font = '14px sans-serif'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText('图表需安装 echarts', width / 2, height / 2)
+    if (!this._texture) {
+      this._texture = new CanvasTexture({ source: canvas, pixelRatio: 1 })
+    }
+    else {
+      this._texture.source = canvas
+    }
     this._texture.requestUpdate('source')
     this._parent.requestDraw()
   }

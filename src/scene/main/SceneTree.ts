@@ -67,6 +67,11 @@ export class SceneTree extends MainLoop {
 
   readonly nodeMap = new Map<string, Node>()
 
+  /** 已订阅 load 事件的 fonts 实例，用于在 fonts 切换 / 销毁时解绑。 */
+  protected _boundFonts?: Fonts
+  protected _textRemeasureScheduled = false
+  protected _onFontLoad = (): void => this._scheduleTextRemeasure()
+
   protected _backgroundColor = new Color()
   protected _previousViewport?: Viewport
   protected _currentViewport?: Viewport
@@ -88,6 +93,39 @@ export class SceneTree extends MainLoop {
     this.on('nodeEnter', node => this.nodeMap.set(node.id, node))
     this.on('nodeExit', node => this.nodeMap.delete(node.id))
     this.setProperties(properties)
+    // 字体可用后重排文字：setProperties 后 fonts 已就绪（默认即全局 fonts 单例）。
+    this._bindFonts(this.fonts)
+  }
+
+  /** 订阅 fonts 的 load 事件，并在切换 fonts / 销毁时解绑，避免重复订阅与泄漏。 */
+  protected _bindFonts(next?: Fonts): void {
+    if (this._boundFonts === next) {
+      return
+    }
+    this._boundFonts?.off('load', this._onFontLoad)
+    this._boundFonts = next
+    next?.on('load', this._onFontLoad)
+  }
+
+  /**
+   * 字体到位后，重排树内全部文字（含表格 back 层单元格——它们也在 nodeMap）。
+   * 一个 tick 内多次 load 合并为一次。文字创建时字体可能尚未就绪、按 0 宽 glyph 测量挤成一坨，
+   * 这里在字体可用时自动重新测量，使所有消费方无需各自轮询字体状态。
+   */
+  protected _scheduleTextRemeasure(): void {
+    if (this._textRemeasureScheduled) {
+      return
+    }
+    this._textRemeasureScheduled = true
+    queueMicrotask(() => {
+      this._textRemeasureScheduled = false
+      this.nodeMap.forEach((node) => {
+        const text = (node as any).text
+        if (text?.enabled && typeof text.update === 'function') {
+          text.update()
+        }
+      })
+    })
   }
 
   protected override _updateProperty(key: string, value: any, oldValue: any): void {
@@ -96,6 +134,10 @@ export class SceneTree extends MainLoop {
     switch (key) {
       case 'backgroundColor':
         this._backgroundColor.value = value
+        break
+      case 'fonts':
+        this._bindFonts(value)
+        this._scheduleTextRemeasure()
         break
     }
   }
@@ -157,6 +199,7 @@ export class SceneTree extends MainLoop {
 
   protected override _destroy(): void {
     super._destroy()
+    this._bindFonts(undefined)
     this.root.destroy()
     this.input.destroy()
     this.nodeMap.clear()

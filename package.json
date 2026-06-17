@@ -1,7 +1,7 @@
 {
   "name": "modern-canvas",
   "type": "module",
-  "version": "0.23.10",
+  "version": "0.23.11",
   "packageManager": "pnpm@10.19.0",
   "description": "A JavaScript WebGL rendering engine. only the ESM.",
   "author": "wxm",
@@ -62,7 +62,7 @@
   "dependencies": {
     "colord": "^2.9.3",
     "earcut": "^3.0.2",
-    "modern-font": "^0.6.0",
+    "modern-font": "^0.6.1",
     "modern-idoc": "^0.11.9",
     "modern-path2d": "^1.8.5",
     "modern-text": "^2.0.6"
