@@ -177,9 +177,13 @@ export class CanvasItem extends TimelineNode {
   }
 
   protected _transformUvs(batchable: CanvasBatchable): Float32Array | undefined {
-    const { texture, vertices, transformUv } = batchable
+    const { texture, vertices, transformUv, meshUvs } = batchable
     if (!texture) {
       return undefined
+    }
+    // mesh 自带归一化 UV，直接用（不由顶点位置派生）
+    if (meshUvs) {
+      return meshUvs
     }
     const { width, height } = texture
     const transform = transformUv

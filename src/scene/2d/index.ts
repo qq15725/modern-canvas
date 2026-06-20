@@ -1,6 +1,7 @@
 export * from './Camera2D'
 export * from './element'
 export * from './Lottie2D'
+export * from './Mesh2D'
 export * from './Node2D'
 export * from './TextureRect2D'
 export * from './TransformRect2D'

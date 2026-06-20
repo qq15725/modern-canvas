@@ -8,11 +8,13 @@ export type TransformUv = (uvs: Float32Array, index: number) => void
 export type TransformVertex = (vertices: Float32Array, index: number) => void
 
 export interface CanvasBatchable extends Batchable2D {
-  type: 'stroke' | 'fill'
+  type: 'stroke' | 'fill' | 'mesh'
   texture?: Texture2D
   transformUv?: TransformUv
   transformVertex?: TransformVertex
   size?: { width: number, height: number }
+  /** mesh 显式 UV(0..1)，绕过「由顶点位置派生 UV」。 */
+  meshUvs?: Float32Array
 }
 
 export interface StrokeDraw extends Partial<CanvasBatchable> {
@@ -24,6 +26,14 @@ export interface StrokeDraw extends Partial<CanvasBatchable> {
 export interface FillDraw extends Partial<CanvasBatchable> {
   type: 'fill'
   path: Path2D
+}
+
+/** 自定义三角网格绘制：顶点(局部像素)+ 显式 UV(0..1) + 三角索引，不经路径三角化。 */
+export interface MeshDraw extends Partial<CanvasBatchable> {
+  type: 'mesh'
+  vertices: Float32Array
+  indices: Uint32Array
+  meshUvs: Float32Array
 }
 
 export class CanvasContext extends Path2D {
@@ -40,7 +50,7 @@ export class CanvasContext extends Path2D {
   transformUv?: TransformUv
   transformVertex?: TransformVertex
 
-  protected _draws: (StrokeDraw | FillDraw)[] = []
+  protected _draws: (StrokeDraw | FillDraw | MeshDraw)[] = []
   // per-draw triangulation cache, reused across frames while geometry is unchanged
   protected _triCache: { sig: string, vertices: Float32Array, indices: Uint32Array }[] = []
 
@@ -96,6 +106,22 @@ export class CanvasContext extends Path2D {
       },
     })
 
+    this.resetStatus()
+  }
+
+  /**
+   * 绘制自定义三角网格（用当前 fillStyle 纹理）。顶点为局部像素坐标 [x,y,...]，
+   * UV 为归一化 [u,v,...]（0..1），indices 为三角索引。用于精灵网格 / 骨骼网格变形。
+   */
+  drawMesh(vertices: ArrayLike<number>, uvs: ArrayLike<number>, indices: ArrayLike<number>): void {
+    this._draws.push({
+      ...this._parseDrawStyle(this.fillStyle),
+      type: 'mesh',
+      vertices: vertices instanceof Float32Array ? vertices : new Float32Array(vertices),
+      meshUvs: uvs instanceof Float32Array ? uvs : new Float32Array(uvs),
+      indices: indices instanceof Uint32Array ? indices : new Uint32Array(indices),
+      transformVertex: this.transformVertex,
+    })
     this.resetStatus()
   }
 
@@ -194,6 +220,15 @@ export class CanvasContext extends Path2D {
 
     for (let len = this._draws.length, i = 0; i < len; i++) {
       const current = this._draws[i]
+
+      // mesh：显式顶点/UV/索引，不做路径三角化
+      if (current.type === 'mesh') {
+        const { vertices, indices, ...rest } = current
+        this._triCache[i] = undefined as any
+        batchables.push({ ...rest, vertices, indices })
+        continue
+      }
+
       const { path, ...batchable } = current
 
       // reuse the previous triangulation when this draw's geometry is unchanged
