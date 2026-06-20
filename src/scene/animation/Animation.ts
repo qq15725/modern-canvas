@@ -41,11 +41,6 @@ function parseOffsetPathData(value: string): string {
   return s.trim()
 }
 
-export const linear = (amount: number): number => amount
-export const ease = cubicBezier(0.25, 0.1, 0.25, 1)
-export const easeIn = cubicBezier(0.42, 0, 1, 1)
-export const easeOut = cubicBezier(0, 0, 0.58, 1)
-export const easeInOut = cubicBezier(0.42, 0, 0.58, 1)
 export function cubicBezier(x1: number, y1: number, x2: number, y2: number): (amount: number) => number {
   const ZERO_LIMIT = 1e-6
   // Calculate the polynomial coefficients,
@@ -116,16 +111,29 @@ export function cubicBezier(x1: number, y1: number, x2: number, y2: number): (am
 
   return (amount: number) => sampleCurveY(solveCurveX(amount))
 }
-export const timingFunctions = {
-  linear,
-  ease,
-  easeIn,
-  easeOut,
-  easeInOut,
-}
-export type TimingFunctions = typeof timingFunctions
 
-export type Easing = keyof TimingFunctions | `cubic-bezier(${string})`
+/** CSS 缓动预设：name → cubic-bezier 控制点 [x1, y1, x2, y2] */
+export const cssEasingPresets = {
+  'linear': [0, 0, 1, 1],
+  'ease': [0.25, 0.1, 0.25, 1],
+  'ease-in': [0.42, 0, 1, 1],
+  'ease-out': [0, 0, 0.58, 1],
+  'ease-in-out': [0.42, 0, 0.58, 1],
+  'ease-in-quad': [0.55, 0.085, 0.68, 0.53],
+  'ease-out-quad': [0.25, 0.46, 0.45, 0.94],
+  'ease-in-out-quad': [0.455, 0.03, 0.515, 0.955],
+  'ease-in-cubic': [0.55, 0.055, 0.675, 0.19],
+  'ease-out-cubic': [0.215, 0.61, 0.355, 1],
+  'ease-in-out-cubic': [0.645, 0.045, 0.355, 1],
+} as const
+export type CssEasing = keyof typeof cssEasingPresets
+
+/** 预先把 CSS 预设编译成缓动函数，避免每次解析关键帧都重建 cubic-bezier */
+const cssEasingFunctions: Record<string, (amount: number) => number> = Object.fromEntries(
+  Object.entries(cssEasingPresets).map(([name, [x1, y1, x2, y2]]) => [name, cubicBezier(x1, y1, x2, y2)]),
+)
+
+export type Easing = CssEasing | `cubic-bezier(${string})`
 
 export interface Keyframe {
   easing?: Easing
@@ -305,11 +313,18 @@ export class Animation extends TimelineNode {
 
   protected _parseEasing(easing: Easing | undefined): (amount: number) => number {
     if (!easing)
-      return timingFunctions.linear
-    if (easing in timingFunctions)
-      return (timingFunctions as any)[easing]
-    const args = easing.replace(/cubic-bezier\((.+)\)/, '$1').split(',').map(v => Number(v))
-    return cubicBezier(args[0], args[1], args[2], args[3])
+      return cssEasingFunctions.linear
+    // 仅支持 CSS 预设名 与 cubic-bezier(...)
+    if (easing in cssEasingFunctions)
+      return cssEasingFunctions[easing]
+    const matched = /cubic-bezier\((.+)\)/.exec(easing)
+    if (matched) {
+      const args = matched[1].split(',').map(v => Number(v))
+      if (args.length === 4 && args.every(n => !Number.isNaN(n)))
+        return cubicBezier(args[0], args[1], args[2], args[3])
+    }
+    // 未知 / 非法 easing 兜底为 linear，避免产出 NaN 让整个动画静默失效
+    return cssEasingFunctions.linear
   }
 
   protected _parseKeyframes(currentTime: number, startProps: Map<string, any>): [NormalizedKeyframe, NormalizedKeyframe] | null {
