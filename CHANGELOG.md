@@ -1,3 +1,9 @@
+## [0.23.14](https://github.com/qq15725/modern-canvas/compare/v0.23.13...v0.23.14) (2026-06-20)
+
+
+### Features
+
+* **scene:** standalone local clock for TimelineNode ([44eb48e](https://github.com/qq15725/modern-canvas/commit/44eb48e8f0b00e67589a776c40695677529009b6))
 ## [0.23.13](https://github.com/qq15725/modern-canvas/compare/v0.23.12...v0.23.13) (2026-06-20)
 
 
