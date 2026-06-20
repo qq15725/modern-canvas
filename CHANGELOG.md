@@ -1,3 +1,9 @@
+## [0.23.12](https://github.com/qq15725/modern-canvas/compare/v0.23.11...v0.23.12) (2026-06-20)
+
+
+### Bug Fixes
+
+* **animation:** support CSS preset easing names and guard against NaN ([630121a](https://github.com/qq15725/modern-canvas/commit/630121a66182f455c7960b24d24795432b0f3726))
 ## [0.23.11](https://github.com/qq15725/modern-canvas/compare/v0.23.10...v0.23.11) (2026-06-17)
 ## [0.23.10](https://github.com/qq15725/modern-canvas/compare/v0.23.9...v0.23.10) (2026-06-16)
 
