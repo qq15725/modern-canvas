@@ -43,6 +43,11 @@ export class TimelineNode extends Node {
   protected _currentTime = 0
   protected _globalStartTime = 0
   protected _globalDuration = 0
+  // 独立播放（脱离全局时间轴）：开启后 currentTime 由外部驱动的本地时钟提供，
+  // 用于「单元素各自触发各自播放」的交互场景，而非随全局时间轴推进。
+  protected _standalone = false
+  protected _localCurrentTime = 0
+  get standalone(): boolean { return this._standalone }
   get parentGlobalStartTime(): number { return (this._parent as TimelineNode)?.globalStartTime ?? 0 }
   get currentTime(): number { return this._currentTime }
   get globalStartTime(): number { return this._globalStartTime }
@@ -100,6 +105,28 @@ export class TimelineNode extends Node {
     this.insideTimeRange = this.isInsideTimeRange()
   }
 
+  /**
+   * 开启/关闭独立播放。开启后本节点的 currentTime 取自 {@link setLocalTime}
+   * 设置的本地时钟，完全脱离全局时间轴；关闭后恢复跟随全局时间轴。
+   */
+  setStandalone(on: boolean): this {
+    if (this._standalone !== on) {
+      this._standalone = on
+      this._updateCurrentTime(true)
+    }
+    return this
+  }
+
+  /**
+   * 独立播放下设置本地时间（毫秒，相对本节点自身 0 起点）并立即刷新。
+   * 由外部循环（如交互运行器）逐帧驱动。
+   */
+  setLocalTime(ms: number): this {
+    this._localCurrentTime = ms
+    this._updateCurrentTime(true)
+    return this
+  }
+
   protected _updateCurrentTime(force = false): void {
     if (force || !this._paused) {
       const parent = this._parent as TimelineNode
@@ -111,8 +138,10 @@ export class TimelineNode extends Node {
       this._globalStartTime = globalStartTime
       this._globalDuration = globalDuration
 
-      let currentTime = this._globalCurrentTime - this.globalStartTime
-      if (this._loop) {
+      let currentTime = this._standalone
+        ? this._localCurrentTime
+        : this._globalCurrentTime - this.globalStartTime
+      if (this._loop && this.globalDuration) {
         currentTime = currentTime % this.globalDuration
       }
       this._currentTime = currentTime
