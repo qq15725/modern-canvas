@@ -1,3 +1,10 @@
+## [0.23.13](https://github.com/qq15725/modern-canvas/compare/v0.23.12...v0.23.13) (2026-06-20)
+
+
+### Features
+
+* **2d:** Mesh2D deformable textured mesh node ([ec04c70](https://github.com/qq15725/modern-canvas/commit/ec04c70b5bb8460756356901751e712ec2c0b06a))
+* **2d:** TextureRect2D texture sub-region (atlas UV) ([72e392d](https://github.com/qq15725/modern-canvas/commit/72e392d3020f970567ac94390f6020c15d5c1d65))
 ## [0.23.12](https://github.com/qq15725/modern-canvas/compare/v0.23.11...v0.23.12) (2026-06-20)
 
 
