@@ -1,6 +1,7 @@
 import type {
   Background,
   Chart,
+  CommentThread,
   Connection,
   Display,
   Fill,
@@ -34,6 +35,7 @@ import { ColorFilterEffect, MaskEffect } from '../../effects'
 import { Node2D } from '../Node2D'
 import { Element2DBackground } from './Element2DBackground'
 import { Element2DChart } from './Element2DChart'
+import { Element2DComments } from './Element2DComments'
 import { Element2DConnection } from './Element2DConnection'
 import { Element2DFill } from './Element2DFill'
 import { Element2DForeground } from './Element2DForeground'
@@ -69,6 +71,7 @@ export interface Element2DProperties extends Node2DProperties {
   connection: Connection
   table: Table
   chart: Chart
+  comments: CommentThread[]
   /** 元素级结构化滤镜（Effect.filter），转成 CSS filter 后与 style.filter 合并 */
   filter: NormalizedFilter
 }
@@ -155,6 +158,10 @@ export class Element2D extends Node2D implements Rectangulable {
   get chart(): Element2DChart { return this._chart }
   set chart(value: Element2DProperties['chart'] | undefined) { this._chart.resetProperties().setProperties(value as Record<string, any>) }
 
+  protected _comments = new Element2DComments(this)
+  get comments(): Element2DComments { return this._comments }
+  set comments(value: Element2DProperties['comments'] | undefined) { this._comments.resetProperties().setProperties(value) }
+
   /** Last routed connection path; identity-compared to skip re-layout when unchanged. */
   protected _lastRoutePath?: Path2D
   // batch depth for setProperties / style setter — defers the heavy text relayout
@@ -195,6 +202,7 @@ export class Element2D extends Node2D implements Rectangulable {
           connection,
           table,
           chart,
+          comments,
           filter,
           ...restProperties
         } = properties
@@ -209,6 +217,7 @@ export class Element2D extends Node2D implements Rectangulable {
         connection && this.connection.setProperties(connection)
         table && this.table.setProperties(table)
         chart && this.chart.setProperties(chart)
+        comments && this.comments.setProperties(comments)
         this._updateElementFilter(filter)
         super.setProperties(restProperties)
       }
@@ -763,6 +772,7 @@ export class Element2D extends Node2D implements Rectangulable {
       connection: notEmptyObjectOrUndef(this.connection.toJSON()),
       table: notEmptyObjectOrUndef(this.table.toJSON()),
       chart: notEmptyObjectOrUndef(this.chart.toJSON()),
+      comments: this.comments.isValid() ? this.comments.toJSON() : undefined,
     })
   }
 
@@ -781,6 +791,7 @@ export class Element2D extends Node2D implements Rectangulable {
     this.foreground.destroy()
     this.shadow.destroy()
     this.connection.destroy()
+    this.comments.destroy()
     this._colorFilterEffect = undefined
     this._maskEffect = undefined
   }
