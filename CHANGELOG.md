@@ -1,3 +1,9 @@
+## [0.24.1](https://github.com/qq15725/modern-canvas/compare/v0.24.0...v0.24.1) (2026-06-21)
+
+
+### Bug Fixes
+
+* **element:** filter empty slots in Element2DComments toJSON/isValid ([7673b84](https://github.com/qq15725/modern-canvas/commit/7673b8450a2b2e08ddfcf68baf70010e06f6b067))
 # [0.24.0](https://github.com/qq15725/modern-canvas/compare/v0.23.14...v0.24.0) (2026-06-21)
 
 
