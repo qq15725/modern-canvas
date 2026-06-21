@@ -1,3 +1,9 @@
+# [0.24.0](https://github.com/qq15725/modern-canvas/compare/v0.23.14...v0.24.0) (2026-06-21)
+
+
+### Features
+
+* **element:** add comments property backed by idoc comment threads ([6b9effd](https://github.com/qq15725/modern-canvas/commit/6b9effd6a44074e5b83dccbc2eb6974ac3f4595a))
 ## [0.23.14](https://github.com/qq15725/modern-canvas/compare/v0.23.13...v0.23.14) (2026-06-20)
 
 
