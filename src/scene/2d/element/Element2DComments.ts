@@ -42,12 +42,13 @@ export class Element2DComments extends CoreObject {
     return super.setProperties(value)
   }
 
-  /** 序列化为 idoc 规范的线程数组。 */
+  /** 序列化为 idoc 规范的线程数组（过滤已删除留下的空位）。 */
   override toJSON(): NormalizedCommentThread[] {
-    return normalizeComments(Object.values(this._properties) as CommentThread[]) ?? []
+    const threads = (Object.values(this._properties) as (CommentThread | undefined)[]).filter(Boolean) as CommentThread[]
+    return normalizeComments(threads) ?? []
   }
 
   isValid(): boolean {
-    return Object.keys(this._properties).length > 0
+    return (Object.values(this._properties) as (CommentThread | undefined)[]).some(Boolean)
   }
 }
