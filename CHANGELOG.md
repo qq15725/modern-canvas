@@ -1,3 +1,15 @@
+## [0.24.3](https://github.com/qq15725/modern-canvas/compare/v0.24.2...v0.24.3) (2026-06-23)
+
+
+### Features
+
+* **timeline:** own playback semantics (play/pause/advance, loop modes) ([3628479](https://github.com/qq15725/modern-canvas/commit/3628479b0fb6a6730681b4cc2e9ef295e599edf2))
+
+
+### Performance Improvements
+
+* **video:** pause off-screen / hidden video decoders ([91b6bd0](https://github.com/qq15725/modern-canvas/commit/91b6bd0c15d148319173915c4970f4e828e7ae82))
+* **video:** play natively with drift correction instead of per-frame seek ([2b75806](https://github.com/qq15725/modern-canvas/commit/2b7580678eea827c3c0b6602470bb938c87c6334))
 ## [0.24.2](https://github.com/qq15725/modern-canvas/compare/v0.24.1...v0.24.2) (2026-06-23)
 ## [0.24.1](https://github.com/qq15725/modern-canvas/compare/v0.24.0...v0.24.1) (2026-06-21)
 
