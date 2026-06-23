@@ -3,7 +3,7 @@ import type { VideoTexture } from '../resources'
 import type { TextureRect2DProperties } from './TextureRect2D'
 import { property } from 'modern-idoc'
 import { assets } from '../../asset'
-import { customNode } from '../../core'
+import { clamp, customNode } from '../../core'
 import { TextureRect2D } from './TextureRect2D'
 
 export interface Video2DProperties extends TextureRect2DProperties {
@@ -60,11 +60,37 @@ export class Video2D extends TextureRect2D<VideoTexture> {
     const texture = this.texture
     if (!texture)
       return
+    const durationMs = this.videoDuration
+    if (!durationMs)
+      return
 
-    if (!texture.isPlaying && !texture.seeking) {
-      const videoCurrentTime = ~~Math.max(0, this.currentTime % this.videoDuration) / 1000
-      if (texture.currentTime !== videoCurrentTime) {
-        texture.currentTime = videoCurrentTime
+    const targetSec = Math.max(0, this.currentTime % durationMs) / 1000
+
+    // 连续正向播放 → 原生播放 + 漂移校正；暂停 / scrub / 反向 → 逐帧精确 seek。
+    // 播放态与带符号倍速由宿主显式写入时间轴（见 Timeline.playing / playbackRate）。
+    const timeline = this._timeline
+    const rate = timeline?.playbackRate ?? 1
+    const playingForward = Boolean(timeline?.playing) && rate > 0
+
+    if (playingForward) {
+      texture.muted = true // 自动播放策略要求静音
+      texture.loop = this.loop
+      texture.playbackRate = clamp(rate, 0.0625, 16)
+      if (texture.paused && texture.isReady) {
+        texture.play()
+      }
+      // 仅当漂移超阈值才 seek 校正（阈值随倍速放宽），避免逐帧 seek 的高开销。
+      const drift = Math.abs(texture.currentTime - targetSec)
+      if (!texture.seeking && drift > Math.max(0.3, clamp(rate, 1, 16) * 0.2)) {
+        texture.currentTime = targetSec
+      }
+    }
+    else {
+      if (!texture.paused) {
+        texture.pause()
+      }
+      if (!texture.isPlaying && !texture.seeking && texture.currentTime !== targetSec) {
+        texture.currentTime = targetSec
         assets.awaitBy(() => texture.waitSeek(this._loadAbort?.signal))
       }
     }

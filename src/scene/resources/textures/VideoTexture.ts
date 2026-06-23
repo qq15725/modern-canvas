@@ -45,6 +45,35 @@ export class VideoTexture extends Texture2D<HTMLVideoElement> {
   get seeking(): boolean { return this.source.seeking }
   get currentTime(): number { return this.source.currentTime }
   set currentTime(val) { this.source.currentTime = val }
+  get paused(): boolean { return this.source.paused }
+  get muted(): boolean { return this.source.muted }
+  set muted(val: boolean) {
+    if (this.source.muted !== val)
+      this.source.muted = val
+  }
+
+  get loop(): boolean { return this.source.loop }
+  set loop(val: boolean) {
+    if (this.source.loop !== val)
+      this.source.loop = val
+  }
+
+  get playbackRate(): number { return this.source.playbackRate }
+  set playbackRate(val: number) {
+    if (this.source.playbackRate !== val)
+      this.source.playbackRate = val
+  }
+
+  /** 原生播放（用于跟随时间轴的连续播放，触发 requestVideoFrameCallback 高效上传）。 */
+  play(): void {
+    const ret = this.source.play()
+    if (ret && typeof ret.catch === 'function')
+      ret.catch(() => {})
+  }
+
+  pause(): void {
+    this.source.pause()
+  }
 
   protected _spf = 0
   protected _autoPlay = false

@@ -30,6 +30,13 @@ export class Timeline extends Node {
   @property({ fallback: false }) declare loop: boolean
   @property({ fallback: false }) declare paused: boolean
 
+  // 宿主驱动的播放态（运行时状态，不参与序列化，故为普通字段而非 @property）。
+  // 下游（如 Video2D）据此区分「连续播放」与「定位/scrub」，决定原生播放还是逐帧 seek。
+  /** 是否处于连续播放（由宿主在 play/pause 时显式设置）。 */
+  playing = false
+  /** 带符号倍速（含方向：正向为正、反向为负；由宿主设置，默认 1）。 */
+  playbackRate = 1
+
   static from(range: number | number[], loop = false): Timeline {
     const [startTime, endTime] = range
       ? Array.isArray(range)
