@@ -64,6 +64,16 @@ export class Video2D extends TextureRect2D<VideoTexture> {
     if (!durationMs)
       return
 
+    // 可见性门控：不可见（隐藏 / 透明 / 超出时间范围）或离屏（视口裁剪）时，
+    // 暂停解码器并跳过 decode/seek/upload——离屏视频不再空耗 CPU/GPU。
+    // 重新可见时下方逻辑会恢复播放或 seek 到当前帧。
+    if (!this.isVisibleInTree() || this._renderCulled) {
+      if (!texture.paused) {
+        texture.pause()
+      }
+      return
+    }
+
     const targetSec = Math.max(0, this.currentTime % durationMs) / 1000
 
     // 连续正向播放 → 原生播放 + 漂移校正；暂停 / scrub / 反向 → 逐帧精确 seek。

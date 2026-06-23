@@ -479,7 +479,15 @@ export class Element2D extends Node2D implements Rectangulable {
     this._shape.setLocalPath(local)
   }
 
+  /** 上一次渲染时的视口裁剪结果（true=离屏被裁剪）。供非渲染阶段（如 Video2D 解码门控）读取。 */
+  protected _renderCulled = false
+
   protected override _cullsRender(): boolean {
+    this._renderCulled = this._computeCullsRender()
+    return this._renderCulled
+  }
+
+  protected _computeCullsRender(): boolean {
     // conservative: never cull nodes whose visible area can exceed their AABB
     // (filters/masks spill outside it; connection routes are sized to their bbox
     // but we keep them to be safe), so culling only drops clearly off-screen content
