@@ -135,7 +135,9 @@ export class GlShaderSystem extends GlSystem {
         value: undefined,
       }
     }
-    glProgram.uniforms = uniforms
+    // Per-context state: locations/shadows belong to this linked program, not to
+    // the shared GlProgram (a static Material reuses one GlProgram across contexts).
+    glProgramData.uniforms = uniforms
     gl.deleteShader(vertex)
     gl.deleteShader(fragment)
     return glProgramData
@@ -158,7 +160,7 @@ export class GlShaderSystem extends GlSystem {
   updateUniforms(source: ShaderLike): void {
     this.bind(source)
     const { glProgram, uniforms = {} } = source
-    this._uploadUniforms(glProgram, this.getGlProgramData(glProgram), uniforms)
+    this._uploadUniforms(this.getGlProgramData(glProgram), uniforms)
   }
 
   /**
@@ -172,18 +174,17 @@ export class GlShaderSystem extends GlSystem {
     }
     glProgramData.uniformDirtyGroups[group.uid] = group._dirtyId
     this.useProgram(glProgram)
-    this._uploadUniforms(glProgram, glProgramData, group.uniforms)
+    this._uploadUniforms(glProgramData, group.uniforms)
   }
 
   protected _uploadUniforms(
-    glProgram: GlProgram,
     glProgramData: GlProgramData,
     uniforms: Record<string, any>,
   ): void {
     const gl = this._gl
     const {
       uniforms: boundUniforms,
-    } = glProgram
+    } = glProgramData
 
     for (const key in uniforms) {
       const value = uniforms[key]

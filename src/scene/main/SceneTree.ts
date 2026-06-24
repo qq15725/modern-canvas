@@ -164,6 +164,11 @@ export class SceneTree extends MainLoop {
   }
 
   protected _process(delta = 0): void {
+    // The render stack is rebuilt from scratch every process pass. Clearing it
+    // up front discards anything a prior `_process` left behind when it was not
+    // followed by a `render` (notably the export pipeline's `waitUntilProcessed`).
+    // Otherwise the scene gets queued twice and stateful effects render wrong.
+    this.renderStack.reset()
     this.timeline.emit('process', delta)
     this.emit('processing')
     this.root.emit('process', delta)
