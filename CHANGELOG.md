@@ -1,3 +1,9 @@
+## [0.24.7](https://github.com/qq15725/modern-canvas/compare/v0.24.6...v0.24.7) (2026-06-24)
+
+
+### Bug Fixes
+
+* **export:** tile oversized image exports within GPU limits ([c5560dc](https://github.com/qq15725/modern-canvas/commit/c5560dc97f41819e8b55b4daf64a4d5fcd4e68d2))
 ## [0.24.6](https://github.com/qq15725/modern-canvas/compare/v0.24.5...v0.24.6) (2026-06-24)
 
 
