@@ -1,3 +1,9 @@
+## [0.24.5](https://github.com/qq15725/modern-canvas/compare/v0.24.4...v0.24.5) (2026-06-24)
+
+
+### Bug Fixes
+
+* **timeline:** avoid NaN currentTime when looping a zero-length range ([7b5886f](https://github.com/qq15725/modern-canvas/commit/7b5886fe3abb986c8f7b7b286100394ab93b4c6d))
 ## [0.24.4](https://github.com/qq15725/modern-canvas/compare/v0.24.3...v0.24.4) (2026-06-24)
 
 
