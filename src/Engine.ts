@@ -5,6 +5,7 @@ import {
   createHTMLCanvas,
   DEVICE_PIXEL_RATIO,
   nextTick,
+  planExportTiles,
   SUPPORTS_RESIZE_OBSERVER,
   WebGLRenderer,
 } from './core'
@@ -155,6 +156,8 @@ export class Engine extends SceneTree {
   }
 
   resize(width: number, height: number, updateCss = false): this {
+    this._exportWidth = 0
+    this._exportHeight = 0
     this.renderer.resize(width, height, updateCss)
     this.root.width = width
     this.root.height = height
@@ -179,6 +182,37 @@ export class Engine extends SceneTree {
     this._render(this.renderer)
   }
 
+  /**
+   * Like {@link waitAndRender} but without the final `_render`. Used by the
+   * export pipeline, where rendering at the full (possibly oversized) logical
+   * size would allocate a render target beyond the GPU limit; {@link toPixels}
+   * performs the actual (tiled) rendering instead.
+   */
+  async waitUntilProcessed(delta = 0): Promise<void> {
+    await assets.waitUntilLoad()
+    this._process(delta)
+    await assets.waitUntilLoad()
+    await this.nextTick()
+  }
+
+  /**
+   * Resize for an export pass. The requested size is remembered as the export
+   * output size, but the root viewport + canvas are capped at the GPU limit:
+   * the root's RenderTarget texture is reactive and re-uploads (texImage2D) on
+   * every size change, so setting it beyond MAX_TEXTURE_SIZE — even just to hold
+   * a "logical" size — throws `width or height out of range`. {@link toPixels}
+   * tiles within the cap and stitches the full image. Does not render.
+   */
+  resizeForExport(width: number, height: number): this {
+    const limit = this._exportTileLimit()
+    this._exportWidth = Math.floor(width)
+    this._exportHeight = Math.floor(height)
+    this.renderer.resize(Math.min(this._exportWidth, limit), Math.min(this._exportHeight, limit), false)
+    this.root.width = Math.min(this._exportWidth, limit)
+    this.root.height = Math.min(this._exportHeight, limit)
+    return this
+  }
+
   render(node?: Node, delta = 0): void {
     if (node) {
       this.renderStack.push(node)
@@ -197,57 +231,103 @@ export class Engine extends SceneTree {
     })
   }
 
+  /**
+   * Largest dimension (in device pixels) a single offscreen render pass can
+   * allocate. The root scene renders into a RenderTarget texture (plus a
+   * stencil renderbuffer when masks are used) sized to the canvas, so any
+   * export larger than these GPU limits throws
+   * `texImage2D: width or height out of range`. Oversized exports are tiled
+   * within this budget instead.
+   */
+  protected _maxExportPassSize(): number {
+    const gl = this.gl
+    const texture = this.renderer.texture.maxTextureSize
+      || gl.getParameter(gl.MAX_TEXTURE_SIZE)
+      || 4096
+    const renderbuffer = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE) || texture
+    const viewportDims = gl.getParameter(gl.MAX_VIEWPORT_DIMS) as Int32Array | null
+    const viewport = viewportDims && viewportDims.length >= 2
+      ? Math.min(viewportDims[0], viewportDims[1])
+      : texture
+    return Math.max(1, Math.min(texture, renderbuffer, viewport))
+  }
+
+  /** Tile budget in logical units (the GPU limit is in device pixels). */
+  protected _exportTileLimit(): number {
+    const pixelRatio = this.pixelRatio || 1
+    return Math.max(1, Math.floor(this._maxExportPassSize() / pixelRatio))
+  }
+
+  /** Resize the renderer + root viewport without triggering a render. */
+  protected _resizeSilently(width: number, height: number): void {
+    this.renderer.resize(width, height, false)
+    this.root.width = width
+    this.root.height = height
+  }
+
+  /** Full export size (set by {@link resizeForExport}); falls back to the root size. */
+  protected _exportWidth = 0
+  protected _exportHeight = 0
+  get exportWidth(): number { return this._exportWidth || Math.floor(this.root.width) }
+  get exportHeight(): number { return this._exportHeight || Math.floor(this.root.height) }
+
   needsChunkReadPixels(): boolean {
-    return Math.floor(this.root.width) !== this.gl.drawingBufferWidth
-      || Math.floor(this.root.height) !== this.gl.drawingBufferHeight
+    const limit = this._exportTileLimit()
+    return this.exportWidth > limit || this.exportHeight > limit
   }
 
   toPixels(): Uint8ClampedArray<ArrayBuffer> {
-    if (this.needsChunkReadPixels()) {
-      const { width, height } = this.root
-      const { drawingBufferWidth: chunkWidth, drawingBufferHeight: chunkHeight } = this.gl
-      const canvasTransform = this.root.canvasTransform
-        .clone()
-        .translate(0, height - chunkHeight)
-
-      const pixels = new Uint8ClampedArray(width * height * 4)
-      const cols = Math.ceil(width / chunkWidth)
-      const rows = Math.ceil(height / chunkHeight)
-
-      for (let row = 0; row < rows; row++) {
-        for (let col = 0; col < cols; col++) {
-          const x = col * chunkWidth
-          const y = row * chunkHeight
-          const w = Math.min(chunkWidth, width - x)
-          const h = Math.min(chunkHeight, height - y)
-
-          this.root.canvasTransform.copyFrom(
-            canvasTransform
-              .clone()
-              .translate(-x, -y),
-          )
-
-          this.render()
-          const _pixels = this.renderer.toPixels(0, 0, w, h)
-
-          for (let r = 0; r < h; r++) {
-            const src = r * w * 4
-            const dst = ((y + r) * width + x) * 4
-            pixels.set(_pixels.subarray(src, src + w * 4), dst)
-          }
-        }
-      }
-
-      if (cols > 1 || rows > 1) {
-        this.root.canvasTransform.copyFrom(canvasTransform)
-        this.render()
-      }
-
-      return pixels
-    }
-    else {
+    if (!this.needsChunkReadPixels()) {
+      this.render()
       return this.renderer.toPixels()
     }
+
+    const pixelRatio = this.pixelRatio || 1
+    const width = this.exportWidth
+    const height = this.exportHeight
+    const limit = this._exportTileLimit()
+    const tiles = planExportTiles(width, height, limit)
+
+    // Output buffer is sized in device pixels, matching renderer.toPixels().
+    const outWidth = Math.floor(width * pixelRatio)
+    const outHeight = Math.floor(height * pixelRatio)
+    const rowStride = outWidth * 4
+    const pixels = new Uint8ClampedArray(outWidth * outHeight * 4)
+
+    const baseTransform = this.root.canvasTransform.clone()
+
+    // A single tile-sized buffer is reused for every tile: the scene is offset
+    // so the tile maps to the buffer's top-left, then only the valid sub-rect
+    // is read back. Keeping the size constant avoids reallocating (and
+    // re-uploading) the render-target texture between tiles.
+    const tileW = Math.min(width, limit)
+    const tileH = Math.min(height, limit)
+    this._resizeSilently(tileW, tileH)
+
+    for (const tile of tiles) {
+      this.root.canvasTransform.copyFrom(
+        baseTransform.clone().translate(-tile.x, -tile.y),
+      )
+      this.render()
+
+      const w = Math.floor(tile.width * pixelRatio)
+      const h = Math.floor(tile.height * pixelRatio)
+      const tilePixels = this.renderer.toPixels(0, 0, w, h)
+      const dstX = Math.floor(tile.x * pixelRatio)
+      const dstY = Math.floor(tile.y * pixelRatio)
+      for (let r = 0; r < h; r++) {
+        const src = r * w * 4
+        const dst = (dstY + r) * rowStride + dstX * 4
+        pixels.set(tilePixels.subarray(src, src + w * 4), dst)
+      }
+    }
+
+    // Restore the original transform. The root viewport stays at the (capped)
+    // tile size — the full export size is tracked separately (exportWidth/Height),
+    // so it is never set on the root, which would re-trigger an oversized upload.
+    this.root.canvasTransform.copyFrom(baseTransform)
+
+    return pixels
   }
 
   toImageData(): ImageData {
@@ -256,8 +336,8 @@ export class Engine extends SceneTree {
     }
     return new ImageData(
       this.toPixels(),
-      this.root.width,
-      this.root.height,
+      this.exportWidth,
+      this.exportHeight,
     )
   }
 

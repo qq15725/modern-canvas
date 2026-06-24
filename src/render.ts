@@ -81,13 +81,16 @@ async function task(options: RenderOptions): Promise<RenderResult> {
   engine.debug = debug
   engine.fonts = fonts
   engine.timeline.currentTime = 0
-  engine.resize(width, height, true)
+  // Export keeps the root at full logical size but caps the canvas/render passes
+  // at the GPU limit; toPixels() does the actual (tiled) rendering. Rendering at
+  // the full size here would overflow MAX_TEXTURE_SIZE for oversized exports.
+  engine.resizeForExport(width, height)
   engine.root.removeChildren(true)
   engine.root.append(data)
 
   // render
   await onBefore?.(engine)
-  await engine.waitAndRender()
+  await engine.waitUntilProcessed()
 
   if (keyframes.length) {
     const len = keyframes.length
@@ -97,7 +100,7 @@ async function task(options: RenderOptions): Promise<RenderResult> {
       const next = keyframes[i + 1] || currentTime
       const duration = next - currentTime
       engine.timeline.currentTime = currentTime
-      await engine.waitAndRender()
+      await engine.waitUntilProcessed()
       await onKeyframe?.(engine.toPixels(), {
         currentTime,
         duration,
