@@ -95,10 +95,13 @@ export class Timeline extends Node {
   addTime(delta: number): this {
     const end = this.endTime
     const start = Math.min(this.startTime, this.endTime)
-    let current = this.currentTime
-    current = current + delta
-    if (this.loop && current > end) {
-      current = start + (current % end)
+    const range = end - start
+    let current = this.currentTime + delta
+    // 仅在区间为正时回绕：end===start（如 startTime/endTime 都为 0）时 current % range = current % 0 = NaN，
+    // 会让 currentTime 退化为 NaN 并沿时间轴污染下游（如 Video2D.currentTime 崩溃）。
+    // 回绕点相对 start（修正 start≠0 的情形；start===0 时与旧 current % end 等价）。
+    if (this.loop && range > 0 && current > end) {
+      current = start + ((current - start) % range)
     }
     current = clamp(current, start, end)
     this.currentTime = current
