@@ -1,3 +1,9 @@
+## [0.24.4](https://github.com/qq15725/modern-canvas/compare/v0.24.3...v0.24.4) (2026-06-24)
+
+
+### Bug Fixes
+
+* **gl:** restore parent scissor rect on pop for nested clipping ([320d052](https://github.com/qq15725/modern-canvas/commit/320d052738db6243895cbdccd3728be7f6d20957))
 ## [0.24.3](https://github.com/qq15725/modern-canvas/compare/v0.24.2...v0.24.3) (2026-06-23)
 
 
