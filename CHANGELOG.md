@@ -1,3 +1,9 @@
+## [0.24.8](https://github.com/qq15725/modern-canvas/compare/v0.24.7...v0.24.8) (2026-06-24)
+
+
+### Bug Fixes
+
+* **render:** apply effects correctly on export ([f5ec86c](https://github.com/qq15725/modern-canvas/commit/f5ec86c8fd60827ccc09e5ad24fee818521011c2))
 ## [0.24.7](https://github.com/qq15725/modern-canvas/compare/v0.24.6...v0.24.7) (2026-06-24)
 
 
