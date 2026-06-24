@@ -32,16 +32,29 @@ function transformRectToAABB(m: Float32Array, rect: RectangleLike): RectangleLik
   }
 }
 
+// 两个 AABB 矩形求交集（同一坐标空间）。无交集时返回 0 尺寸（裁掉全部）。
+function intersectRect(a: RectangleLike, b: RectangleLike): RectangleLike {
+  const x1 = Math.max(a.x, b.x)
+  const y1 = Math.max(a.y, b.y)
+  const x2 = Math.min(a.x + a.width, b.x + b.width)
+  const y2 = Math.min(a.y + a.height, b.y + b.height)
+  return {
+    x: x1,
+    y: y1,
+    width: Math.max(0, x2 - x1),
+    height: Math.max(0, y2 - y1),
+  }
+}
+
 export class GlScissorSystem extends GlSystem {
   override install(renderer: WebGLRenderer): void {
     super.install(renderer)
     renderer.scissor = this
   }
 
-  current: Record<number, { refCount: number, rect?: RectangleLike }> = {
-    [-1]: {
-      refCount: 0,
-    },
+  // 按 renderTarget 维护一个裁剪矩形栈：嵌套画板时内层与外层求交、内层 pop 后恢复外层。
+  current: Record<number, { stack: RectangleLike[] }> = {
+    [-1]: { stack: [] },
   }
 
   protected override _setup(): void {
@@ -49,45 +62,40 @@ export class GlScissorSystem extends GlSystem {
     this._renderer.renderTarget.on('updateRenderTarget', this._updateRenderTarget)
   }
 
+  protected _current(): { stack: RectangleLike[] } {
+    const id = this._renderer.renderTarget.current?.instanceId ?? -1
+    return this.current[id] ?? (this.current[id] = { stack: [] })
+  }
+
   protected _updateRenderTarget = (renderTarget: RenderTargetLike | null): void => {
     if (renderTarget) {
-      let current = this.current[renderTarget.instanceId]
-      if (!current) {
-        current = this.current[renderTarget.instanceId] = {
-          refCount: 0,
-        }
-      }
-      if (current.rect && current.refCount > 0) {
-        this.bind(current.rect)
-      }
-      else {
-        this.bind(null)
-      }
+      const current = this.current[renderTarget.instanceId]
+        ?? (this.current[renderTarget.instanceId] = { stack: [] })
+      this.bind(current.stack[current.stack.length - 1] ?? null)
     }
   }
 
   push(rect: RectangleLike): void {
-    const gl = this._gl
-    gl.enable(gl.SCISSOR_TEST)
-    const current = this.current[this._renderer.renderTarget.current?.instanceId ?? -1]
-    current.refCount++
-    current.rect = rect
-    this.bind(rect)
+    const current = this._current()
+    const top = current.stack[current.stack.length - 1]
+    // 入栈前快照（脱离 globalAabb 引用），并与外层裁剪框求交，保证内层不超出外层。
+    const snap: RectangleLike = { x: rect.x, y: rect.y, width: rect.width, height: rect.height }
+    const effective = top ? intersectRect(top, snap) : snap
+    current.stack.push(effective)
+    this.bind(effective)
   }
 
   pop(): void {
-    const current = this.current[this._renderer.renderTarget.current?.instanceId ?? -1]
-    if (current.refCount > 0) {
-      current.refCount--
-    }
-    if (current.refCount <= 0) {
-      this.bind(null)
-    }
+    const current = this._current()
+    current.stack.pop()
+    // 恢复到上一层裁剪框；栈空则关闭裁剪。
+    this.bind(current.stack[current.stack.length - 1] ?? null)
   }
 
   bind(rect?: RectangleLike | null): void {
     const gl = this._gl
     if (rect) {
+      gl.enable(gl.SCISSOR_TEST)
       const { pixelRatio, viewport } = this._renderer
       const { viewMatrix } = this._renderer.shader.uniforms
 
