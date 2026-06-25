@@ -1,3 +1,9 @@
+## [0.24.9](https://github.com/qq15725/modern-canvas/compare/v0.24.8...v0.24.9) (2026-06-25)
+
+
+### Bug Fixes
+
+* **gl:** use active viewport matrix when rebinding scissor on render-target switch ([d6ed5a5](https://github.com/qq15725/modern-canvas/commit/d6ed5a5055214bc2d21e43cec1370540877de10b))
 ## [0.24.8](https://github.com/qq15725/modern-canvas/compare/v0.24.7...v0.24.8) (2026-06-24)
 
 
