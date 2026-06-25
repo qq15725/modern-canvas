@@ -75,9 +75,16 @@ export class Viewport extends Node implements Rectangulable {
   activate(renderer: WebGLRenderer, frame?: RectangleLike): boolean {
     if (this.valid) {
       this.flush(renderer)
-      this.renderTarget.activate(renderer, frame)
+      // Set viewMatrix BEFORE activating the render target. Activating it emits
+      // `updateRenderTarget`, which makes the scissor system re-bind that target's
+      // clip rect — and that bind transforms the rect by the *current* viewMatrix.
+      // If we activated first, the rebind would use the previously-active
+      // viewport's matrix, offsetting the restored scissor by that viewport's
+      // translation (e.g. a masked child overhanging an `overflow:hidden` parent
+      // clipped its left edge by |offset| on single-pass export).
       renderer.shader.uniforms.viewMatrix = this.canvasTransform.toArray(true)
       renderer.shader.markGlobalUniformsDirty()
+      this.renderTarget.activate(renderer, frame)
       this._tree?.setCurrentViewport(this)
       return true
     }
