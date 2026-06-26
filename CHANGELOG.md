@@ -1,3 +1,9 @@
+## [0.24.10](https://github.com/qq15725/modern-canvas/compare/v0.24.9...v0.24.10) (2026-06-26)
+
+
+### Bug Fixes
+
+* **render:** reject render/renderPixels on export error and clamp size to >=1 ([014ae4b](https://github.com/qq15725/modern-canvas/commit/014ae4bfd677e866552db93c3e0ce1a9361f1c42))
 ## [0.24.9](https://github.com/qq15725/modern-canvas/compare/v0.24.8...v0.24.9) (2026-06-25)
 
 
