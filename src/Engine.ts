@@ -233,11 +233,12 @@ export class Engine extends SceneTree {
 
   /**
    * Largest dimension (in device pixels) a single offscreen render pass can
-   * allocate. The root scene renders into a RenderTarget texture (plus a
-   * stencil renderbuffer when masks are used) sized to the canvas, so any
-   * export larger than these GPU limits throws
-   * `texImage2D: width or height out of range`. Oversized exports are tiled
-   * within this budget instead.
+   * allocate. Capped by the GPU's MAX_TEXTURE_SIZE / MAX_RENDERBUFFER_SIZE /
+   * MAX_VIEWPORT_DIMS *and* — crucially — the actual WebGL drawing-buffer size,
+   * which the browser/GPU often clamps far below MAX_TEXTURE_SIZE (tied to
+   * screen size / VRAM, e.g. ~5760 on a laptop while MAX_TEXTURE_SIZE is 16384).
+   * The export reads pixels back from the drawing buffer, so anything beyond it
+   * is lost/garbled. Oversized exports are tiled within this budget instead.
    */
   protected _maxExportPassSize(): number {
     const gl = this.gl
@@ -249,7 +250,35 @@ export class Engine extends SceneTree {
     const viewport = viewportDims && viewportDims.length >= 2
       ? Math.min(viewportDims[0], viewportDims[1])
       : texture
-    return Math.max(1, Math.min(texture, renderbuffer, viewport))
+    const cap = Math.max(1, Math.min(texture, renderbuffer, viewport))
+    return this._maxDrawingBufferSize(cap)
+  }
+
+  protected _maxDrawingBufferCache = 0
+  /**
+   * Probe the real drawing-buffer cap on the *renderer's own* GL context (its
+   * attributes — preserveDrawingBuffer / stencil / antialias — lower the cap vs
+   * a bare context, so a throwaway probe overestimates). Temporarily sizes the
+   * canvas (default framebuffer only, not the FBO textures) to `cap` and reads
+   * `drawingBufferWidth/Height`, then restores. Cached per engine.
+   */
+  protected _maxDrawingBufferSize(cap: number): number {
+    if (this._maxDrawingBufferCache)
+      return this._maxDrawingBufferCache
+    let real = cap
+    try {
+      const gl = this.gl
+      const canvas = gl.canvas as HTMLCanvasElement
+      const prevW = canvas.width
+      const prevH = canvas.height
+      canvas.width = cap
+      canvas.height = cap
+      real = Math.min(gl.drawingBufferWidth || cap, gl.drawingBufferHeight || cap)
+      canvas.width = prevW
+      canvas.height = prevH
+    }
+    catch {}
+    return (this._maxDrawingBufferCache = Math.max(1, Math.min(cap, real)))
   }
 
   /** Tile budget in logical units (the GPU limit is in device pixels). */
