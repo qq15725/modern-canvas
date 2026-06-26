@@ -70,8 +70,10 @@ async function task(options: RenderOptions): Promise<RenderResult> {
     ...properties
   } = options
 
-  const width = Math.floor(_width)
-  const height = Math.floor(_height)
+  // 尺寸兜底到至少 1：宽/高为 0（如选区/画布 aabb 退化）会让 toImageData 的
+  // new ImageData(pixels, 0, 0) 抛 IndexSizeError，进而在导出队列里表现为永久挂起。
+  const width = Math.max(1, Math.floor(_width))
+  const height = Math.max(1, Math.floor(_height))
 
   const engine = getRenderEngine()
 
@@ -118,15 +120,31 @@ async function task(options: RenderOptions): Promise<RenderResult> {
 }
 
 export async function render(options: RenderOptions): Promise<HTMLCanvasElement> {
-  return new Promise((r) => {
-    queue.push(async () => r(await task(options).then(rep => rep.toCanvas2D())))
+  return new Promise((resolve, reject) => {
+    // 必须 try/catch 转 reject：task 抛错时若只调 resolve，外层 await 永不 settle，
+    // 导出会卡死（start() 的 try/catch 只吞错日志，不会让本 Promise 失败）。
+    queue.push(async () => {
+      try {
+        resolve(await task(options).then(rep => rep.toCanvas2D()))
+      }
+      catch (e) {
+        reject(e)
+      }
+    })
     start()
   })
 }
 
 export async function renderPixels(options: RenderOptions): Promise<Uint8ClampedArray<ArrayBuffer>> {
-  return new Promise((r) => {
-    queue.push(async () => r(await task(options).then(rep => rep.pixels)))
+  return new Promise((resolve, reject) => {
+    queue.push(async () => {
+      try {
+        resolve(await task(options).then(rep => rep.pixels))
+      }
+      catch (e) {
+        reject(e)
+      }
+    })
     start()
   })
 }
