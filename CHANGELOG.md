@@ -1,3 +1,9 @@
+## [0.24.11](https://github.com/qq15725/modern-canvas/compare/v0.24.10...v0.24.11) (2026-06-26)
+
+
+### Bug Fixes
+
+* **export:** cap export tile size by the real drawing-buffer, not MAX_TEXTURE_SIZE ([49ec90e](https://github.com/qq15725/modern-canvas/commit/49ec90e4728ef5179bfd071bd1f6240a1ae828de))
 ## [0.24.10](https://github.com/qq15725/modern-canvas/compare/v0.24.9...v0.24.10) (2026-06-26)
 
 
