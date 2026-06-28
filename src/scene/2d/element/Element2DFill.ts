@@ -5,7 +5,6 @@ import { isNone, normalizeFill, property } from 'modern-idoc'
 import { assets } from '../../../asset'
 import { CoreObject, createHTMLCanvas, SUPPORTS_IMAGE_BITMAP } from '../../../core'
 import { GradientTexture, Texture2D, ViewportTexture } from '../../resources'
-import { getImagePipelineResolver } from './imagePipeline'
 import { getFillDrawOptions } from './utils'
 
 type Snapshotable = CanvasImageSource & { width: number, height: number }
@@ -27,7 +26,7 @@ export class Element2DFill extends CoreObject implements NormalizedFill {
   @property() declare tile?: NormalizedFill['tile']
   @property() declare opacity?: NormalizedFill['opacity']
   /** 图片处理管线；图片加载后交由注入的解析器烘焙到运行时纹理，不持久化 */
-  @property() declare pipelines?: NormalizedFill['pipelines']
+  @property() declare imagePipelines?: NormalizedFill['imagePipelines']
 
   texture?: Texture2D
   animatedTexture?: AnimatedTexture
@@ -67,7 +66,7 @@ export class Element2DFill extends CoreObject implements NormalizedFill {
       case 'image':
       case 'linearGradient':
       case 'radialGradient':
-      case 'pipelines':
+      case 'imagePipelines':
         this._updateTexture()
         break
     }
@@ -105,9 +104,16 @@ export class Element2DFill extends CoreObject implements NormalizedFill {
         if (isGif) {
           this.animatedTexture = res as any
         }
+        else if (this.imagePipelines?.length && this._parent.tree?.imagePipelineResolver) {
+          // 有管线：保留当前纹理直到烘焙完成，避免动态切换管线时闪回一帧原图；
+          // 仅首次（尚无纹理）用原图占位。烘焙在 _applyImagePipelines 内完成后替换。
+          if (!this.texture) {
+            this.texture = res as any
+          }
+          await this._applyImagePipelines(url)
+        }
         else {
           this.texture = res as any
-          await this._applyPipelines(url)
         }
       }
     }
@@ -118,20 +124,20 @@ export class Element2DFill extends CoreObject implements NormalizedFill {
   }
 
   /**
-   * 把原图经 `pipelines` 烘焙成一张运行时纹理（无管线 / 无解析器 / gif 时跳过）。
+   * 把原图经 `imagePipelines` 烘焙成一张运行时纹理（无管线 / 无解析器 / gif 时跳过）。
    * 始终从 image 独立解码像素喂给管线，不读 `this.texture.source`（那张 ImageBitmap
    * 由纹理管线持有、会经 premultiply 上传/GC 而被消费）。结果按 `url + 管线` 缓存复用。
    */
-  protected async _applyPipelines(url: string): Promise<void> {
-    const pipelines = this.pipelines
-    const resolver = getImagePipelineResolver()
-    if (!pipelines?.length || !resolver)
+  protected async _applyImagePipelines(url: string): Promise<void> {
+    const imagePipelines = this.imagePipelines
+    const resolver = this._parent.tree?.imagePipelineResolver
+    if (!imagePipelines?.length || !resolver)
       return
-    const canvas = await assets.loadBy(`${url}#mc-pipeline:${this._pipelineKey(pipelines)}`, async () => {
+    const canvas = await assets.loadBy(`${url}#mc-image-pipeline:${this._imagePipelineKey(imagePipelines)}`, async () => {
       const source = await this._decodePipelineSource(url)
       if (!source)
         return undefined
-      const out = await resolver(pipelines, source)
+      const out = await resolver(imagePipelines, source)
       if (!out)
         return undefined
       return this._pipelineImageToCanvas(out)
@@ -142,8 +148,8 @@ export class Element2DFill extends CoreObject implements NormalizedFill {
       this.texture = new Texture2D({ source: canvas, width: canvas.width, height: canvas.height, uploadMethodId: 'image' })
   }
 
-  protected _pipelineKey(pipelines: NonNullable<NormalizedFill['pipelines']>): string {
-    return pipelines.map(p => `${p.name}:${p.params ? JSON.stringify(p.params) : ''}`).join('|')
+  protected _imagePipelineKey(imagePipelines: NonNullable<NormalizedFill['imagePipelines']>): string {
+    return imagePipelines.map(p => `${p.name}:${p.params ? JSON.stringify(p.params) : ''}`).join('|')
   }
 
   /** 从 image 独立解码为中立像素结构（不读 GPU 纹理 source） */

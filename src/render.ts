@@ -1,5 +1,6 @@
 import type { Fonts } from 'modern-font'
 import type { EngineData, EngineProperties } from './Engine'
+import type { ImagePipelineResolver } from './scene/2d/element/imagePipeline'
 import { Engine } from './Engine'
 
 export interface RenderOptions extends Partial<EngineProperties> {
@@ -9,6 +10,8 @@ export interface RenderOptions extends Partial<EngineProperties> {
   debug?: boolean
   fonts?: Fonts
   keyframes?: number[]
+  /** 图片处理管线解析器：设到渲染引擎实例，使带 imagePipelines 的图片填充在渲染时烘焙。 */
+  imagePipelineResolver?: ImagePipelineResolver
   onBefore?: (engine: Engine) => void | Promise<void>
   onKeyframe?: (frame: Uint8ClampedArray<ArrayBuffer>, ctx: {
     currentTime: number
@@ -65,6 +68,7 @@ async function task(options: RenderOptions): Promise<RenderResult> {
     height: _height,
     data,
     keyframes = [],
+    imagePipelineResolver,
     onBefore,
     onKeyframe,
     ...properties
@@ -87,6 +91,8 @@ async function task(options: RenderOptions): Promise<RenderResult> {
   // at the GPU limit; toPixels() does the actual (tiled) rendering. Rendering at
   // the full size here would overflow MAX_TEXTURE_SIZE for oversized exports.
   engine.resizeForExport(width, height)
+  // 每次显式设置（含 undefined，清掉上次渲染残留），使带 imagePipelines 的图片填充按本次解析器烘焙。
+  engine.imagePipelineResolver = imagePipelineResolver
   engine.root.removeChildren(true)
   engine.root.append(data)
 

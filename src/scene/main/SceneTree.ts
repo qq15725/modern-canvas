@@ -1,5 +1,6 @@
 import type { Fonts } from 'modern-font'
 import type { Hex8Color } from 'modern-idoc'
+import type { ImagePipelineResolver } from '../2d/element/imagePipeline'
 import type {
   InputEvents,
   MainLoopEvents,
@@ -64,6 +65,13 @@ export class SceneTree extends MainLoop {
   readonly renderStack = new RenderStack()
   readonly root = new Window().setTree(this)
   timeline = new Timeline().setTree(this)
+
+  /**
+   * 图片处理管线解析器（实例级，非全局）。图片填充带 `imagePipelines` 时，
+   * 子节点经 `this.tree?.imagePipelineResolver` 取用，把图片烘焙到运行时纹理。
+   * 由宿主按引擎实例注入；未注入则不处理、沿用原图。
+   */
+  imagePipelineResolver?: ImagePipelineResolver
 
   readonly nodeMap = new Map<string, Node>()
 

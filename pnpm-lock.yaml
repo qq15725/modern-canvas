@@ -18,8 +18,8 @@ importers:
         specifier: ^0.6.1
         version: 0.6.1
       modern-idoc:
-        specifier: ^0.12.2
-        version: 0.12.2
+        specifier: ^0.12.3
+        version: 0.12.3
       modern-path2d:
         specifier: ^1.8.5
         version: 1.8.5
@@ -2239,8 +2239,8 @@ packages:
   modern-gif@2.1.0:
     resolution: {integrity: sha512-9ZGD5b4jNUge0fvFP1bd9Hsqz5CSZI1al3EhCJ+WFkZgmn5NO1yvVwXJA/LTqro85l2Gt0+S0dDFgVYhYtLLWg==}
 
-  modern-idoc@0.12.2:
-    resolution: {integrity: sha512-jAbgAixWrs4M9HSKAd3SeuIoyULc+IysyIMquly6NDwGNdoO0N0Ah+9PvXKeV5Lhkh1URRpgz0pBDV7x/xbCfw==}
+  modern-idoc@0.12.3:
+    resolution: {integrity: sha512-5DRaW+/zgC1w8r37mrOEQ1lOVTDIGMBSgMQA2KCcrdjLOp4RsxG2yfl61VrXB8s7BPU0dzg2aEEfiUNZLM/NJw==}
 
   modern-palette@2.0.0:
     resolution: {integrity: sha512-wKZcom2QzK6sS6h5RLYHEkd3V3maQLzgkI+ekDCimlk7dfXa63aekZcy+7KS+8JEqIDeY/yV1CAvA7l+7u6QHA==}
@@ -2538,6 +2538,10 @@ packages:
 
   postcss@8.5.15:
     resolution: {integrity: sha512-FfR8sjd4em2T6fb3I2MwAJU7HWVMr9zba+enmQeeWFfCbm+UOC/0X4DS8XtpUTMwWMGbjKYP7xjfNekzyGmB3A==}
+    engines: {node: ^10 || ^12 || >=14}
+
+  postcss@8.5.16:
+    resolution: {integrity: sha512-vuwillviilfKZsg0VGj5R/YwwcHx4SLsIOI/7K6mQkWx+l5cUHTjj5g0AasTBcyXsbfTgrwsUNmVUb5xVwyPwg==}
     engines: {node: ^10 || ^12 || >=14}
 
   prelude-ls@1.2.1:
@@ -3854,7 +3858,7 @@ snapshots:
       '@vue/shared': 3.5.13
       estree-walker: 2.0.2
       magic-string: 0.30.21
-      postcss: 8.5.15
+      postcss: 8.5.16
       source-map-js: 1.2.1
 
   '@vue/compiler-ssr@3.5.13':
@@ -5210,7 +5214,7 @@ snapshots:
     dependencies:
       modern-palette: 2.0.0
 
-  modern-idoc@0.12.2:
+  modern-idoc@0.12.3:
     dependencies:
       colord: 2.9.3
       nanoid: 5.1.15
@@ -5226,7 +5230,7 @@ snapshots:
     dependencies:
       diff: 9.0.0
       modern-font: 0.6.1
-      modern-idoc: 0.12.2
+      modern-idoc: 0.12.3
       modern-path2d: 1.8.5
 
   module-replacements@3.0.0-beta.8: {}
@@ -5491,6 +5495,12 @@ snapshots:
   postcss-value-parser@4.2.0: {}
 
   postcss@8.5.15:
+    dependencies:
+      nanoid: 3.3.15
+      picocolors: 1.1.1
+      source-map-js: 1.2.1
+
+  postcss@8.5.16:
     dependencies:
       nanoid: 3.3.15
       picocolors: 1.1.1
