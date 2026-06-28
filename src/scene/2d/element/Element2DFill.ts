@@ -1,11 +1,14 @@
-import type { Fill, NormalizedFill } from 'modern-idoc'
-import type { AnimatedTexture, Texture2D } from '../../resources'
+import type { Fill, NormalizedFill, PipelineImage } from 'modern-idoc'
+import type { AnimatedTexture } from '../../resources'
 import type { Element2D } from './Element2D'
 import { isNone, normalizeFill, property } from 'modern-idoc'
 import { assets } from '../../../asset'
-import { CoreObject } from '../../../core'
-import { GradientTexture, ViewportTexture } from '../../resources'
+import { CoreObject, createHTMLCanvas, SUPPORTS_IMAGE_BITMAP } from '../../../core'
+import { GradientTexture, Texture2D, ViewportTexture } from '../../resources'
+import { getImagePipelineResolver } from './imagePipeline'
 import { getFillDrawOptions } from './utils'
+
+type Snapshotable = CanvasImageSource & { width: number, height: number }
 
 export interface Element2DFill extends NormalizedFill {
   //
@@ -23,6 +26,8 @@ export class Element2DFill extends CoreObject implements NormalizedFill {
   @property() declare rotateWithShape?: NormalizedFill['rotateWithShape']
   @property() declare tile?: NormalizedFill['tile']
   @property() declare opacity?: NormalizedFill['opacity']
+  /** 图片处理管线；图片加载后交由注入的解析器烘焙到运行时纹理，不持久化 */
+  @property() declare pipelines?: NormalizedFill['pipelines']
 
   texture?: Texture2D
   animatedTexture?: AnimatedTexture
@@ -62,6 +67,7 @@ export class Element2DFill extends CoreObject implements NormalizedFill {
       case 'image':
       case 'linearGradient':
       case 'radialGradient':
+      case 'pipelines':
         this._updateTexture()
         break
     }
@@ -101,6 +107,7 @@ export class Element2DFill extends CoreObject implements NormalizedFill {
         }
         else {
           this.texture = res as any
+          await this._applyPipelines(url)
         }
       }
     }
@@ -108,6 +115,64 @@ export class Element2DFill extends CoreObject implements NormalizedFill {
       this.animatedTexture = undefined
       this.texture = undefined
     }
+  }
+
+  /**
+   * 把原图经 `pipelines` 烘焙成一张运行时纹理（无管线 / 无解析器 / gif 时跳过）。
+   * 始终从 image 独立解码像素喂给管线，不读 `this.texture.source`（那张 ImageBitmap
+   * 由纹理管线持有、会经 premultiply 上传/GC 而被消费）。结果按 `url + 管线` 缓存复用。
+   */
+  protected async _applyPipelines(url: string): Promise<void> {
+    const pipelines = this.pipelines
+    const resolver = getImagePipelineResolver()
+    if (!pipelines?.length || !resolver)
+      return
+    const canvas = await assets.loadBy(`${url}#mc-pipeline:${this._pipelineKey(pipelines)}`, async () => {
+      const source = await this._decodePipelineSource(url)
+      if (!source)
+        return undefined
+      const out = await resolver(pipelines, source)
+      if (!out)
+        return undefined
+      return this._pipelineImageToCanvas(out)
+    })
+    // 用普通 Texture2D 包裹烘焙结果（不能用 CanvasTexture：其设置 width/height 会重设
+    // canvas 而清空已烘焙像素）。仅当确有结果时替换，避免覆盖已加载的原图纹理。
+    if (canvas)
+      this.texture = new Texture2D({ source: canvas, width: canvas.width, height: canvas.height, uploadMethodId: 'image' })
+  }
+
+  protected _pipelineKey(pipelines: NonNullable<NormalizedFill['pipelines']>): string {
+    return pipelines.map(p => `${p.name}:${p.params ? JSON.stringify(p.params) : ''}`).join('|')
+  }
+
+  /** 从 image 独立解码为中立像素结构（不读 GPU 纹理 source） */
+  protected async _decodePipelineSource(url: string): Promise<PipelineImage | undefined> {
+    const bitmap = await assets.fetchImageBitmap(url) as unknown as Snapshotable
+    const w = Math.max(1, Math.round(bitmap.width))
+    const h = Math.max(1, Math.round(bitmap.height))
+    const canvas = createHTMLCanvas(w, h)
+    const ctx = canvas?.getContext('2d')
+    if (!canvas || !ctx)
+      return undefined
+    ctx.drawImage(bitmap, 0, 0, w, h)
+    if (SUPPORTS_IMAGE_BITMAP && bitmap instanceof ImageBitmap)
+      bitmap.close()
+    const imageData = ctx.getImageData(0, 0, w, h)
+    return { data: imageData.data, width: w, height: h }
+  }
+
+  protected _pipelineImageToCanvas(image: PipelineImage): HTMLCanvasElement | undefined {
+    const w = Math.max(1, Math.round(image.width))
+    const h = Math.max(1, Math.round(image.height))
+    const canvas = createHTMLCanvas(w, h)
+    const ctx = canvas?.getContext('2d')
+    if (!canvas || !ctx)
+      return undefined
+    const imageData = ctx.createImageData(w, h)
+    imageData.data.set(image.data)
+    ctx.putImageData(imageData, 0, 0)
+    return canvas
   }
 
   protected async _updateTexture(): Promise<void> {
