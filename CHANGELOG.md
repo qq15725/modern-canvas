@@ -1,3 +1,9 @@
+## [0.24.13](https://github.com/qq15725/modern-canvas/compare/v0.24.12...v0.24.13) (2026-06-28)
+
+
+### Bug Fixes
+
+* **deps:** bump modern-idoc to ^0.12.2 ([936e28a](https://github.com/qq15725/modern-canvas/commit/936e28a2f18cc0b8940bf6cbf1b1afa4b61bb3f9))
 ## [0.24.12](https://github.com/qq15725/modern-canvas/compare/v0.24.11...v0.24.12) (2026-06-28)
 
 
