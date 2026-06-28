@@ -1,3 +1,16 @@
+## [0.24.12](https://github.com/qq15725/modern-canvas/compare/v0.24.11...v0.24.12) (2026-06-28)
+
+
+* feat(element)!: bake image fill via injectable pipeline resolver ([70d20d7](https://github.com/qq15725/modern-canvas/commit/70d20d7da8d0fa398cfb4f45ce4a786aab31551b))
+
+
+### BREAKING CHANGES
+
+* remove built-in `bakeImageEffects` and
+`foreground.effects` baking; image styling moves to pipelines, the
+concrete effect pipeline now lives in the host (e.g. @mce/bigesj).
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 ## [0.24.11](https://github.com/qq15725/modern-canvas/compare/v0.24.10...v0.24.11) (2026-06-26)
 
 
