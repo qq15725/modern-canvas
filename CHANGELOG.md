@@ -1,3 +1,15 @@
+# [0.25.0](https://github.com/qq15725/modern-canvas/compare/v0.24.13...v0.25.0) (2026-06-28)
+
+
+* refactor(element)!: scope image pipeline resolver to engine instance ([26831b7](https://github.com/qq15725/modern-canvas/commit/26831b745e5d2f1da774318a73a0f584313d5a28))
+
+
+### BREAKING CHANGES
+
+* the setImagePipelineResolver / getImagePipelineResolver
+globals are removed; assign the engine instance's imagePipelineResolver.
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 ## [0.24.13](https://github.com/qq15725/modern-canvas/compare/v0.24.12...v0.24.13) (2026-06-28)
 
 
