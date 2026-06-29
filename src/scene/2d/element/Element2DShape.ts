@@ -105,8 +105,11 @@ export class Element2DShape extends CoreObject implements NormalizedShape {
     if (!set) {
       return false
     }
-    // fill hits are exact; the stroke slack covers the outline's outer half + tolerance
-    return Boolean(set.hitTest(localPos, { stroke: true, tolerance: tolerance + strokeWidth / 2 }))
+    // fill hits are exact; the stroke slack covers the outline's outer half + tolerance.
+    // forceStroke: the outline is an element-level property (not declared on the path's own
+    // style), so the stroke must be tested regardless — otherwise an unstroked open path
+    // (a line) only ever fill-tests and never registers a hit across its drawn width.
+    return Boolean(set.hitTest(localPos, { stroke: true, forceStroke: true, tolerance: tolerance + strokeWidth / 2 }))
   }
 
   /**
