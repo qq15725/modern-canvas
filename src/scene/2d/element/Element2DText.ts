@@ -15,7 +15,7 @@ import { isNone, normalizeFill, normalizeText, normalizeTextContent, property } 
 import { BoundingBox, Transform2D } from 'modern-path2d'
 import { Character, Text } from 'modern-text'
 import { assets } from '../../../asset'
-import { CoreObject } from '../../../core'
+import { CoreObject, markRaw } from '../../../core'
 import { CanvasTexture, GradientTexture } from '../../resources'
 import { getFillDrawOptions } from './utils'
 
@@ -54,7 +54,9 @@ export class Element2DText extends CoreObject implements NormalizedText {
   ) {
     super()
 
-    this.base = new Text()
+    // 文本排版实例挂载大量字形 path 数据，是渲染资源而非视图数据：创建即 markRaw，
+    // 使其不被宿主响应式系统深度代理（否则代理海量 path 会带来严重的响应式开销）。
+    this.base = markRaw(new Text())
     this.base.setPropertyAccessor(this)
   }
 

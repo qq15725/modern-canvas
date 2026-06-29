@@ -1,5 +1,6 @@
 import type { Node as YogaNode } from 'yoga-layout/load'
 import type { Node } from '../../main'
+import { markRaw } from '../../../core'
 import { Element2D } from './Element2D'
 
 export const edgeMap = {
@@ -90,7 +91,9 @@ export class Flexbox {
     this._yoga = await loadYoga()
   }
 
-  node: YogaNode | undefined = Flexbox._yoga?.Node.create()
+  // yoga 节点是布局计算对象、不参与视图响应式：创建即 markRaw，使其不被宿主响应式系统代理
+  // （被代理后传入 yoga 的 embind 接口会令参数序列化失败而崩溃）。
+  node: YogaNode | undefined = Flexbox._yoga ? markRaw(Flexbox._yoga.Node.create()) : undefined
 
   constructor(
     protected _parent: Element2D,
