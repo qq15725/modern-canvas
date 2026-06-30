@@ -489,6 +489,11 @@ export class Element2DText extends CoreObject implements NormalizedText {
     if (Boolean(this.effects?.length) || Boolean(this.outline?.width)) {
       return false
     }
+    // 文字变形（arch/wave/flag…）逐字平移+旋转字形几何，atlas 的轴对齐 quad 表达不了旋转，
+    // 必须走整段栅格化（base.render 会跑 deformation 插件）。
+    if (this.deformation && !isNone(this.deformation) && (this.deformation as any).type) {
+      return false
+    }
     if (this.fill && !isNone(this.fill)) {
       return false // 元素级渐变/图片填充。
     }
