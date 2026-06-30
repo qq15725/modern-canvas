@@ -65,7 +65,7 @@
     "modern-font": "^0.6.1",
     "modern-idoc": "^0.12.3",
     "modern-path2d": "^1.8.6",
-    "modern-text": "^2.0.9"
+    "modern-text": "^2.1.0"
   },
   "peerDependencies": {
     "echarts": "^5 || ^6",

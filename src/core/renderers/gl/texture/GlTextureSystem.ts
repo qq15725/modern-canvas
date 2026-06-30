@@ -70,7 +70,13 @@ export class GlTextureSystem extends GlSystem {
       texture.mipmap
       && (this._renderer.supports.nonPowOf2mipmaps || texture.isPowerOfTwo)
     ) {
-      const biggestDimension = Math.max(texture.width, texture.height)
+      // mip 级数必须按「实际上传到 GPU 的像素尺寸」(pixelWidth/Height) 计算，而非逻辑尺寸。
+      // 当 pixelRatio < 1（如按显示分辨率栅格的小纹理）逻辑尺寸 > 像素尺寸，用逻辑尺寸会得出
+      // 超过该纹理实际可生成的级数 → mip 链不完整 → 整张纹理采样为空、不显示。
+      const biggestDimension = Math.max(
+        texture.pixelWidth ?? texture.width,
+        texture.pixelHeight ?? texture.height,
+      )
       texture.mipLevelCount = Math.floor(Math.log2(biggestDimension)) + 1
     }
     if (!this.textures.get(texture.instanceId)) {

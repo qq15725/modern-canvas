@@ -78,6 +78,10 @@ export interface Element2DProperties extends Node2DProperties {
 
 const layoutStyle = new Set(Object.keys(getDefaultLayoutStyle()))
 const textStyles = new Set(Object.keys(getDefaultTextStyle()))
+// 纯平移 style：只改元素在父级中的位置，不影响其内部文字排版。它们虽属 layoutStyle，
+// 但不应触发 text.update()——否则拖拽（每帧改 left/top）会每帧重跑文字排版+重栅格纹理，
+// 拖动时白白消耗。只排除 left/top（拖拽实际改动的键），right/bottom 保守起见仍触发更新。
+const positionStyle = new Set(['left', 'top'])
 
 // reusable scratch for viewport culling (avoids per-frame allocation)
 const _cullVec = new Vector2()
@@ -282,6 +286,20 @@ export class Element2D extends Node2D implements Rectangulable {
       ?? this._parentGlobalDisplay
   }
 
+  /**
+   * 批量修改：fn 内对 style 的多次改动只在结束时合并触发一次 text.update()（文字重栅格）。
+   * 否则逐个改 width/height/fontSize 会各自重栅一次（如 resize 时每帧重栅 3 次）。
+   */
+  batch(fn: () => void): void {
+    this._beginBatch()
+    try {
+      fn()
+    }
+    finally {
+      this._endBatch()
+    }
+  }
+
   protected _beginBatch(): void {
     this._batchDepth++
   }
@@ -391,7 +409,7 @@ export class Element2D extends Node2D implements Rectangulable {
         break
     }
 
-    if (textStyles.has(key) || layoutStyle.has(key)) {
+    if ((textStyles.has(key) || layoutStyle.has(key)) && !positionStyle.has(key)) {
       if (this.text.isValid()) {
         if (this._batchDepth > 0) {
           this._pendingTextUpdate = true

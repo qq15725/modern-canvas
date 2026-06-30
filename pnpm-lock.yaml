@@ -24,8 +24,8 @@ importers:
         specifier: ^1.8.6
         version: 1.8.6
       modern-text:
-        specifier: ^2.0.9
-        version: 2.0.9
+        specifier: ^2.1.0
+        version: 2.1.0
     devDependencies:
       '@antfu/eslint-config':
         specifier: ^9.1.0
@@ -2248,8 +2248,8 @@ packages:
   modern-path2d@1.8.6:
     resolution: {integrity: sha512-bPU+NFqop4TI/L53dL/1mzrgfM60fSLKxgjUrnbyz0niptWRRdug5Z44/ECF3K1BY2VTLEcWACAc3uF73ML/EQ==}
 
-  modern-text@2.0.9:
-    resolution: {integrity: sha512-T/6iGksR7BQ96oTDqfwn8+pREsOlc5HemtEgYSAqLBSLU8dXH/mBTHQLFNbgX+n66Ojg1nyZiF8QH/UXDkojRQ==}
+  modern-text@2.1.0:
+    resolution: {integrity: sha512-1sNVOqrRGoCvO6sTI9JoylgydAxbUXBJgR4unLTlL6yZcQ3tkuh8Gqzi1szGshHrf0p9o7uG4JGFveGQL7u2EQ==}
 
   module-replacements@3.0.0-beta.8:
     resolution: {integrity: sha512-sc8TepP9elxoOBXEpxmhPzKKjTjbswHVcmsKGbgvm3k6jZlLu/WMV/Lfmga6IGMgHU/V3WtY2s6VEgM4nTElUQ==}
@@ -3657,8 +3657,8 @@ snapshots:
 
   '@typescript-eslint/project-service@8.56.1(typescript@6.0.3)':
     dependencies:
-      '@typescript-eslint/tsconfig-utils': 8.56.1(typescript@6.0.3)
-      '@typescript-eslint/types': 8.56.1
+      '@typescript-eslint/tsconfig-utils': 8.62.0(typescript@6.0.3)
+      '@typescript-eslint/types': 8.62.0
       debug: 4.4.3
       typescript: 6.0.3
     transitivePeerDependencies:
@@ -5226,7 +5226,7 @@ snapshots:
       earcut: 3.0.2
       polygon-clipping: 0.15.7
 
-  modern-text@2.0.9:
+  modern-text@2.1.0:
     dependencies:
       diff: 9.0.0
       modern-font: 0.6.1
