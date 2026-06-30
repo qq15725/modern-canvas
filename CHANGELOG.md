@@ -1,3 +1,9 @@
+# [0.26.0](https://github.com/qq15725/modern-canvas/compare/v0.25.2...v0.26.0) (2026-06-30)
+
+
+### Features
+
+* glyph atlas text rendering ([2b0f279](https://github.com/qq15725/modern-canvas/commit/2b0f279721c297c7d6d25e8973c8b44ce4db2dca))
 ## [0.25.2](https://github.com/qq15725/modern-canvas/compare/v0.25.1...v0.25.2) (2026-06-29)
 ## [0.25.1](https://github.com/qq15725/modern-canvas/compare/v0.25.0...v0.25.1) (2026-06-29)
 # [0.25.0](https://github.com/qq15725/modern-canvas/compare/v0.24.13...v0.25.0) (2026-06-28)
