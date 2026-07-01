@@ -61,11 +61,11 @@
   },
   "dependencies": {
     "colord": "^2.9.3",
-    "earcut": "^3.0.2",
-    "modern-font": "^0.6.1",
+    "earcut": "^3.2.0",
+    "modern-font": "^0.6.2",
     "modern-idoc": "^0.12.3",
     "modern-path2d": "^1.8.6",
-    "modern-text": "^2.1.0"
+    "modern-text": "^2.1.2"
   },
   "peerDependencies": {
     "echarts": "^5 || ^6",
@@ -90,16 +90,16 @@
   "devDependencies": {
     "@antfu/eslint-config": "^9.1.0",
     "@types/earcut": "^3.0.0",
-    "@types/node": "^26.0.0",
+    "@types/node": "^26.0.1",
     "bumpp": "^11.1.0",
     "conventional-changelog-cli": "^5.0.0",
     "echarts": "^6.1.0",
-    "eslint": "^10.5.0",
+    "eslint": "^10.6.0",
     "lottie-web": "^5.13.0",
     "modern-gif": "^2.1.0",
     "typescript": "^6.0.3",
     "unbuild": "^3.6.1",
-    "vite": "^8.1.0",
+    "vite": "^8.1.2",
     "vitest": "^4.1.9",
     "yoga-layout": "^3.2.1"
   }
