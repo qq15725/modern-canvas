@@ -139,9 +139,12 @@ export class Element2DText extends CoreObject implements NormalizedText {
   update(): void {
     this.base.fonts = this.base.fonts ?? this._parent.tree?.fonts
     this.base.update()
-    // 变形会把字形移出布局框，渲染范围（base.boundingBox）大于 size；通知父元素按变形后
-    // 范围重算 aabb，否则选框只裹住原始布局框、露在外面的变形部分选不中。
-    if (this.deformation && !isNone(this.deformation) && (this.deformation as any).type) {
+    // 渲染范围（base.boundingBox：变形/溢出/超大字形）可能超出布局框 size；超出时通知父元素
+    // 并入重算 aabb，否则选框只裹住布局框、露在外面的部分选不中。变形改的是内容不是 transform，
+    // 不会自动触发 aabb 重算，故在此显式判定。
+    const rbb = this.base.boundingBox
+    const psize = this._parent.size
+    if (rbb && (rbb.left < 0 || rbb.top < 0 || rbb.left + rbb.width > psize.width || rbb.top + rbb.height > psize.height)) {
       this._parent.updateContentAabb()
     }
     // glyph atlas 路径：纯色实心字形走逐字 quad 批渲染，跳过整段栅格化（编辑/缩放/resize

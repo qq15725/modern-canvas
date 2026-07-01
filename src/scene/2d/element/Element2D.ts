@@ -617,12 +617,11 @@ export class Element2D extends Node2D implements Rectangulable {
 
   protected _getPointArray(): Vector2Like[] {
     const { width, height } = this.size
-    // 变形文字（arch/bend/wave…）把字形移出布局框；aabb/选框只按 size 四角算会裹不住露在
-    // 框外的变形部分。有变形时并入变形后的字形范围（text.base.boundingBox），让选框贴合。
-    const deformation = this._text.deformation
-    if (this._text.isValid() && deformation && !isNone(deformation) && (deformation as any).type) {
+    // 文字的实际渲染范围（base.boundingBox）可能超出布局框 size——变形把字形移出框、
+    // 溢出/超大字形亦然。aabb/选框只按 size 四角算就裹不住露在框外的部分，故并入渲染范围。
+    if (this._text.isValid()) {
       const bb = this._text.base.boundingBox
-      if (bb) {
+      if (bb && (bb.left < 0 || bb.top < 0 || bb.left + bb.width > width || bb.top + bb.height > height)) {
         const left = Math.min(0, bb.left)
         const top = Math.min(0, bb.top)
         const right = Math.max(width, bb.left + bb.width)
