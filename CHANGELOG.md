@@ -1,3 +1,10 @@
+## [0.26.2](https://github.com/qq15725/modern-canvas/compare/v0.26.1...v0.26.2) (2026-07-01)
+
+
+### Bug Fixes
+
+* include deformed glyph range in text element aabb ([876bc57](https://github.com/qq15725/modern-canvas/commit/876bc57cc96c3353a0f580f2dc115e8762cc15b3))
+* route text with decoration/background/list markers off the atlas ([b42c848](https://github.com/qq15725/modern-canvas/commit/b42c848c64e31d38b22ef1d46d48ed646ae226b2))
 ## [0.26.1](https://github.com/qq15725/modern-canvas/compare/v0.26.0...v0.26.1) (2026-07-01)
 
 
