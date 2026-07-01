@@ -237,6 +237,15 @@ export class Element2D extends Node2D implements Rectangulable {
     this._updateAabb()
   }
 
+  /**
+   * 供文字渲染子（Element2DText）在变形/内容改变、渲染范围可能超出布局框时调用，
+   * 按最新的 _getPointArray（已并入变形后字形范围）重算本地/全局 aabb，让选框贴合。
+   */
+  updateContentAabb(): void {
+    this._updateAabb()
+    this._updateGlobalAabb()
+  }
+
   protected _updateAabb(): void {
     const { a, b, c, d, tx, ty } = this.transform
     const x: number[] = []
@@ -608,6 +617,24 @@ export class Element2D extends Node2D implements Rectangulable {
 
   protected _getPointArray(): Vector2Like[] {
     const { width, height } = this.size
+    // 变形文字（arch/bend/wave…）把字形移出布局框；aabb/选框只按 size 四角算会裹不住露在
+    // 框外的变形部分。有变形时并入变形后的字形范围（text.base.boundingBox），让选框贴合。
+    const deformation = this._text.deformation
+    if (this._text.isValid() && deformation && !isNone(deformation) && (deformation as any).type) {
+      const bb = this._text.base.boundingBox
+      if (bb) {
+        const left = Math.min(0, bb.left)
+        const top = Math.min(0, bb.top)
+        const right = Math.max(width, bb.left + bb.width)
+        const bottom = Math.max(height, bb.top + bb.height)
+        return [
+          { x: left, y: top },
+          { x: left, y: bottom },
+          { x: right, y: top },
+          { x: right, y: bottom },
+        ]
+      }
+    }
     return [
       { x: 0, y: 0 },
       { x: 0, y: height },
