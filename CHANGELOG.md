@@ -1,3 +1,9 @@
+## [0.26.1](https://github.com/qq15725/modern-canvas/compare/v0.26.0...v0.26.1) (2026-07-01)
+
+
+### Bug Fixes
+
+* exclude deformed text from the glyph atlas ([ffaf704](https://github.com/qq15725/modern-canvas/commit/ffaf704e2ccc4e5a0ea54d2f639acd638c860abc))
 # [0.26.0](https://github.com/qq15725/modern-canvas/compare/v0.25.2...v0.26.0) (2026-06-30)
 
 
