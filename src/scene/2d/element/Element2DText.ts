@@ -139,6 +139,11 @@ export class Element2DText extends CoreObject implements NormalizedText {
   update(): void {
     this.base.fonts = this.base.fonts ?? this._parent.tree?.fonts
     this.base.update()
+    // 变形会把字形移出布局框，渲染范围（base.boundingBox）大于 size；通知父元素按变形后
+    // 范围重算 aabb，否则选框只裹住原始布局框、露在外面的变形部分选不中。
+    if (this.deformation && !isNone(this.deformation) && (this.deformation as any).type) {
+      this._parent.updateContentAabb()
+    }
     // glyph atlas 路径：纯色实心字形走逐字 quad 批渲染，跳过整段栅格化（编辑/缩放/resize
     // 不再每次重栅整篇）。slot 在 draw() 时按需栅格化、跨元素复用。
     this._atlasEligible = this._computeAtlasEligible()
@@ -502,6 +507,13 @@ export class Element2DText extends CoreObject implements NormalizedText {
     )))
     if (hasComplexFragment) {
       return false
+    }
+    // 背景、下划线/删除线/上划线、列表标记、高亮等由各插件绘制到独立 pathSet；atlas 只逐字形
+    // 画字形 quad、不含这些额外绘制，任一非空就必须回退纹理路径，否则装饰会整片丢失。
+    for (const name of ['background', 'textDecoration', 'listStyle', 'highlight']) {
+      if ((this.base.plugins.get(name) as any)?.pathSet?.paths?.length) {
+        return false
+      }
     }
     // 单页设备尺寸上限 PAGE(2048) / superSample(2)，留 1.5 余量给高瘦字形。
     const maxGlyphLogical = (2048 / sharedGlyphAtlas.superSample) / 1.5
