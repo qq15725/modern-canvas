@@ -113,20 +113,52 @@ export class Element2DOutline extends Element2DFill implements NormalizedOutline
     if (len < 1e-3)
       return
 
-    const factor = LINE_END_SIZE_FACTOR[String(end.width ?? end.height ?? 'md')] ?? 6
-    const arrowLen = strokeWidth * factor
-    const arrowHalf = strokeWidth * factor * 0.5
-
-    // unit tangent (toward tip) and the perpendicular for the triangle base
+    // unit tangent (toward tip) and the perpendicular
     const tx = dx / len
     const ty = dy / len
+
+    const factor = LINE_END_SIZE_FACTOR[String(end.width ?? end.height ?? 'md')] ?? 6
+    const ctx = this._parent.context
+    const endColor = (end as any).color ?? color
+
+    // 'bar'：垂直于线端切线的短竖线端点标记（如工作流连接点）。以 tip 为中心、
+    // 沿切线取厚度、沿法线取长度，画一个矩形。
+    if ((end as unknown as { type?: string }).type === 'bar') {
+      const half = strokeWidth * factor * 0.6 // 竖线半长
+      const thick = Math.max(strokeWidth * 0.9, 1.5) // 竖线厚度（沿轴）
+      // 把切线吸附到最近的坐标轴，使端点标记对齐节点边缘（左右端口→竖直、上下端口→水平），
+      // 不随曲线到端点的斜率歪掉。
+      let ax = 0
+      let ay = 0
+      if (Math.abs(tx) >= Math.abs(ty)) {
+        ax = Math.sign(tx) || 1
+      }
+      else {
+        ay = Math.sign(ty) || 1
+      }
+      const nx = -ay * half // 沿轴法线取半长
+      const ny = ax * half
+      const hx = ax * (thick / 2) // 沿轴取半厚
+      const hy = ay * (thick / 2)
+      ctx.fillStyle = endColor
+      ctx
+        .moveTo(tip.x + nx - hx, tip.y + ny - hy)
+        .lineTo(tip.x - nx - hx, tip.y - ny - hy)
+        .lineTo(tip.x - nx + hx, tip.y - ny + hy)
+        .lineTo(tip.x + nx + hx, tip.y + ny + hy)
+        .closePath()
+        .fill()
+      return
+    }
+
+    const arrowLen = strokeWidth * factor
+    const arrowHalf = strokeWidth * factor * 0.5
     const baseX = tip.x - tx * arrowLen
     const baseY = tip.y - ty * arrowLen
     const px = -ty * arrowHalf
     const py = tx * arrowHalf
 
-    const ctx = this._parent.context
-    ctx.fillStyle = color
+    ctx.fillStyle = endColor
     ctx
       .moveTo(tip.x, tip.y)
       .lineTo(baseX + px, baseY + py)
