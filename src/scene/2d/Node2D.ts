@@ -13,6 +13,12 @@ export interface Node2DProperties extends CanvasItemProperties {
   //
 }
 
+// Scratch transform for folding a parent's contentOffset into the child's global
+// transform. Used and consumed synchronously inside updateGlobalTransform (which
+// never recurses into another node's updateGlobalTransform), so a single shared
+// instance is safe and avoids a per-frame allocation.
+const _contentTransform = new Transform2D()
+
 export interface Node2DEvents extends CanvasItemEvents {
   updateGlobalTransform: []
 }
@@ -28,6 +34,13 @@ export interface Node2D {
 export class Node2D extends CanvasItem {
   rotation = 0
   readonly position = new Vector2(0, 0, () => this.updateGlobalTransform())
+  /**
+   * Scroll/content offset (in this node's local space) applied only to its
+   * children's global transform — the node's own transform, globalAabb and
+   * overflow-clip box are unaffected. Runtime UI state, not serialized: lets a
+   * frame scroll its overflowing content while its clip box stays put.
+   */
+  readonly contentOffset = new Vector2(0, 0, () => this.updateGlobalTransform())
   readonly scale = new Vector2(1, 1, () => this.updateGlobalTransform())
   readonly skew = new Vector2(0, 0, () => this.updateGlobalTransform())
   readonly pivot = new Vector2(0, 0, () => this.updateGlobalTransform())
@@ -73,16 +86,31 @@ export class Node2D extends CanvasItem {
         globalSkew,
         globalRotation,
         transformDirtyId,
+        contentOffset,
       } = parent
       this.parentTransformDirtyId = transformDirtyId
-      this.globalPosition.set(globalPosition.x + this.position.x, globalPosition.y + this.position.y)
+      const ox = contentOffset.x
+      const oy = contentOffset.y
+      this.globalPosition.set(globalPosition.x + this.position.x - ox, globalPosition.y + this.position.y - oy)
       this.globalScale.set(globalScale.x * this.scale.x, globalScale.y * this.scale.y)
       this.globalSkew.set(globalSkew.x * this.skew.x, globalSkew.y * this.skew.y)
       this.globalRotation = globalRotation + this.rotation
-      this.globalTransform.appendFrom(
-        this.transform,
-        parent.globalTransform,
-      )
+      if (ox !== 0 || oy !== 0) {
+        // Fold the parent's content offset (a translation in parent-local space)
+        // into its global transform: g · T(-offset). Done as a proper local
+        // post-translate so it stays correct under parent scale / rotation.
+        const g = parent.globalTransform
+        _contentTransform.copyFrom(g)
+        _contentTransform.tx = g.tx - (ox * g.a) - (oy * g.c)
+        _contentTransform.ty = g.ty - (ox * g.b) - (oy * g.d)
+        this.globalTransform.appendFrom(this.transform, _contentTransform)
+      }
+      else {
+        this.globalTransform.appendFrom(
+          this.transform,
+          parent.globalTransform,
+        )
+      }
     }
     else {
       this.globalPosition.copyFrom(this.position)

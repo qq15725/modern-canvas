@@ -18,6 +18,7 @@ import type {
   InputEvent,
   InputEventKey,
   PointerInputEvent,
+  WebGLRenderer,
 } from '../../../core'
 import type { Node, Rectangulable, RectangulableEvents, SceneTree, Viewport } from '../../main'
 import type { Node2DEvents, Node2DProperties } from '../Node2D'
@@ -33,6 +34,7 @@ import {
 } from '../../../core'
 import { parseCssTransformOrigin } from '../../../css'
 import { ColorFilterEffect, MaskEffect } from '../../effects'
+import { ColorTexture } from '../../resources'
 import { Node2D } from '../Node2D'
 import { Element2DBackground } from './Element2DBackground'
 import { Element2DChart } from './Element2DChart'
@@ -88,6 +90,18 @@ const positionStyle = new Set(['left', 'top'])
 const _cullVec = new Vector2()
 const _cullCorners: [number, number][] = [[0, 0], [1, 0], [1, 1], [0, 1]]
 
+// 滚动条（overflow:scroll/auto）常量，单位=屏幕像素（渲染时按相机 zoom 换算成世界尺寸）。
+const SB_THICK = 6 // 粗细
+const SB_GAP = 2 // 距边内边距
+const SB_MIN = 24 // thumb 最小长度
+const _sbPoint = { x: 0, y: 0 }
+
+function sbClamp(v: number, min: number, max: number): number {
+  return v < min ? min : v > max ? max : v
+}
+
+interface ScrollThumb { x: number, y: number, w: number, h: number, travel: number, span: number, min: number }
+
 @customNode('Element2D')
 export class Element2D extends Node2D implements Rectangulable {
   readonly flexbox = new Flexbox(this)
@@ -107,6 +121,14 @@ export class Element2D extends Node2D implements Rectangulable {
 
   protected _allowPointerEvents = true
   protected _overflowHidden = false
+  // 滚动条模式（overflow:scroll 常显 / auto 悬停显示）+ 运行时交互态（不序列化）。
+  protected _scrollbarMode?: 'scroll' | 'auto'
+  protected _pointerInside = false
+  protected _scrollbarHoverAxis?: 'x' | 'y'
+  protected _scrollbarDrag?: { axis: 'x' | 'y', startScreen: number, startOffset: number, travel: number, span: number, min: number }
+  // thumb 的 batchable 按几何缓存复用：合批器的静态帧复用按对象 identity 判断，
+  // 每帧 new 会让整个 flush 每帧全量重建；仅几何/透明度变化时才换新对象。
+  protected _scrollThumbCache: Record<'v' | 'h', { key: string, batchable: any } | undefined> = { v: undefined, h: undefined }
 
   protected _style = new Element2DStyle().on('updateProperty', (...args: any[]) => {
     this.onUpdateStyleProperty(args[0], args[1], args[2])
@@ -410,7 +432,9 @@ export class Element2D extends Node2D implements Rectangulable {
         this.outline.color = value
         break
       case 'overflow':
-        this._overflowHidden = value === 'hidden'
+        // hidden/clip 只裁剪；scroll/auto 裁剪 + 显示滚动条（scroll 常显、auto 悬停显示）。
+        this._overflowHidden = value === 'hidden' || value === 'clip' || value === 'scroll' || value === 'auto'
+        this._scrollbarMode = value === 'scroll' ? 'scroll' : value === 'auto' ? 'auto' : undefined
         this._updateMask()
         break
       case 'pointerEvents':
@@ -755,6 +779,227 @@ export class Element2D extends Node2D implements Rectangulable {
     //
   }
 
+  /**
+   * 内容（子节点本地 AABB 并集）相对自身 box 的可滚动区间。用于滚动条与滚轮：
+   * offset>0 表示内容上/左移、露出下/右侧内容。无子节点返回 undefined。
+   */
+  getScrollRange(): { x: { min: number, max: number }, y: { min: number, max: number }, content: { w: number, h: number } } | undefined {
+    const kids = this.getChildren() as Element2D[]
+    if (!kids.length) {
+      return undefined
+    }
+    let minX = Infinity
+    let minY = Infinity
+    let maxX = -Infinity
+    let maxY = -Infinity
+    for (const c of kids) {
+      const x = c.position?.x ?? 0
+      const y = c.position?.y ?? 0
+      const w = c.size?.width ?? 0
+      const h = c.size?.height ?? 0
+      if (x < minX)
+        minX = x
+      if (y < minY)
+        minY = y
+      if (x + w > maxX)
+        maxX = x + w
+      if (y + h > maxY)
+        maxY = y + h
+    }
+    const fw = this.size.width
+    const fh = this.size.height
+    return {
+      x: { min: Math.min(0, minX), max: Math.max(0, maxX - fw) },
+      y: { min: Math.min(0, minY), max: Math.max(0, maxY - fh) },
+      content: { w: maxX - Math.min(0, minX), h: maxY - Math.min(0, minY) },
+    }
+  }
+
+  // thumb 的世界坐标矩形（沿自身世界 AABB 右/下内侧）。zx/zy=世界→屏幕缩放，
+  // 用于把「屏幕恒定像素」的粗细/间距换算成世界尺寸。无溢出返回空。
+  protected _scrollThumbs(zx: number, zy: number): { v?: ScrollThumb, h?: ScrollThumb } | undefined {
+    const range = this.getScrollRange()
+    if (!range) {
+      return undefined
+    }
+    const overflowX = range.x.max > range.x.min
+    const overflowY = range.y.max > range.y.min
+    if (!overflowX && !overflowY) {
+      return undefined
+    }
+    const a = this.globalAabb
+    const thickXw = SB_THICK / zx
+    const thickYw = SB_THICK / zy
+    const gapXw = SB_GAP / zx
+    const gapYw = SB_GAP / zy
+    const co = this.contentOffset
+    const out: { v?: ScrollThumb, h?: ScrollThumb } = {}
+    if (overflowY) {
+      const trackLen = a.size.y - gapYw * 2 - (overflowX ? thickYw + gapYw : 0)
+      const thumbLen = Math.max(SB_MIN / zy, Math.min(trackLen, trackLen * this.size.height / range.content.h))
+      const span = range.y.max - range.y.min
+      const frac = span > 0 ? (co.y - range.y.min) / span : 0
+      out.v = {
+        x: a.min.x + a.size.x - gapXw - thickXw,
+        y: a.min.y + gapYw + frac * (trackLen - thumbLen),
+        w: thickXw,
+        h: thumbLen,
+        travel: (trackLen - thumbLen) * zy, // 屏幕像素行程
+        span,
+        min: range.y.min,
+      }
+    }
+    if (overflowX) {
+      const trackLen = a.size.x - gapXw * 2 - (overflowY ? thickXw + gapXw : 0)
+      const thumbLen = Math.max(SB_MIN / zx, Math.min(trackLen, trackLen * this.size.width / range.content.w))
+      const span = range.x.max - range.x.min
+      const frac = span > 0 ? (co.x - range.x.min) / span : 0
+      out.h = {
+        x: a.min.x + gapXw + frac * (trackLen - thumbLen),
+        y: a.min.y + a.size.y - gapYw - thickYw,
+        w: thumbLen,
+        h: thickYw,
+        travel: (trackLen - thumbLen) * zx,
+        span,
+        min: range.x.min,
+      }
+    }
+    return out
+  }
+
+  // 当前用于世界↔屏幕换算的视口：渲染期用正在渲染的视口，输入期(getCurrentViewport
+  // 为空)回退到根视口——两者的 canvasTransform 都是相机变换。
+  protected _scrollViewport(): Viewport | undefined {
+    return this.tree?.getCurrentViewport() ?? this.getViewport()
+  }
+
+  // 在子节点画完、mask 弹出后叠画滚动条（不被裁剪、在最上层）。
+  override render(renderer: WebGLRenderer, next?: () => void): void {
+    super.render(renderer, next)
+    if (!this._scrollbarMode) {
+      return
+    }
+    // auto：仅悬停在画板上或拖拽中才显示；scroll：有溢出即常显。
+    if (this._scrollbarMode === 'auto' && !this._pointerInside && !this._scrollbarDrag) {
+      return
+    }
+    const viewport = this._scrollViewport()
+    if (!viewport?.valid) {
+      return
+    }
+    const zx = viewport.canvasTransform.a || 1
+    const zy = viewport.canvasTransform.d || 1
+    const thumbs = this._scrollThumbs(zx, zy)
+    if (!thumbs) {
+      return
+    }
+    if (thumbs.v) {
+      this._drawScrollThumb(renderer, 'v', thumbs.v, this._scrollbarHoverAxis === 'y' || this._scrollbarDrag?.axis === 'y')
+    }
+    if (thumbs.h) {
+      this._drawScrollThumb(renderer, 'h', thumbs.h, this._scrollbarHoverAxis === 'x' || this._scrollbarDrag?.axis === 'x')
+    }
+  }
+
+  protected _drawScrollThumb(renderer: WebGLRenderer, slot: 'v' | 'h', r: ScrollThumb, active: boolean): void {
+    const { x, y, w, h } = r
+    // 半透明黑（modulate 的 alpha 乘子，0-255）；命中/拖拽时加深。
+    const alpha = active ? 150 : 82
+    // 几何/透明度未变则复用缓存对象——保住合批器的静态帧复用（悬停静止时零重建）。
+    const key = `${x.toFixed(2)},${y.toFixed(2)},${w.toFixed(2)},${h.toFixed(2)},${alpha}`
+    let cached = this._scrollThumbCache[slot]
+    if (!cached || cached.key !== key) {
+      cached = {
+        key,
+        batchable: {
+          vertices: new Float32Array([x, y, x + w, y, x + w, y + h, x, y + h]),
+          uvs: new Float32Array([0, 0, 1, 0, 1, 1, 0, 1]),
+          indices: new Uint32Array([0, 1, 2, 0, 2, 3]),
+          texture: ColorTexture.get('#000000'),
+          modulate: [255, 255, 255, alpha],
+        },
+      }
+      this._scrollThumbCache[slot] = cached
+    }
+    renderer.batch2D.render(cached.batchable)
+  }
+
+  // 滚动条的悬停/拖拽输入。返回 true 表示已消费（拖拽中），调用方应 stopPropagation。
+  protected _scrollbarInput(event: InputEvent, key: InputEventKey): boolean {
+    if (!this._scrollbarMode) {
+      return false
+    }
+    const pe = event as PointerInputEvent
+
+    // 拖拽进行中：任意位置的 move/up 都由本元素处理。
+    if (this._scrollbarDrag) {
+      const d = this._scrollbarDrag
+      if (key === 'pointermove') {
+        const cur = d.axis === 'y' ? pe.screenY : pe.screenX
+        if (d.travel > 0) {
+          this.contentOffset[d.axis] = sbClamp(d.startOffset + (cur - d.startScreen) / d.travel * d.span, d.min, d.min + d.span)
+        }
+        event.stopPropagation()
+        return true
+      }
+      if (key === 'pointerup') {
+        this._scrollbarDrag = undefined
+        event.stopPropagation()
+        return true
+      }
+      return false
+    }
+
+    const viewport = this._scrollViewport()
+    if (!viewport?.valid) {
+      return false
+    }
+    const zx = viewport.canvasTransform.a || 1
+    const zy = viewport.canvasTransform.d || 1
+    _sbPoint.x = pe.screenX
+    _sbPoint.y = pe.screenY
+    viewport.toCanvasGlobal(_sbPoint, _sbPoint)
+    const a = this.globalAabb
+    const wasInside = this._pointerInside
+    const prevHover = this._scrollbarHoverAxis
+    this._pointerInside = _sbPoint.x >= a.min.x && _sbPoint.x <= a.min.x + a.size.x
+      && _sbPoint.y >= a.min.y && _sbPoint.y <= a.min.y + a.size.y
+
+    // 指针在画板外且无悬停态需要清理时早退——thumb 全在 AABB 内侧不可能命中，
+    // 免得每次 pointermove 都为每个画板遍历子节点算滚动区间。
+    if (!this._pointerInside && !wasInside && !prevHover) {
+      return false
+    }
+
+    const thumbs = this._pointerInside ? this._scrollThumbs(zx, zy) : undefined
+    const hit = (r?: ScrollThumb): boolean =>
+      !!r && _sbPoint.x >= r.x && _sbPoint.x <= r.x + r.w && _sbPoint.y >= r.y && _sbPoint.y <= r.y + r.h
+    const onV = hit(thumbs?.v)
+    const onH = hit(thumbs?.h)
+    this._scrollbarHoverAxis = onV ? 'y' : onH ? 'x' : undefined
+
+    // 悬停态变化需重绘（auto 显隐 / thumb 高亮）。
+    if (this._pointerInside !== wasInside || this._scrollbarHoverAxis !== prevHover) {
+      this.requestDraw()
+    }
+
+    if (key === 'pointerdown' && (onV || onH)) {
+      const t = (onV ? thumbs!.v! : thumbs!.h!)
+      const axis: 'x' | 'y' = onV ? 'y' : 'x'
+      this._scrollbarDrag = {
+        axis,
+        startScreen: axis === 'y' ? pe.screenY : pe.screenX,
+        startOffset: this.contentOffset[axis],
+        travel: t.travel,
+        span: t.span,
+        min: t.min,
+      }
+      event.stopPropagation()
+      return true
+    }
+    return false
+  }
+
   override input(event: InputEvent, key: InputEventKey): void {
     const array = this.getChildren(true)
     for (let i = array.length - 1; i >= 0; i--) {
@@ -793,6 +1038,10 @@ export class Element2D extends Node2D implements Rectangulable {
       case 'pointerdown':
       case 'pointermove':
       case 'pointerup': {
+        // 滚动条优先（overflow:scroll/auto）：拖拽/命中时消费事件，阻止其它交互。
+        if (this._scrollbarInput(event, key)) {
+          return
+        }
         if (this._allowPointerEvents) {
           const { screenX, screenY } = event as PointerInputEvent
           if (screenX && screenY) {
