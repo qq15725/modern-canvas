@@ -30,6 +30,7 @@ import {
   bumpGeometryRevision,
   customNode,
   DEG_TO_RAD,
+  geometryRevision,
   Obb2D,
 } from '../../../core'
 import { parseCssTransformOrigin } from '../../../css'
@@ -101,6 +102,12 @@ function sbClamp(v: number, min: number, max: number): number {
 }
 
 interface ScrollThumb { x: number, y: number, w: number, h: number, travel: number, span: number, min: number }
+
+export interface ScrollRange {
+  x: { min: number, max: number }
+  y: { min: number, max: number }
+  content: { w: number, h: number }
+}
 
 @customNode('Element2D')
 export class Element2D extends Node2D implements Rectangulable {
@@ -779,11 +786,28 @@ export class Element2D extends Node2D implements Rectangulable {
     //
   }
 
+  protected _scrollRangeCache?: { rev: number, value: ScrollRange | undefined }
+
   /**
    * 内容（子节点本地 AABB 并集）相对自身 box 的可滚动区间。用于滚动条与滚轮：
    * offset>0 表示内容上/左移、露出下/右侧内容。无子节点返回 undefined。
+   *
+   * 按全局 geometryRevision 缓存（与连线 route 缓存同款）：同一帧内滚轮 handler /
+   * render / thumb 命中检测会多次调用，宿主（如 mce）还经 reactive proxy 访问——
+   * 子节点上千时每次遍历是数千次 proxy 读，缓存命中则一次都不发生。
    */
-  getScrollRange(): { x: { min: number, max: number }, y: { min: number, max: number }, content: { w: number, h: number } } | undefined {
+  getScrollRange(): ScrollRange | undefined {
+    const rev = geometryRevision()
+    const cache = this._scrollRangeCache
+    if (cache && cache.rev === rev) {
+      return cache.value
+    }
+    const value = this._computeScrollRange()
+    this._scrollRangeCache = { rev, value }
+    return value
+  }
+
+  protected _computeScrollRange(): ScrollRange | undefined {
     const kids = this.getChildren() as Element2D[]
     if (!kids.length) {
       return undefined
