@@ -1,14 +1,15 @@
 import type {
-  BufferLike,
   BufferLikeObject,
   GeometryAttributeLike,
   GeometryLikeObject,
   ShaderLikeObject, TextureLike,
 } from '../shared'
+import type { Batch2DEffect } from './Batch2DEffect'
 import type { GlDrawOptions } from './geometry'
 import type { WebGLRenderer } from './WebGLRenderer'
 import { instanceId } from '../../shared'
 import { BufferUsage } from '../shared'
+import { flowStreakEffect, strokeFeatherEffect } from './Batch2DEffect'
 import { GlProgram } from './shader'
 import { GlBlendMode, GlState } from './state'
 import { GlSystem } from './system'
@@ -23,6 +24,18 @@ export interface Batchable2D {
   blendMode?: GlBlendMode
   roundPixels?: boolean
   clipOutsideUv?: boolean
+  /**
+   * Effect flag bits (bit 1+ of the aTextureParams.y byte; bit 0 is reserved
+   * for clipOutsideUv). Semantics are defined by the registered
+   * {@link Batch2DEffect}s — e.g. {@link FLAG_STROKE_AA}. 0/undefined = none.
+   */
+  effectFlags?: number
+  /**
+   * Effect scalar parameter (the spare aTextureParams.w byte, 0-255; 0 = off).
+   * Encoding is defined by the effect that consumes it — e.g. the flow streak
+   * effect's {@link encodeFlowSpeed}. Costs no extra vertex attribute.
+   */
+  effectParam?: number
 }
 
 type DrawCall = Required<GlDrawOptions> & {
@@ -32,10 +45,37 @@ type DrawCall = Required<GlDrawOptions> & {
   blendMode: GlBlendMode
 }
 
-interface Shader {
-  update: (bufferData: BufferLike['data'], indexBufferData: BufferLike['data']) => void
-  draw: (options?: GlDrawOptions) => void
+interface BatchProgram {
+  shader: ShaderLikeObject
+  samplers: Int32Array
+  /** merged `uniformDefaults` of the effects compiled into this program */
+  uniformDefaults: Record<string, any>
 }
+
+/**
+ * Per-flush GPU + staging resources, addressed by flush ordinal within a frame.
+ * Dedicated (not pooled/shared) so an unchanged flush can skip both the CPU
+ * vertex rewrite and the GPU upload and just re-issue its draw calls — the GL
+ * buffers still hold exactly this flush's data. `refs` snapshots what the
+ * buffer content was built from (see {@link GlBatch2DSystem.flush}).
+ */
+interface BatchSlot {
+  buffer: BufferLikeObject
+  indexBuffer: BufferLikeObject
+  geometry: GeometryLikeObject
+  attrData?: ArrayBuffer
+  f32?: Float32Array
+  u8?: Uint8Array
+  indexData?: Uint32Array<ArrayBuffer>
+  refs: any[]
+  drawCalls: DrawCall[]
+}
+
+/** REF_STRIDE entries per batchable in {@link BatchSlot.refs}. */
+const REF_STRIDE = 5
+
+/** Slots beyond this share the last one and never reuse (defensive cap). */
+const MAX_SLOTS = 64
 
 export class GlBatch2DSystem extends GlSystem {
   override install(renderer: WebGLRenderer): void {
@@ -49,9 +89,44 @@ export class GlBatch2DSystem extends GlSystem {
   protected _batchables: Batchable2D[] = []
   protected _vertexCount = 0
   protected _indexCount = 0
-  protected _attributeBuffer: ArrayBuffer[] = []
-  protected _indexBuffers: Uint32Array<ArrayBuffer>[] = []
-  protected _shaders = new Map<number, Shader>()
+  protected _programs = new Map<string, BatchProgram>()
+
+  /**
+   * Registered shader effects, composed into the batch program at compile time
+   * (see {@link Batch2DEffect}). Re-registering by name replaces and triggers a
+   * program rebuild on the next flush.
+   */
+  protected _effects: Batch2DEffect[] = [strokeFeatherEffect, flowStreakEffect]
+  protected _effectsRevision = 0
+
+  /**
+   * Host-written uniform values for effect snippets (e.g. `uFlowColor`).
+   * Merged over each effect's `uniformDefaults` on every draw.
+   */
+  effectUniforms: Record<string, any> = {}
+
+  registerEffect(effect: Batch2DEffect): void {
+    const index = this._effects.findIndex(e => e.name === effect.name)
+    if (index >= 0) {
+      this._effects[index] = effect
+    }
+    else {
+      this._effects.push(effect)
+    }
+    this._effectsRevision++
+  }
+
+  protected _slots: BatchSlot[] = []
+  protected _slotIndex = 0
+
+  /**
+   * Marks the start of a frame: flush ordinals restart so each flush lines up
+   * with the slot holding its previous content. Without this call slots keep
+   * advancing and simply never reuse (capped at {@link MAX_SLOTS}).
+   */
+  beginFrame(): void {
+    this._slotIndex = 0
+  }
 
   protected _attributes: Record<string, Partial<GeometryAttributeLike>> = {
     aPosition: { format: 'float32x2' }, // 2
@@ -62,21 +137,42 @@ export class GlBatch2DSystem extends GlSystem {
 
   protected _vertexSize = 2 + 2 + 1 + 1
 
-  protected _getShader(maxTextureUnits: number): Shader {
-    let shader = this._shaders.get(maxTextureUnits)
-    if (!shader) {
-      this._shaders.set(maxTextureUnits, shader = this._createShader(maxTextureUnits))
+  protected _getProgram(maxTextureUnits: number): BatchProgram {
+    const key = `${maxTextureUnits}:${this._effectsRevision}`
+    let program = this._programs.get(key)
+    if (!program) {
+      this._programs.set(key, program = this._createProgram(maxTextureUnits))
     }
-    return shader
+    return program
   }
 
-  protected _createShader(maxTextureUnits: number): Shader {
+  protected _createProgram(maxTextureUnits: number): BatchProgram {
     const renderer = this._renderer
+
+    // WebGL2 compiles the batch shader as real ES 300 so effect snippets can
+    // use derivatives (fwidth). WebGL1 keeps the ES 100 define-mapped path and
+    // composes each effect's `fragmentGl1` fallback (or omits the effect).
+    const es3 = renderer.version === 2
+    const header = es3 ? '#version 300 es\n' : ''
+
+    const effects = this._effects
+    const effectDecls = effects
+      .map(e => e.uniformDecls ?? '')
+      .filter(Boolean)
+      .join('\n')
+    const effectSnippets = effects
+      .map(e => (es3 ? e.fragment : e.fragmentGl1) ?? '')
+      .filter(Boolean)
+      .join('\n  ')
+    const uniformDefaults: Record<string, any> = {}
+    for (const e of effects) {
+      Object.assign(uniformDefaults, e.uniformDefaults)
+    }
 
     const shader: ShaderLikeObject = {
       instanceId: instanceId(),
       glProgram: new GlProgram({
-        vertex: `precision highp float;
+        vertex: `${header}precision highp float;
 in vec2 aPosition;
 in vec2 aUv;
 in vec4 aTextureParams;
@@ -87,7 +183,8 @@ uniform mat3 projectionMatrix;
 uniform mat3 viewMatrix;
 
 out float vTextureId;
-out float vClipOutsideUv;
+out float vFlags;
+out float vParam;
 out vec2 vUv;
 out vec4 vModulate;
 
@@ -104,20 +201,28 @@ void main(void) {
   mat3 modelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
   gl_Position = vec4((modelViewProjectionMatrix * vec3(aPosition, 1.0)).xy, 0.0, 1.0);
   vTextureId = aTextureParams.x;
-  vClipOutsideUv = aTextureParams.y;
+  // flags byte: bit 0 = clipOutsideUv (core), bits 1+ = effect flags
+  vFlags = aTextureParams.y;
   if (aTextureParams.z == 1.) {
     gl_Position.xy = roundPixels(gl_Position.xy, size);
   }
+  // effect-defined scalar (0 = off), see Batchable2D.effectParam
+  vParam = aTextureParams.w;
   vUv = aUv;
   vModulate = aModulate;
 }`,
-        fragment: `precision highp float;
+        fragment: `${header}precision highp float;
 in float vTextureId;
-in float vClipOutsideUv;
+in float vFlags;
+in float vParam;
 in vec2 vUv;
 in vec4 vModulate;
 
 uniform sampler2D samplers[${maxTextureUnits}];
+uniform float uTime;
+${effectDecls}
+
+out vec4 finalColor;
 
 vec4 textureColor() {
   vec4 color = vec4(0.0);
@@ -134,62 +239,95 @@ vec4 textureColor() {
 
 void main(void) {
   vec4 color = textureColor();
-  if (vClipOutsideUv == 1. && (vUv.x < 0.0 || vUv.y < 0.0 || vUv.x > 1.0 || vUv.y > 1.0)) {
+  if (mod(vFlags, 2.0) == 1. && (vUv.x < 0.0 || vUv.y < 0.0 || vUv.x > 1.0 || vUv.y > 1.0)) {
     color = vec4(0.0);
   }
+  ${effectSnippets}
   finalColor = color;
 }`,
       }),
-    }
-
-    const buffer: BufferLikeObject = {
-      instanceId: instanceId(),
-      usage: BufferUsage.vertex,
-      data: new Float32Array(),
-    }
-
-    const indexBuffer: BufferLikeObject = {
-      instanceId: instanceId(),
-      usage: BufferUsage.index,
-      data: new Uint32Array(),
-    }
-
-    const geometry: GeometryLikeObject = {
-      instanceId: instanceId(),
-      topology: 'triangle-list',
-      attributes: Object.fromEntries(
-        Object.entries(this._attributes)
-          .map(([key, value]) => [key, { ...value, buffer }]),
-      ) as Record<string, GeometryAttributeLike>,
-      indexBuffer,
     }
 
     const samplers = new Int32Array(
       Array.from({ length: maxTextureUnits }, (_, i) => i),
     )
 
-    return {
-      update: (bufferData, indexBufferData) => {
-        buffer.data = bufferData
-        indexBuffer.data = indexBufferData
-        renderer.buffer.update(buffer, true)
-        renderer.buffer.update(indexBuffer, true)
-      },
-      draw: (options) => {
-        shader.uniforms = {
-          samplers,
-          size: [
-            renderer.gl.drawingBufferWidth / renderer.pixelRatio,
-            renderer.gl.drawingBufferHeight / renderer.pixelRatio,
-          ],
+    return { shader, samplers, uniformDefaults }
+  }
+
+  protected _getSlot(): BatchSlot {
+    const index = Math.min(this._slotIndex++, MAX_SLOTS - 1)
+    let slot = this._slots[index]
+    if (!slot) {
+      const buffer: BufferLikeObject = {
+        instanceId: instanceId(),
+        usage: BufferUsage.vertex,
+        data: new Float32Array(),
+      }
+      const indexBuffer: BufferLikeObject = {
+        instanceId: instanceId(),
+        usage: BufferUsage.index,
+        data: new Uint32Array(),
+      }
+      const geometry: GeometryLikeObject = {
+        instanceId: instanceId(),
+        topology: 'triangle-list',
+        attributes: Object.fromEntries(
+          Object.entries(this._attributes)
+            .map(([key, value]) => [key, { ...value, buffer }]),
+        ) as Record<string, GeometryAttributeLike>,
+        indexBuffer,
+      }
+      this._slots[index] = slot = { buffer, indexBuffer, geometry, refs: [], drawCalls: [] }
+    }
+    return slot
+  }
+
+  protected _drawSlot(program: BatchProgram, slot: BatchSlot, options: GlDrawOptions): void {
+    const renderer = this._renderer
+    const shader = program.shader
+    shader.uniforms = {
+      samplers: program.samplers,
+      size: [
+        renderer.gl.drawingBufferWidth / renderer.pixelRatio,
+        renderer.gl.drawingBufferHeight / renderer.pixelRatio,
+      ],
+      // wall-clock seconds for animated effects; wrapped to keep float32 fract
+      // precision (at 1024s a <=4 cycle/s effect is still sub-0.001 accurate)
+      uTime: (performance.now() % 1024000) / 1000,
+      // effect uniforms: compiled-in defaults, overridden by host-written values
+      ...program.uniformDefaults,
+      ...this.effectUniforms,
+    }
+    renderer.shader.updateUniforms(shader)
+    // projection/view are a shared group: only re-uploaded to this program when changed
+    renderer.shader.updateUniformGroup(renderer.shader.globalUniforms, shader.glProgram)
+    renderer.geometry.bind(slot.geometry, shader.glProgram)
+    renderer.geometry.draw(options)
+  }
+
+  protected _issueDrawCalls(program: BatchProgram, slot: BatchSlot): void {
+    const drawCalls = slot.drawCalls
+    for (let len = drawCalls.length, i = 0; i < len; i++) {
+      const drawCall = drawCalls[i]
+      const { start = 0, textures, textureLocationMap } = drawCall
+
+      for (let len = textures.length, i = 0; i < len; i++) {
+        const texture = textures[i]
+        const location = textureLocationMap.get(texture)
+        if (location !== undefined) {
+          this._renderer.texture.bind(texture, location)
         }
-        renderer.shader.updateUniforms(shader)
-        // projection/view are a shared group: only re-uploaded to this program when changed
-        renderer.shader.updateUniformGroup(renderer.shader.globalUniforms, shader.glProgram)
-        renderer.geometry.bind(geometry, shader.glProgram)
-        renderer.geometry.draw(options)
-      },
-    } as Shader
+      }
+
+      this._state.blendMode = drawCall.blendMode
+      this._renderer.state.bind(this._state)
+
+      this._drawSlot(program, slot, {
+        size: drawCall.size,
+        start,
+      })
+    }
   }
 
   render(batchable: Batchable2D): void {
@@ -220,10 +358,60 @@ void main(void) {
     this._indexCount = 0
 
     const textureMaxUnits = this._renderer.texture.maxTextureImageUnits
-    const bufferData = this._getBufferData(vertexCount)
-    const float32View = new Float32Array(bufferData)
-    const uint8View = new Uint8Array(bufferData)
-    const indexBufferData = this._getIndexBufferData(indexCount)
+    const program = this._getProgram(textureMaxUnits)
+    const overflowed = this._slotIndex >= MAX_SLOTS
+    const slot = this._getSlot()
+
+    // Static-frame reuse: if this flush was built from the exact same batchable
+    // objects (and the per-frame-mutable fields: resolved texture, viewport uvs,
+    // pixelate size, roundPixels), its GL buffers already hold identical bytes —
+    // skip the CPU vertex rewrite and the upload, just re-issue the draw calls.
+    // Batchable identity is the invariant: CanvasItem recreates the objects on
+    // any draw/layout/paint change, and world-space vertices don't depend on
+    // camera (view/projection are uniforms), so pan/zoom stays on this path.
+    const refs = slot.refs
+    let same = !overflowed && slot.drawCalls.length > 0 && refs.length === batchables.length * REF_STRIDE
+    if (same) {
+      for (let j = 0, i = 0, len = batchables.length; i < len; i++, j += REF_STRIDE) {
+        const b = batchables[i] as any
+        if (
+          refs[j] !== (b.__source ?? b)
+          || refs[j + 1] !== b.texture
+          || refs[j + 2] !== b.uvs
+          || refs[j + 3] !== b.size
+          || refs[j + 4] !== b.roundPixels
+        ) {
+          same = false
+          break
+        }
+      }
+    }
+    if (same) {
+      this._issueDrawCalls(program, slot)
+      return
+    }
+
+    // snapshot what this rebuild is derived from (skip for the shared overflow slot)
+    refs.length = 0
+    if (!overflowed) {
+      for (let len = batchables.length, i = 0; i < len; i++) {
+        const b = batchables[i] as any
+        refs.push(b.__source ?? b, b.texture, b.uvs, b.size, b.roundPixels)
+      }
+    }
+
+    const byteSize = vertexCount * this._vertexSize * 4
+    if (!slot.attrData || slot.attrData.byteLength < byteSize) {
+      slot.attrData = new ArrayBuffer(nextPow2(byteSize))
+      slot.f32 = new Float32Array(slot.attrData)
+      slot.u8 = new Uint8Array(slot.attrData)
+    }
+    if (!slot.indexData || slot.indexData.length < indexCount) {
+      slot.indexData = new Uint32Array(nextPow2(indexCount))
+    }
+    const float32View = slot.f32!
+    const uint8View = slot.u8!
+    const indexBufferData = slot.indexData
     let aIndex = 0
     let iIndex = 0
     const drawCalls: DrawCall[] = []
@@ -269,6 +457,8 @@ void main(void) {
             clipOutsideUv,
             roundPixels,
             modulate = [255, 255, 255, 255],
+            effectFlags,
+            effectParam,
           } = batchables[i]
 
           if (start < i && drawCall.blendMode !== blendMode) {
@@ -285,7 +475,10 @@ void main(void) {
           const iIndexStart = aIndex / this._vertexSize
           const textureLocation = (texture ? textureLocationMap.get(texture) : 255) ?? 255
           const roundPixelsInt = roundPixels ? 1 : 0
-          const clipOutsideUvInt = clipOutsideUv ? 1 : 0
+          // flags byte: bit 0 = clipOutsideUv (core), bits 1+ = effect flags
+          const flagsByte = (clipOutsideUv ? 1 : 0) | (effectFlags ?? 0)
+          // effect scalar byte (encoding owned by the consuming effect; 0 = off)
+          const paramByte = effectParam ?? 0
 
           let uvX, uvY, aU8Index
           for (let len = vertices.length, i = 0; i < len; i += 2) {
@@ -301,9 +494,9 @@ void main(void) {
             float32View[aIndex++] = uvY
             aU8Index = aIndex * 4
             uint8View[aU8Index] = textureLocation
-            uint8View[aU8Index + 1] = clipOutsideUvInt
+            uint8View[aU8Index + 1] = flagsByte
             uint8View[aU8Index + 2] = roundPixelsInt
-            uint8View[aU8Index + 3] = 0
+            uint8View[aU8Index + 3] = paramByte
             aIndex++
             aU8Index = aIndex * 4
             uint8View[aU8Index] = modulate[0]
@@ -329,72 +522,29 @@ void main(void) {
       }
     }
 
-    const shader = this._getShader(textureMaxUnits)
+    // Unbind the current VAO before uploading: ELEMENT_ARRAY_BUFFER binding is
+    // VAO state, so uploading this slot's index buffer while the previous
+    // slot's VAO is still bound would silently rewire that VAO to this buffer
+    // (with shared buffers this was benign; with per-slot buffers it corrupts).
+    this._renderer.geometry.unbind()
 
     // only upload the portion actually written this flush, not the whole rounded-up buffer
-    shader.update(
-      float32View.subarray(0, vertexCount * this._vertexSize),
-      indexBufferData.subarray(0, indexCount),
-    )
+    slot.buffer.data = float32View.subarray(0, vertexCount * this._vertexSize)
+    slot.indexBuffer.data = indexBufferData.subarray(0, indexCount)
+    this._renderer.buffer.update(slot.buffer, true)
+    this._renderer.buffer.update(slot.indexBuffer, true)
 
-    for (let len = drawCalls.length, i = 0; i < len; i++) {
-      const drawCall = drawCalls[i]
-      const { start = 0, textures, textureLocationMap } = drawCall
-
-      for (let len = textures.length, i = 0; i < len; i++) {
-        const texture = textures[i]
-        const location = textureLocationMap.get(texture)
-        if (location !== undefined) {
-          this._renderer.texture.bind(texture, location)
-        }
-      }
-
-      this._state.blendMode = drawCall.blendMode
-      this._renderer.state.bind(this._state)
-
-      shader.draw({
-        size: drawCall.size,
-        start,
-      })
-    }
+    slot.drawCalls = drawCalls
+    this._issueDrawCalls(program, slot)
   }
 
-  protected _getBufferData(size: number): ArrayBuffer {
-    // 8 vertices is enough for 2 quads
-    const roundedP2 = nextPow2(Math.ceil(size / 8))
-    const roundedSizeIndex = log2(roundedP2)
-    const roundedSize = roundedP2 * 8
-
-    if (this._attributeBuffer.length <= roundedSizeIndex) {
-      this._attributeBuffer.length = roundedSizeIndex + 1
-    }
-
-    let buffer = this._attributeBuffer[roundedSizeIndex]
-
-    if (!buffer) {
-      this._attributeBuffer[roundedSizeIndex] = buffer = new ArrayBuffer(roundedSize * this._vertexSize * 4)
-    }
-
-    return buffer
-  }
-
-  protected _getIndexBufferData(size: number): Uint32Array<ArrayBuffer> {
-    // 12 indices is enough for 2 quads
-    const roundedP2 = nextPow2(Math.ceil(size / 12))
-    const roundedSizeIndex = log2(roundedP2)
-    const roundedSize = roundedP2 * 12
-
-    if (this._indexBuffers.length <= roundedSizeIndex) {
-      this._indexBuffers.length = roundedSizeIndex + 1
-    }
-
-    let buffer = this._indexBuffers[roundedSizeIndex]
-
-    if (!buffer) {
-      this._indexBuffers[roundedSizeIndex] = buffer = new Uint32Array(roundedSize)
-    }
-
-    return buffer
+  override reset(): void {
+    super.reset()
+    this._slots = []
+    this._slotIndex = 0
+    this._batchables = []
+    this._vertexCount = 0
+    this._indexCount = 0
   }
 }
 

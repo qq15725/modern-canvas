@@ -2,6 +2,7 @@ import type { FillRule, LineCap, LineJoin, LineStyle } from 'modern-path2d'
 import type { Batchable2D, ColorValue } from '../../core'
 import { isColorFillObject } from 'modern-idoc'
 import { Path2D } from 'modern-path2d'
+import { encodeFlowSpeed, FLAG_STROKE_AA } from '../../core'
 import { ColorTexture, Texture2D } from '../resources'
 
 export type TransformUv = (uvs: Float32Array, index: number) => void
@@ -21,6 +22,8 @@ export interface StrokeDraw extends Partial<CanvasBatchable> {
   type: 'stroke'
   path: Path2D
   lineStyle: LineStyle
+  /** 流动速度（周期/秒，符号=方向）；发射 batchable 时经 encodeFlowSpeed 编成 effectParam。 */
+  flow?: number
 }
 
 export interface FillDraw extends Partial<CanvasBatchable> {
@@ -45,6 +48,8 @@ export class CanvasContext extends Path2D {
   lineJoin?: LineJoin
   lineWidth?: number
   miterLimit?: number
+  /** 描边流动效果速度（周期/秒，符号=方向；0/undefined=关闭）。见 flowStreakEffect。 */
+  lineFlow?: number
 
   // custom
   transformUv?: TransformUv
@@ -52,7 +57,7 @@ export class CanvasContext extends Path2D {
 
   protected _draws: (StrokeDraw | FillDraw | MeshDraw)[] = []
   // per-draw triangulation cache, reused across frames while geometry is unchanged
-  protected _triCache: { sig: string, vertices: Float32Array, indices: Uint32Array }[] = []
+  protected _triCache: { sig: string, vertices: Float32Array, indices: Uint32Array, uvs?: Float32Array }[] = []
 
   protected _parseDrawStyle(source?: ColorValue | Texture2D): { texture?: Texture2D } {
     if (source) {
@@ -95,6 +100,7 @@ export class CanvasContext extends Path2D {
       ...this._parseDrawStyle(stroke),
       type: 'stroke',
       path: new Path2D(this),
+      flow: options?.flow ?? this.lineFlow,
       transformUv: this.transformUv,
       transformVertex: this.transformVertex,
       lineStyle: {
@@ -184,6 +190,7 @@ export class CanvasContext extends Path2D {
     this.strokeStyle = source.strokeStyle
     this.fillStyle = source.fillStyle
     this.fillRule = source.fillRule
+    this.lineFlow = source.lineFlow
     this.transformUv = source.transformUv
     this.transformVertex = source.transformVertex
     this.strokeAlignment = source.strokeAlignment
@@ -200,6 +207,7 @@ export class CanvasContext extends Path2D {
     this.strokeStyle = undefined
     this.fillStyle = undefined
     this.fillRule = undefined
+    this.lineFlow = undefined
     this.transformUv = undefined
     this.transformVertex = undefined
     this.strokeAlignment = undefined
@@ -236,11 +244,21 @@ export class CanvasContext extends Path2D {
       // downstream only reads batchable.vertices (slice in _transformUvs, length in
       // _relayout), so sharing the cached arrays is safe.
       const ls = batchable.type === 'stroke' ? batchable.lineStyle : undefined
-      const sig = `${batchable.type}|${path.toData()}|${ls ? `${ls.width},${ls.cap},${ls.join},${ls.alignment},${ls.miterLimit}` : ''}`
+      // Arc-length UVs power the flow effect and screen-space stroke feathering.
+      // Only plain-color strokes can repurpose the UV channel this way — their
+      // texture is a 1×1 ColorTexture, so sampling ignores UV; textured strokes
+      // keep position-derived UVs and skip both effects. The uv flag is part of
+      // the signature (not the speed — changing speed must not re-triangulate).
+      const isStroke = batchable.type === 'stroke'
+      const flow = isStroke ? (batchable as Partial<StrokeDraw>).flow : undefined
+      const plainStroke = isStroke && (!batchable.texture || batchable.texture instanceof ColorTexture)
+      const wantUv = isStroke && (Boolean(flow) || plainStroke)
+      const sig = `${batchable.type}|${path.toData()}|${ls ? `${ls.width},${ls.cap},${ls.join},${ls.alignment},${ls.miterLimit}` : ''}${wantUv ? '|uv' : ''}`
       let cached = this._triCache[i]
       if (!cached || cached.sig !== sig) {
         const vertices: number[] = []
         const indices: number[] = []
+        const uvs: number[] | undefined = wantUv ? [] : undefined
         if (batchable.type === 'fill') {
           path.fillTriangulate({ vertices, indices })
         }
@@ -248,19 +266,31 @@ export class CanvasContext extends Path2D {
           path.strokeTriangulate({
             vertices,
             indices,
+            uvs,
             lineStyle: batchable.lineStyle,
             flipAlignment: false,
             closed: path.getPoint(0).equals(path.getPoint(1)),
           })
         }
-        cached = { sig, vertices: new Float32Array(vertices), indices: new Uint32Array(indices) }
+        cached = {
+          sig,
+          vertices: new Float32Array(vertices),
+          indices: new Uint32Array(indices),
+          uvs: uvs ? new Float32Array(uvs) : undefined,
+        }
         this._triCache[i] = cached
       }
 
+      // 通道编码归效果模块所有：flow → 参数字节（encodeFlowSpeed），羽化 →
+      // FLAG_STROKE_AA 标志位。flow 描边在 shader 里自带 core AA，编码侧不再
+      // 同时置羽化位——效果片段之间因此无需互相感知。
       batchables.push({
         ...batchable,
         vertices: cached.vertices,
         indices: cached.indices,
+        meshUvs: cached.uvs ?? batchable.meshUvs,
+        effectFlags: plainStroke && cached.uvs && !flow ? FLAG_STROKE_AA : 0,
+        effectParam: flow && cached.uvs ? encodeFlowSpeed(flow) : 0,
       })
     }
 

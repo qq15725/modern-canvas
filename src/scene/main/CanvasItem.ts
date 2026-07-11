@@ -41,6 +41,9 @@ function acquireBatch(
   o.roundPixels = roundPixels
   o.size = size
   o.texture = texture
+  // identity of the node-owned batchable: the batcher's static-frame reuse keys
+  // on it (CanvasItem recreates these objects on any draw/layout/paint change)
+  o.__source = batchable
   return o
 }
 

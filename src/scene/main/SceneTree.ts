@@ -12,11 +12,12 @@ import type { Viewport } from './Viewport'
 import { fonts } from 'modern-font'
 import { property } from 'modern-idoc'
 import {
+  bumpGeometryRevision,
   Color,
   Input,
   MainLoop,
 } from '../../core'
-import { QuadUvGeometry } from '../resources'
+import { FxaaMaterial, QuadUvGeometry } from '../resources'
 import { resetBatchPool } from './CanvasItem'
 import { RenderStack } from './RenderStack'
 import { Timeline } from './Timeline'
@@ -42,6 +43,7 @@ export interface SceneTree {
 
 export interface SceneTreeProperties extends MainLoopProperties {
   msaa: boolean
+  fxaa: boolean
   pixelate: boolean
   roundPixels: boolean
   backgroundColor: Hex8Color
@@ -54,6 +56,12 @@ export interface SceneTreeProperties extends MainLoopProperties {
 
 export class SceneTree extends MainLoop {
   @property({ alias: 'root.msaa' }) declare msaa: boolean
+  /** 最终合成时做 FXAA 后处理（零额外 pass / 显存，MSAA 之外的轻量抗锯齿路线）。 */
+  @property({ fallback: false }) declare fxaa: boolean
+  /** 描边流动效果的高亮色（如主题主色）；见 Element2DOutline.flow。 */
+  @property() declare flowColor?: Hex8Color
+  /** 流动亮段的间距（路径像素，亮段约占其 30%）；固定物理尺度，长短线亮段一致。 */
+  @property() declare flowPeriod?: number
   @property({ fallback: false }) declare pixelate: boolean
   @property({ fallback: false }) declare roundPixels: boolean
   @property() declare backgroundColor?: Hex8Color
@@ -81,6 +89,8 @@ export class SceneTree extends MainLoop {
   protected _onFontLoad = (): void => this._scheduleTextRemeasure()
 
   protected _backgroundColor = new Color()
+  protected _flowColor = new Color()
+  protected _flowColorArray?: Float32Array
   protected _previousViewport?: Viewport
   protected _currentViewport?: Viewport
   getPreviousViewport(): Viewport | undefined { return this._previousViewport }
@@ -98,8 +108,17 @@ export class SceneTree extends MainLoop {
 
   constructor(properties?: Partial<SceneTreeProperties>) {
     super()
-    this.on('nodeEnter', node => this.nodeMap.set(node.id, node))
-    this.on('nodeExit', node => this.nodeMap.delete(node.id))
+    // A node entering/leaving changes no geometry, but it does change what an id
+    // resolves to — connections cache their route against this revision and would
+    // otherwise keep serving a path routed to a node that is no longer in the tree.
+    this.on('nodeEnter', (node) => {
+      this.nodeMap.set(node.id, node)
+      bumpGeometryRevision()
+    })
+    this.on('nodeExit', (node) => {
+      this.nodeMap.delete(node.id)
+      bumpGeometryRevision()
+    })
     this.setProperties(properties)
     // 字体可用后重排文字：setProperties 后 fonts 已就绪（默认即全局 fonts 单例）。
     this._bindFonts(this.fonts)
@@ -142,6 +161,10 @@ export class SceneTree extends MainLoop {
     switch (key) {
       case 'backgroundColor':
         this._backgroundColor.value = value
+        break
+      case 'flowColor':
+        this._flowColor.value = value ?? 0x3B82F6
+        this._flowColorArray = new Float32Array(this._flowColor.toArray().slice(0, 3))
         break
       case 'fonts':
         this._bindFonts(value)
@@ -188,6 +211,15 @@ export class SceneTree extends MainLoop {
     // reset the batch wrapper pool at frame start — last frame's render finished
     // synchronously, so all pooled references have already been consumed by flush
     resetBatchPool()
+    // restart flush ordinals so each flush pairs with its slot from last frame
+    // (enables the batcher's static-frame buffer reuse)
+    renderer.batch2D.beginFrame()
+    if (this._flowColorArray) {
+      renderer.batch2D.effectUniforms.uFlowColor = this._flowColorArray
+    }
+    if (this.flowPeriod) {
+      renderer.batch2D.effectUniforms.uFlowPeriod = this.flowPeriod
+    }
     this.renderStack.render(renderer)
     this._renderScreen(renderer)
     this.emit('rendered')
@@ -206,7 +238,19 @@ export class SceneTree extends MainLoop {
     }
     const texture = this.root.texture
     texture.activate(renderer, 0)
-    QuadUvGeometry.draw(renderer)
+    if (this.fxaa) {
+      // AA happens inside the composite draw that runs anyway — no extra pass
+      QuadUvGeometry.draw(renderer, FxaaMaterial.instance, {
+        sampler: 0,
+        texelSize: [
+          1 / (texture.pixelWidth || texture.width || 1),
+          1 / (texture.pixelHeight || texture.height || 1),
+        ],
+      })
+    }
+    else {
+      QuadUvGeometry.draw(renderer)
+    }
     texture.inactivate(renderer)
   }
 

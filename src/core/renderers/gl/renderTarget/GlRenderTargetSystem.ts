@@ -33,6 +33,11 @@ export class GlRenderTargetSystem extends GlSystem {
   protected _writeDepthTexture = true
   projection = new Projection2D()
 
+  /** 4x MSAA, clamped to what the device actually supports (some GPUs cap at 2). */
+  protected get _sampleCount(): number {
+    return Math.min(4, this._msaaSamples[0] || 4)
+  }
+
   protected override _updateContext(gl: GlRenderingContext): void {
     super._updateContext(gl)
     this._hasMRT = true
@@ -191,7 +196,8 @@ export class GlRenderTargetSystem extends GlSystem {
     const gl = this._gl
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, glRenderTarget.framebuffer)
-    glRenderTarget.msaa = Boolean(renderTarget.msaa)
+    // multisample renderbuffers + blit resolve are WebGL2-only; silently degrade on 1
+    glRenderTarget.msaa = Boolean(renderTarget.msaa) && this._renderer.version === 2
     glRenderTarget.width = colorTextures[0]?.pixelWidth ?? 1
     glRenderTarget.height = colorTextures[0]?.pixelHeight ?? 1
 
@@ -296,7 +302,7 @@ export class GlRenderTargetSystem extends GlSystem {
     if (glRenderTarget.msaa) {
       gl.renderbufferStorageMultisample(
         gl.RENDERBUFFER,
-        4,
+        this._sampleCount,
         gl.DEPTH24_STENCIL8,
         glRenderTarget.width,
         glRenderTarget.height,
@@ -332,7 +338,7 @@ export class GlRenderTargetSystem extends GlSystem {
           gl.bindRenderbuffer(gl.RENDERBUFFER, buffer)
           gl.renderbufferStorageMultisample(
             gl.RENDERBUFFER,
-            4,
+            this._sampleCount,
             renderer.texture.getGlTexture(texture).internalFormat,
             texture.pixelWidth ?? 1,
             texture.pixelHeight ?? 1,

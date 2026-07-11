@@ -9,7 +9,7 @@ import {
   svgToPath2DSet,
   Transform2D,
 } from 'modern-path2d'
-import { CoreObject } from '../../../core'
+import { bumpGeometryRevision, CoreObject } from '../../../core'
 
 export class Element2DShape extends CoreObject implements NormalizedShape {
   @property({ fallback: true }) declare enabled: boolean
@@ -18,6 +18,13 @@ export class Element2DShape extends CoreObject implements NormalizedShape {
   @property() declare viewBox: NormalizedShape['viewBox']
   @property() declare paths: NormalizedShape['paths']
   @property() declare connectionPoints: NormalizedShape['connectionPoints']
+
+  /**
+   * Bumped whenever `connectionPoints` is replaced. Connections use it to tell
+   * whether their anchors moved without re-resolving them every frame.
+   * Mutating the array in place doesn't bump it — same as every other property.
+   */
+  connectionPointsDirtyId = 0
 
   protected _path2DSet: Path2DSet = new Path2DSet()
 
@@ -70,6 +77,11 @@ export class Element2DShape extends CoreObject implements NormalizedShape {
       case 'enabled':
         this._updatePath2DSet()
         this._parent.requestDraw()
+        break
+      case 'connectionPoints':
+        this.connectionPointsDirtyId++
+        // Anchors moved without any transform changing — wake the connections up.
+        bumpGeometryRevision()
         break
     }
   }

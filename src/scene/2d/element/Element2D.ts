@@ -26,6 +26,7 @@ import { clearUndef, getDefaultLayoutStyle, getDefaultTextStyle, isNone, stringi
 import { Transform2D, Vector2 } from 'modern-path2d'
 import {
   Aabb2D,
+  bumpGeometryRevision,
   customNode,
   DEG_TO_RAD,
   Obb2D,
@@ -278,6 +279,8 @@ export class Element2D extends Node2D implements Rectangulable {
     this.globalAabb.min.set(min.x, min.y)
     this.globalAabb.size.set(max.x - min.x, max.y - min.y)
     this._updateMask()
+    // Connections cache their route against this; see geometryRevision.
+    bumpGeometryRevision()
   }
 
   protected _updateMask(): void {
@@ -464,7 +467,8 @@ export class Element2D extends Node2D implements Rectangulable {
     this.outline.process(delta)
     this.background.process(delta)
 
-    if (this._connection.isValid()) {
+    // isRoutable, not isValid: a connection whose targets left the tree must stop routing.
+    if (this._connection.isRoutable()) {
       this._updateConnection()
     }
 
@@ -517,12 +521,14 @@ export class Element2D extends Node2D implements Rectangulable {
   protected _computeCullsRender(): boolean {
     // conservative: never cull nodes whose visible area can exceed their AABB
     // (filters/masks spill outside it; connection routes are sized to their bbox
-    // but we keep them to be safe), so culling only drops clearly off-screen content
+    // but we keep them to be safe), so culling only drops clearly off-screen content.
+    // A dangling connection (targets gone) has nothing left to draw beyond its aabb,
+    // so it goes through normal culling rather than being pinned on screen forever.
     if (
       this._colorFilterEffect
       || this._maskEffect
       || this._overflowHidden
-      || this._connection.isValid()
+      || this._connection.isRoutable()
     ) {
       return false
     }

@@ -16,6 +16,17 @@ export class Element2DOutline extends Element2DFill implements NormalizedOutline
   @property({ fallback: 'miter' }) declare lineJoin: NormalizedOutline['lineJoin']
   @property() declare headEnd?: HeadEnd
   @property() declare tailEnd?: TailEnd
+  /**
+   * 描边流动效果速度（周期/秒，符号=方向，0/undefined=关闭）。运行时 UI 态
+   * （internal：不进 toJSON / setProperties，不会被序列化或协同同步），供
+   * hover/激活时给连线加「能量流动」效果。
+   */
+  @property({ internal: true }) declare flow?: number
+  /**
+   * 描边宽度的运行时倍率（internal，不序列化）。hover 加粗等纯 UI 反馈用，
+   * 不改动文档里的 width；1/undefined = 不加粗。
+   */
+  @property({ internal: true }) declare widthBoost?: number
 
   override setProperties(properties?: Outline): this {
     return super._setProperties(
@@ -36,6 +47,8 @@ export class Element2DOutline extends Element2DFill implements NormalizedOutline
       case 'headEnd':
       case 'tailEnd':
       case 'enabled':
+      case 'flow':
+      case 'widthBoost':
         this._parent.requestDraw()
         break
     }
@@ -62,9 +75,10 @@ export class Element2DOutline extends Element2DFill implements NormalizedOutline
         ?? this.color
         ?? '#000000FF'
     }
-    ctx.lineWidth = this.width || 1
+    ctx.lineWidth = (this.width || 1) * (this.widthBoost || 1)
     ctx.lineCap = this.lineCap
     ctx.lineJoin = this.lineJoin
+    ctx.lineFlow = this.flow
     ctx.stroke({
       ...getFillDrawOptions(this, { x: 0, y: 0, width, height }),
     })

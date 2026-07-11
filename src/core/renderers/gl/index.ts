@@ -1,3 +1,4 @@
+export * from './Batch2DEffect'
 export * from './buffer'
 export * from './GlBatch2DSystem'
 export * from './GlMaskSystem'

@@ -83,13 +83,14 @@ export class Engine extends SceneTree {
     } = properties
 
     super()
+    // user-provided context attributes win; defaults only fill the gaps
     this.renderer = new WebGLRenderer(view, {
-      alpha: defaultOptions.alpha ?? properties.alpha,
-      stencil: defaultOptions.stencil ?? properties.stencil,
-      antialias: defaultOptions.antialias ?? properties.antialias,
-      premultipliedAlpha: defaultOptions.premultipliedAlpha ?? properties.premultipliedAlpha,
-      preserveDrawingBuffer: defaultOptions.preserveDrawingBuffer ?? properties.preserveDrawingBuffer,
-      powerPreference: defaultOptions.powerPreference ?? properties.powerPreference,
+      alpha: properties.alpha ?? defaultOptions.alpha,
+      stencil: properties.stencil ?? defaultOptions.stencil,
+      antialias: properties.antialias ?? defaultOptions.antialias,
+      premultipliedAlpha: properties.premultipliedAlpha ?? defaultOptions.premultipliedAlpha,
+      preserveDrawingBuffer: properties.preserveDrawingBuffer ?? defaultOptions.preserveDrawingBuffer,
+      powerPreference: properties.powerPreference ?? defaultOptions.powerPreference,
     })
     this._setupInput()
     this.pixelRatio = pixelRatio

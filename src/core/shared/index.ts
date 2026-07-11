@@ -1,4 +1,5 @@
 export * from './css'
 export * from './dom'
+export * from './geometryRevision'
 export * from './id'
 export * from './utils'
