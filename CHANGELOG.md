@@ -1,3 +1,20 @@
+# [0.27.0](https://github.com/qq15725/modern-canvas/compare/v0.26.3...v0.27.0) (2026-07-11)
+
+
+### Bug Fixes
+
+* **assets:** evict destroyed resources from the cache ([6df54d4](https://github.com/qq15725/modern-canvas/commit/6df54d469228963c40d61547b33a8e2fc5b5ffe7))
+
+
+### Features
+
+* **element:** contentOffset scrolling + engine-rendered scrollbars ([4636aaf](https://github.com/qq15725/modern-canvas/commit/4636aaf19c39700f965e04162d9757c011f97d25))
+* **render:** shader effect slots, FXAA, static-frame batch reuse ([0656fc3](https://github.com/qq15725/modern-canvas/commit/0656fc3f82c01e14ae31f503192bf7c94da16cbd))
+
+
+### Performance Improvements
+
+* **element:** cache getScrollRange by geometryRevision ([9ba4a14](https://github.com/qq15725/modern-canvas/commit/9ba4a14a23f55d4ffd253fc927c9bafac76f5432))
 ## [0.26.3](https://github.com/qq15725/modern-canvas/compare/v0.26.2...v0.26.3) (2026-07-02)
 ## [0.26.2](https://github.com/qq15725/modern-canvas/compare/v0.26.1...v0.26.2) (2026-07-01)
 
