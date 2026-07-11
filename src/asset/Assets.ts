@@ -172,6 +172,19 @@ export class Assets extends Observable<AssetsEvents> {
       handled = new WeakRef(value)
     }
     this._handled.set(id, handled)
+    // 资源被销毁后不能再从缓存发出去：共享的 Texture2D 在某个文档拆除时会
+    // _destroy()（close 掉 ImageBitmap 源、删掉 GPU 纹理），但缓存按 url 跨
+    // setDoc 存活，会把这张 source 已 detach 的废纹理继续发给新使用者，
+    // 上传时 texSubImage2D 报 “source data detached” → 纹理全空、节点不渲染。
+    // 销毁即自我驱逐，下次 loadBy 重新加载一份有效资源。
+    if (value && typeof value.on === 'function') {
+      value.on('destroy', () => {
+        // 仅当缓存项仍是这张资源时才删，避免误删已被替换的新项。
+        if (this.get(id) === value) {
+          this._handled.delete(id)
+        }
+      })
+    }
   }
 
   async awaitBy<T = any>(handler: () => Promise<T>): Promise<T> {
@@ -186,9 +199,20 @@ export class Assets extends Observable<AssetsEvents> {
     id: string,
     handler: () => Promise<T> = () => this.fetch(id).then(rep => rep.blob()) as any,
   ): Promise<T> {
-    const result = this.get<T>(id) ?? this._handleing.get(id)
-    if (result)
-      return result
+    const cached = this.get<T>(id)
+    if (cached !== undefined) {
+      // 已销毁的缓存项当作未命中（兜底 set() 的 destroy 驱逐：极端时序下资源
+      // 可能销毁却未及时驱逐）——驱逐后重新加载，绝不把废资源发出去。
+      if ((cached as any)?.destroyed) {
+        this._handled.delete(id)
+      }
+      else {
+        return cached
+      }
+    }
+    const pending = this._handleing.get(id)
+    if (pending)
+      return pending
     const promise = handler()
       .then((result) => {
         this.set(id, result)
