@@ -1,3 +1,9 @@
+## [0.27.1](https://github.com/qq15725/modern-canvas/compare/v0.27.0...v0.27.1) (2026-07-12)
+
+
+### Bug Fixes
+
+* **element:** make getGlobalObb scale-aware to match globalAabb ([7a3f4a0](https://github.com/qq15725/modern-canvas/commit/7a3f4a021f84acced9c0243c7453ccf29e5aef02))
 # [0.27.0](https://github.com/qq15725/modern-canvas/compare/v0.26.3...v0.27.0) (2026-07-11)
 
 
