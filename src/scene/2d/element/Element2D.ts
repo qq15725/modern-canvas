@@ -698,13 +698,16 @@ export class Element2D extends Node2D implements Rectangulable {
 
   getGlobalObb(): Obb2D {
     const pivot = this.pivot
+    const s = this.globalScale
     const _pivot = this.globalTransform.apply(pivot).sub(pivot)
+    // 绕 pivot 施加 globalScale 再平移：Obb2D 由这组「未旋转」的点取 AABB 当尺寸、
+    // 旋转另行传入，所以点须是缩放后的轴对齐盒。scale=1 时与原实现逐点等价（不改行为），
+    // scale≠1 时选框/命中/getTransform 才随缩放正确（globalAabb 一直用完整 transform、已含 scale）。
     return new Obb2D(
-      this._getPointArray().map((p) => {
-        p.x += _pivot.x
-        p.y += _pivot.y
-        return p
-      }),
+      this._getPointArray().map(p => ({
+        x: pivot.x + (p.x - pivot.x) * s.x + _pivot.x,
+        y: pivot.y + (p.y - pivot.y) * s.y + _pivot.y,
+      })),
       this.globalRotation,
     )
   }
