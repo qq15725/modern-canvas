@@ -1028,6 +1028,33 @@ export class Element2D extends Node2D implements Rectangulable {
   }
 
   override input(event: InputEvent, key: InputEventKey): void {
+    // Overflow-clipped container (overflow:hidden/clip/scroll/auto): a pointer outside
+    // its clip rect (its own globalAabb — the frame doesn't move when its content
+    // scrolls) can't hit its children, which are visually clipped there. Skip the
+    // descent so scrolled-out / overflowing content isn't hoverable/clickable, matching
+    // the render mask. Still run _input on self so an in-progress scrollbar drag keeps
+    // getting move/up even when the pointer leaves the frame.
+    if (
+      this._overflowHidden
+      && (key === 'pointerdown' || key === 'pointermove' || key === 'pointerup')
+    ) {
+      const { screenX, screenY } = event as PointerInputEvent
+      if (screenX && screenY) {
+        const p = { x: screenX, y: screenY }
+        this.getViewport()?.toCanvasGlobal(p, p)
+        const a = this.globalAabb
+        if (
+          p.x < a.min.x || p.x >= a.min.x + a.size.x
+          || p.y < a.min.y || p.y >= a.min.y + a.size.y
+        ) {
+          if (this.isVisibleInTree()) {
+            this._input(event, key)
+          }
+          return
+        }
+      }
+    }
+
     const array = this.getChildren(true)
     for (let i = array.length - 1; i >= 0; i--) {
       array[i].input(event, key)
