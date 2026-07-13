@@ -332,11 +332,22 @@ export class Flexbox {
       if (node.hasNewLayout()) {
         const { left, top, width, height } = node.getComputedLayout()
 
+        // A flex CHILD is placed by its flex parent → take yoga's computed left/top.
+        // A flex ROOT (an auto-layout container whose own parent is not flex, e.g. a
+        // top-level or in-frame auto-layout frame) is positioned absolutely by its own
+        // style.left/top; yoga treats it as the layout origin and returns (0,0), so
+        // applying that would snap it to the origin. Keep its own offset — only its
+        // children flow. `globalDisplay` is inherited, so a flex child's parent reads
+        // 'flex' while a flex root's (non-flex) parent does not.
+        const parentFlex = el.getParent<Element2D>()?.globalDisplay === 'flex'
+        const px = parentFlex ? left : (Number(el.style.left) || 0)
+        const py = parentFlex ? top : (Number(el.style.top) || 0)
+
         if (
-          (!Number.isNaN(left) && left !== el.position.x)
-          || (!Number.isNaN(top) && top !== el.position.y)
+          (!Number.isNaN(px) && px !== el.position.x)
+          || (!Number.isNaN(py) && py !== el.position.y)
         ) {
-          el.position.set(left, top)
+          el.position.set(px, py)
         }
 
         if (
