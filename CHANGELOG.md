@@ -1,3 +1,9 @@
+## [0.27.3](https://github.com/qq15725/modern-canvas/compare/v0.27.2...v0.27.3) (2026-07-13)
+
+
+### Bug Fixes
+
+* **flex:** keep a fixed-size auto-layout root's own size and guard NaN ([8bf4175](https://github.com/qq15725/modern-canvas/commit/8bf41756cd52cc47ecd62607efde9073f63e0c5e))
 ## [0.27.2](https://github.com/qq15725/modern-canvas/compare/v0.27.1...v0.27.2) (2026-07-13)
 
 
