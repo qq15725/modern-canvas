@@ -1,3 +1,9 @@
+## [0.27.4](https://github.com/qq15725/modern-canvas/compare/v0.27.3...v0.27.4) (2026-07-13)
+
+
+### Bug Fixes
+
+* **input:** don't hit-test children clipped out of an overflow container ([35a2b8a](https://github.com/qq15725/modern-canvas/commit/35a2b8a75e4a83e386bbf031efa3886214ce470d))
 ## [0.27.3](https://github.com/qq15725/modern-canvas/compare/v0.27.2...v0.27.3) (2026-07-13)
 
 
