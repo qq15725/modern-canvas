@@ -1,3 +1,9 @@
+## [0.27.2](https://github.com/qq15725/modern-canvas/compare/v0.27.1...v0.27.2) (2026-07-13)
+
+
+### Bug Fixes
+
+* **flex:** keep an auto-layout root at its own position instead of (0,0) ([b8acc9c](https://github.com/qq15725/modern-canvas/commit/b8acc9cf74aab9aff8e830fe82e14b5f12bc052e))
 ## [0.27.1](https://github.com/qq15725/modern-canvas/compare/v0.27.0...v0.27.1) (2026-07-12)
 
 
