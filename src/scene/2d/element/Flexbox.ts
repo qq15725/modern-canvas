@@ -343,6 +343,15 @@ export class Flexbox {
         const px = parentFlex ? left : (Number(el.style.left) || 0)
         const py = parentFlex ? top : (Number(el.style.top) || 0)
 
+        // Size: a flex CHILD takes yoga's computed size. A flex ROOT keeps its own
+        // explicit width/height when they are fixed numbers — yoga, laying the root out
+        // unconstrained, hugs the content and would grow a fixed-size scroll frame to fit
+        // its children (killing the overflow that makes it scrollable). Only fall back to
+        // yoga's size for an 'auto' dimension (genuine hug). Children still overflow the
+        // fixed box via yoga, so getScrollRange sees it.
+        const sw = parentFlex || typeof el.style.width !== 'number' ? width : el.style.width
+        const sh = parentFlex || typeof el.style.height !== 'number' ? height : el.style.height
+
         if (
           (!Number.isNaN(px) && px !== el.position.x)
           || (!Number.isNaN(py) && py !== el.position.y)
@@ -350,11 +359,14 @@ export class Flexbox {
           el.position.set(px, py)
         }
 
+        // Only apply finite sizes: a NaN width/height (an unresolved 'auto' on a flex
+        // root) would poison the Aabb (NaN !== NaN loops the size↔max callbacks → stack
+        // overflow).
         if (
-          (!Number.isNaN(width) && width !== el.size.x)
-          || (!Number.isNaN(height) && height !== el.size.y)
+          !Number.isNaN(sw) && !Number.isNaN(sh)
+          && (sw !== el.size.x || sh !== el.size.y)
         ) {
-          el.size.set(width, height)
+          el.size.set(sw, sh)
         }
 
         node.markLayoutSeen()
