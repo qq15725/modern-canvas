@@ -1,3 +1,9 @@
+## [0.27.5](https://github.com/qq15725/modern-canvas/compare/v0.27.4...v0.27.5) (2026-07-14)
+
+
+### Bug Fixes
+
+* **scroll:** sub-pixel tolerance in getScrollRange to avoid spurious scrollbars ([2bdc11b](https://github.com/qq15725/modern-canvas/commit/2bdc11be5fbce870e6a3edce291ed46336e2f31e))
 ## [0.27.4](https://github.com/qq15725/modern-canvas/compare/v0.27.3...v0.27.4) (2026-07-13)
 
 
