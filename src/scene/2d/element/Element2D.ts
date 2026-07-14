@@ -835,9 +835,20 @@ export class Element2D extends Node2D implements Rectangulable {
     }
     const fw = this.size.width
     const fh = this.size.height
+    // Sub-pixel tolerance: a child sitting flush against a frame edge can land a
+    // hair outside it once fractional positions/sizes (e.g. a frame resized to
+    // 1050.94) round through float math. A <1px overflow isn't meaningfully
+    // scrollable, so snap it to 0 — otherwise getScrollRange reports an overflow
+    // and the frame shows a spurious (near-full-width) scrollbar.
+    const EPS = 1
+    const snap = (v: number): number => (Math.abs(v) < EPS ? 0 : v)
+    const minXo = snap(Math.min(0, minX))
+    const maxXo = snap(Math.max(0, maxX - fw))
+    const minYo = snap(Math.min(0, minY))
+    const maxYo = snap(Math.max(0, maxY - fh))
     return {
-      x: { min: Math.min(0, minX), max: Math.max(0, maxX - fw) },
-      y: { min: Math.min(0, minY), max: Math.max(0, maxY - fh) },
+      x: { min: minXo, max: maxXo },
+      y: { min: minYo, max: maxYo },
       content: { w: maxX - Math.min(0, minX), h: maxY - Math.min(0, minY) },
     }
   }
