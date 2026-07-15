@@ -33,7 +33,8 @@ function uniformsAfterApply(effect: DrawboardEffect): Record<string, any> {
 
 describe('drawboardEffect uniforms', () => {
   it('maps each checkerboard style to its shader constant', () => {
-    const styles = { grid: 1, gridDark: 2, dot: 3, dotDark: 4 } as const
+    // 明暗不再进枚举，family 只有 grid / dot。
+    const styles = { grid: 1, dot: 2 } as const
     for (const [style, code] of Object.entries(styles)) {
       const e = new DrawboardEffect({ checkerboard: true, checkerboardStyle: style as any })
       expect(uniformsAfterApply(e).checkerboardStyle).toBe(code)
@@ -45,25 +46,24 @@ describe('drawboardEffect uniforms', () => {
     expect(uniformsAfterApply(e).checkerboard).toBe(0)
   })
 
-  it('passes light dot colours by default and dark colours under dotDark', () => {
-    const light = uniformsAfterApply(new DrawboardEffect({ checkerboardStyle: 'dot' }))
-    const dark = uniformsAfterApply(new DrawboardEffect({ checkerboardStyle: 'dotDark' }))
-    expect(light.dotBackgroundBaseColor).toBeGreaterThan(0.9)
-    expect(dark.dotBackgroundBaseColor).toBeLessThan(0.2)
-    expect(dark.dotBackgroundZoomedOutColor).toBeGreaterThan(light.dotBackgroundBaseColor - 0.7)
-    expect(dark.dotBackgroundBaseColor).not.toBe(light.dotBackgroundBaseColor)
+  it('ships checkerboard colours as RGB (0..1) vec3 from the colour props', () => {
+    const u = uniformsAfterApply(new DrawboardEffect({
+      checkerboardColor: '#ffffff',
+      checkerboardDotColor: '#000000',
+    }))
+    expect(u.checkerboardColor).toEqual([1, 1, 1])
+    expect(u.checkerboardDotColor).toEqual([0, 0, 0])
   })
 
-  it('lets explicit dot colour props override the style preset', () => {
-    const e = new DrawboardEffect({
+  it('resolves dark colours the same way (no baked style variant)', () => {
+    const u = uniformsAfterApply(new DrawboardEffect({
       checkerboardStyle: 'dot',
-      dotBaseColor: 0.2,
-      dotColor: 0.8,
-      dotZoomDiff: 0.05,
-    })
-    const u = uniformsAfterApply(e)
-    expect(u.dotBackgroundBaseColor).toBe(0.2)
-    expect(u.dotBackgroundZoomedOutColor).toBe(0.8)
+      checkerboardColor: '#141414',
+      checkerboardDotColor: '#505050',
+      dotColorDiff: 0.05,
+    }))
+    expect(u.checkerboardColor[0]).toBeCloseTo(0x14 / 255, 2)
+    expect(u.checkerboardDotColor[0]).toBeCloseTo(0x50 / 255, 2)
     expect(u.dotColorDiff).toBe(0.05)
   })
 })
@@ -84,10 +84,10 @@ describe('drawboardEffect re-render triggers', () => {
 
   it('requests a re-render when shader-driving properties change', () => {
     expectTriggers('checkerboard', true)
-    expectTriggers('checkerboardStyle', 'dotDark')
+    expectTriggers('checkerboardStyle', 'dot')
     expectTriggers('pixelGrid', true)
-    expectTriggers('dotBaseColor', 0.5)
-    expectTriggers('dotColor', 0.4)
-    expectTriggers('dotZoomDiff', 0.2)
+    expectTriggers('checkerboardColor', '#123456')
+    expectTriggers('checkerboardDotColor', '#654321')
+    expectTriggers('dotColorDiff', 0.2)
   })
 })
