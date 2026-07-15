@@ -1,3 +1,9 @@
+## [0.27.6](https://github.com/qq15725/modern-canvas/compare/v0.27.5...v0.27.6) (2026-07-15)
+
+
+### Features
+
+* theme-aware semantic colors + tokenized drawboard background ([ba1daf5](https://github.com/qq15725/modern-canvas/commit/ba1daf52ee9fde50e1124d7401fa7ed37a632c2b))
 ## [0.27.5](https://github.com/qq15725/modern-canvas/compare/v0.27.4...v0.27.5) (2026-07-14)
 
 
