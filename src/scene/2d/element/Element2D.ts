@@ -421,7 +421,7 @@ export class Element2D extends Node2D implements Rectangulable {
         this._updateStyleMaskImage(value)
         break
       case 'backgroundColor':
-        this.background.color = value
+        this.background.color = this._resolveThemeColor(value)
         break
       case 'backgroundImage':
         this.background.image = value
@@ -436,7 +436,7 @@ export class Element2D extends Node2D implements Rectangulable {
         break
       case 'borderColor':
       case 'outlineColor':
-        this.outline.color = value
+        this.outline.color = this._resolveThemeColor(value)
         break
       case 'overflow':
         // hidden/clip 只裁剪；scroll/auto 裁剪 + 显示滚动条（scroll 常显、auto 悬停显示）。
@@ -482,6 +482,32 @@ export class Element2D extends Node2D implements Rectangulable {
           break
       }
     }
+  }
+
+  /** 语义色 token → 实际色（经所属 tree 的当前主题）；无 tree / 非 token 时原样返回。 */
+  protected _resolveThemeColor(value: any): any {
+    return this.tree?.resolveThemeColor(value) ?? value
+  }
+
+  /**
+   * 主题变更后重解析本元素的 token 色。仅当 style 里存的是 `@token` 才重设，
+   * 普通字面色不动（用户显式提供的色不受主题影响）。文字色走惰性解析，这里触发重排重栅格。
+   */
+  applyThemeColors(): void {
+    const style = this._style.json as Record<string, any>
+    const bg = style.backgroundColor
+    if (typeof bg === 'string' && bg[0] === '@') {
+      this.background.color = this._resolveThemeColor(bg)
+    }
+    const border = style.borderColor ?? style.outlineColor
+    if (typeof border === 'string' && border[0] === '@') {
+      this.outline.color = this._resolveThemeColor(border)
+    }
+    // 文字 fragment 色在绘制时惰性解析（见 Element2DText），主题变了需重排+重栅格才生效。
+    if (this._text.isValid()) {
+      this._text.update()
+    }
+    this.requestDraw()
   }
 
   override requestLayout(): void {

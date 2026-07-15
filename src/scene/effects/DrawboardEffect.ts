@@ -3,23 +3,24 @@ import type { EffectProperties, Node, Viewport } from '../main'
 import type { Texture2D } from '../resources'
 import { property } from 'modern-idoc'
 import { assets } from '../../asset'
-import { customNode } from '../../core'
+import { Color, customNode } from '../../core'
 import { Effect } from '../main/Effect'
 import { Material, QuadUvGeometry } from '../resources'
 import fragment from './DrawboardEffect.frag?raw'
 
-export type CheckerboardStyle = 'grid' | 'gridDark' | 'dot' | 'dotDark'
+// 底纹家族（明暗不再进枚举，交由 checkerboardColor / checkerboardDotColor 颜色决定）。
+export type CheckerboardStyle = 'grid' | 'dot'
 
 export interface DrawboardEffectProperties extends EffectProperties {
   checkerboard?: boolean
   checkerboardStyle?: CheckerboardStyle
   pixelGrid?: boolean
-  /** Override dot grid surface colour (0..1). Defaults to the dot/dotDark preset. */
-  dotBaseColor?: number
-  /** Override dot fill colour at the zoomed-out limit (0..1). */
-  dotColor?: number
-  /** Extra brightening of the dot when zooming in (0..1). */
-  dotZoomDiff?: number
+  /** 底纹底色（网格底格 / 点阵底）。颜色字符串，可为主题 token；缺省浅色。 */
+  checkerboardColor?: string
+  /** 点阵圆点色。缺省浅灰。 */
+  checkerboardDotColor?: string
+  /** 放大时圆点的额外提亮量（0..1）。 */
+  dotColorDiff?: number
   watermark?: string
   watermarkWidth?: number
   watermarkAlpha?: number
@@ -31,15 +32,18 @@ export class DrawboardEffect extends Effect {
   @property({ fallback: false }) declare checkerboard: boolean
   @property({ fallback: 'grid' }) declare checkerboardStyle: CheckerboardStyle
   @property({ fallback: false }) declare pixelGrid: boolean
-  @property() declare dotBaseColor?: number
-  @property() declare dotColor?: number
-  @property() declare dotZoomDiff?: number
+  @property({ fallback: '#f2f3f5' }) declare checkerboardColor: string
+  @property({ fallback: '#c8ccd4' }) declare checkerboardDotColor: string
+  @property({ fallback: 0.06 }) declare dotColorDiff: number
   @property() declare watermark?: string
   @property({ fallback: 100 }) declare watermarkWidth: number
   @property({ fallback: 0.05 }) declare watermarkAlpha: number
   @property({ fallback: 0.5236 }) declare watermarkRotation: number
 
   protected _watermark?: Texture2D
+  // 底纹颜色解析缓存：属性变更时重解析成 RGB（0..1），供 shader 直接使用。
+  protected _color = new Color('#f2f3f5')
+  protected _dotColor = new Color('#c8ccd4')
 
   static material = new Material({
     gl: {
@@ -71,12 +75,18 @@ void main() {
       case 'watermark':
         this._loadWatermark(value)
         break
+      case 'checkerboardColor':
+        this._color.value = value
+        this.requestRender()
+        break
+      case 'checkerboardDotColor':
+        this._dotColor.value = value
+        this.requestRender()
+        break
       case 'checkerboard':
       case 'checkerboardStyle':
       case 'pixelGrid':
-      case 'dotBaseColor':
-      case 'dotColor':
-      case 'dotZoomDiff':
+      case 'dotColorDiff':
         // these only feed the fragment shader; nothing else marks the effect
         // dirty, so request a re-render to reflect the change next frame
         this.requestRender()
@@ -95,16 +105,7 @@ void main() {
 
   protected _checkerboardStyleMap: Record<CheckerboardStyle, number> = {
     grid: 1,
-    gridDark: 2,
-    dot: 3,
-    dotDark: 4,
-  }
-
-  // dot grid colours per theme: light keeps the original near-white surface with
-  // darker dots; dark mirrors `gridDark`'s surface with lighter dots on top.
-  protected _dotColors: Record<'light' | 'dark', { base: number, zoomedOut: number, diff: number }> = {
-    light: { base: 0.9608, zoomedOut: 0.6667, diff: 0.1020 },
-    dark: { base: 0.1216, zoomedOut: 0.3137, diff: 0.1020 },
+    dot: 2,
   }
 
   override apply(renderer: WebGLRenderer, source: Viewport): void {
@@ -124,16 +125,9 @@ void main() {
         : [0, 0]
       const watermarkMaxWh = Math.max(watermarkSize[0], watermarkSize[1])
 
-      // pick the preset from the style, then allow per-property overrides so
-      // callers can theme freely without picking a new style enum
-      const preset = this.checkerboardStyle === 'dotDark'
-        ? this._dotColors.dark
-        : this._dotColors.light
-      const dot = {
-        base: this.dotBaseColor ?? preset.base,
-        zoomedOut: this.dotColor ?? preset.zoomedOut,
-        diff: this.dotZoomDiff ?? preset.diff,
-      }
+      // 底纹颜色（明暗由传入的颜色决定，主题解析在上层完成）→ RGB(0..1)。
+      const [cr, cg, cb] = this._color.toArray()
+      const [dr, dg, db] = this._dotColor.toArray()
 
       QuadUvGeometry.draw(renderer, DrawboardEffect.material, {
         uTexture: 0,
@@ -151,9 +145,9 @@ void main() {
         ],
         checkerboard: this.checkerboard ? 1 : 0,
         checkerboardStyle: this._checkerboardStyleMap[this.checkerboardStyle] ?? 0,
-        dotBackgroundBaseColor: dot.base,
-        dotBackgroundZoomedOutColor: dot.zoomedOut,
-        dotColorDiff: dot.diff,
+        checkerboardColor: [cr, cg, cb],
+        checkerboardDotColor: [dr, dg, db],
+        dotColorDiff: this.dotColorDiff,
         pixelGrid: this.pixelGrid ? 1 : 0,
         watermark: this._watermark ? 1 : 0,
         watermarkTexture: 1,

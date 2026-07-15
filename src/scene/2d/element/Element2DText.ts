@@ -160,6 +160,11 @@ export class Element2DText extends CoreObject implements NormalizedText {
     this._parent.requestDraw()
   }
 
+  /** fragment 颜色的语义色 token（`@token`）→ 当前主题实际色；非 token 原样返回。 */
+  protected _resolveThemeColor<T = any>(value: T): T | string {
+    return this._parent.tree?.resolveThemeColor(value) ?? value
+  }
+
   // 整段栅格化到 CanvasTexture（atlas 不适用时的回退路径：effects/outline/渐变/图片填充/超大字形）。
   protected _rasterTexture(): void {
     const width = Math.ceil(this.base.boundingBox.width)
@@ -371,7 +376,7 @@ export class Element2DText extends CoreObject implements NormalizedText {
               ) {
                 ctx.addPath(path)
                 ctx.style = { ...path.style }
-                ctx.fillStyle = texture?.texture ?? fill.color
+                ctx.fillStyle = texture?.texture ?? this._resolveThemeColor(fill.color)
                 ctx.fill({
                   ...getFillDrawOptions(
                     fill,
@@ -410,7 +415,7 @@ export class Element2DText extends CoreObject implements NormalizedText {
                 ctx.addPath(path)
                 ctx.style = { ...path.style }
                 ctx.lineWidth = outline.width || 1
-                ctx.strokeStyle = texture?.texture ?? outline.color
+                ctx.strokeStyle = texture?.texture ?? this._resolveThemeColor(outline.color)
                 ctx.lineCap = outline.lineCap
                 ctx.lineJoin = outline.lineJoin
                 ctx.stroke({
@@ -547,10 +552,11 @@ export class Element2DText extends CoreObject implements NormalizedText {
         continue
       }
       const cs = ch.computedStyle
-      const color = cs.color
-      if (typeof color !== 'string') {
+      if (typeof cs.color !== 'string') {
         return false
       }
+      // 语义色 token 在此惰性解析为当前主题实际色（key 含 color，主题变了自然换 atlas slot）。
+      const color = this._resolveThemeColor(cs.color) as string
       const italic = cs.fontStyle === 'italic' ? 1 : 0
       const key = `${ch.content}|${cs.fontFamily}|${cs.fontSize}|${cs.fontWeight ?? 400}|${italic}|${color}`
       const left = gb.left

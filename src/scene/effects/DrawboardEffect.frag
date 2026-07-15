@@ -9,8 +9,11 @@ uniform float gridScale;
 uniform vec2 gridSize;
 uniform int checkerboard;
 uniform int checkerboardStyle;
-uniform float dotBackgroundBaseColor;
-uniform float dotBackgroundZoomedOutColor;
+// 背景底纹颜色（明暗由主题解析后传入，引擎不再区分 dark 变体）：
+//   checkerboardColor    —— 底色（网格底格 / 点阵底）
+//   checkerboardDotColor —— 点色（点阵的圆点）
+uniform vec3 checkerboardColor;
+uniform vec3 checkerboardDotColor;
 uniform float dotColorDiff;
 uniform int pixelGrid;
 uniform int watermark;
@@ -25,11 +28,14 @@ const float VIEWPORT_SPACE_MIN_DOT_RADIUS = 0.5;
 const float CANVAS_SPACE_DOT_RADIUS = 1.;
 const float CANVAS_SPACE_DOT_GRID_SIZE_PX = 16.;
 
+// 远距淡出：缩放低于 DOT_FADE_END 起点阵开始渐隐，到 DOT_FADE_START 完全隐藏
+// （避免缩得很远时点糊成一片，Figma/FigJam/Miro 同法：点的可见度随 zoom 衰减）。
+const float DOT_FADE_START = 0.04;
+const float DOT_FADE_END = 0.10;
+
 const int CHECKERBOARD_STYLE_NONE = 0;
 const int CHECKERBOARD_STYLE_GRID = 1;
-const int CHECKERBOARD_STYLE_GRID_DARK = 2;
-const int CHECKERBOARD_STYLE_DOTS = 3;
-const int CHECKERBOARD_STYLE_DOTS_DARK = 4;
+const int CHECKERBOARD_STYLE_DOTS = 2;
 
 float _round(float val) {
   return floor(val + .5);
@@ -61,30 +67,31 @@ float scaledGridSize(float zoomScale) {
 }
 
 vec4 renderCheckerboard(vec2 coord, vec4 color) {
-  float value;
+  vec3 bg;
   if (checkerboardStyle == CHECKERBOARD_STYLE_GRID) {
+    // 棋盘：两格用底色与其轻微压暗，保持细腻网格感（明暗全由 checkerboardColor 决定）。
     vec2 fractValue = fract(coord * vec2(gridScale) * zoom) - 0.5;
-    value = fractValue.x * fractValue.y < 0.0 ? 1.0 : 0.95;
+    bg = fractValue.x * fractValue.y < 0.0 ? checkerboardColor : checkerboardColor * 0.96;
   }
-  else if (checkerboardStyle == CHECKERBOARD_STYLE_GRID_DARK) {
-    vec2 fractValue = fract(coord * vec2(gridScale) * zoom) - 0.5;
-    value = fractValue.x * fractValue.y < 0.0 ? 0.12 : 0.17;
-  }
-  else if (checkerboardStyle == CHECKERBOARD_STYLE_DOTS || checkerboardStyle == CHECKERBOARD_STYLE_DOTS_DARK) {
-    // light vs dark dots share this path; the base/dot colours are supplied as
-    // uniforms (set per style on the CPU side), so only the values differ.
+  else if (checkerboardStyle == CHECKERBOARD_STYLE_DOTS) {
+    // 点阵：底色 checkerboardColor + 圆点 checkerboardDotColor（放大时按 dotColorDiff 提亮）。
     float zoomScale = zoom.x;
     float gridPixelSize = scaledGridSize(zoomScale);
     float zoomInterpolationFactor = smoothstep(0.5, 1.0, zoomScale);
-    float dotColor = dotBackgroundZoomedOutColor + dotColorDiff * zoomInterpolationFactor;
+    vec3 dotColor = checkerboardDotColor + vec3(dotColorDiff * zoomInterpolationFactor);
     vec2 nearestGridPoint = _round(coord / gridPixelSize) * gridPixelSize;
     float canvasSpaceDist = length(coord - nearestGridPoint);
     float viewportSpaceDist = canvasSpaceDist * zoomScale;
     float viewportSpaceDotRadius = max(VIEWPORT_SPACE_MIN_DOT_RADIUS, CANVAS_SPACE_DOT_RADIUS * zoomScale);
     float dist = 1.0 - smoothstep(0., 1., (viewportSpaceDist - viewportSpaceDotRadius + .5));
-    value = mix(dotBackgroundBaseColor, dotColor, dist);
+    // 远距淡出：zoomScale 越低点越淡，低于 DOT_FADE_START 完全隐去（回落到纯底色）。
+    dist *= smoothstep(DOT_FADE_START, DOT_FADE_END, zoomScale);
+    bg = mix(checkerboardColor, dotColor, dist);
   }
-  return vec4(value * (1.0 - color.a) + color.rgb, 1);
+  else {
+    bg = checkerboardColor;
+  }
+  return vec4(bg * (1.0 - color.a) + color.rgb, 1);
 }
 
 vec4 renderPixelGrid(vec2 coord, vec4 color) {

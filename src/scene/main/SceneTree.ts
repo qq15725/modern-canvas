@@ -41,12 +41,19 @@ export interface SceneTree {
   emit: <K extends keyof SceneTreeEvents & string>(event: K, ...args: SceneTreeEvents[K]) => this
 }
 
+/** 语义色 token 调色板：token 名 → 各主题实际色（如 { surface: { light: '#fff', dark: '#1e1e1e' } }）。 */
+export type ThemeTokens = Record<string, Record<string, string>>
+
 export interface SceneTreeProperties extends MainLoopProperties {
   msaa: boolean
   fxaa: boolean
   pixelate: boolean
   roundPixels: boolean
   backgroundColor: Hex8Color
+  /** 当前主题名（默认 'light'）。元素颜色为 `@token` 时按此主题查 themeTokens 解析。 */
+  theme: string
+  /** token 调色板；由宿主注入，引擎自身不含具体颜色。 */
+  themeTokens: ThemeTokens
   // internal
   debug: boolean
   processPaused: boolean
@@ -65,6 +72,9 @@ export class SceneTree extends MainLoop {
   @property({ fallback: false }) declare pixelate: boolean
   @property({ fallback: false }) declare roundPixels: boolean
   @property() declare backgroundColor?: Hex8Color
+  /** 语义色主题；变更时重解析全树 token 色。见 resolveThemeColor。 */
+  @property({ fallback: 'light' }) declare theme: string
+  @property() declare themeTokens?: ThemeTokens
   @property({ internal: true, fallback: false }) declare debug: boolean
   @property({ internal: true, fallback: false }) declare processPaused: boolean
   @property({ internal: true, default: () => fonts }) declare fonts: Fonts | undefined
@@ -106,6 +116,26 @@ export class SceneTree extends MainLoop {
     return this.nodeMap.get(id) as T | undefined
   }
 
+  /**
+   * 语义色 token 解析：`@token` → 当前主题下的实际色。
+   * 非 token（普通颜色字符串/数值）原样返回；token 未在调色板命中时也原样返回（安全回退）。
+   */
+  resolveThemeColor<T = any>(value: T): T | string {
+    if (typeof value !== 'string' || value[0] !== '@') {
+      return value
+    }
+    const token = value.slice(1)
+    const resolved = this.themeTokens?.[token]?.[this.theme]
+    return resolved ?? value
+  }
+
+  /** 主题 / 调色板变更后，重解析全树元素的 token 色（bg/border 即时重设，文字重排重栅格）。 */
+  protected _applyThemeToTree(): void {
+    this.nodeMap.forEach((node) => {
+      (node as any).applyThemeColors?.()
+    })
+  }
+
   constructor(properties?: Partial<SceneTreeProperties>) {
     super()
     // A node entering/leaving changes no geometry, but it does change what an id
@@ -113,6 +143,8 @@ export class SceneTree extends MainLoop {
     // otherwise keep serving a path routed to a node that is no longer in the tree.
     this.on('nodeEnter', (node) => {
       this.nodeMap.set(node.id, node)
+      // 元素构造期 apply style 时 tree 尚未挂上，token 色解析不到主题；入树后补解析一次。
+      ;(node as any).applyThemeColors?.()
       bumpGeometryRevision()
     })
     this.on('nodeExit', (node) => {
@@ -169,6 +201,10 @@ export class SceneTree extends MainLoop {
       case 'fonts':
         this._bindFonts(value)
         this._scheduleTextRemeasure()
+        break
+      case 'theme':
+      case 'themeTokens':
+        this._applyThemeToTree()
         break
     }
   }
