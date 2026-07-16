@@ -27,6 +27,13 @@ export interface Batch2DEffect {
   uniformDecls?: string
   /** uniform 默认值；宿主可经 `batch2D.effectUniforms` 逐帧覆盖。 */
   uniformDefaults?: Record<string, any>
+  /**
+   * flow 描边的 vUv.x 归一化到「每条线 0..1」（除以整条线总弧长）而非默认的
+   * 路径像素弧长。归一化在批打包阶段按当前激活效果动态处理，顶点布局不变。
+   * - true（箭头 / 生长线）：效果在「每条线」空间里工作 —— 严格一个 / 走满整条。
+   * - false/缺省（流光 / 虚线）：像素弧长 —— 段长固定物理尺寸，与线长无关。
+   */
+  uvNormalized?: boolean
 }
 
 /** aTextureParams.y bit0：UV 越界裁剪（核心语义，效果位从 bit1 起）。 */
@@ -65,6 +72,7 @@ export const flowStreakEffect: Batch2DEffect = {
 uniform float uFlowPeriod;`,
   uniformDefaults: {
     uFlowColor: new Float32Array([0.231, 0.51, 0.965]),
+    // uFlowPeriod = 亮段间距（路径像素）：固定物理长度，长短线亮段大小一致。
     uFlowPeriod: 800,
   },
   fragment: `if (vParam > 0.5) {

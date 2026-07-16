@@ -1,9 +1,11 @@
 import type { Node, SceneTreeEvents, SceneTreeProperties } from './scene'
+import type { Batch2DEffect } from './core'
 import { property } from 'modern-idoc'
 import { assets } from './asset'
 import {
   createHTMLCanvas,
   DEVICE_PIXEL_RATIO,
+  flowStreakEffect,
   nextTick,
   planExportTiles,
   SUPPORTS_RESIZE_OBSERVER,
@@ -58,6 +60,17 @@ export class Engine extends SceneTree {
   set pixelRatio(val) {
     this.renderer.pixelRatio = val
     this.resize(this.width, this.height)
+  }
+
+  /**
+   * 切换描边/连线的「流动」预设：内置 flowStreak / flowArrow / flowGrow / flowDash，
+   * 或宿主自定义 Batch2DEffect。占用同一 flow 槽（按名替换 + 重编译），传 undefined 恢复默认。
+   * 颜色/周期仍走 flowColor / flowPeriod（effectUniforms）。
+   */
+  set flowEffect(effect: Batch2DEffect | undefined) {
+    this.renderer.batch2D.registerEffect(
+      effect ? { ...effect, name: 'flowStreak' } : flowStreakEffect,
+    )
   }
 
   protected _resizeObserver = SUPPORTS_RESIZE_OBSERVER

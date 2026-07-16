@@ -69,6 +69,8 @@ interface BatchSlot {
   indexData?: Uint32Array<ArrayBuffer>
   refs: any[]
   drawCalls: DrawCall[]
+  /** 上次重建时的效果修订号；效果注册变更（含 flow uv 归一化模式）后强制失效。 */
+  effectsRevision?: number
 }
 
 /** REF_STRIDE entries per batchable in {@link BatchSlot.refs}. */
@@ -185,6 +187,7 @@ uniform mat3 viewMatrix;
 out float vTextureId;
 out float vFlags;
 out float vParam;
+out float vFlowMeta;
 out vec2 vUv;
 out vec4 vModulate;
 
@@ -203,9 +206,12 @@ void main(void) {
   vTextureId = aTextureParams.x;
   // flags byte: bit 0 = clipOutsideUv (core), bits 1+ = effect flags
   vFlags = aTextureParams.y;
-  if (aTextureParams.z == 1.) {
+  // z 字节：bit 0 = roundPixels；bits 1-7 = flow 描边的「线宽/线长」量化值(0..127)，
+  // 供箭头等效果把尺寸锁成线宽相关（每条线常量、平滑，无需 fwidth 沿路径导数）。QMAX=0.6。
+  if (mod(aTextureParams.z, 2.0) == 1.) {
     gl_Position.xy = roundPixels(gl_Position.xy, size);
   }
+  vFlowMeta = floor(aTextureParams.z / 2.0) / 127.0 * 0.6;
   // effect-defined scalar (0 = off), see Batchable2D.effectParam
   vParam = aTextureParams.w;
   vUv = aUv;
@@ -215,6 +221,7 @@ void main(void) {
 in float vTextureId;
 in float vFlags;
 in float vParam;
+in float vFlowMeta;
 in vec2 vUv;
 in vec4 vModulate;
 
@@ -369,8 +376,15 @@ void main(void) {
     // Batchable identity is the invariant: CanvasItem recreates the objects on
     // any draw/layout/paint change, and world-space vertices don't depend on
     // camera (view/projection are uniforms), so pan/zoom stays on this path.
+    // flow 描边的 uv.x 是否归一化到「每条线 0..1」——取当前占据 flow 槽的效果声明。
+    // 由效果动态决定：箭头/生长线要归一化（一线一个 / 走满整条），流光/虚线用像素弧长（固定段长）。
+    const flowNormalize = this._effects.some(e => e.name === 'flowStreak' && e.uvNormalized)
+
     const refs = slot.refs
-    let same = !overflowed && slot.drawCalls.length > 0 && refs.length === batchables.length * REF_STRIDE
+    let same = !overflowed
+      && slot.drawCalls.length > 0
+      && slot.effectsRevision === this._effectsRevision
+      && refs.length === batchables.length * REF_STRIDE
     if (same) {
       for (let j = 0, i = 0, len = batchables.length; i < len; i++, j += REF_STRIDE) {
         const b = batchables[i] as any
@@ -390,6 +404,8 @@ void main(void) {
       this._issueDrawCalls(program, slot)
       return
     }
+
+    slot.effectsRevision = this._effectsRevision
 
     // snapshot what this rebuild is derived from (skip for the shared overflow slot)
     refs.length = 0
@@ -480,6 +496,29 @@ void main(void) {
           // effect scalar byte (encoding owned by the consuming effect; 0 = off)
           const paramByte = effectParam ?? 0
 
+          // flow 描边（effectParam!=0）的每条线预计算：总弧长(= uv.x 最大值) → 两用途：
+          //   1. 按需把 uv.x 归一化到「每条线 0..1」(flowNormalize：箭头一线一个 / 生长线走满整条)；
+          //   2. 把「线宽/线长」量化进 z 字节 bits 1-7，供箭头把尺寸锁成线宽相关（QMAX=0.6，见顶点着色器）。
+          // 每条线一次线性扫描，仅 flow 描边生效；顶点布局不变。
+          let invTotal = 0
+          let flowZByte = roundPixelsInt
+          if (effectParam) {
+            let maxU = 0
+            for (let k = 0, ul = uvs.length; k < ul; k += 2) {
+              if (uvs[k] > maxU) {
+                maxU = uvs[k]
+              }
+            }
+            if (maxU > 0) {
+              if (flowNormalize) {
+                invTotal = 1 / maxU
+              }
+              const lineWidth = (batchables[i] as any).lineStyle?.width ?? 0
+              const qQuant = Math.max(0, Math.min(127, Math.round((lineWidth / maxU) / 0.6 * 127)))
+              flowZByte = roundPixelsInt | (qQuant << 1)
+            }
+          }
+
           let uvX, uvY, aU8Index
           for (let len = vertices.length, i = 0; i < len; i += 2) {
             uvX = uvs[i]
@@ -488,6 +527,9 @@ void main(void) {
               uvX = Math.ceil(uvX * width) / width
               uvY = Math.ceil(uvY * height) / height
             }
+            if (invTotal) {
+              uvX *= invTotal
+            }
             float32View[aIndex++] = vertices[i]
             float32View[aIndex++] = vertices[i + 1]
             float32View[aIndex++] = uvX
@@ -495,7 +537,7 @@ void main(void) {
             aU8Index = aIndex * 4
             uint8View[aU8Index] = textureLocation
             uint8View[aU8Index + 1] = flagsByte
-            uint8View[aU8Index + 2] = roundPixelsInt
+            uint8View[aU8Index + 2] = flowZByte
             uint8View[aU8Index + 3] = paramByte
             aIndex++
             aU8Index = aIndex * 4

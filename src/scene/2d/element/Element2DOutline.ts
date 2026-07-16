@@ -64,6 +64,11 @@ export class Element2DOutline extends Element2DFill implements NormalizedOutline
     )
   }
 
+  /** 惰性解析 `@token` 语义色（描边色可为 `@border-color` 等，随主题变化，绘制时解析）。 */
+  protected _resolveThemeColor<T = any>(value: T): T | string {
+    return this._parent.tree?.resolveThemeColor(value) ?? value
+  }
+
   draw(): void {
     const { width, height } = this._parent.size
     const ctx = this._parent.context
@@ -72,7 +77,7 @@ export class Element2DOutline extends Element2DFill implements NormalizedOutline
     }
     else {
       ctx.strokeStyle = this.texture
-        ?? this.color
+        ?? this._resolveThemeColor(this.color)
         ?? '#000000FF'
     }
     ctx.lineWidth = (this.width || 1) * (this.widthBoost || 1)
@@ -98,7 +103,7 @@ export class Element2DOutline extends Element2DFill implements NormalizedOutline
       return
 
     const strokeWidth = this.width || 1
-    const fillColor = this.color ?? '#000000FF'
+    const fillColor = this._resolveThemeColor(this.color) ?? '#000000FF'
 
     if (this.headEnd) {
       const last = segs[segs.length - 1]
@@ -133,7 +138,7 @@ export class Element2DOutline extends Element2DFill implements NormalizedOutline
 
     const factor = LINE_END_SIZE_FACTOR[String(end.width ?? end.height ?? 'md')] ?? 6
     const ctx = this._parent.context
-    const endColor = (end as any).color ?? color
+    const endColor = this._resolveThemeColor((end as any).color) ?? color
 
     // 'bar'：垂直于线端切线的短竖线端点标记（如工作流连接点）。以 tip 为中心、
     // 沿切线取厚度、沿法线取长度，画一个矩形。
