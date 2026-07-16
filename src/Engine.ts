@@ -1,5 +1,5 @@
-import type { Node, SceneTreeEvents, SceneTreeProperties } from './scene'
 import type { Batch2DEffect } from './core'
+import type { Node, SceneTreeEvents, SceneTreeProperties } from './scene'
 import { property } from 'modern-idoc'
 import { assets } from './asset'
 import {
@@ -62,12 +62,19 @@ export class Engine extends SceneTree {
     this.resize(this.width, this.height)
   }
 
+  protected _flowEffect?: Batch2DEffect
+
+  get flowEffect(): Batch2DEffect | undefined {
+    return this._flowEffect
+  }
+
   /**
-   * 切换描边/连线的「流动」预设：内置 flowStreak / flowArrow / flowGrow / flowDash，
-   * 或宿主自定义 Batch2DEffect。占用同一 flow 槽（按名替换 + 重编译），传 undefined 恢复默认。
+   * 切换描边/连线的「流动」预设：引擎只内置 flowStreak，其余样式（箭头/生长线/虚线等）
+   * 由宿主传自定义 Batch2DEffect。占用同一 flow 槽（按名替换 + 重编译），传 undefined 恢复默认。
    * 颜色/周期仍走 flowColor / flowPeriod（effectUniforms）。
    */
   set flowEffect(effect: Batch2DEffect | undefined) {
+    this._flowEffect = effect
     this.renderer.batch2D.registerEffect(
       effect ? { ...effect, name: 'flowStreak' } : flowStreakEffect,
     )
