@@ -1,3 +1,14 @@
+## [0.27.7](https://github.com/qq15725/modern-canvas/compare/v0.27.6...v0.27.7) (2026-07-16)
+
+
+### Bug Fixes
+
+* add Engine.flowEffect getter (accessor-pairs) + import order ([6893cec](https://github.com/qq15725/modern-canvas/commit/6893cec7e2bbb900f0c177c61483d64daa7dd2bb))
+
+
+### Features
+
+* externally configurable connection flow effect + theme-token outline color ([b836175](https://github.com/qq15725/modern-canvas/commit/b836175f4afbf7e5120e1db68b10365a7d2cca86))
 ## [0.27.6](https://github.com/qq15725/modern-canvas/compare/v0.27.5...v0.27.6) (2026-07-15)
 
 
