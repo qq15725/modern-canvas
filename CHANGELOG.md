@@ -1,3 +1,9 @@
+## [0.27.8](https://github.com/qq15725/modern-canvas/compare/v0.27.7...v0.27.8) (2026-07-17)
+
+
+### Bug Fixes
+
+* **text:** resolve theme color tokens before texture rasterization ([5f7fc0e](https://github.com/qq15725/modern-canvas/commit/5f7fc0ef1e8e75b21a8e0f19ee55e5db2c999c86)), closes [#000000](https://github.com/qq15725/modern-canvas/issues/000000)
 ## [0.27.7](https://github.com/qq15725/modern-canvas/compare/v0.27.6...v0.27.7) (2026-07-16)
 
 
