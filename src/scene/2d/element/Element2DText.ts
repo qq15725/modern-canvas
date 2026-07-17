@@ -165,8 +165,40 @@ export class Element2DText extends CoreObject implements NormalizedText {
     return this._parent.tree?.resolveThemeColor(value) ?? value
   }
 
+  // 纹理栅格路径由 modern-text 直接消费 base 的派生样式（computedStyle / 段落 / 片段），
+  // 不像 atlas/path 路径在绘制时才惰性 _resolveThemeColor —— 语义色 token（@surface / @on-surface 等）
+  // 会原样落到 modern-text 的 Canvas2D fillStyle，被浏览器判为非法色而忽略、fillStyle 回退默认黑，
+  // 使 background 插件 fillRect(整段) 把元素整块画黑（字色同理会变黑）。故栅格前先把 base 派生结构里
+  // 的颜色 token 解析为当前主题实际色，与 atlas/path 路径口径一致。
+  protected _resolveBaseThemeColors(): void {
+    if (!this._parent.tree) {
+      return
+    }
+    const resolveOn = (style: any, keys: readonly string[]): void => {
+      if (!style) {
+        return
+      }
+      for (const key of keys) {
+        const value = style[key]
+        if (typeof value === 'string' && value.charCodeAt(0) === 64 /* '@' */) {
+          style[key] = this._resolveThemeColor(value)
+        }
+      }
+    }
+    resolveOn(this.base.computedStyle, ['backgroundColor', 'color'])
+    for (const paragraph of this.base.paragraphs) {
+      resolveOn((paragraph as any).style, ['backgroundColor'])
+      resolveOn(paragraph.computedStyle, ['backgroundColor', 'color'])
+      for (const fragment of paragraph.fragments) {
+        resolveOn((fragment as any).style, ['backgroundColor'])
+        resolveOn(fragment.computedStyle, ['backgroundColor', 'color'])
+      }
+    }
+  }
+
   // 整段栅格化到 CanvasTexture（atlas 不适用时的回退路径：effects/outline/渐变/图片填充/超大字形）。
   protected _rasterTexture(): void {
+    this._resolveBaseThemeColors()
     const width = Math.ceil(this.base.boundingBox.width)
     const height = Math.ceil(this.base.boundingBox.height)
     const pixelRatio = DEFAULT_TEXT_PIXEL_RATIO
