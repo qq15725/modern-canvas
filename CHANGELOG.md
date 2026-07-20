@@ -1,3 +1,9 @@
+## [0.27.9](https://github.com/qq15725/modern-canvas/compare/v0.27.8...v0.27.9) (2026-07-20)
+
+
+### Bug Fixes
+
+* **text:** resolve theme tokens in fill/outline on the raster path ([4f1366f](https://github.com/qq15725/modern-canvas/commit/4f1366f3f2a266a4ac0de4149293adb350795e04))
 ## [0.27.8](https://github.com/qq15725/modern-canvas/compare/v0.27.7...v0.27.8) (2026-07-17)
 
 
