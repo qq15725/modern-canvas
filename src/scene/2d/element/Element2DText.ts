@@ -165,10 +165,19 @@ export class Element2DText extends CoreObject implements NormalizedText {
     return this._parent.tree?.resolveThemeColor(value) ?? value
   }
 
-  // 纹理栅格路径由 modern-text 直接消费 base 的派生样式（computedStyle / 段落 / 片段），
+  /**
+   * 派生结构上已就地解析过的 token 原值：key = 派生对象，value = { 属性名: '@token' }。
+   *
+   * 就地写入实际色会丢掉 token 本身，而布局可复用时（内容没变）这些派生对象**不会重建**，
+   * 于是主题切换后再跑本方法只看到实际色、认不出是 token，颜色就永远停在首次解析的那套主题
+   * （暗色下栅格过的文字，切回亮色仍是白字）。故记下原值，每次栅格都按当前主题重新解析。
+   */
+  protected _themeColorOrigins = new WeakMap<object, Record<string, string>>()
+
+  // 纹理栅格路径由 modern-text 直接消费 base 的派生样式（computedStyle / computedFill / computedOutline），
   // 不像 atlas/path 路径在绘制时才惰性 _resolveThemeColor —— 语义色 token（@surface / @on-surface 等）
-  // 会原样落到 modern-text 的 Canvas2D fillStyle，被浏览器判为非法色而忽略、fillStyle 回退默认黑，
-  // 使 background 插件 fillRect(整段) 把元素整块画黑（字色同理会变黑）。故栅格前先把 base 派生结构里
+  // 会原样落到 modern-text 的 Canvas2D fillStyle，被浏览器判为非法色而忽略，fillStyle 沿用上一次的值
+  // （常见是刚填过的白底/黑底），使元素整块被填成纯色、文字“消失”。故栅格前先把 base 派生结构里
   // 的颜色 token 解析为当前主题实际色，与 atlas/path 路径口径一致。
   protected _resolveBaseThemeColors(): void {
     if (!this._parent.tree) {
@@ -179,19 +188,39 @@ export class Element2DText extends CoreObject implements NormalizedText {
         return
       }
       for (const key of keys) {
-        const value = style[key]
-        if (typeof value === 'string' && value.charCodeAt(0) === 64 /* '@' */) {
-          style[key] = this._resolveThemeColor(value)
+        const origins = this._themeColorOrigins.get(style)
+        // 解析过的以记下的原 token 为准（此刻 style[key] 已是实际色，认不出是 token）
+        const source = origins?.[key] ?? style[key]
+        if (typeof source !== 'string' || source.charCodeAt(0) !== 64 /* '@' */) {
+          continue
         }
+        if (!origins?.[key]) {
+          const next = origins ?? {}
+          next[key] = source
+          this._themeColorOrigins.set(style, next)
+        }
+        style[key] = this._resolveThemeColor(source)
       }
     }
+    // fill / outline 的 color 必须与 style.color 一同解析：Canvas2D 取 pathStyle.fill 时
+    // **computedFill.color 优先于 style.color**（见 modern-text Canvas2DRenderer），漏掉它
+    // 等于整段文字都用未解析的 token 去填色。computedFill / computedOutline 是 modern-text 每次
+    // update 重建的拷贝（clearUndef / 浅拷贝），就地改不会污染文档里的 text.fill。
+    const resolveFillLike = (v: any): void => resolveOn(v, ['color'])
+
     resolveOn(this.base.computedStyle, ['backgroundColor', 'color'])
+    resolveFillLike(this.base.computedFill)
+    resolveFillLike(this.base.computedOutline)
     for (const paragraph of this.base.paragraphs) {
       resolveOn((paragraph as any).style, ['backgroundColor'])
       resolveOn(paragraph.computedStyle, ['backgroundColor', 'color'])
+      resolveFillLike(paragraph.computedFill)
+      resolveFillLike(paragraph.computedOutline)
       for (const fragment of paragraph.fragments) {
         resolveOn((fragment as any).style, ['backgroundColor'])
         resolveOn(fragment.computedStyle, ['backgroundColor', 'color'])
+        resolveFillLike(fragment.computedFill)
+        resolveFillLike(fragment.computedOutline)
       }
     }
   }
