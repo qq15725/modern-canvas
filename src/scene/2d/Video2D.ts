@@ -8,11 +8,25 @@ import { TextureRect2D } from './TextureRect2D'
 
 export interface Video2DProperties extends TextureRect2DProperties {
   src: string
+  loop: boolean
 }
 
 @customNode('Video2D')
 export class Video2D extends TextureRect2D<VideoTexture> {
   @property({ fallback: '' }) declare src: string
+
+  /**
+   * Loop playback, on by default.
+   *
+   * `_updateVideoCurrentTime` has always forwarded this to the underlying `<video>`, but the
+   * property itself was never declared — it read as `undefined`, so native looping stayed off and
+   * a finished video only restarted via the fallbacks below (re-`play()` once `paused` flips, plus
+   * drift correction). Those are fragile: when the drift stays under the threshold, or the element
+   * is momentarily culled/invisible (which pauses and returns early), playback sticks on the last
+   * frame while the timeline keeps looping. Declaring it — defaulting to on — lets the browser
+   * loop natively and keeps the fallbacks as a safety net rather than the mechanism.
+   */
+  @property({ fallback: true }) declare loop: boolean
 
   get videoDuration(): number { return (this.texture?.duration ?? 0) * 1000 }
 

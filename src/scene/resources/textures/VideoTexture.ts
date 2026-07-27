@@ -253,7 +253,15 @@ export class VideoTexture extends Texture2D<HTMLVideoElement> {
   }
 
   protected _setupAutoUpdate(): void {
-    if (this.autoUpdate && this.isPlaying) {
+    // Gate on "is the element running", not on `isPlaying` — the latter also requires `isReady`.
+    // When playback starts the browser routinely drops readyState back to HAVE_METADATA to
+    // re-buffer, so the 'play'/'playing' handler would see isReady === false and skip arming the
+    // frame callback; nothing calls this again afterwards (the 'canplay' listeners are removed by
+    // the first `_onCanPlay`), leaving the <video> playing while not a single frame is uploaded —
+    // the canvas then sits on the first frame forever. Arming early is safe:
+    // requestVideoFrameCallback simply doesn't fire until a frame is actually presented.
+    const running = !this.source.paused && !this.source.ended
+    if (this.autoUpdate && running) {
       if (!this.fps && this.source.requestVideoFrameCallback) {
         if (this._connected) {
           Ticker.off(this.requestUpload)
@@ -324,6 +332,14 @@ export class VideoTexture extends Texture2D<HTMLVideoElement> {
       }
 
       source.addEventListener('play', this._onPlayStart)
+      // 'play' alone is not enough to arm the frame callback: it fires as soon as playback is
+      // *requested*, and the browser often drops readyState back to HAVE_METADATA at that moment
+      // to re-buffer. `_setupAutoUpdate` then sees `isPlaying === false` (it requires isReady) and
+      // skips — and nothing calls it again, because the 'canplay' listeners were already removed
+      // by the first `_onCanPlay`. Result: the <video> plays on while no frame is ever uploaded
+      // and the canvas stays on the first frame. 'playing' is exactly the "buffered enough and
+      // actually running now" signal, so hook it too.
+      source.addEventListener('playing', this._onPlayStart)
       source.addEventListener('pause', this._onPlayStop)
       source.addEventListener('seeked', this._onSeeked)
 
@@ -358,6 +374,7 @@ export class VideoTexture extends Texture2D<HTMLVideoElement> {
     const source = this.source
     if (source) {
       source.removeEventListener('play', this._onPlayStart)
+      source.removeEventListener('playing', this._onPlayStart)
       source.removeEventListener('pause', this._onPlayStop)
       source.removeEventListener('seeked', this._onSeeked)
       source.removeEventListener('canplay', this._onCanPlay)
