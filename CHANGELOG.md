@@ -1,3 +1,9 @@
+## [0.27.11](https://github.com/qq15725/modern-canvas/compare/v0.27.10...v0.27.11) (2026-07-27)
+
+
+### Bug Fixes
+
+* **video:** keep playback frames flowing to the canvas ([f272849](https://github.com/qq15725/modern-canvas/commit/f27284936a81a23c781810b4e803165b653587b8))
 ## [0.27.10](https://github.com/qq15725/modern-canvas/compare/v0.27.9...v0.27.10) (2026-07-23)
 ## [0.27.9](https://github.com/qq15725/modern-canvas/compare/v0.27.8...v0.27.9) (2026-07-20)
 
