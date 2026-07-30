@@ -197,6 +197,11 @@ export class Element2DFill extends CoreObject implements NormalizedFill {
     )
   }
 
+  /** Resolve `@token` theme colors lazily on draw, same as outline / text do. */
+  protected _resolveThemeColor<T = any>(value: T): T | string {
+    return this._parent.tree?.resolveThemeColor(value) ?? value
+  }
+
   draw(): void {
     const { width, height } = this._parent.size
     const ctx = this._parent.context
@@ -219,8 +224,10 @@ export class Element2DFill extends CoreObject implements NormalizedFill {
             : { x: 0, y: 0, width, height },
         ),
       }
+      // An unresolved `@token` is not a valid fillStyle — it silently falls back to
+      // black and paints the whole element, so resolve it here like outline does.
       ctx.fillStyle = texture
-        ?? this.color
+        ?? this._resolveThemeColor(this.color)
         ?? '#000000FF'
     }
     ctx.fill(options)
