@@ -1,3 +1,9 @@
+## [0.27.13](https://github.com/qq15725/modern-canvas/compare/v0.27.12...v0.27.13) (2026-07-30)
+
+
+### Bug Fixes
+
+* **math:** stop Aabb2D from recursing forever on non-finite values ([b8fa008](https://github.com/qq15725/modern-canvas/commit/b8fa008d15d13ca2c2cd9692930322e5a9f8e1d3))
 ## [0.27.12](https://github.com/qq15725/modern-canvas/compare/v0.27.11...v0.27.12) (2026-07-30)
 
 
