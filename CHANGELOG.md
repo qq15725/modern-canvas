@@ -1,3 +1,9 @@
+## [0.27.12](https://github.com/qq15725/modern-canvas/compare/v0.27.11...v0.27.12) (2026-07-30)
+
+
+### Bug Fixes
+
+* **fill:** resolve `@token` theme colors on draw ([e1971fb](https://github.com/qq15725/modern-canvas/commit/e1971fb8e1b7d5edd15780ee7f2cd86ea11f6f68))
 ## [0.27.11](https://github.com/qq15725/modern-canvas/compare/v0.27.10...v0.27.11) (2026-07-27)
 
 
