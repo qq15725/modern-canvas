@@ -1,6 +1,11 @@
 import type { Vector2Like } from 'modern-path2d'
 import { Vector2 } from 'modern-path2d'
 
+/** NaN / Infinity collapse to 0 — see the note on Aabb2D._updateSize. */
+function finite(value: number): number {
+  return Number.isFinite(value) ? value : 0
+}
+
 export interface RectangleLike {
   x: number
   y: number
@@ -85,18 +90,26 @@ export class Aabb2D implements RectangleLike {
     this.max = new Vector2(min.x + size.x, min.y + size.y, this._updateSize)
   }
 
+  /**
+   * `min`/`size` and `max` mirror each other through Vector2's onUpdate hooks, and the
+   * recursion normally stops because `Vector2.set` skips the callback when the value is
+   * unchanged. That check is `!==`, so a single NaN anywhere in the box never compares
+   * equal to itself and `_updateMax` ⇄ `_updateSize` bounce until the stack blows —
+   * which takes the render loop (and the WebGL context) down with it.
+   * Collapsing non-finite results to 0 keeps the mirror consistent and terminates.
+   */
   protected _updateSize(): this {
     this.size.set(
-      this.max.x - this.min.x,
-      this.max.y - this.min.y,
+      finite(this.max.x - this.min.x),
+      finite(this.max.y - this.min.y),
     )
     return this
   }
 
   protected _updateMax(): this {
     this.max.set(
-      this.min.x + this.size.x,
-      this.min.y + this.size.y,
+      finite(this.min.x + this.size.x),
+      finite(this.min.y + this.size.y),
     )
     return this
   }
