@@ -354,6 +354,19 @@ void main(void) {
   flush(): void {
     super.flush()
     if (this._vertexCount === 0) {
+      // 没顶点可画也必须把累加器清空 —— 早期这里直接 return，把状态漏给了下一帧。
+      //
+      // `vertices.length === 0` 的**退化 batchable**（元素 style 没有 width/height，
+      // size 退化成 0x0）会让 _vertexCount 停在 0，但它已经把自己 push 进 _batchables、
+      // 把 indices 计进 _indexCount。直接 return 等于把这些残留留给下一次 flush。
+      //
+      // 而 render() 复用的是 getRenderEngine() 的**共享单例**，所以受害的是下一次
+      // 渲染：索引数超出本次实际写入的顶点，glDrawElements 报
+      // GL_INVALID_OPERATION: Insufficient buffer size，产出一张尺寸正确、内容全空的图；
+      // 再下一次 flush 才把残留清掉，于是表现为「隔一次自愈」，极难定位。
+      // 现场：给工作流连线渲缩略图（其 JSON 只有 left/top，没有宽高）之后导出画布。
+      this._batchables = []
+      this._indexCount = 0
       return
     }
 

@@ -76,8 +76,19 @@ async function task(options: RenderOptions): Promise<RenderResult> {
 
   // 尺寸兜底到至少 1：宽/高为 0（如选区/画布 aabb 退化）会让 toImageData 的
   // new ImageData(pixels, 0, 0) 抛 IndexSizeError，进而在导出队列里表现为永久挂起。
-  const width = Math.max(1, Math.floor(_width))
-  const height = Math.max(1, Math.floor(_height))
+  //
+  // 必须先过 isFinite 再钳制：`Math.max(1, Math.floor(undefined))` 是 **NaN**，不是 1 ——
+  // 只写 Math.max 挡得住 0 却挡不住「调用方压根没给尺寸」。传 NaN 进来后果有两层，
+  // 且第二层会波及**下一次**渲染：
+  //   1. new ImageData(pixels, NaN, NaN) 抛 IndexSizeError（调用方看到的直接报错）；
+  //   2. 更隐蔽 —— engine 是 getRenderEngine() 的共享单例，resizeForExport(NaN, NaN)
+  //      会把它的缓冲区留在坏尺寸上，紧接着的那次导出报 GL_INVALID_OPERATION
+  //      (glDrawElements: Insufficient buffer size)，产出一张尺寸正确但内容空白的图。
+  // 触发场景：给「JSON 里没有 style.width/height 的元素」截图，如工作流连线
+  // （位置/尺寸直写 transform，序列化后 style 只剩 left/top）。
+  const finite = (v: number): number => (Number.isFinite(v) ? Math.floor(v) : 0)
+  const width = Math.max(1, finite(_width))
+  const height = Math.max(1, finite(_height))
 
   const engine = getRenderEngine()
 
