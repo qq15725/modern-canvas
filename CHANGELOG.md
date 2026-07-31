@@ -1,3 +1,9 @@
+## [0.27.14](https://github.com/qq15725/modern-canvas/compare/v0.27.13...v0.27.14) (2026-07-31)
+
+
+### Bug Fixes
+
+* **context:** zero the effect channels for mesh batchables ([ac7fd0b](https://github.com/qq15725/modern-canvas/commit/ac7fd0b06be990230985378ce3bd22eb7aa151f4))
 ## [0.27.13](https://github.com/qq15725/modern-canvas/compare/v0.27.12...v0.27.13) (2026-07-30)
 
 
