@@ -1,3 +1,9 @@
+## [0.27.15](https://github.com/qq15725/modern-canvas/compare/v0.27.14...v0.27.15) (2026-07-31)
+
+
+### Bug Fixes
+
+* **gl:** clear batch accumulators when a flush has no vertices ([d5a5aa7](https://github.com/qq15725/modern-canvas/commit/d5a5aa709fe2174a82b99f06c318311afb3ac49f))
 ## [0.27.14](https://github.com/qq15725/modern-canvas/compare/v0.27.13...v0.27.14) (2026-07-31)
 
 
