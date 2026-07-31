@@ -229,11 +229,18 @@ export class CanvasContext extends Path2D {
     for (let len = this._draws.length, i = 0; i < len; i++) {
       const current = this._draws[i]
 
-      // mesh：显式顶点/UV/索引，不做路径三角化
+      // mesh：显式顶点/UV/索引，不做路径三角化。
+      //
+      // effectFlags / effectParam 必须显式归零，不能只靠 `...rest` 透传：mesh 不参与 flow 描边，
+      // 也不走描边羽化，但这两个通道是**逐 batchable** 编码进顶点的，只要值从上游残留下来，
+      // 着色器就会把这些顶点当流动描边处理（拿 invTotal 缩放 UV、把 z 字节当线宽量化）。
+      // 实际后果：工作流模式下删掉一条带流动高亮的连线后，同批次里文字的字形 quad 采样坐标全乱、
+      // 挤成一团；且因为批次静态复用会跳过顶点重写，坏值会一直留在 GPU 缓冲里，重绘也救不回来。
+      // 下面 stroke/fill 分支同样是每次显式写死这两个字段，这里保持对等。
       if (current.type === 'mesh') {
         const { vertices, indices, ...rest } = current
         this._triCache[i] = undefined as any
-        batchables.push({ ...rest, vertices, indices })
+        batchables.push({ ...rest, vertices, indices, effectFlags: 0, effectParam: 0 })
         continue
       }
 
