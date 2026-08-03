@@ -62,10 +62,10 @@
   "dependencies": {
     "colord": "^2.9.3",
     "earcut": "^3.2.0",
-    "modern-font": "^0.6.2",
+    "modern-font": "^0.6.3",
     "modern-idoc": "^0.12.4",
     "modern-path2d": "^1.8.8",
-    "modern-text": "^2.1.3"
+    "modern-text": "^2.2.3"
   },
   "peerDependencies": {
     "echarts": "^5 || ^6",

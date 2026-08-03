@@ -164,6 +164,12 @@ export class Element2DShape extends CoreObject implements NormalizedShape {
         this._path2DSet.paths[i] = path2D
       })
     }
+    // An explicit `viewBox` wins over the bounding box: preset shapes solve their
+    // paths against the element's own width/height, so that IS the coordinate
+    // system. Falling back to the bounding box instead rescales the shape to fill
+    // the element box — and once an adjust value moves that box (pie, arc, callout
+    // tails…), the shape gets re-stretched on every frame and visibly jitters.
+    viewBox ??= this.viewBox
     if (!viewBox) {
       const bbox = this._path2DSet.getBoundingBox()
       viewBox = bbox
