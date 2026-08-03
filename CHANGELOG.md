@@ -1,3 +1,9 @@
+## [0.27.16](https://github.com/qq15725/modern-canvas/compare/v0.27.15...v0.27.16) (2026-08-03)
+
+
+### Bug Fixes
+
+* **shape:** honour an explicit viewBox instead of falling back to the bounding box ([7cfa30c](https://github.com/qq15725/modern-canvas/commit/7cfa30cd77550408e1d3e93a3f09edf11ed71820))
 ## [0.27.15](https://github.com/qq15725/modern-canvas/compare/v0.27.14...v0.27.15) (2026-07-31)
 
 
