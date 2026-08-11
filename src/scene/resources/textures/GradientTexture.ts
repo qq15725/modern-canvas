@@ -4,9 +4,27 @@ import { isGradient } from 'modern-idoc'
 import { createHTMLCanvas } from '../../../core'
 import { Texture2D } from './Texture2D'
 
+// 渐变本身是连续函数，不需要按目标逻辑尺寸逐像素烘焙。限制中间纹理既不改变 UV 映射，
+// 又避免超长文字/图形仅为一个渐变就创建数百 MiB 的 Canvas 与 Uint8Array。
+const MAX_GRADIENT_TEXTURE_PIXELS = 4 * 1024 * 1024
+const MAX_GRADIENT_TEXTURE_EDGE = 4096
+
 export class GradientTexture extends Texture2D {
   static test(value: string): boolean {
     return isGradient(value)
+  }
+
+  protected static _fitTextureSize(width: number, height: number): { width: number, height: number } {
+    const scale = Math.min(
+      1,
+      MAX_GRADIENT_TEXTURE_EDGE / width,
+      MAX_GRADIENT_TEXTURE_EDGE / height,
+      Math.sqrt(MAX_GRADIENT_TEXTURE_PIXELS / (width * height)),
+    )
+    return {
+      width: Math.max(1, Math.floor(width * scale)),
+      height: Math.max(1, Math.floor(height * scale)),
+    }
   }
 
   static linearGradient(linearGradient: LinearGradient, width: number, height: number): Texture2DProperties {
@@ -16,6 +34,7 @@ export class GradientTexture extends Texture2D {
     const angleOk = Number.isFinite(linearGradient.angle)
     width = wOk ? width : 1
     height = hOk ? height : 1
+    ;({ width, height } = this._fitTextureSize(width, height))
     const canvas = createHTMLCanvas(width, height)
     if (!canvas) {
       throw new Error('GradientTexture requires a canvas; call setCanvasFactory() in non-browser environments.')

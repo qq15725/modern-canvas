@@ -63,19 +63,22 @@ export class Texture2D<T extends TextureSource = TextureSource> extends Resource
 
   get pixelWidth(): number {
     if (this.width) {
-      return this.width * this.pixelRatio
+      // WebGL 纹理尺寸只能是整数；CanvasTexture 的 backing store 同样按 ceil 建立。
+      // 两边必须使用同一口径，否则小数 pixelRatio 会让 source 比 GPU 目标多 1px，
+      // texSubImage2D 随即越界，表现为文字偶发空白或 GL_INVALID_VALUE。
+      return Math.ceil(this.width * this.pixelRatio)
     }
     else {
-      return this.width ? (this.sourceWidth ?? 1) : 1
+      return this.sourceWidth || 1
     }
   }
 
   get pixelHeight(): number {
     if (this.height) {
-      return this.height * this.pixelRatio
+      return Math.ceil(this.height * this.pixelRatio)
     }
     else {
-      return this.height ? (this.sourceHeight ?? 1) : 1
+      return this.sourceHeight || 1
     }
   }
 

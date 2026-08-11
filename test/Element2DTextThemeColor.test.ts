@@ -3,8 +3,8 @@ import { Element2D } from '../src'
 
 // 语义色 token 在「栅格路径」下的解析（_resolveBaseThemeColors）。
 //
-// 背景：元素带 text.fill 时会被踢出 glyph atlas、走整段栅格化，由 modern-text 直接消费 base 的
-// 派生结构。而 Canvas2D 取 pathStyle.fill 时 computedFill.color **优先于** style.color，
+// 背景：复杂填充或强制 texture 模式会走整段栅格化，由 modern-text 直接消费 base 的派生结构。
+// 而 Canvas2D 取 pathStyle.fill 时 computedFill.color **优先于** style.color，
 // 早前只解析了 computedStyle.color、漏了 computedFill/computedOutline，`@token` 被原样交给
 // fillStyle → 非法值被忽略、沿用上一次颜色（常见是刚填过的白底）→ 整块白、文字“消失”。
 
@@ -36,6 +36,7 @@ function makeElement(theme: 'light' | 'dark'): { el: Element2D, tree: any } {
     content: [{ fragments: [{ content: '语义色文字', color: '@on-surface' }] }],
     fill: { enabled: true, color: '@on-surface' },
   } as any
+  el.text.drawMode = 'texture'
   // 先排版出派生结构（computedStyle / computedFill），栅格前才有东西可解析
   el.text.base.update()
   return { el, tree }

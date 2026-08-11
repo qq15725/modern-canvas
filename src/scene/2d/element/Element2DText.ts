@@ -24,6 +24,10 @@ export type TextDrawMode = 'auto' | 'texture' | 'path'
 // 文字栅格像素密度（2 倍超采样，保证常规文字清晰；缩小靠 mipmap）。
 const DEFAULT_TEXT_PIXEL_RATIO = 2
 
+// 整段栅格路径的硬像素预算：16M RGBA 像素约占 64 MiB Canvas backing store。
+// 超大文字优先转 path；必须保留栅格效果时降低 pixelRatio，保证尺寸再大也不会无上限申请内存。
+const MAX_TEXT_RASTER_PIXELS = 16 * 1024 * 1024
+
 // 纹理尺寸安全余量：夹到 GPU 上限时留几像素，避免 ceil 后正好触达上限导致纹理异常/黑块。
 const TEXTURE_SIZE_MARGIN = 64
 
@@ -80,6 +84,10 @@ export class Element2DText extends CoreObject implements NormalizedText {
     texture: Texture2D | undefined
     box: RectangleLike
   }>()
+
+  protected _ownedTextureMap = new Map<string, Texture2D>()
+
+  protected _textureMapVersion = 0
 
   constructor(
     protected _parent: Element2D,
@@ -150,13 +158,13 @@ export class Element2DText extends CoreObject implements NormalizedText {
     // glyph atlas 路径：纯色实心字形走逐字 quad 批渲染，跳过整段栅格化（编辑/缩放/resize
     // 不再每次重栅整篇）。slot 在 draw() 时按需栅格化、跨元素复用。
     this._atlasEligible = this._computeAtlasEligible()
-    if (this._atlasEligible) {
-      this._releaseTiles()
-      this._textureStale = true
+    this._textureStale = true
+    if (this._atlasEligible || !this.useTextureDraw()) {
+      // atlas/path 不再消费整段栅格，立即释放之前的 Canvas/GPU 资源。
+      this._releaseRasterTextures()
       this._parent.requestDraw()
       return
     }
-    this._rasterTexture()
     this._parent.requestDraw()
   }
 
@@ -230,7 +238,7 @@ export class Element2DText extends CoreObject implements NormalizedText {
     this._resolveBaseThemeColors()
     const width = Math.ceil(this.base.boundingBox.width)
     const height = Math.ceil(this.base.boundingBox.height)
-    const pixelRatio = DEFAULT_TEXT_PIXEL_RATIO
+    const pixelRatio = this._getRasterPixelRatio(width, height)
     const maxTile = Math.floor((getMaxTextureSize() - TEXTURE_SIZE_MARGIN) / pixelRatio)
     if (width <= maxTile && height <= maxTile) {
       this._releaseTiles()
@@ -245,6 +253,41 @@ export class Element2DText extends CoreObject implements NormalizedText {
       this._renderTiles(width, height, pixelRatio, maxTile)
     }
     this._textureStale = false
+  }
+
+  /** 栅格总像素始终不超过预算；普通尺寸仍保持原来的 2 倍超采样。 */
+  protected _getRasterPixelRatio(width: number, height: number): number {
+    const area = width * height
+    if (!Number.isFinite(area) || area <= 0) {
+      return DEFAULT_TEXT_PIXEL_RATIO
+    }
+    const budgetRatio = Math.sqrt(MAX_TEXT_RASTER_PIXELS / area)
+    // 极端长宽下至少让长边有 1 个设备像素，避免 0 尺寸和除零。
+    const minimumRatio = 1 / Math.max(width, height)
+    let pixelRatio = Math.max(minimumRatio, Math.min(DEFAULT_TEXT_PIXEL_RATIO, budgetRatio))
+
+    // Canvas backing store 会对两条边分别 ceil；直接使用面积开方值会因两个取整多出少量像素。
+    // 只有触及预算时才二分收紧，确保真实 source.width * source.height 也严格不越界。
+    const backingPixels = (ratio: number): number => Math.ceil(width * ratio) * Math.ceil(height * ratio)
+    if (backingPixels(pixelRatio) > MAX_TEXT_RASTER_PIXELS) {
+      let low = minimumRatio
+      let high = pixelRatio
+      for (let i = 0; i < 32; i++) {
+        const mid = (low + high) / 2
+        if (backingPixels(mid) <= MAX_TEXT_RASTER_PIXELS) {
+          low = mid
+        }
+        else {
+          high = mid
+        }
+      }
+      pixelRatio = low
+    }
+    return pixelRatio
+  }
+
+  protected _exceedsRasterPixelBudget(width = this.base.boundingBox.width, height = this.base.boundingBox.height): boolean {
+    return width * height * DEFAULT_TEXT_PIXEL_RATIO ** 2 > MAX_TEXT_RASTER_PIXELS
   }
 
   // 把文字按 maxTile 切成 cols×rows 块逐块栅格；复用已有 tile 纹理（多退少补），
@@ -290,11 +333,31 @@ export class Element2DText extends CoreObject implements NormalizedText {
     }
   }
 
-  protected _updateTextureMap(): void {
+  protected _releaseRasterTextures(): void {
+    this._releaseTiles()
+    const texture = this._texture
+    if (!texture.destroyed && (texture.width !== 1 || texture.height !== 1 || texture.pixelRatio !== 1)) {
+      // 先缩逻辑尺寸再恢复 pixelRatio，避免超长纹理在中间态短暂变成 1 倍全尺寸并被 WebGL 上传。
+      texture.width = 1
+      texture.height = 1
+      texture.pixelRatio = 1
+      texture.requestUpdate('source')
+    }
+  }
+
+  protected _releaseTextureMap(): void {
+    this._textureMapVersion++
+    this._ownedTextureMap.forEach(texture => texture.destroy())
+    this._ownedTextureMap.clear()
     this._textureMap.clear()
+  }
+
+  protected _updateTextureMap(): void {
+    this._releaseTextureMap()
     if (this.useTextureDraw()) {
       return
     }
+    const version = this._textureMapVersion
     const pGlyphBoxs: BoundingBox[] = []
     this.base.paragraphs.forEach((p, pIndex) => {
       const fGlyphBoxs: BoundingBox[] = []
@@ -303,31 +366,41 @@ export class Element2DText extends CoreObject implements NormalizedText {
           const fGlyphBox = BoundingBox.from(
             ...f.characters.map(c => c.compatibleGlyphBox),
           )
-          this._updateTexture(`${pIndex}.${fIndex}.fill`, f.fill, fGlyphBox)
-          this._updateTexture(`${pIndex}.${fIndex}.outline`, f.outline, fGlyphBox)
+          this._updateTexture(`${pIndex}.${fIndex}.fill`, f.fill, fGlyphBox, version)
+          this._updateTexture(`${pIndex}.${fIndex}.outline`, f.outline, fGlyphBox, version)
           fGlyphBoxs.push(fGlyphBox)
         }
       })
       if (fGlyphBoxs.length) {
         const pGlyphBox = BoundingBox.from(...fGlyphBoxs)
-        this._updateTexture(`${pIndex}.fill`, p.fill, pGlyphBox)
-        this._updateTexture(`${pIndex}.outline`, p.outline, pGlyphBox)
+        this._updateTexture(`${pIndex}.fill`, p.fill, pGlyphBox, version)
+        this._updateTexture(`${pIndex}.outline`, p.outline, pGlyphBox, version)
         pGlyphBoxs.push(pGlyphBox)
       }
     })
     if (pGlyphBoxs.length) {
       const glyphBox = BoundingBox.from(...pGlyphBoxs)
-      this._updateTexture('fill', this.fill, glyphBox)
-      this._updateTexture('outline', this.outline, glyphBox)
+      this._updateTexture('fill', this.fill, glyphBox, version)
+      this._updateTexture('outline', this.outline, glyphBox, version)
     }
   }
 
-  protected async _updateTexture(key: string, fill: NormalizedFill | undefined, box: BoundingBox): Promise<void> {
+  protected async _updateTexture(key: string, fill: NormalizedFill | undefined, box: BoundingBox, version: number): Promise<void> {
     if (fill && Object.keys(fill).length > 0) {
+      const texture = await this._loadTexture(normalizeFill(fill), box)
+      if (version !== this._textureMapVersion || this.destroyed) {
+        if (texture instanceof GradientTexture) {
+          texture.destroy()
+        }
+        return
+      }
       this._textureMap.set(key, {
-        texture: await this._loadTexture(normalizeFill(fill), box),
+        texture,
         box,
       })
+      if (texture instanceof GradientTexture) {
+        this._ownedTextureMap.set(key, texture)
+      }
       this._parent.requestDraw()
     }
   }
@@ -394,17 +467,20 @@ export class Element2DText extends CoreObject implements NormalizedText {
   useTextureDraw(): boolean {
     let drawMode = this.drawMode
     if (drawMode === 'auto') {
-      if (
-        Boolean(this.effects?.length)
-        || Boolean(this.outline?.width)
+      const requiresTexture = Boolean(this.effects?.length)
         || this.content.some((p) => {
           return p.fragments.some(f => Boolean(
             f.highlightImage
             || f.highlight?.image,
           ))
         })
-      ) {
+      if (requiresTexture) {
         drawMode = 'texture'
+      }
+      else if (this._exceedsRasterPixelBudget()) {
+        // 渐变/图片填充、描边、变形和装饰都可由 path 路径精确表达。超大文字改走矢量，
+        // 避免为了保留清晰度而创建覆盖整篇内容的巨型纹理。
+        drawMode = 'path'
       }
       else {
         drawMode = this._autoDrawMode ?? 'texture'
@@ -554,8 +630,33 @@ export class Element2DText extends CoreObject implements NormalizedText {
     })
   }
 
-  // atlas 适用条件：drawMode 非强制 path/texture、无 effects/outline/高亮图片、无渐变/图片填充
-  // （仅纯色实心字形），且最大字号不超过单页容量（超大字走 tiling 回退）。
+  /**
+   * 取得 atlas 能直接绘制的字形颜色。
+   *
+   * modern-text 的实际填色优先级是 computedFill.color > computedStyle.color。纯色 fill 与
+   * style.color 一样都能由 glyph atlas 表达，不能仅因为上层配置了 text/paragraph/fragment.fill
+   * 就把整段文字踢回大纹理；否则超长文本会创建数张接近 GPU 上限的 CanvasTexture。
+   * 渐变、图片、预设以及未来新增的 fill 字段仍保守回退栅格路径，避免丢失视觉语义。
+   */
+  protected _getAtlasCharacterColor(character: Character): string | undefined {
+    const fill = character.computedFill
+    if (fill?.enabled) {
+      for (const [key, value] of Object.entries(fill)) {
+        if (key !== 'enabled' && key !== 'color' && !isNone(value)) {
+          return undefined
+        }
+      }
+      if (!isNone(fill.color)) {
+        return typeof fill.color === 'string' ? fill.color : undefined
+      }
+    }
+    return typeof character.computedStyle.color === 'string'
+      ? character.computedStyle.color
+      : undefined
+  }
+
+  // atlas 适用条件：drawMode 非强制 path/texture、无 effects/outline/高亮图片、无复杂填充
+  // （纯色 fill 可直接作为字形颜色），且最大字号不超过单页容量（超大字走 tiling 回退）。
   protected _computeAtlasEligible(): boolean {
     if (this.drawMode === 'texture' || this.drawMode === 'path') {
       return false
@@ -568,11 +669,8 @@ export class Element2DText extends CoreObject implements NormalizedText {
     if (this.deformation && !isNone(this.deformation) && (this.deformation as any).type) {
       return false
     }
-    if (this.fill && !isNone(this.fill)) {
-      return false // 元素级渐变/图片填充。
-    }
     const hasComplexFragment = this.content.some(p => p.fragments.some(f => Boolean(
-      f.highlightImage || f.highlight?.image || (f.fill && !isNone(f.fill as any)),
+      f.highlightImage || f.highlight?.image,
     )))
     if (hasComplexFragment) {
       return false
@@ -589,7 +687,7 @@ export class Element2DText extends CoreObject implements NormalizedText {
     const chars = this.base.characters
     for (let i = 0; i < chars.length; i++) {
       const cs = chars[i].computedStyle
-      if (typeof cs.color !== 'string') {
+      if (!this._getAtlasCharacterColor(chars[i])) {
         return false
       }
       if (cs.fontSize > maxGlyphLogical) {
@@ -613,11 +711,12 @@ export class Element2DText extends CoreObject implements NormalizedText {
         continue
       }
       const cs = ch.computedStyle
-      if (typeof cs.color !== 'string') {
+      const sourceColor = this._getAtlasCharacterColor(ch)
+      if (!sourceColor) {
         return false
       }
       // 语义色 token 在此惰性解析为当前主题实际色（key 含 color，主题变了自然换 atlas slot）。
-      const color = this._resolveThemeColor(cs.color) as string
+      const color = this._resolveThemeColor(sourceColor) as string
       const italic = cs.fontStyle === 'italic' ? 1 : 0
       const key = `${ch.content}|${cs.fontFamily}|${cs.fontSize}|${cs.fontWeight ?? 400}|${italic}|${color}`
       const left = gb.left
@@ -674,5 +773,12 @@ export class Element2DText extends CoreObject implements NormalizedText {
 
   process(_delta: number): void {
     //
+  }
+
+  protected override _destroy(): void {
+    super._destroy()
+    this._releaseTextureMap()
+    this._releaseTiles()
+    this._texture.destroy()
   }
 }
