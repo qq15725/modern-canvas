@@ -1,3 +1,9 @@
+## [0.27.17](https://github.com/qq15725/modern-canvas/compare/v0.27.16...v0.27.17) (2026-08-11)
+
+
+### Bug Fixes
+
+* **text:** prevent oversized raster texture memory growth ([c15d225](https://github.com/qq15725/modern-canvas/commit/c15d225fb8a2fc56ef753712aaa2bd8da9b561f3))
 ## [0.27.16](https://github.com/qq15725/modern-canvas/compare/v0.27.15...v0.27.16) (2026-08-03)
 
 
