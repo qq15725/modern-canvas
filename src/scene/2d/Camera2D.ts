@@ -151,7 +151,8 @@ export class Camera2D extends Node2D {
   zoomOut(): void {
     const step = this._zoomStep(this._zoom.x)
     let val = this._zoom.x - step
-    val = Math.ceil(val / step) * step
+    // 0.4 - 0.1 可能得到 0.30000000000000004，直接 ceil 会重新吸附到 0.4，导致无法继续缩小。
+    val = Math.ceil(val / step - 1e-10) * step
     this.setZoomAtOrigin(val, val, 'screenCenter')
   }
 
