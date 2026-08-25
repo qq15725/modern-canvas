@@ -1,3 +1,9 @@
+## [0.27.18](https://github.com/qq15725/modern-canvas/compare/v0.27.17...v0.27.18) (2026-08-25)
+
+
+### Bug Fixes
+
+* **camera:** 修复缩放卡在小数步进边界 ([dac533b](https://github.com/qq15725/modern-canvas/commit/dac533b5f532f6d6dfb53a2a385c29e0e2c6238d))
 ## [0.27.17](https://github.com/qq15725/modern-canvas/compare/v0.27.16...v0.27.17) (2026-08-11)
 
 
