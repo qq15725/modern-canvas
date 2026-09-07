@@ -1,3 +1,9 @@
+## [0.27.19](https://github.com/qq15725/modern-canvas/compare/v0.27.18...v0.27.19) (2026-09-07)
+
+
+### Bug Fixes
+
+* 修复字体加载后的字形纹理缓存 ([96f1abc](https://github.com/qq15725/modern-canvas/commit/96f1abcb83e176a0247ba38aed8f6d72ece07055))
 ## [0.27.18](https://github.com/qq15725/modern-canvas/compare/v0.27.17...v0.27.18) (2026-08-25)
 
 
