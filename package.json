@@ -54,7 +54,7 @@
     "dev": "vite playground",
     "lint": "eslint src playground test",
     "version": "conventional-changelog -p angular -i CHANGELOG.md -s && git add CHANGELOG.md",
-    "release": "pnpm typecheck && pnpm lint && pnpm vitest run && bumpp package.json --commit \"release: v%s\" --push --all --tag",
+    "release": "pnpm typecheck && pnpm lint && pnpm vitest run && bumpp package.json --commit \"chore: 发布 v%s\" --push --all --tag",
     "start": "esno src/index.ts",
     "test": "vitest",
     "typecheck": "tsc --noEmit"
@@ -65,7 +65,7 @@
     "modern-font": "^0.6.3",
     "modern-idoc": "^0.12.4",
     "modern-path2d": "^1.8.8",
-    "modern-text": "^2.2.3"
+    "modern-text": "^2.2.5"
   },
   "peerDependencies": {
     "echarts": "^5 || ^6",

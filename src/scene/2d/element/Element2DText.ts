@@ -718,7 +718,9 @@ export class Element2DText extends CoreObject implements NormalizedText {
       // 语义色 token 在此惰性解析为当前主题实际色（key 含 color，主题变了自然换 atlas slot）。
       const color = this._resolveThemeColor(sourceColor) as string
       const italic = cs.fontStyle === 'italic' ? 1 : 0
-      const key = `${ch.content}|${cs.fontFamily}|${cs.fontSize}|${cs.fontWeight ?? 400}|${italic}|${color}`
+      // 声明的字体名在异步加载前后不变，实际字形却从 fallback 切换成目标字体。
+      // 使用测量该字形时的字体身份，避免复用加载前、缺字回退或其它字体库的旧纹理。
+      const key = `${ch.glyphFontId}|${ch.content}|${cs.fontFamily}|${cs.fontSize}|${cs.fontWeight ?? 400}|${italic}|${color}`
       const left = gb.left
       const top = gb.top
       const slot = atlas.acquire(key, gb.width, gb.height, (c2d) => {
