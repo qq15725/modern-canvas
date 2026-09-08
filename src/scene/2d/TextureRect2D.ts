@@ -56,6 +56,7 @@ export class TextureRect2D<T extends Texture2D = Texture2D> extends Element2D {
       const { a, c, tx, b, d, ty } = this._uvTransform()
       let _x, _y
       this.context.fill({
+        clampTexture: true,
         transformUv: (uvs, i) => {
           _x = uvs[i]
           _y = uvs[i + 1]

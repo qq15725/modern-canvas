@@ -68,6 +68,7 @@ export function getFillDrawOptions(
   let _x, _y
   return {
     clipOutsideUv,
+    clampTexture: !!fill.cropRect || !fill.tile,
     transformUv: (uvs, i) => {
       _x = uvs[i]
       _y = uvs[i + 1]

@@ -24,6 +24,8 @@ export interface Batchable2D {
   blendMode?: GlBlendMode
   roundPixels?: boolean
   clipOutsideUv?: boolean
+  /** 本次绘制钳制图片边缘；不修改共享纹理，平铺绘制仍使用纹理原有采样方式。 */
+  clampTexture?: boolean
   /**
    * Effect flag bits (bit 1+ of the aTextureParams.y byte; bit 0 is reserved
    * for clipOutsideUv). Semantics are defined by the registered
@@ -42,6 +44,7 @@ type DrawCall = Required<GlDrawOptions> & {
   id: number
   textures: TextureLike[]
   textureLocationMap: Map<TextureLike, number>
+  textureClampMap: Map<TextureLike, boolean>
   blendMode: GlBlendMode
 }
 
@@ -74,7 +77,7 @@ interface BatchSlot {
 }
 
 /** REF_STRIDE entries per batchable in {@link BatchSlot.refs}. */
-const REF_STRIDE = 5
+const REF_STRIDE = 6
 
 /** Slots beyond this share the last one and never reuse (defensive cap). */
 const MAX_SLOTS = 64
@@ -323,7 +326,7 @@ void main(void) {
         const texture = textures[i]
         const location = textureLocationMap.get(texture)
         if (location !== undefined) {
-          this._renderer.texture.bind(texture, location)
+          this._renderer.texture.bind(texture, location, drawCall.textureClampMap.get(texture))
         }
       }
 
@@ -407,6 +410,7 @@ void main(void) {
           || refs[j + 2] !== b.uvs
           || refs[j + 3] !== b.size
           || refs[j + 4] !== b.roundPixels
+          || refs[j + 5] !== b.clampTexture
         ) {
           same = false
           break
@@ -425,7 +429,7 @@ void main(void) {
     if (!overflowed) {
       for (let len = batchables.length, i = 0; i < len; i++) {
         const b = batchables[i] as any
-        refs.push(b.__source ?? b, b.texture, b.uvs, b.size, b.roundPixels)
+        refs.push(b.__source ?? b, b.texture, b.uvs, b.size, b.roundPixels, b.clampTexture)
       }
     }
 
@@ -451,6 +455,7 @@ void main(void) {
         drawCall = { id: ++drawCallUid } as DrawCall,
         textures: TextureLike[] = [],
         textureLocationMap = new Map<TextureLike, number>(),
+        textureClampMap = new Map<TextureLike, boolean>(),
         textureCount = 0,
         start = 0,
         end = 0;
@@ -458,7 +463,13 @@ void main(void) {
       end++
     ) {
       const texture = batchables[end].texture
-      const isLast = end === len - 1
+      const clampTexture = !!batchables[end].clampTexture
+      if (texture)
+        textureClampMap.set(texture, clampTexture)
+      // 只有同一纹理的采样方式冲突才拆批；不同图片仍可与文字、形状合批。
+      const next = batchables[end + 1]
+      const isLast = !next || (!!next.texture && textureClampMap.has(next.texture)
+        && textureClampMap.get(next.texture) !== !!next.clampTexture)
       if (!texture || textureLocationMap.has(texture)) {
         if (!isLast) {
           continue
@@ -471,6 +482,7 @@ void main(void) {
 
       if (isLast || textureCount >= textureMaxUnits) {
         drawCall.textures = textures
+        drawCall.textureClampMap = textureClampMap
         drawCall.textureLocationMap = textureLocationMap
         textureCount = 0
         drawCall.start = iIndex
@@ -574,6 +586,7 @@ void main(void) {
         drawCall = { id: ++drawCallUid } as DrawCall
         textures = []
         textureLocationMap = new Map()
+        textureClampMap = new Map()
       }
     }
 

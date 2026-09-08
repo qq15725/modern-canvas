@@ -5,6 +5,7 @@ export class GlTexture {
   width = -1
   height = -1
   mipmap = false
+  clampOverride = false
   type = GlType.UNSIGNED_BYTE
   internalFormat = GlFormat.RGBA
   format = GlFormat.RGBA

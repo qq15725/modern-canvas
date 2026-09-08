@@ -10,7 +10,7 @@ import { GlTexture } from './GlTexture'
 import { mapFormatToGlFormat } from './mapFormatToGlFormat'
 import { mapFormatToGlInternalFormat } from './mapFormatToGlInternalFormat'
 import { mapFormatToGlType } from './mapFormatToGlType'
-import { updateTextureStyle } from './updateTextureStyle'
+import { updateTextureStyle, wrapModeMap } from './updateTextureStyle'
 import uploaders from './uploaders'
 
 export class GlTextureSystem extends GlSystem {
@@ -118,7 +118,7 @@ export class GlTextureSystem extends GlSystem {
     return glTexture
   }
 
-  bind(texture?: TextureLike | null, location = this._location): void {
+  bind(texture?: TextureLike | null, location = this._location, clampOverride = false): void {
     const gl = this._gl
     const _texture = texture ?? null
     // if (texture) {
@@ -133,6 +133,16 @@ export class GlTextureSystem extends GlSystem {
       }
       else {
         gl.bindTexture(gl.TEXTURE_2D, null)
+      }
+    }
+    if (_texture) {
+      const glTexture = this.getGlTexture(_texture)
+      if (glTexture.clampOverride !== clampOverride) {
+        this._activateLocation(location)
+        const forceClamp = clampOverride || (!this._renderer.supports.nonPowOf2wrapping && !_texture.isPowerOfTwo)
+        gl.texParameteri(glTexture.target, gl.TEXTURE_WRAP_S, wrapModeMap[forceClamp ? 'clamp-to-edge' : (_texture.addressModeU ?? 'repeat')])
+        gl.texParameteri(glTexture.target, gl.TEXTURE_WRAP_T, wrapModeMap[forceClamp ? 'clamp-to-edge' : (_texture.addressModeV ?? 'repeat')])
+        glTexture.clampOverride = clampOverride
       }
     }
   }
@@ -176,6 +186,8 @@ export class GlTextureSystem extends GlSystem {
   }
 
   updateStyle(texture: TextureLike, firstCreation = false): void {
+    // 属性更新可能发生在另一张纹理绑定期间，先绑定目标并恢复其原生采样状态。
+    this.bind(texture)
     const gl = this._gl
     updateTextureStyle(
       texture,
