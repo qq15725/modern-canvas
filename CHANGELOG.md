@@ -1,3 +1,9 @@
+## [0.27.20](https://github.com/qq15725/modern-canvas/compare/v0.27.19...v0.27.20) (2026-09-08)
+
+
+### Bug Fixes
+
+* 修复图片边缘串色并隔离平铺采样 ([f79d560](https://github.com/qq15725/modern-canvas/commit/f79d560512531fc2df67c610313d1c776204b306))
 ## [0.27.19](https://github.com/qq15725/modern-canvas/compare/v0.27.18...v0.27.19) (2026-09-07)
 
 
